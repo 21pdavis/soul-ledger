@@ -4,6 +4,10 @@ A "Spotify Wrapped"-style stat tracker for Valve's **Deadlock**. Paste a Steam p
 
 **Status:** milestone M1 (data layer) is done. M2 (the 2D story) is next.
 
+## Releases
+
+See [`CHANGELOG.md`](CHANGELOG.md) and [GitHub Releases](https://github.com/21pdavis/soul-ledger/releases). Each milestone is a minor version (M1 = v0.1.0).
+
 ## Knowledge base
 
 Everything we know and have decided lives in [`wiki/`](wiki/index.md). It is an [Open Knowledge Format](https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md) (OKF v0.2) bundle:
