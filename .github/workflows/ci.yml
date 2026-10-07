@@ -29,6 +29,9 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Wiki check (OKF)
+        run: pnpm check:wiki
+
       # Integration tests use in-process PGlite, so no database service is needed.
       - name: Unit and integration tests
         run: pnpm test

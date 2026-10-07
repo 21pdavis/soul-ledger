@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: "0021: Two kill slides; MVP is the most extreme percentile stat"
-description: "How you kill" and "Precision" are separate slides; the MVP signature stat is the player's most extreme percentile, compared against same-hero players where possible.
+description: '"How you kill" and "Precision" are separate slides; the MVP signature stat is the player''s most extreme percentile, compared against same-hero players where possible.'
 tags: [story]
 status: stable
 decision: accepted

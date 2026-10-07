@@ -1,10 +1,11 @@
 ---
 type: Open Question
 title: "Monetization and open source"
-description: How the project is funded (Patreon, open source) given Valve's fan content policy and how peer sites operate.
+description: Research on how peer sites fund themselves; resolved by ADR 0016, kept as reference.
 tags: [legal, business]
 status: draft
 question_status: resolved
+resolved_by: ../decisions/0016-open-source-patreon.md
 recommendation: "Open source plus Patreon/Ko-fi for hosting and API costs; no ads, no paywalled stats."
 raised_on: 2026-10-06
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T12:00:00Z }
