@@ -19,11 +19,13 @@ jobs:
       # Pushes to main/staging and any PR touching other files run everything.
       - name: Classify changes
         id: changes
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          files=$(git diff --name-only "origin/$BASE_REF...HEAD")
           echo "Changed files:"; echo "$files"
           if echo "$files" | grep -qvE '(\.md$|^wiki/|^\.claude/)'; then
             echo "code=true" >> "$GITHUB_OUTPUT"
