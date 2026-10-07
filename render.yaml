@@ -15,3 +15,24 @@ services:
         sync: false # Neon main branch connection string, set in the Render Dashboard
       - key: STEAM_API_KEY
         sync: false # optional; set only if vanity lookups start failing (wiki/research/steam-vanity-resolution.md)
+
+  # Staging (ADR 0042, 0043): deploys the `staging` branch against the Neon `staging` branch, behind
+  # a secret access link. Agents may merge to `staging`; only the owner merges to `main`.
+  - type: web
+    name: soul-ledger-staging
+    runtime: node
+    plan: free
+    region: oregon
+    branch: staging
+    buildCommand: npx --yes pnpm@12.9.1 install --frozen-lockfile && npx --yes pnpm@12.9.1 build
+    startCommand: node_modules/.bin/next start
+    healthCheckPath: /api/health
+    envVars:
+      - key: STAGING_GATE
+        value: "on"
+      - key: STAGING_ACCESS_KEY
+        sync: false # 32+ random chars; open the site once with ?key=<it>, or send it as x-staging-token
+      - key: DATABASE_URL
+        sync: false # Neon staging branch connection string
+      - key: STEAM_API_KEY
+        sync: false # optional, as in production

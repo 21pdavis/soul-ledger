@@ -28,6 +28,7 @@ Don't batch wiki updates to the end. When something is learned or decided, write
 | A new undecided question comes up | `wiki/open-questions/short-slug.md` with `question_status: open` and a `recommendation`. |
 | A fact about an external API, data or library | A concept in `wiki/research/`, with `sources` in frontmatter and footnotes keyed to `sources[].id` for specific claims. |
 | An idea, improvement or future task | `wiki/recommendations/backlog.md`, or a new concept in `wiki/recommendations/` if it is large. |
+| A shortcut taken, or a known gap or security weakness | A new `TD-n` row in `wiki/recommendations/tech-debt.md` plus a GitHub issue labelled `tech-debt` (and `security` if relevant). Before the repo is public, issues are private; after that, describe security gaps generally and fix them before disclosing details. |
 | A decision gets reversed | Write a new ADR. Set the old one to `status: deprecated` and add `superseded_by:`. Never delete it. |
 
 After every change to the wiki:
@@ -58,6 +59,21 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
 - Links: use **relative** markdown links (`../decisions/0001-x.md`). OKF permits relative links. We avoid the spec's recommended bundle-absolute `/x.md` form because `wiki/` is a subdirectory, so absolute links would break on GitHub and in editors.
 - Prefer structure (headings, tables, lists) over prose.
 - File names: lowercase kebab-case. ADRs are numbered `NNNN-slug.md`.
+
+## Environments and branches (ADR 0042, 0043)
+
+| Environment | Branch | URL | Database |
+|---|---|---|---|
+| Production | `main` | https://soul-ledger.onrender.com | Neon `main` |
+| Staging | `staging` | https://soul-ledger-staging.onrender.com (secret access link, ADR 0043) | Neon `staging` |
+| Local | any | http://localhost:3000 | Neon `dev` (`DATABASE_URL` in `.env.local`) |
+
+Rules for agents:
+
+- Cut feature branches from `staging` and open PRs **into `staging`**. You may merge them once CI is green.
+- Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
+- Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
+- **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
 
 ## Planned stack (accepted, see wiki/decisions/0005)
 

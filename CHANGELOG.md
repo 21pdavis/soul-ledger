@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Added
+
+- A private **staging** site for reviewing changes before they go live. It is unlocked with a private access link and deploys from the `staging` branch with its own database. Production is unchanged and still needs no login.
+
 ## [0.1.0] - 2026-10-07
 
 **Milestone M1: the data layer.** Live at https://soul-ledger.onrender.com. The page is a placeholder; the story UI arrives in M2.

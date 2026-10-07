@@ -9,12 +9,14 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
 
 # Next
 
+Tech debt and security hardening have their own [tech-debt register](tech-debt.md), linked to GitHub issues.
+
 | Priority | Item | Links |
 |---|---|---|
+| P0 | Before the repo goes public at M2, fix every *pre-public* item in the [tech-debt register](tech-debt.md) | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P0 | Start M2: the 11-slide story in 2D, fed by `/api/lookup` | [ADR 0028](../decisions/0028-milestones.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md) |
-| P1 | Bump GitHub Actions to Node 24 versions (checkout, setup-node, pnpm action), which CI flags as deprecated | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |
 
@@ -29,7 +31,6 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
 
 # Later / deferred features
 
-- **Rate limiting is per process.** That's fine for one Render instance. Several instances would need a shared limiter (Postgres or Key Value).
 - **Hall of Fame (M6)** ranks the fun stats from our own cache, because the API has no distribution for them ([percentile metrics](../research/percentile-metrics.md)).
 
 - Steam OpenID login ([ADR 0002](../decisions/0002-steam-id-no-login.md)).
