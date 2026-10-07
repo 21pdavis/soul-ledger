@@ -27,15 +27,27 @@ export async function resolveSteamInput(
       `https://steamcommunity.com/id/${encodeURIComponent(parsed.vanity)}/?xml=1`,
       { signal: AbortSignal.timeout(10_000) },
     );
-    if (!res.ok) return { ok: false, reason: "unavailable" };
     body = await res.text();
-  } catch {
+    if (!res.ok) {
+      warn(parsed.vanity, `HTTP ${res.status}`, body);
+      return { ok: false, reason: "unavailable" };
+    }
+  } catch (err) {
+    warn(parsed.vanity, err instanceof Error ? err.message : String(err));
     return { ok: false, reason: "unavailable" };
   }
 
   const match = STEAM_ID_64_TAG.exec(body);
   if (match) return { ok: true, accountId: steamId64ToAccountId(match[1]) };
-  return body.includes("<error>")
-    ? { ok: false, reason: "not_found" }
-    : { ok: false, reason: "unavailable" };
+  if (body.includes("<error>")) return { ok: false, reason: "not_found" };
+  warn(parsed.vanity, "no steamID64 in response", body);
+  return { ok: false, reason: "unavailable" };
+}
+
+/** Steam can block or challenge server IPs; log enough to tell which. */
+function warn(vanity: string, problem: string, body?: string): void {
+  console.warn(
+    `steam vanity resolve failed for ${JSON.stringify(vanity)}: ${problem}` +
+      (body === undefined ? "" : ` body=${JSON.stringify(body.slice(0, 300))}`),
+  );
 }
