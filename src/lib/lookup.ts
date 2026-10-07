@@ -38,6 +38,8 @@ export interface LookupDeps {
   api: DeadlockApi;
   /** Used for resolving Steam vanity URLs. */
   fetch?: typeof fetch;
+  /** Steam Web API key for resolving vanity URLs from a server (see resolve.ts). */
+  steamApiKey?: string;
   now?: () => Date;
   pollMs?: number;
 }
@@ -53,7 +55,10 @@ export async function runLookup(
 ): Promise<void> {
   const { db, api, now = () => new Date() } = deps;
 
-  const resolved = await resolveSteamInput(request.input, { fetch: deps.fetch });
+  const resolved = await resolveSteamInput(request.input, {
+    fetch: deps.fetch,
+    steamApiKey: deps.steamApiKey,
+  });
   if (!resolved.ok) return emit({ type: "error", reason: resolved.reason });
   const { accountId } = resolved;
   emit({ type: "resolved", accountId });

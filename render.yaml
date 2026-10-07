@@ -13,3 +13,5 @@ services:
     envVars:
       - key: DATABASE_URL
         sync: false # Neon main branch connection string, set in the Render Dashboard
+      - key: STEAM_API_KEY
+        sync: false # optional; set only if vanity lookups start failing (wiki/research/steam-vanity-resolution.md)

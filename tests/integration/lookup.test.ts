@@ -62,6 +62,21 @@ describe("runLookup", () => {
     expect(s.story.main?.percentiles.length).toBeGreaterThan(0);
   });
 
+  it("resolves vanity URLs through the Steam Web API when a key is configured", async () => {
+    const { api } = fakeApi();
+    const steamApi = fakeFetch({
+      "api.steampowered.com/ISteamUser/ResolveVanityURL/v1/": () =>
+        text(fixtureText("steam/resolve-vanity-found.json")),
+    });
+    const events = await lookup("https://steamcommunity.com/id/DoctorPol/", {
+      api,
+      fetch: steamApi.fetch,
+      steamApiKey: "test-key",
+    });
+    expect(events[0]).toEqual({ type: "resolved", accountId: TEST_ACCOUNT_ID });
+    expect(steamApi.calls[0].host).toBe("api.steampowered.com");
+  });
+
   it("rejects input that is not a Steam identifier without calling any API", async () => {
     const { api, state } = fakeApi();
     expect(await lookup("definitely not valid!", { api })).toEqual([
