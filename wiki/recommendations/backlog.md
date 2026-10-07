@@ -4,16 +4,16 @@ title: Backlog and recommendations
 description: Prioritized list of recommended next steps, research to do, and deferred features.
 tags: [backlog, planning]
 status: stable
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T07:00:00Z }
 ---
 
 # Next
 
-Tech debt and security hardening have their own [tech-debt register](tech-debt.md), linked to GitHub issues.
+Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Atech-debt) (rules: [tech debt](tech-debt.md)).
 
 | Priority | Item | Links |
 |---|---|---|
-| P0 | Before the repo goes public at M2, fix every *pre-public* item in the [tech-debt register](tech-debt.md) | [ADR 0032](../decisions/0032-github-private-ci.md) |
+| P0 | Before the repo goes public at M2, fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public) | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P0 | Start M2: the 11-slide story in 2D, fed by `/api/lookup` | [ADR 0028](../decisions/0028-milestones.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md) |

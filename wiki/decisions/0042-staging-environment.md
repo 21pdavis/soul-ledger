@@ -5,12 +5,12 @@ description: Staging is a second Render service deploying the staging branch aga
 tags: [infra, staging, auth, process]
 status: deprecated
 decision: superseded
-superseded_by: 0043-staging-access-link.md
+superseded_by: [0043-staging-access-link.md, 0044-pr-gated-changes-and-agent-review.md]
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T07:00:00Z }
 ---
 
-> **Partly superseded** by [ADR 0043](0043-staging-access-link.md): staging is unlocked with a secret link and cookie, not Google sign-in. The environments, branches and agent rules below still stand.
+> **Partly superseded** by [ADR 0043](0043-staging-access-link.md): staging is unlocked with a secret link and cookie, not Google sign-in. The merge rule is superseded by [ADR 0044](0044-pr-gated-changes-and-agent-review.md): agents merge into `staging` only after CI **and** an independent agent review. The environments and branches below still stand.
 
 # Decision
 
@@ -23,7 +23,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
 # Flow
 
 1. Work happens on feature branches cut from `staging`. PRs target `staging`.
-2. **Agents may merge to `staging`** once CI is green, then validate on the live staging site.
+2. **Agents may merge to `staging`** once CI is green, then validate on the live staging site. *(Superseded by ADR 0044, which also requires an agent review.)*
 3. Promotion is a `staging` → `main` PR that **only the owner merges**. That merge deploys production.
 
 # The gate (`src/proxy.ts`, `src/lib/staging-gate.ts`)
