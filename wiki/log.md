@@ -1,7 +1,8 @@
 # Directory Update Log
 
 ## 2026-10-07
-* **Decision**: Lighter wiki upkeep. `pnpm check:wiki` (run in CI) now enforces frontmatter, index entries, links, supersession and log order; the log records only decisions, research, new concepts, deprecations and milestones. It found and fixed three pages whose YAML frontmatter did not parse.
+* **Decision**: [ADR 0046](decisions/0046-strict-red-first-tdd.md) makes strict red-first TDD mandatory, strengthening ADR 0029.
+* **Decision**: [ADR 0045](decisions/0045-lighter-wiki-upkeep.md), lighter wiki upkeep. `pnpm check:wiki` (run in CI) now enforces frontmatter, index entries, links, supersession and log order; the log records only decisions, research, new concepts, deprecations and milestones. It found and fixed three pages whose YAML frontmatter did not parse.
 * **Decision**: [ADR 0044](decisions/0044-pr-gated-changes-and-agent-review.md): PRs gate every change; agents merge into `staging` only after CI and an independent agent review, act on review feedback without being asked, and report every merge. Supersedes ADR 0042's merge rule. Added the `pre-public` issue label (#8, #9).
 * **Update**: GitHub issues are now the source of truth for tech debt (the TD-n register is retired; new issues #15 for 2FA and #16 for a shared limiter; #10 now covers `staging` too). CLAUDE.md: PRs gate every change, with no direct or force pushes, an agent review is required before merging into `staging`, and every merge is reported to the owner.
 * **Update**: CLAUDE.md now makes strict red-green-refactor TDD a rule (ADR 0029), with red-first evidence required in PRs.

@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: "0042: A private staging environment behind Google sign-in, fed by a staging branch"
-description: Staging is a second Render service deploying the staging branch against a Neon staging branch; its Google sign-in was superseded by ADR 0043 and its merge rule by ADR 0044.
+description: Staging is a second Render service deploying the staging branch against a Neon staging branch; its environments and branches still stand, while its Google sign-in was superseded by ADR 0043 and its merge rule by ADR 0044.
 tags: [infra, staging, auth, process]
 status: deprecated
 decision: superseded

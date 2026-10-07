@@ -9,6 +9,8 @@ decided_on: 2026-10-06
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T16:00:00Z }
 ---
 
+> **Strengthened** by [ADR 0046](0046-strict-red-first-tdd.md): TDD is mandatory and red-first, not "where possible".
+
 # Decision
 
 - **Comprehensive unit and integration testing is the cornerstone of the project** (user's words).

@@ -31,7 +31,7 @@ Don't batch wiki updates to the end. When something is learned or decided, write
 | A shortcut taken, or a known gap or security weakness | A **GitHub issue** labelled `tech-debt` (plus `security`/`infra` where they fit). Issues are the source of truth; refer to them by number (#10). Rules: `wiki/recommendations/tech-debt.md`. |
 | A decision gets reversed | Write a new ADR. Set the old one to `status: deprecated` and add `superseded_by:`. Never delete it. |
 
-After changing the wiki:
+After changing the wiki ([ADR 0045](wiki/decisions/0045-lighter-wiki-upkeep.md)):
 
 - **Run `pnpm check:wiki`** (CI runs it too). It catches the bookkeeping, so you don't have to remember it, and its messages say exactly what to fix:
   - frontmatter that won't parse, or lacks `type` or `description`;
@@ -59,7 +59,7 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
   - `title` and `description`: description is one sentence.
   - `tags`.
   - `status`: `draft` | `stable` | `deprecated`.
-  - `generated: { by: <actor>, at: <ISO-8601 UTC> }`: update this whenever you meaningfully change the content.
+  - `generated: { by: <actor>, at: <ISO-8601 UTC> }`: update this whenever you meaningfully change the content. Description syncs and formatting fixes don't count.
   - `sources`: list of `{ id, resource, title }` when the content derives from external material.
   - `verified`: only when content was actually checked. Add `{ by: human:paul, at: ... }` only when the user explicitly confirms the written content.
   - `stale_after`: use it on research about fast-moving things such as the API.
@@ -70,7 +70,7 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
 - Prefer structure (headings, tables, lists) over prose.
 - File names: lowercase kebab-case. ADRs are numbered `NNNN-slug.md`.
 
-## Testing: strict TDD (ADR 0029)
+## Testing: strict TDD (ADR 0029, 0046)
 
 Every change to app behaviour follows **red → green → refactor**. This is a rule, not a preference.
 

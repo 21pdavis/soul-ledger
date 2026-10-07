@@ -36,13 +36,13 @@ type Frontmatter = Record<string, unknown>;
 function readFrontmatter(
   content: string,
 ): { ok: true; data: Frontmatter } | { ok: false; reason: string } | null {
-  const text = content.replace(/\r\n/g, "\n");
-  if (!text.startsWith("---\n")) return null;
-  const end = text.indexOf("\n---", 4);
+  const lines = content.replace(/\r\n/g, "\n").split("\n");
+  if (lines[0] !== "---") return null;
+  const end = lines.indexOf("---", 1); // the closing line must be exactly ---
   if (end === -1) return { ok: false, reason: "unterminated" };
   try {
-    const data: unknown = parse(text.slice(4, end));
-    return data && typeof data === "object" && !Array.isArray(data)
+    const data: unknown = parse(lines.slice(1, end).join("\n")) ?? {};
+    return typeof data === "object" && !Array.isArray(data)
       ? { ok: true, data: data as Frontmatter }
       : { ok: false, reason: "not a mapping" };
   } catch (err) {
@@ -51,6 +51,8 @@ function readFrontmatter(
 }
 
 const nonEmpty = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
+/** A frontmatter value that may be one path or a list of paths. */
+const targets = (v: unknown): string[] => [v].flat().filter(nonEmpty);
 
 function checkConcept(
   path: string,
@@ -74,15 +76,15 @@ function checkConcept(
   const sibling = (target: string) => posix.join(dir, target);
 
   if (data.type === "Decision Record") {
-    const successors = data.superseded_by;
+    const successors = targets(data.superseded_by);
     if (data.decision === "superseded") {
       if (data.status !== "deprecated")
         errors.push(`${path}: superseded but status is not deprecated`);
-      if (successors === undefined) errors.push(`${path}: superseded but no superseded_by`);
+      if (successors.length === 0) errors.push(`${path}: superseded but no superseded_by`);
     } else if (data.status === "deprecated") {
       errors.push(`${path}: status deprecated but decision is "${String(data.decision)}"`);
     }
-    for (const target of [successors].flat().filter(nonEmpty)) {
+    for (const target of successors) {
       if (!(sibling(target) in files)) {
         errors.push(`${path}: superseded_by target ${target} does not exist`);
       }
@@ -90,20 +92,36 @@ function checkConcept(
   }
 
   if (data.type === "Open Question" && data.question_status === "resolved") {
-    if (!nonEmpty(data.resolved_by)) errors.push(`${path}: resolved but no resolved_by`);
-    else if (!(sibling(data.resolved_by) in files)) {
-      errors.push(`${path}: resolved_by target ${data.resolved_by} does not exist`);
+    const resolvers = targets(data.resolved_by);
+    if (resolvers.length === 0) errors.push(`${path}: resolved but no resolved_by`);
+    for (const target of resolvers) {
+      if (!(sibling(target) in files)) {
+        errors.push(`${path}: resolved_by target ${target} does not exist`);
+      }
     }
   }
 }
 
-const INDEX_ENTRY = /^\* \[(.+?)\]\(([^)]+)\) - (.*)$/;
+/** A link target allowing one level of balanced parentheses, e.g. foo_(bar).md. */
+const TARGET = String.raw`(?:[^()\s]|\([^()\s]*\))+`;
+const INDEX_ENTRY = new RegExp(String.raw`^\* \[(.+?)\]\((${TARGET})\) - (.*)$`);
+
+/** Decodes %-escapes and drops a leading ./ so equivalent spellings compare equal. */
+function cleanTarget(raw: string): string {
+  let target = raw;
+  try {
+    target = decodeURIComponent(raw);
+  } catch {
+    // Keep malformed escapes as written.
+  }
+  return target.startsWith("./") ? target.slice(2) : target;
+}
 
 function indexEntries(content: string): Map<string, string> {
   const entries = new Map<string, string>();
   for (const line of content.split("\n")) {
     const m = INDEX_ENTRY.exec(line.trimEnd());
-    if (m) entries.set(m[2], m[3]);
+    if (m) entries.set(cleanTarget(m[2]), m[3]);
   }
   return entries;
 }
@@ -147,7 +165,7 @@ function checkLog(path: string, content: string, errors: string[]): void {
     const m = /^## (.+)$/.exec(line.trimEnd());
     if (!m) continue;
     const date = m[1].trim();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    if (!isRealDate(date)) {
       errors.push(`${path}: heading "${date}" is not an ISO YYYY-MM-DD date`);
       continue;
     }
@@ -158,7 +176,17 @@ function checkLog(path: string, content: string, errors: string[]): void {
   }
 }
 
-const LINK = /\]\(([^)\s]+)\)/g;
+function isRealDate(date: string): boolean {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (!m) return false;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const parsed = new Date(Date.UTC(y, mo - 1, d));
+  return (
+    parsed.getUTCFullYear() === y && parsed.getUTCMonth() === mo - 1 && parsed.getUTCDate() === d
+  );
+}
+
+const LINK = new RegExp(String.raw`\]\((${TARGET})\)`, "g");
 
 function checkLinks(
   path: string,
@@ -166,14 +194,16 @@ function checkLinks(
   exists: (p: string) => boolean,
   errors: string[],
 ): void {
-  const text = content.replace(/```[\s\S]*?```/g, "");
+  // Code isn't links: drop fenced blocks (``` or ~~~) and inline code first.
+  const text = content.replace(/^(```|~~~)[\s\S]*?^\1/gm, "").replace(/`[^`\n]*`/g, "");
   for (const [, raw] of text.matchAll(LINK)) {
     if (/^(https?:|mailto:|#|\/)/.test(raw)) continue;
-    const target = raw.split("#")[0].split("?")[0];
+    const target = cleanTarget(raw.split("#")[0].split("?")[0]);
     if (!target) continue;
     const resolved = posix.normalize(posix.join(posix.dirname(path), target));
     if (resolved.startsWith("../")) continue; // outside the wiki
-    const ok = target.endsWith("/") ? exists(posix.join(resolved, "index.md")) : exists(resolved);
+    // A directory link, with or without a trailing slash, resolves to its index.md.
+    const ok = exists(resolved) || exists(posix.join(resolved, "index.md"));
     if (!ok) errors.push(`${path}: broken link ${raw.split("#")[0]}`);
   }
 }

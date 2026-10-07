@@ -148,3 +148,81 @@ describe("checkWiki", () => {
     expect(checkWiki(b)).toContainEqual("vision.md: uses CRLF line endings; use LF");
   });
 });
+
+describe("checkWiki review fixes (PR #18)", () => {
+  const question = (extra: Record<string, string>) =>
+    fm({
+      type: "Open Question",
+      title: "Q",
+      description: "A question.",
+      question_status: "resolved",
+      ...extra,
+    });
+  const withQuestion = (q: string) => ({
+    ...bundle(),
+    "open-questions/index.md": "# Q\n\n* [Q](q.md) - A question.\n",
+    "open-questions/q.md": q,
+  });
+
+  it("accepts resolved_by as a list, like superseded_by", () => {
+    expect(
+      checkWiki(withQuestion(question({ resolved_by: "[../decisions/0001-thing.md]" }))),
+    ).toEqual([]);
+    expect(
+      checkWiki(withQuestion(question({ resolved_by: "[../decisions/0099-nope.md]" }))),
+    ).toContainEqual(
+      "open-questions/q.md: resolved_by target ../decisions/0099-nope.md does not exist",
+    );
+  });
+
+  it("rejects an empty superseded_by", () => {
+    for (const empty of ["''", "null", "{}", "[]"]) {
+      const b = bundle();
+      b["decisions/0001-thing.md"] = adr({
+        decision: "superseded",
+        status: "deprecated",
+        superseded_by: empty,
+      });
+      expect(checkWiki(b)).toContainEqual(
+        "decisions/0001-thing.md: superseded but no superseded_by",
+      );
+    }
+  });
+
+  it("ignores links in inline code and ~~~ blocks", () => {
+    const b = bundle();
+    b["vision.md"] += "\nUse `[x](missing.md)` syntax.\n\n~~~\n[y](also-missing.md)\n~~~\n";
+    expect(checkWiki(b)).toEqual([]);
+  });
+
+  it("handles parentheses and %-encoding in link targets, and directory links without a slash", () => {
+    const b = bundle();
+    b["decisions/index.md"] += "* [P](foo_(bar).md) - P.\n* [S](a%20b.md) - S.\n";
+    b["decisions/foo_(bar).md"] = adr({ title: "P", description: "P." });
+    b["decisions/a b.md"] = adr({ title: "S", description: "S." });
+    b["vision.md"] += "\nSee [all](decisions).\n";
+    expect(checkWiki(b)).toEqual([]);
+  });
+
+  it("finds the frontmatter end only on an exact --- line", () => {
+    const b = bundle();
+    b["vision.md"] = "---\ntype: Vision\nnote: |\n  ----x\ndescription: The vision.\n---\nBody\n";
+    expect(checkWiki(b)).toEqual([]);
+    b["vision.md"] = "---\n---\nBody\n";
+    expect(checkWiki(b)).toContainEqual("vision.md: missing type");
+  });
+
+  it("rejects impossible log dates", () => {
+    const b = bundle();
+    b["log.md"] = "# Log\n\n## 2026-13-45\n* x\n";
+    expect(checkWiki(b)).toContainEqual(
+      'log.md: heading "2026-13-45" is not an ISO YYYY-MM-DD date',
+    );
+  });
+
+  it("recognises ./-prefixed index entries", () => {
+    const b = bundle();
+    b["decisions/index.md"] = "# Decisions\n\n* [0001: Thing](./0001-thing.md) - Does a thing.\n";
+    expect(checkWiki(b)).toEqual([]);
+  });
+});
