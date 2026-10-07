@@ -2,7 +2,6 @@
 
 None.
 
-
 # Resolved (kept for reference)
 
 * [M1 implementation choices](m1-implementation-choices.md) - The libraries, schema and tuning values chosen while building M1; confirmed by ADR 0040.
