@@ -3,11 +3,14 @@ type: Decision Record
 title: "0020: Squad roles list and assignment"
 description: Ten squad roles, each awarded for the highest per-match value of one stat; every player gets one headline role, and extras show as badges.
 tags: [squad]
-status: stable
-decision: accepted
+status: deprecated
+decision: superseded
+superseded_by: 0037-squad-roles-without-backseat-gamer.md
 decided_on: 2026-10-06
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T14:00:00Z }
 ---
+
+> **Superseded** by [ADR 0037](0037-squad-roles-without-backseat-gamer.md), which drops The Backseat Gamer.
 
 # Decision
 

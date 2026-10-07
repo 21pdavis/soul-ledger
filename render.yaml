@@ -1,0 +1,15 @@
+# Render Blueprint (ADR 0005). Neon hosts the database (ADR 0033), so Render runs only the web app.
+services:
+  - type: web
+    name: soul-ledger
+    runtime: node
+    plan: free
+    region: oregon # next to Neon aws-us-west-2
+    branch: main
+    # Install the exact pnpm pinned in package.json rather than relying on the platform's version.
+    buildCommand: npm install -g pnpm@12.9.1 && pnpm install --frozen-lockfile && pnpm build
+    startCommand: node_modules/.bin/next start
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false # Neon main branch connection string, set in the Render Dashboard

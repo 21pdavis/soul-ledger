@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+tests/fixtures/
+drizzle/meta/
+wiki/
+.next/
+
+# Prose and agent files keep their hand formatting
+*.md
+.claude/

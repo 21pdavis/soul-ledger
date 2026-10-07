@@ -1,0 +1,1535 @@
+[
+ {
+  "id": 1,
+  "class_name": "hero_inferno",
+  "name": "Infernus",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/inferno_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/inferno_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    70,
+    45
+   ],
+   "style": [
+    201,
+    60,
+    38
+   ],
+   "style_hex": "#C93C26"
+  }
+ },
+ {
+  "id": 2,
+  "class_name": "hero_gigawatt",
+  "name": "Seven",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/gigawatt_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/gigawatt_mm.png"
+  },
+  "colors": {
+   "ui": [
+    237,
+    149,
+    60
+   ],
+   "style": [
+    204,
+    134,
+    30
+   ],
+   "style_hex": "#CC861E"
+  }
+ },
+ {
+  "id": 3,
+  "class_name": "hero_hornet",
+  "name": "Vindicta",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/hornet_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/hornet_mm.png"
+  },
+  "colors": {
+   "ui": [
+    156,
+    205,
+    236
+   ],
+   "style": [
+    162,
+    199,
+    229
+   ],
+   "style_hex": "#A2C7E5"
+  }
+ },
+ {
+  "id": 4,
+  "class_name": "hero_ghost",
+  "name": "Lady Geist",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/spectre_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/spectre_mm.png"
+  },
+  "colors": {
+   "ui": [
+    9,
+    137,
+    89
+   ],
+   "style": [
+    33,
+    132,
+    64
+   ],
+   "style_hex": "#218440"
+  }
+ },
+ {
+  "id": 6,
+  "class_name": "hero_atlas",
+  "name": "Abrams",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/bull_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/bull_mm.png"
+  },
+  "colors": {
+   "ui": [
+    32,
+    146,
+    174
+   ],
+   "style": [
+    32,
+    146,
+    174
+   ],
+   "style_hex": "#2092AE"
+  }
+ },
+ {
+  "id": 7,
+  "class_name": "hero_wraith",
+  "name": "Wraith",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/wraith_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/wraith_mm.png"
+  },
+  "colors": {
+   "ui": [
+    148,
+    77,
+    120
+   ],
+   "style": [
+    148,
+    77,
+    120
+   ],
+   "style_hex": "#944D78"
+  }
+ },
+ {
+  "id": 8,
+  "class_name": "hero_forge",
+  "name": "McGinnis",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/engineer_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/engineer_mm.png"
+  },
+  "colors": {
+   "ui": [
+    70,
+    104,
+    155
+   ],
+   "style": [
+    35,
+    84,
+    157
+   ],
+   "style_hex": "#23549D"
+  }
+ },
+ {
+  "id": 10,
+  "class_name": "hero_chrono",
+  "name": "Paradox",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/chrono_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/chrono_mm.png"
+  },
+  "colors": {
+   "ui": [
+    152,
+    57,
+    82
+   ],
+   "style": [
+    152,
+    57,
+    82
+   ],
+   "style_hex": "#983952"
+  }
+ },
+ {
+  "id": 11,
+  "class_name": "hero_dynamo",
+  "name": "Dynamo",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/sumo_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/sumo_mm.png"
+  },
+  "colors": {
+   "ui": [
+    207,
+    185,
+    69
+   ],
+   "style": [
+    208,
+    185,
+    69
+   ],
+   "style_hex": "#D0B945"
+  }
+ },
+ {
+  "id": 12,
+  "class_name": "hero_kelvin",
+  "name": "Kelvin",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/kelvin_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/kelvin_mm.png"
+  },
+  "colors": {
+   "ui": [
+    116,
+    171,
+    188
+   ],
+   "style": [
+    116,
+    171,
+    188
+   ],
+   "style_hex": "#74ABBC"
+  }
+ },
+ {
+  "id": 13,
+  "class_name": "hero_haze",
+  "name": "Haze",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/haze_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/haze_mm.png"
+  },
+  "colors": {
+   "ui": [
+    172,
+    97,
+    51
+   ],
+   "style": [
+    172,
+    97,
+    51
+   ],
+   "style_hex": "#AC6133"
+  }
+ },
+ {
+  "id": 14,
+  "class_name": "hero_astro",
+  "name": "Holliday",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/astro_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/astro_mm.png"
+  },
+  "colors": {
+   "ui": [
+    142,
+    76,
+    49
+   ],
+   "style": [
+    163,
+    90,
+    27
+   ],
+   "style_hex": "#A35A1B"
+  }
+ },
+ {
+  "id": 15,
+  "class_name": "hero_bebop",
+  "name": "Bebop",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/bebop_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/bebop_mm.png"
+  },
+  "colors": {
+   "ui": [
+    159,
+    71,
+    52
+   ],
+   "style": [
+    159,
+    71,
+    52
+   ],
+   "style_hex": "#9F4734"
+  }
+ },
+ {
+  "id": 16,
+  "class_name": "hero_nano",
+  "name": "Calico",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/nano_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/nano_mm.png"
+  },
+  "colors": {
+   "ui": [
+    98,
+    15,
+    214
+   ],
+   "style": [
+    87,
+    39,
+    152
+   ],
+   "style_hex": "#572798"
+  }
+ },
+ {
+  "id": 17,
+  "class_name": "hero_orion",
+  "name": "Grey Talon",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/archer_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/archer_mm.png"
+  },
+  "colors": {
+   "ui": [
+    94,
+    176,
+    131
+   ],
+   "style": [
+    94,
+    176,
+    131
+   ],
+   "style_hex": "#5EB083"
+  }
+ },
+ {
+  "id": 18,
+  "class_name": "hero_krill",
+  "name": "Mo & Krill",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/digger_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/digger_mm.png"
+  },
+  "colors": {
+   "ui": [
+    104,
+    75,
+    133
+   ],
+   "style": [
+    197,
+    132,
+    40
+   ],
+   "style_hex": "#C58428"
+  }
+ },
+ {
+  "id": 19,
+  "class_name": "hero_shiv",
+  "name": "Shiv",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/shiv_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/shiv_mm.png"
+  },
+  "colors": {
+   "ui": [
+    164,
+    60,
+    135
+   ],
+   "style": [
+    229,
+    42,
+    104
+   ],
+   "style_hex": "#E52A68"
+  }
+ },
+ {
+  "id": 20,
+  "class_name": "hero_tengu",
+  "name": "Ivy",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/tengu_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/tengu_mm.png"
+  },
+  "colors": {
+   "ui": [
+    179,
+    115,
+    217
+   ],
+   "style": [
+    157,
+    140,
+    169
+   ],
+   "style_hex": "#9D8CA9"
+  }
+ },
+ {
+  "id": 21,
+  "class_name": "hero_kali",
+  "name": "Kali",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": false,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/kali_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/kali_mm.png"
+  },
+  "colors": {
+   "ui": [
+    246,
+    218,
+    79
+   ],
+   "style": [
+    215,
+    174,
+    97
+   ],
+   "style_hex": "#D7AE61"
+  }
+ },
+ {
+  "id": 25,
+  "class_name": "hero_warden",
+  "name": "Warden",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/warden_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/warden_mm.png"
+  },
+  "colors": {
+   "ui": [
+    85,
+    97,
+    120
+   ],
+   "style": [
+    77,
+    104,
+    163
+   ],
+   "style_hex": "#4D68A3"
+  }
+ },
+ {
+  "id": 27,
+  "class_name": "hero_yamato",
+  "name": "Yamato",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/yamato_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/yamato_mm.png"
+  },
+  "colors": {
+   "ui": [
+    110,
+    144,
+    128
+   ],
+   "style": [
+    98,
+    87,
+    137
+   ],
+   "style_hex": "#625789"
+  }
+ },
+ {
+  "id": 31,
+  "class_name": "hero_lash",
+  "name": "Lash",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/lash_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/lash_mm.png"
+  },
+  "colors": {
+   "ui": [
+    66,
+    75,
+    86
+   ],
+   "style": [
+    65,
+    116,
+    187
+   ],
+   "style_hex": "#4174BB"
+  }
+ },
+ {
+  "id": 35,
+  "class_name": "hero_viscous",
+  "name": "Viscous",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/viscous_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/viscous_mm.png"
+  },
+  "colors": {
+   "ui": [
+    136,
+    195,
+    99
+   ],
+   "style": [
+    49,
+    152,
+    38
+   ],
+   "style_hex": "#319826"
+  }
+ },
+ {
+  "id": 38,
+  "class_name": "hero_gunslinger",
+  "name": "Gunslinger",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/gunslinger_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/gunslinger_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ]
+  }
+ },
+ {
+  "id": 39,
+  "class_name": "hero_yakuza",
+  "name": "The Boss",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/yakuza_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/yakuza_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ]
+  }
+ },
+ {
+  "id": 48,
+  "class_name": "hero_wrecker",
+  "name": "Wrecker",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/wrecker_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/wrecker_mm.png"
+  },
+  "colors": {
+   "ui": [
+    127,
+    45,
+    177
+   ],
+   "style": [
+    127,
+    45,
+    177
+   ],
+   "style_hex": "#7F2DB1"
+  }
+ },
+ {
+  "id": 49,
+  "class_name": "hero_rutger",
+  "name": "Rutger",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/rutger_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/rutger_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ]
+  }
+ },
+ {
+  "id": 50,
+  "class_name": "hero_synth",
+  "name": "Pocket",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/synth_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/synth_mm.png"
+  },
+  "colors": {
+   "ui": [
+    84,
+    95,
+    149
+   ],
+   "style": [
+    133,
+    134,
+    23
+   ],
+   "style_hex": "#858617"
+  }
+ },
+ {
+  "id": 51,
+  "class_name": "hero_thumper",
+  "name": "Thumper",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/thumper_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/thumper_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ]
+  }
+ },
+ {
+  "id": 52,
+  "class_name": "hero_mirage",
+  "name": "Mirage",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/mirage_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/mirage_mm.png"
+  },
+  "colors": {
+   "ui": [
+    132,
+    103,
+    60
+   ],
+   "style": [
+    106,
+    46,
+    104
+   ],
+   "style_hex": "#6A2E68"
+  }
+ },
+ {
+  "id": 53,
+  "class_name": "hero_slork",
+  "name": "Fathom",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/slork_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/slork_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ]
+  }
+ },
+ {
+  "id": 54,
+  "class_name": "hero_cadence",
+  "name": "Cadence",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/cadence_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/cadence_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ]
+  }
+ },
+ {
+  "id": 56,
+  "class_name": "hero_bomber",
+  "name": "Bomber",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {},
+  "colors": {
+   "ui": [
+    98,
+    15,
+    214
+   ]
+  }
+ },
+ {
+  "id": 57,
+  "class_name": "hero_shieldguy",
+  "name": "Shield Guy",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {},
+  "colors": {
+   "ui": [
+    98,
+    15,
+    214
+   ]
+  }
+ },
+ {
+  "id": 58,
+  "class_name": "hero_viper",
+  "name": "Vyper",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/kali_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/kali_mm.png"
+  },
+  "colors": {
+   "ui": [
+    179,
+    115,
+    217
+   ],
+   "style": [
+    167,
+    173,
+    0
+   ],
+   "style_hex": "#A7AD00"
+  }
+ },
+ {
+  "id": 59,
+  "class_name": "hero_vandal",
+  "name": "Vandal",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/vandal_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/vandal_mm.png"
+  },
+  "colors": {
+   "ui": [
+    179,
+    115,
+    217
+   ]
+  }
+ },
+ {
+  "id": 60,
+  "class_name": "hero_magician",
+  "name": "Sinclair",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/magician_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/magician_mm.png"
+  },
+  "colors": {
+   "ui": [
+    237,
+    149,
+    60
+   ],
+   "style": [
+    107,
+    107,
+    107
+   ],
+   "style_hex": "#6B6B6B"
+  }
+ },
+ {
+  "id": 61,
+  "class_name": "hero_trapper",
+  "name": "Trapper",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/trapper_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/trapper_mm.png"
+  },
+  "colors": {
+   "ui": [
+    85,
+    97,
+    120
+   ]
+  }
+ },
+ {
+  "id": 62,
+  "class_name": "hero_operative",
+  "name": "Raven",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/operative_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/operative_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ]
+  }
+ },
+ {
+  "id": 63,
+  "class_name": "hero_vampirebat",
+  "name": "Mina",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/vampirebat_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/vampirebat_mm.png"
+  },
+  "colors": {
+   "ui": [
+    152,
+    57,
+    82
+   ],
+   "style": [
+    169,
+    23,
+    30
+   ],
+   "style_hex": "#A9171E"
+  }
+ },
+ {
+  "id": 64,
+  "class_name": "hero_drifter",
+  "name": "Drifter",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/drifter_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/drifter_mm.png"
+  },
+  "colors": {
+   "ui": [
+    164,
+    60,
+    135
+   ],
+   "style": [
+    157,
+    44,
+    43
+   ],
+   "style_hex": "#9D2C2B"
+  }
+ },
+ {
+  "id": 65,
+  "class_name": "hero_priest",
+  "name": "Venator",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/priest_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/priest_mm.png"
+  },
+  "colors": {
+   "ui": [
+    85,
+    97,
+    120
+   ],
+   "style": [
+    189,
+    53,
+    153
+   ],
+   "style_hex": "#BD3599"
+  }
+ },
+ {
+  "id": 66,
+  "class_name": "hero_frank",
+  "name": "Victor",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/frank_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/frank_mm.png"
+  },
+  "colors": {
+   "ui": [
+    85,
+    97,
+    120
+   ],
+   "style": [
+    101,
+    139,
+    111
+   ],
+   "style_hex": "#658B6F"
+  }
+ },
+ {
+  "id": 67,
+  "class_name": "hero_bookworm",
+  "name": "Paige",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/bookworm_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/bookworm_mm.png"
+  },
+  "colors": {
+   "ui": [
+    156,
+    205,
+    236
+   ],
+   "style": [
+    37,
+    143,
+    99
+   ],
+   "style_hex": "#258F63"
+  }
+ },
+ {
+  "id": 68,
+  "class_name": "hero_boho",
+  "name": "Boho",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/hornet_sm.png"
+  },
+  "colors": {
+   "ui": [
+    156,
+    205,
+    236
+   ]
+  }
+ },
+ {
+  "id": 69,
+  "class_name": "hero_doorman",
+  "name": "The Doorman",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/doorman_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/doorman_mm.png"
+  },
+  "colors": {
+   "ui": [
+    156,
+    205,
+    236
+   ],
+   "style": [
+    183,
+    117,
+    40
+   ],
+   "style_hex": "#B77528"
+  }
+ },
+ {
+  "id": 70,
+  "class_name": "hero_skyrunner",
+  "name": "Skyrunner",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/skyrunner_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/skyrunner_mm.png"
+  },
+  "colors": {
+   "ui": [
+    66,
+    75,
+    86
+   ]
+  }
+ },
+ {
+  "id": 71,
+  "class_name": "hero_swan",
+  "name": "Swan",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/swan_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/swan_mm.png"
+  },
+  "colors": {
+   "ui": [
+    152,
+    57,
+    82
+   ]
+  }
+ },
+ {
+  "id": 72,
+  "class_name": "hero_punkgoat",
+  "name": "Billy",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/punkgoat_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/punkgoat_mm.png"
+  },
+  "colors": {
+   "ui": [
+    164,
+    60,
+    135
+   ],
+   "style": [
+    212,
+    173,
+    14
+   ],
+   "style_hex": "#D4AD0E"
+  }
+ },
+ {
+  "id": 73,
+  "class_name": "hero_druid",
+  "name": "Druid",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/druid_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/druid_mm.png"
+  },
+  "colors": {
+   "ui": [
+    98,
+    15,
+    214
+   ]
+  }
+ },
+ {
+  "id": 74,
+  "class_name": "hero_graf",
+  "name": "Graf",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/graf_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/graf_mm.png"
+  },
+  "colors": {
+   "ui": [
+    152,
+    57,
+    82
+   ]
+  }
+ },
+ {
+  "id": 75,
+  "class_name": "hero_fortuna",
+  "name": "Fortuna",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/fortuna_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/fortuna_mm.png"
+  },
+  "colors": {
+   "ui": [
+    148,
+    77,
+    120
+   ]
+  }
+ },
+ {
+  "id": 76,
+  "class_name": "hero_necro",
+  "name": "Graves",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/necro_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/necro_mm.png"
+  },
+  "colors": {
+   "ui": [
+    152,
+    57,
+    82
+   ],
+   "style": [
+    217,
+    243,
+    52
+   ],
+   "style_hex": "#D9F334"
+  }
+ },
+ {
+  "id": 77,
+  "class_name": "hero_fencer",
+  "name": "Apollo",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/fencer_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/fencer_mm.png"
+  },
+  "colors": {
+   "ui": [
+    255,
+    51,
+    51
+   ],
+   "style": [
+    255,
+    51,
+    51
+   ],
+   "style_hex": "#FF3333"
+  }
+ },
+ {
+  "id": 78,
+  "class_name": "hero_deadpack",
+  "name": "Deadman Danny",
+  "player_selectable": false,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "pre_release",
+  "images": {},
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ],
+   "style": [
+    206,
+    141,
+    42
+   ],
+   "style_hex": "#CE8D2A"
+  }
+ },
+ {
+  "id": 79,
+  "class_name": "hero_familiar",
+  "name": "Rem",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/familiar_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/familiar_mm.png"
+  },
+  "colors": {
+   "ui": [
+    152,
+    57,
+    82
+   ],
+   "style": [
+    83,
+    131,
+    209
+   ],
+   "style_hex": "#5383D1"
+  }
+ },
+ {
+  "id": 80,
+  "class_name": "hero_werewolf",
+  "name": "Silver",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/werewolf_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/werewolf_mm.png"
+  },
+  "colors": {
+   "ui": [
+    156,
+    205,
+    236
+   ],
+   "style": [
+    191,
+    188,
+    159
+   ],
+   "style_hex": "#BFBC9F"
+  }
+ },
+ {
+  "id": 81,
+  "class_name": "hero_unicorn",
+  "name": "Celeste",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/unicorn_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/unicorn_mm.png"
+  },
+  "colors": {
+   "ui": [
+    152,
+    57,
+    82
+   ],
+   "style": [
+    187,
+    169,
+    225
+   ],
+   "style_hex": "#BBA9E1"
+  }
+ },
+ {
+  "id": 82,
+  "class_name": "hero_opera",
+  "name": "Opera",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {},
+  "colors": {
+   "ui": [
+    98,
+    15,
+    214
+   ]
+  }
+ },
+ {
+  "id": 83,
+  "class_name": "hero_testhero",
+  "name": "hero_testhero",
+  "player_selectable": false,
+  "disabled": true,
+  "in_development": true,
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/nano_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/nano_mm.png"
+  },
+  "colors": {
+   "ui": [
+    98,
+    15,
+    214
+   ]
+  }
+ },
+ {
+  "id": 84,
+  "class_name": "hero_ratking",
+  "name": "Rat King",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/ratking_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/ratking_mm.png"
+  },
+  "colors": {
+   "ui": [
+    104,
+    75,
+    133
+   ],
+   "style": [
+    115,
+    48,
+    51
+   ],
+   "style_hex": "#733033"
+  }
+ },
+ {
+  "id": 85,
+  "class_name": "hero_chessmaster",
+  "name": "Solomon",
+  "player_selectable": false,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "pre_release",
+  "images": {},
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ],
+   "style": [
+    170,
+    158,
+    126
+   ],
+   "style_hex": "#AA9E7E"
+  }
+ },
+ {
+  "id": 86,
+  "class_name": "hero_artist",
+  "name": "Violet",
+  "player_selectable": false,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "pre_release",
+  "images": {},
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ],
+   "style": [
+    101,
+    60,
+    188
+   ],
+   "style_hex": "#653cbc"
+  }
+ },
+ {
+  "id": 87,
+  "class_name": "hero_nurse",
+  "name": "Nurse Harrow",
+  "player_selectable": false,
+  "disabled": false,
+  "in_development": false,
+  "development_state": "pre_release",
+  "images": {},
+  "colors": {
+   "ui": [
+    255,
+    255,
+    255
+   ],
+   "style": [
+    245,
+    94,
+    32
+   ],
+   "style_hex": "#f55e20"
+  }
+ },
+ {
+  "id": 88,
+  "class_name": "hero_baba",
+  "name": "Baba",
+  "player_selectable": true,
+  "disabled": false,
+  "in_development": true,
+  "development_state": "release",
+  "images": {
+   "icon_image_small": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/baba_sm.png",
+   "minimap_image": "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/baba_mm.png"
+  },
+  "colors": {
+   "ui": [
+    70,
+    104,
+    155
+   ],
+   "style": [
+    137,
+    86,
+    114
+   ],
+   "style_hex": "#895672"
+  }
+ }
+]

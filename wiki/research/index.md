@@ -2,6 +2,8 @@
 
 * [deadlock-api.com endpoints and limits](deadlock-api.md) - The deadlock-api.com endpoints Soul Ledger needs, with their rate limits and coverage caveats.
 * [Match metadata fields](match-metadata-fields.md) - The per-player and match-level fields in deadlock-api match metadata and which Wrapped stats each one feeds.
+* [Bulk match metadata for one player](bulk-match-metadata.md) - How M1 fetches a player's whole history from /v1/matches/metadata in one or a few requests, and the data quirks found in the response.
+* [Global percentile metrics](percentile-metrics.md) - Which stats /v1/analytics/player-stats/metrics can rank, what its accuracy and crit metrics mean, and how M1 turns quantiles into percentiles.
 * [gold_sources enum (EGoldSource)](gold-sources.md) - The protobuf EGoldSource enum values used in per-player gold_sources stats, including Sinner's Sacrifice and breakables.
 * [Playable hero roster](hero-roster.md) - The current playable heroes from /v1/assets/heroes, the list v1 must model.
 * [Primary test account](test-account.md) - The user's own Deadlock account, used as the main development and test case.

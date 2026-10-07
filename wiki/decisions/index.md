@@ -19,7 +19,6 @@
 * [0017: Full history for development comes from the user's own $1.50 deadlock-api Patreon tier](0017-full-history-via-patreon-for-now.md) - For now the user subscribes to the deadlock-api Patreon tier and tests with their own account; outreach to maintainers waits until launch.
 * [0018: Shared stories are frozen JSON snapshots with OG images](0018-story-snapshots.md) - Each shared story is a frozen JSON snapshot at /w/<slug> with a generated preview image and a see-my-latest button.
 * [0019: Build stylized low-poly models for all heroes in code](0019-code-built-hero-models.md) - All playable heroes get stylized low-poly models built procedurally in code (Three.js primitives), using API images and other views as reference.
-* [0020: Squad roles list and assignment](0020-squad-roles.md) - Ten squad roles, each awarded for the highest per-match value of one stat; every player gets one headline role, and extras show as badges.
 * [0021: Two kill slides; MVP is the most extreme percentile stat](0021-kill-slides-and-mvp.md) - "How you kill" and "Precision" are separate slides; the MVP signature stat is the player's most extreme percentile, compared against same-hero players where possible.
 * [0022: The product is named Soul Ledger](0022-name-soul-ledger.md) - The site is called Soul Ledger; "Wrapped" is used only in descriptive copy.
 * [0023: Everyone looked up is listed in the Hall of Fame, with a removal request](0023-hall-of-fame-privacy.md) - Any looked-up player can appear on the Hall of Fame under their Steam name; a removal request form handles opt-outs.
@@ -34,3 +33,12 @@
 * [0032: Private GitHub repo now, CI on every push, public at M2](0032-github-private-ci.md) - The repo lives on GitHub (21pdavis/soul-ledger), private until milestone M2, with GitHub Actions running all tests on every push.
 * [0033: Neon project soul-ledger with main and dev branches](0033-neon-project.md) - Postgres is the Neon project soul-ledger (aws-us-west-2, PG 17) with a main branch for production and a dev branch; tests use throwaway databases.
 * [0034: Tooling is pnpm, Vitest, Playwright, Drizzle, ESLint and Prettier](0034-tooling.md) - Package manager pnpm; Vitest for unit/integration tests; Playwright for e2e on phone and desktop; Drizzle ORM; ESLint and Prettier.
+* [0035: The current patch starts on the date in the newest changelog title](0035-patch-date-from-changelog-title.md) - The this-patch window starts at UTC midnight of the MM-DD-YYYY date in the newest /v1/patches title, falling back to pub_date.
+* [0037: Squad roles list, without The Backseat Gamer](0037-squad-roles-without-backseat-gamer.md) - Nine squad roles, each awarded for the highest per-match value of one stat; The Backseat Gamer (pings) is dropped.
+* [0038: A one-trick plays their main in at least 50% of matches](0038-one-trick-threshold-50.md) - The roster slide labels a player a one-trick when their most-played hero accounts for 50% or more of counted matches, otherwise flex.
+* [0039: Deploy from main via a Render Blueprint on the free plan](0039-render-free-blueprint.md) - The app deploys as one free-plan Render web service in Oregon, defined in render.yaml, built from main after PR review, using the migrated Neon main branch.
+
+# Superseded decisions
+
+* [0020: Squad roles list and assignment](0020-squad-roles.md) - Ten squad roles, each awarded for the highest per-match value of one stat; every player gets one headline role, and extras show as badges.
+* [0036: A one-trick plays their main in at least 60% of matches](0036-one-trick-threshold.md) - The roster slide labels a player a one-trick when their most-played hero accounts for 60% or more of counted matches, otherwise flex.

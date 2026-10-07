@@ -2,7 +2,7 @@
 
 A "Spotify Wrapped"-style stat tracker for Valve's **Deadlock**. Paste a Steam profile URL or ID and get an animated, full-screen story: win rates and main heroes, plus the fun stuff (crates smashed, Sinner's Sacrifice gambles, urns run home), each ranked against other players. Three.js visuals, 1920s-occult-jazz music, mostly hype with a roast or two. Afterwards, a dashboard to explore, a shareable export, and a squad mode to compare friends.
 
-**Status:** pre-code. The design is still being decided.
+**Status:** milestone M1 (data layer) is done. M2 (the 2D story) is next.
 
 ## Knowledge base
 
