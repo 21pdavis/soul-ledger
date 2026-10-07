@@ -73,7 +73,7 @@ Every change to app behaviour follows **red → green → refactor**. This is a 
 - **PR descriptions:** list the red → green evidence for each behaviour (the failing test name and what made it pass). Reviewers, human or subagent, check that every new behaviour has a test that was seen failing first.
 - **Exceptions**, which need no failing test: docs, config, generated migrations and pure wiring with no logic. Name them in the PR.
 
-## Environments and branches (ADR 0042, 0043)
+## Environments and branches (ADR 0042, 0043, 0044)
 
 | Environment | Branch | URL | Database |
 |---|---|---|---|
@@ -86,9 +86,13 @@ Rules for agents:
 - **PRs gate every change.** Never push directly to `staging` or `main`, never force-push either, and never push to a branch after its PR has merged. Every change, including one-line doc fixes, goes through a PR with green CI.
 - Cut feature branches from `staging` and open PRs **into `staging`**. You may merge your own PR into `staging` only when **both** of these hold:
   1. **CI passes** on the PR's final commit.
-  2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts its findings as a PR comment (`gh pr comment`), even when it finds nothing. Every finding is either fixed in a new commit, which needs CI again, or answered in a reply explaining why not.
+  2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts its findings as a PR comment (`gh pr comment`), even when it finds nothing.
+- **Act on agent review feedback without being asked**, as if the owner had said "go fix the feedback on this PR".
+  - **Blocking** findings must be fixed. The only exception is a finding that turns on a business decision only the owner can make: ask the owner and don't merge until they answer. Never dismiss a blocking finding on your own.
+  - **Non-blocking** findings and nits are fixed, or answered in a PR reply explaining why not.
+  - Every fix commit needs CI to pass again before merging.
 - PRs into `staging` don't need the owner's review. **`staging` → `main` always does**, and only the owner merges it.
-- **Tell the owner about every merge.** Whenever you merge a PR, report it in the conversation straight away: PR number and link, a one-line summary, the agent review outcome, and the CI result. During long unattended runs, also send a push notification. Don't batch merges silently into an end-of-run summary.
+- **Tell the owner about every merge.** Whenever you merge a PR, or notice that one was merged (including the owner's `staging` → `main`), report it in the conversation straight away: PR number and link, a one-line summary, the agent review outcome, and the CI result. During long unattended runs, also send a push notification. Don't batch merges silently into an end-of-run summary.
 - Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.

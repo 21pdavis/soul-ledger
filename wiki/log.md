@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-07
+* **Decision**: [ADR 0044](decisions/0044-pr-gated-changes-and-agent-review.md): PRs gate every change; agents merge into `staging` only after CI and an independent agent review, act on review feedback without being asked, and report every merge. Supersedes ADR 0042's merge rule. Added the `pre-public` issue label (#8, #9).
 * **Update**: GitHub issues are now the source of truth for tech debt (the TD-n register is retired; new issues #15 for 2FA and #16 for a shared limiter; #10 now covers `staging` too). CLAUDE.md: PRs gate every change, with no direct or force pushes, an agent review is required before merging into `staging`, and every merge is reported to the owner.
 * **Update**: CLAUDE.md now makes strict red-green-refactor TDD a rule (ADR 0029), with red-first evidence required in PRs.
 * **Decision**: [ADR 0043](decisions/0043-staging-access-link.md) unlocks staging with a secret link and a 90-day signed cookie instead of Google sign-in (Auth.js removed). [ADR 0042](decisions/0042-staging-environment.md) is partly superseded.

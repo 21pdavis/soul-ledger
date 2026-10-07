@@ -40,6 +40,7 @@
 * [0040: M1 implementation choices confirmed; parry king at 60%](0040-m1-implementation-choices.md) - Confirms M1's libraries, flattened stat schema and tuning values as built, and sets the parry-king line at a 60% success rate.
 * [0041: CHANGELOG.md plus a tagged GitHub Release per milestone](0041-changelog-and-releases.md) - Release notes live in CHANGELOG.md (Keep a Changelog); each milestone is a minor version tagged and published as a GitHub Release, with an in-app What's new page later.
 * [0043: Staging access by secret link and 90-day cookie, replacing Google sign-in](0043-staging-access-link.md) - The staging gate admits a browser that opened a link carrying STAGING_ACCESS_KEY (then a signed 90-day cookie) or a request with that key in the x-staging-token header; Google sign-in is dropped.
+* [0044: PRs gate every change; agent review before merging into staging](0044-pr-gated-changes-and-agent-review.md) - Every change goes through a PR with green CI; agents merge into staging only after an independent agent review whose feedback they act on; the owner hears about every merge and alone merges into main.
 
 # Superseded decisions
 
