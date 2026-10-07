@@ -30,8 +30,15 @@ A PR number, and optionally what to focus on or a request to **re-review** after
      - `CHANGELOG.md` updated when players would notice the change;
      - wiki rules followed (`pnpm check:wiki`);
      - no scope creep.
-3. You may run read-only commands: tests, `pnpm check:wiki`, `git log`/`git diff`, and throwaway probe scripts in the session scratchpad.
+3. You may run read-only commands: tests, `pnpm check:wiki`, `git log`/`git diff`, and throwaway probe scripts.
+   - Put any file you need (a probe script, the comment body) in a temp directory created with `mktemp -d`, and write it with a Bash heredoc. You have no Write tool, and the repo's working tree must stay untouched.
+   - To run the PR's code, use `git worktree add <tmp> origin/<branch>` plus `pnpm install --frozen-lockfile` there, not a checkout in the main tree. Remove the worktree when done.
 4. **Never** edit repo files, commit, push or merge. If a check needs a code change, make it a finding.
+
+# Stop
+
+- **Done** once your comment is posted.
+- **Blocked:** if you can't read the PR or post the comment (auth or network), report that instead of retrying for long.
 
 # Output
 

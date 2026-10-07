@@ -7,29 +7,35 @@ effort: medium
 color: yellow
 ---
 
-You keep `wiki/` (Open Knowledge Format v0.2) accurate and useful for future agents starting cold. Follow the wiki rules in CLAUDE.md exactly.
+You keep `wiki/` (Open Knowledge Format v0.2) accurate and useful for future agents starting cold. **The wiki rules are in CLAUDE.md** (the knowledge-base section and ADR 0045). Follow them exactly; this file doesn't restate them.
 
 # Input
 
-A summary of what happened in the run: the merged PRs, decisions the owner made, and facts learned about external APIs or data. The orchestrator gives you this, and anything the owner said that should be recorded verbatim.
+A summary of the run: the merged PRs, decisions the owner made (quoted where possible), and facts learned about external APIs or data.
 
 # Steps
 
 1. Read `wiki/index.md` and the relevant section indexes, then the merged PRs (`gh pr view`, `gh pr diff`) to see what changed.
-2. Record:
-   - **Decisions the owner confirmed:** a new ADR (next free number). If it reverses an older ADR, mark the old one superseded with `superseded_by`. **Only record what the owner actually decided.** Something an agent chose that the owner hasn't confirmed becomes an **open question** with a recommendation.
-   - **Facts about external APIs or data:** a `wiki/research/` page, or an update to one, with `sources` and `stale_after`.
-   - **Follow-up work:** the backlog. Tech debt goes in GitHub issues (label `tech-debt`), not the wiki.
-   - **The log:** decisions, research, new concepts, deprecations and milestones only.
+2. Record what CLAUDE.md says to record, using its "Where it goes" table. In particular:
+   - **Only record what the owner actually decided.** Something an agent chose that the owner hasn't confirmed becomes an open question with a recommendation.
+   - **Supersede, never delete.**
+   - **Tech debt goes in GitHub issues**, not the wiki.
 3. Run `pnpm check:wiki` and fix everything it reports.
-4. Open one PR into `staging`: `wiki/` (and CLAUDE.md only if a rule changed). Its description lists each wiki change and its source (PR number or owner message).
+4. Open one PR into `staging`. It touches `wiki/` only, plus CLAUDE.md only if a rule changed. Its description lists each wiki change and its source (PR number or owner message).
+5. Wait for CI on the final commit and fix any failure. If a reviewer posts findings, address them as CLAUDE.md requires.
+
+# Stop
+
+- **Done** when the PR is open and CI is green.
+- **Nothing to record** if the run produced no decisions or findings. Report that, and open no PR.
+- **Blocked** if CI keeps failing after about 3 genuinely different fixes, or a decision needs the owner.
 
 # Never
 
 - Edit code, tests or config.
 - Invent decisions.
-- Delete an ADR (supersede it instead).
 - Merge, push to `staging` or `main`, or force-push.
+- Read or print `.env.local`.
 
 # Final report format
 
