@@ -1,63 +1,67 @@
-import { timingSafeEqual } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
- * The staging gate (ADR 0042): when on, every route needs either a Google sign-in from an
- * allowlisted email or the automation bypass token. Off in production, which stays public.
+ * The staging gate (ADR 0043). When on, every route needs a session cookie (set by opening any
+ * URL once with `?key=<STAGING_ACCESS_KEY>`) or the same key in the `x-staging-token` header.
+ * Off in production, which stays public.
  */
 export interface GateConfig {
   enabled: boolean;
-  /** Lower-cased emails allowed to sign in. */
-  allowedEmails: string[];
-  /** Shared secret for automated tests and agents; null disables the bypass. */
-  bypassToken: string | null;
+  /** Null when unset or too short; the gate then refuses everyone (fails closed). */
+  accessKey: string | null;
 }
 
-export type GateDecision = "allow" | "sign_in" | "unauthorized" | "not_found";
+export type GateDecision = "allow" | "login" | "deny_page" | "deny_api";
 
-/** Request header carrying the bypass token. */
-export const BYPASS_HEADER = "x-staging-token";
+export const ACCESS_HEADER = "x-staging-token";
+export const KEY_PARAM = "key";
+export const SESSION_COOKIE = "staging_session";
+export const SESSION_DAYS = 90;
 
-const MIN_TOKEN_LENGTH = 32;
+const MIN_KEY_LENGTH = 32;
 
 export function readGateConfig(env: Record<string, string | undefined>): GateConfig {
-  const token = env.STAGING_BYPASS_TOKEN ?? "";
+  const key = env.STAGING_ACCESS_KEY ?? "";
   return {
     enabled: env.STAGING_GATE === "on",
-    allowedEmails: (env.STAGING_ALLOWED_EMAILS ?? "")
-      .split(",")
-      .map((e) => e.trim().toLowerCase())
-      .filter(Boolean),
-    bypassToken: token.length >= MIN_TOKEN_LENGTH ? token : null,
+    accessKey: key.length >= MIN_KEY_LENGTH ? key : null,
   };
 }
-
-const isUnder = (pathname: string, prefix: string) =>
-  pathname === prefix || pathname.startsWith(prefix + "/");
 
 export function gateDecision(input: {
   config: GateConfig;
   pathname: string;
-  token: string | null;
-  sessionEmail: string | null;
+  headerToken: string | null;
+  queryKey: string | null;
+  cookie: string | null;
+  now: number;
 }): GateDecision {
-  const { config, pathname, token, sessionEmail } = input;
+  const { config, pathname, headerToken, queryKey, cookie, now } = input;
+  if (!config.enabled || pathname === "/api/health") return "allow";
 
-  if (!config.enabled) return isUnder(pathname, "/api/auth") ? "not_found" : "allow";
-
-  if (isUnder(pathname, "/api/auth") || pathname === "/api/health") return "allow";
-  if (config.bypassToken && token && tokensMatch(token, config.bypassToken)) return "allow";
-  if (sessionEmail && config.allowedEmails.includes(sessionEmail.toLowerCase())) return "allow";
-
-  return isUnder(pathname, "/api") ? "unauthorized" : "sign_in";
+  const key = config.accessKey;
+  if (key) {
+    if (headerToken && tokensMatch(headerToken, key)) return "allow";
+    if (queryKey && tokensMatch(queryKey, key)) return "login";
+    if (cookie && verifySession(key, cookie, now)) return "allow";
+  }
+  return pathname === "/api" || pathname.startsWith("/api/") ? "deny_api" : "deny_page";
 }
 
-/** Only verified, allowlisted emails may create a session. */
-export function isAllowedEmail(
-  email: string | null | undefined,
-  verified: boolean | null | undefined,
-  allowedEmails: string[],
-): boolean {
-  return !!email && verified === true && allowedEmails.includes(email.toLowerCase());
+/** A session cookie value: `<expiry ms>.<HMAC of the expiry>`, signed with the access key. */
+export function signSession(key: string, expiresAt: number): string {
+  return `${expiresAt}.${hmac(key, String(expiresAt))}`;
+}
+
+export function verifySession(key: string, value: string, now: number): boolean {
+  const match = /^(\d+)\.([\w-]+)$/.exec(value);
+  if (!match) return false;
+  const [, expiry, signature] = match;
+  return tokensMatch(signature, hmac(key, expiry)) && Number(expiry) > now;
+}
+
+function hmac(key: string, data: string): string {
+  return createHmac("sha256", key).update(data).digest("base64url");
 }
 
 export function tokensMatch(given: string, expected: string): boolean {

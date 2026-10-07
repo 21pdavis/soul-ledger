@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-07
+* **Decision**: [ADR 0043](decisions/0043-staging-access-link.md) unlocks staging with a secret link and a 90-day signed cookie instead of Google sign-in (Auth.js removed). [ADR 0042](decisions/0042-staging-environment.md) is partly superseded.
 * **Creation**: Added the [tech-debt register](recommendations/tech-debt.md) (TD-1 to TD-9) and GitHub issues #7-#13 (labels `tech-debt`, `security`, `infra`). Security items must be fixed before the repo goes public at M2.
 * **Decision**: [ADR 0042](decisions/0042-staging-environment.md) adds a staging environment: a `staging` branch, the Render service `soul-ledger-staging`, the Neon branch `staging`, and Google sign-in plus a bypass token. Published the [v0.1.0 release](https://github.com/21pdavis/soul-ledger/releases/tag/v0.1.0).
 * **Decision**: [ADR 0041](decisions/0041-changelog-and-releases.md) adds `CHANGELOG.md` and a GitHub Release per milestone. M1 is released as **v0.1.0**.

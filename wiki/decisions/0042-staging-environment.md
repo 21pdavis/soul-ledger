@@ -3,11 +3,14 @@ type: Decision Record
 title: "0042: A private staging environment behind Google sign-in, fed by a staging branch"
 description: Staging is a second Render service deploying the staging branch against a Neon staging branch, gated by Google sign-in for allowlisted emails plus a bypass token for automation.
 tags: [infra, staging, auth, process]
-status: stable
-decision: accepted
+status: deprecated
+decision: superseded
+superseded_by: 0043-staging-access-link.md
 decided_on: 2026-10-07
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
 ---
+
+> **Partly superseded** by [ADR 0043](0043-staging-access-link.md): staging is unlocked with a secret link and cookie, not Google sign-in. The environments, branches and agent rules below still stand.
 
 # Decision
 

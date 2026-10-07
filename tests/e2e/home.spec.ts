@@ -25,7 +25,9 @@ test("health endpoint answers for Render's health check", async ({ request }) =>
   expect(await res.json()).toEqual({ ok: true });
 });
 
-test("production hides the sign-in routes", async ({ request }) => {
-  test.skip(!!process.env.STAGING_URL, "staging has sign-in routes by design");
-  expect((await request.get("/api/auth/signin")).status()).toBe(404);
+test("production ignores the staging key and sets no cookie", async ({ request }) => {
+  test.skip(!!process.env.STAGING_URL, "staging is gated by design");
+  const res = await request.get("/?key=" + "x".repeat(40), { maxRedirects: 0 });
+  expect(res.status()).toBe(200);
+  expect(res.headers()["set-cookie"]).toBeUndefined();
 });

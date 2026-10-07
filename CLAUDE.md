@@ -60,18 +60,18 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
 - Prefer structure (headings, tables, lists) over prose.
 - File names: lowercase kebab-case. ADRs are numbered `NNNN-slug.md`.
 
-## Environments and branches (ADR 0042)
+## Environments and branches (ADR 0042, 0043)
 
 | Environment | Branch | URL | Database |
 |---|---|---|---|
 | Production | `main` | https://soul-ledger.onrender.com | Neon `main` |
-| Staging | `staging` | https://soul-ledger-staging.onrender.com (Google sign-in) | Neon `staging` |
+| Staging | `staging` | https://soul-ledger-staging.onrender.com (secret access link, ADR 0043) | Neon `staging` |
 | Local | any | http://localhost:3000 | Neon `dev` (`DATABASE_URL` in `.env.local`) |
 
 Rules for agents:
 
 - Cut feature branches from `staging` and open PRs **into `staging`**. You may merge them once CI is green.
-- Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_BYPASS_TOKEN` from `.env.local`. API calls need the `x-staging-token` header.
+- Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
 

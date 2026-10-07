@@ -4,14 +4,14 @@ const PORT = 3100;
 const GATE_PORT = 3101;
 
 /** Local stand-in secrets for the gated server; never used anywhere real. */
-export const TEST_BYPASS_TOKEN = "e2e-bypass-token-0123456789abcdef0123";
+export const TEST_ACCESS_KEY = "e2e-access-key-0123456789abcdef0123456";
 
 /**
  * Two modes:
  * - Local (default): `pnpm test:e2e` builds once, then starts an open server (like production)
  *   and a gated one (like staging) to test the gate itself.
- * - Remote: with STAGING_URL and STAGING_BYPASS_TOKEN set, `pnpm test:e2e:staging` runs the
- *   phone and desktop suites against live staging, passing the gate with the bypass token.
+ * - Remote: with STAGING_URL and STAGING_ACCESS_KEY set, `pnpm test:e2e:staging` runs the
+ *   phone and desktop suites against live staging, passing the gate with the key header.
  */
 const remote = process.env.STAGING_URL;
 
@@ -32,7 +32,7 @@ export default defineConfig({
   use: {
     baseURL: remote ?? `http://localhost:${PORT}`,
     trace: "on-first-retry",
-    extraHTTPHeaders: remote ? { "x-staging-token": process.env.STAGING_BYPASS_TOKEN ?? "" } : {},
+    extraHTTPHeaders: remote ? { "x-staging-token": process.env.STAGING_ACCESS_KEY ?? "" } : {},
   },
   projects: remote
     ? devicesProjects
@@ -59,14 +59,7 @@ export default defineConfig({
           url: `http://localhost:${GATE_PORT}/api/health`,
           reuseExistingServer: !process.env.CI,
           timeout: 60_000,
-          env: {
-            STAGING_GATE: "on",
-            STAGING_ALLOWED_EMAILS: "owner@example.com",
-            STAGING_BYPASS_TOKEN: TEST_BYPASS_TOKEN,
-            AUTH_SECRET: "e2e-only-auth-secret-not-used-anywhere-real",
-            AUTH_GOOGLE_ID: "e2e-google-client-id",
-            AUTH_GOOGLE_SECRET: "e2e-google-client-secret",
-          },
+          env: { STAGING_GATE: "on", STAGING_ACCESS_KEY: TEST_ACCESS_KEY },
         },
       ],
 });

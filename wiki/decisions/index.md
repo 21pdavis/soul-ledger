@@ -39,9 +39,10 @@
 * [0039: Deploy from main via a Render Blueprint on the free plan](0039-render-free-blueprint.md) - The app deploys as one free-plan Render web service in Oregon, defined in render.yaml, built from main after PR review, using the migrated Neon main branch.
 * [0040: M1 implementation choices confirmed; parry king at 60%](0040-m1-implementation-choices.md) - Confirms M1's libraries, flattened stat schema and tuning values as built, and sets the parry-king line at a 60% success rate.
 * [0041: CHANGELOG.md plus a tagged GitHub Release per milestone](0041-changelog-and-releases.md) - Release notes live in CHANGELOG.md (Keep a Changelog); each milestone is a minor version tagged and published as a GitHub Release, with an in-app What's new page later.
-* [0042: A private staging environment behind Google sign-in, fed by a staging branch](0042-staging-environment.md) - Staging is a second Render service deploying the staging branch against a Neon staging branch, gated by Google sign-in for allowlisted emails plus a bypass token for automation.
+* [0043: Staging access by secret link and 90-day cookie, replacing Google sign-in](0043-staging-access-link.md) - The staging gate admits a browser that opened a link carrying STAGING_ACCESS_KEY (then a signed 90-day cookie) or a request with that key in the x-staging-token header; Google sign-in is dropped.
 
 # Superseded decisions
 
 * [0020: Squad roles list and assignment](0020-squad-roles.md) - Ten squad roles, each awarded for the highest per-match value of one stat; every player gets one headline role, and extras show as badges.
 * [0036: A one-trick plays their main in at least 60% of matches](0036-one-trick-threshold.md) - The roster slide labels a player a one-trick when their most-played hero accounts for 60% or more of counted matches, otherwise flex.
+* [0042: A private staging environment behind Google sign-in, fed by a staging branch](0042-staging-environment.md) - Environments and agent rules still stand; the Google sign-in part was superseded by 0043. Staging is a second Render service deploying the staging branch against a Neon staging branch, gated by Google sign-in for allowlisted emails plus a bypass token for automation.
