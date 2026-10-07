@@ -30,6 +30,6 @@ All checks compare in constant time. The code is in `src/lib/staging-gate.ts` an
 
 - **The link is the password.** Anyone who has it gets in, and it stays in browser history on devices where it was opened. Keep it in a password manager and don't paste it anywhere public. If it leaks, change `STAGING_ACCESS_KEY` on Render, which also logs everyone out.
 - Unlike Google sign-in, access isn't tied to a person, there's no second factor, and there's no per-person revocation. That's acceptable for one owner reviewing a staging site with public data.
-- The URL is still reachable from the internet; only the app's gate stands in front. The upgrade path stays Cloudflare Access on a custom domain ([TD-4](../recommendations/tech-debt.md)).
+- The URL is still reachable from the internet; only the app's gate stands in front. The upgrade path stays Cloudflare Access on a custom domain ([#11](https://github.com/21pdavis/soul-ledger/issues/11)).
 
 Supersedes the Google sign-in part of [ADR 0042](0042-staging-environment.md).

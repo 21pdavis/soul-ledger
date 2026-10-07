@@ -28,7 +28,7 @@ Don't batch wiki updates to the end. When something is learned or decided, write
 | A new undecided question comes up | `wiki/open-questions/short-slug.md` with `question_status: open` and a `recommendation`. |
 | A fact about an external API, data or library | A concept in `wiki/research/`, with `sources` in frontmatter and footnotes keyed to `sources[].id` for specific claims. |
 | An idea, improvement or future task | `wiki/recommendations/backlog.md`, or a new concept in `wiki/recommendations/` if it is large. |
-| A shortcut taken, or a known gap or security weakness | A new `TD-n` row in `wiki/recommendations/tech-debt.md` plus a GitHub issue labelled `tech-debt` (and `security` if relevant). Before the repo is public, issues are private; after that, describe security gaps generally and fix them before disclosing details. |
+| A shortcut taken, or a known gap or security weakness | A **GitHub issue** labelled `tech-debt` (plus `security`/`infra` where they fit). Issues are the source of truth; refer to them by number (#10). Rules: `wiki/recommendations/tech-debt.md`. |
 | A decision gets reversed | Write a new ADR. Set the old one to `status: deprecated` and add `superseded_by:`. Never delete it. |
 
 After every change to the wiki:
@@ -83,7 +83,8 @@ Every change to app behaviour follows **red → green → refactor**. This is a 
 
 Rules for agents:
 
-- Cut feature branches from `staging` and open PRs **into `staging`**. You may merge them once CI is green.
+- **PRs gate every change.** Never push directly to `staging` or `main`, never force-push either, and never push to a branch after its PR has merged. Every change, including one-line doc fixes, goes through a PR with green CI.
+- Cut feature branches from `staging` and open PRs **into `staging`**. You may merge your own PR into `staging` only after CI passes on its final commit.
 - Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
