@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: "0031: Visual identity is art-deco occult"
-description: UI uses an art-deco occult look: deco display type, clean grotesk numerals, ink/bone palette with Patron-green and brass, ledger motifs.
+description: "UI uses an art-deco occult look: deco display type, clean grotesk numerals, ink/bone palette with Patron-green and brass, ledger motifs."
 tags: [design, brand]
 status: stable
 decision: accepted

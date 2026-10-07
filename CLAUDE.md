@@ -31,11 +31,21 @@ Don't batch wiki updates to the end. When something is learned or decided, write
 | A shortcut taken, or a known gap or security weakness | A **GitHub issue** labelled `tech-debt` (plus `security`/`infra` where they fit). Issues are the source of truth; refer to them by number (#10). Rules: `wiki/recommendations/tech-debt.md`. |
 | A decision gets reversed | Write a new ADR. Set the old one to `status: deprecated` and add `superseded_by:`. Never delete it. |
 
-After every change to the wiki:
+After changing the wiki ([ADR 0045](wiki/decisions/0045-lighter-wiki-upkeep.md)):
 
-- **Update the `index.md`** of every directory you touched, and the root `wiki/index.md` if you added a section. Every entry is `* [Title](path) - description`, and the description matches the concept's frontmatter `description`.
-- **Add an entry to `wiki/log.md`**: newest date first, `## YYYY-MM-DD` headings, bullets that start with a bold verb (`**Creation**`, `**Update**`, `**Decision**`, `**Deprecation**`, `**Research**`).
+- **Run `pnpm check:wiki`** (CI runs it too). It catches the bookkeeping, so you don't have to remember it, and its messages say exactly what to fix:
+  - frontmatter that won't parse, or lacks `type` or `description`;
+  - a concept missing from its directory `index.md`, or an index description that doesn't match the frontmatter;
+  - broken relative links;
+  - a superseded ADR without `superseded_by`, or a resolved question without `resolved_by`;
+  - log dates out of order;
+  - CRLF line endings.
+- **Index entries** are `* [Title](file.md) - description`, with the description copied from the frontmatter. To change the wording, change the frontmatter and copy it across.
+- **Log only what a future agent needs to know happened**, under `## YYYY-MM-DD` (newest first), one bullet per item, each starting with a bold verb: `**Decision**`, `**Research**`, `**Creation**` (a new concept), `**Deprecation**` or `**Milestone**`. Skip routine edits (wording, timestamps, index tweaks, link fixes); git history has those.
+- **Quote YAML values that contain `: ` or start with a quote**, e.g. `description: "Uses X: a, b."`. Otherwise the frontmatter breaks.
 - Commit wiki changes alongside the code they explain.
+
+**Where things live:** CLAUDE.md states the **operational rules**, briefly, and links the ADR. The ADR holds the **decision and its reasoning**. Don't restate an ADR's reasoning here; link to it.
 
 ### Release notes: `CHANGELOG.md`
 
@@ -49,7 +59,7 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
   - `title` and `description`: description is one sentence.
   - `tags`.
   - `status`: `draft` | `stable` | `deprecated`.
-  - `generated: { by: <actor>, at: <ISO-8601 UTC> }`: update this whenever you meaningfully change the content.
+  - `generated: { by: <actor>, at: <ISO-8601 UTC> }`: update this whenever you meaningfully change the content. Description syncs and formatting fixes don't count.
   - `sources`: list of `{ id, resource, title }` when the content derives from external material.
   - `verified`: only when content was actually checked. Add `{ by: human:paul, at: ... }` only when the user explicitly confirms the written content.
   - `stale_after`: use it on research about fast-moving things such as the API.
@@ -60,7 +70,7 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
 - Prefer structure (headings, tables, lists) over prose.
 - File names: lowercase kebab-case. ADRs are numbered `NNNN-slug.md`.
 
-## Testing: strict TDD (ADR 0029)
+## Testing: strict TDD (ADR 0029, 0046)
 
 Every change to app behaviour follows **red → green → refactor**. This is a rule, not a preference.
 
