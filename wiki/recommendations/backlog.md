@@ -22,6 +22,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 # Later / deferred features
 
 - Steam OpenID login ([ADR 0002](../decisions/0002-steam-id-no-login.md)).
+- Username search like Statlocker's, after the URL-only prototype. The API already has `/v1/players/steam-search` (search by account id or persona name, with a recent-activity weighting) ([API](../research/deadlock-api.md)).
 - The "unlock full history" flow ([ADR 0009](../decisions/0009-preview-then-full-history.md), [mechanism](../open-questions/full-history-unlock.md)).
 - Video export ([export](../decisions/0011-sharing.md)).
 

@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-06
+* **Milestone**: The user confirmed shared understanding. The interview is complete. Username search was added to the [backlog](recommendations/backlog.md); the prototype stays URL-only.
 * **Decision**: Recorded round-5 answers as [ADRs 0031-0034](decisions/index.md): visual identity, GitHub private with CI, the Neon project, tooling. No open questions remain.
 * **Infra**: Created the Neon project `soul-ledger` (`icy-bread-38573768`) with `main` and `dev` branches. Created the private GitHub repo `21pdavis/soul-ledger`.
 * **Research**: Test-account coverage: 352 of ~650 games (~54%) are available without payment.
