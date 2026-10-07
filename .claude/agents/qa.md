@@ -23,7 +23,7 @@ The merged PR number(s), plus what changed and what to look at.
 `.env.local` holds database URLs and keys. **Never** `cat`, `Read` or print it, or echo its values. Export only what you need, with exactly this, in the same shell command as the tests:
 
 ```
-export STAGING_URL="$(grep '^STAGING_URL=' .env.local | cut -d= -f2- | tr -d '"')" STAGING_ACCESS_KEY="$(grep '^STAGING_ACCESS_KEY=' .env.local | cut -d= -f2- | tr -d '"')"
+export STAGING_URL="$(grep '^STAGING_URL=' .env.local | cut -d= -f2- | tr -d '"\r')" STAGING_ACCESS_KEY="$(grep '^STAGING_ACCESS_KEY=' .env.local | cut -d= -f2- | tr -d '"\r')"
 ```
 
 # Steps

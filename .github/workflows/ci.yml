@@ -1,8 +1,10 @@
 name: CI
 
+# One run per change (ADR 0047): PRs, plus pushes to the long-lived branches.
 on:
-  push:
   pull_request:
+  push:
+    branches: [main, staging]
 
 jobs:
   test:
@@ -10,6 +12,25 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Docs-only PRs (markdown, wiki/, .claude/) skip typecheck, tests and e2e.
+      # Pushes to main/staging and any PR touching other files run everything.
+      - name: Classify changes
+        id: changes
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          files=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          echo "Changed files:"; echo "$files"
+          if echo "$files" | grep -qvE '(\.md$|^wiki/|^\.claude/)'; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+            echo "Docs-only change: running format, lint and wiki check only."
+          fi
 
       - uses: pnpm/action-setup@v4
 
@@ -26,24 +47,28 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Typecheck
-        run: pnpm typecheck
-
       - name: Wiki check (OKF)
         run: pnpm check:wiki
 
+      - name: Typecheck
+        if: steps.changes.outputs.code == 'true'
+        run: pnpm typecheck
+
       # Integration tests use in-process PGlite, so no database service is needed.
       - name: Unit and integration tests
+        if: steps.changes.outputs.code == 'true'
         run: pnpm test
 
       - name: Install Playwright browser
+        if: steps.changes.outputs.code == 'true'
         run: pnpm exec playwright install --with-deps chromium
 
       - name: End-to-end tests (phone and desktop)
+        if: steps.changes.outputs.code == 'true'
         run: pnpm test:e2e
 
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: failure() && steps.changes.outputs.code == 'true'
         with:
           name: playwright-report
           path: playwright-report/

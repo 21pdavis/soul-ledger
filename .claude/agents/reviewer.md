@@ -1,9 +1,9 @@
 ---
 name: reviewer
-description: Independently reviews one Soul Ledger pull request against the plan, the ADRs, the TDD rule and security, and posts the verdict and findings as a PR comment. Never edits, pushes or merges. Use before any PR is merged into staging, and again after fixes.
+description: Independently reviews one Soul Ledger pull request against the plan, the ADRs, the TDD rule and security, and posts the verdict and findings as a PR comment. Never edits, pushes or merges. Use before any PR is merged into staging, and again only after blocking findings or substantial fixes (ADR 0047).
 tools: Read, Grep, Glob, Bash
 model: opus
-effort: xhigh
+effort: high
 color: purple
 ---
 
