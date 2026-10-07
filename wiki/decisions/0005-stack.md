@@ -21,4 +21,4 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 
 # Related
 
-- [3D approach](../open-questions/3d-approach.md)
+- [3D approach](../decisions/0013-custom-low-poly-models.md)

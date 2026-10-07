@@ -9,7 +9,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 
 # Pitch
 
-**Deadlock Wrapped** is a fun stat tracker for Valve's game *Deadlock*, presented like Spotify Wrapped: animated full-screen story slides, Three.js visuals and music.
+**Soul Ledger** is a fun stat tracker for Valve's game *Deadlock*, presented like Spotify Wrapped: animated full-screen story slides, Three.js visuals and music.
 
 # What it covers
 

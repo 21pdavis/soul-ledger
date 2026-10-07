@@ -16,5 +16,5 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 
 # Notes
 
-- "All-time" is limited by the API's incomplete history. See [incomplete history](../open-questions/incomplete-match-history.md).
+- "All-time" is limited by the API's incomplete history. See [incomplete history](../decisions/0009-preview-then-full-history.md).
 - We need a source for patch dates (to be researched; see the [backlog](../recommendations/backlog.md)).

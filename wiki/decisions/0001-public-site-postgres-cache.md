@@ -21,6 +21,6 @@ The site needs data from the third-party [deadlock-api.com](../research/deadlock
 
 # Consequences
 
-- We need a schema for matches and per-player match rows, plus a refresh policy (see [incomplete history](../open-questions/incomplete-match-history.md)).
+- We need a schema for matches and per-player match rows, plus a refresh policy (see [incomplete history](../decisions/0009-preview-then-full-history.md)).
 - Postgres storage grows with users. Store only the fields the slides need, or compress raw JSON.
-- Our cache also feeds the site-only Hall of Fame (see [ranking population](../open-questions/ranking-population.md)).
+- Our cache also feeds the site-only Hall of Fame (see [ranking population](../decisions/0008-ranking-population.md)).

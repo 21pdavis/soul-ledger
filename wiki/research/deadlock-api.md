@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: deadlock-api.com endpoints and limits
-description: The deadlock-api.com endpoints Deadlock Wrapped needs, with their rate limits and coverage caveats.
+description: The deadlock-api.com endpoints Soul Ledger needs, with their rate limits and coverage caveats.
 resource: https://api.deadlock-api.com/openapi.json
 tags: [data-source, api, deadlock-api]
 status: stable
@@ -23,8 +23,8 @@ Verified against the live API on 2026-10-06.[^openapi]
 
 | Endpoint | Use | Notes |
 |---|---|---|
-| `/v1/players/{account_id}/match-history` | List of a player's matches | Stored history only, unless the account friends the API's Steam bot. One sample player had 63 matches back to 2024-09, so **coverage is incomplete** ([open question](../open-questions/incomplete-match-history.md)). |
-| `/v1/players/{id}/rank`, `/v1/players/rank` | Rank (single / batch) | Batch is useful for [squad mode](../open-questions/squad-mode.md). |
+| `/v1/players/{account_id}/match-history` | List of a player's matches | Stored history only, unless the account friends the API's Steam bot. One sample player had 63 matches back to 2024-09, so **coverage is incomplete** ([open question](../decisions/0009-preview-then-full-history.md)). |
+| `/v1/players/{id}/rank`, `/v1/players/rank` | Rank (single / batch) | Batch is useful for [squad mode](../decisions/0010-squad-mode.md). |
 | `/v1/players/{id}/mate-stats`, `/v1/players/{id}/enemy-stats` | Duo and rival stats | |
 | `/v1/players/steam`, `/v1/players/steam-search` | Steam profile lookup / search | For resolving pasted URLs ([ADR 0002](../decisions/0002-steam-id-no-login.md)). |
 | `account-stats` | | **Patreon-only**. Not usable. |
@@ -40,7 +40,7 @@ Verified against the live API on 2026-10-06.[^openapi]
 
 | Endpoint | Use | Notes |
 |---|---|---|
-| `/v1/analytics/player-stats/metrics` | Global quantiles (DDSketch) | Cached 6h. Basis for [percentile rankings](../open-questions/ranking-population.md). |
+| `/v1/analytics/player-stats/metrics` | Global quantiles (DDSketch) | Cached 6h. Basis for [percentile rankings](../decisions/0008-ranking-population.md). |
 | `/v1/analytics/scoreboards/players` | Player leaderboards | |
 
 All analytics endpoints share **200 req/min per IP**.

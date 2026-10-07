@@ -11,7 +11,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 
 | Priority | Item | Links |
 |---|---|---|
-| P0 | Finish interview round 2: resolve each open question and turn it into an ADR | [open questions](../open-questions/index.md) |
+| P0 | Write failing tests first, then build M1 (data layer) | [ADR 0028](../decisions/0028-milestones.md), [ADR 0029](../decisions/0029-testing-tdd.md) |
 | P0 | Design the Postgres cache schema (players, matches, per-player match rows, fetch state) | [ADR 0001](../decisions/0001-public-site-postgres-cache.md) |
 | P1 | Find a reliable source for patch dates to support the "this patch" toggle | [ADR 0004](../decisions/0004-time-window.md) |
 | P1 | Check which metrics `/v1/analytics/player-stats/metrics` supports for percentiles, especially the fun stats | [API](../research/deadlock-api.md) |
@@ -22,8 +22,8 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 # Later / deferred features
 
 - Steam OpenID login ([ADR 0002](../decisions/0002-steam-id-no-login.md)).
-- A bot-friend "unlock full history" flow ([incomplete history](../open-questions/incomplete-match-history.md)).
-- Video export ([export](../open-questions/export-format.md)).
+- The "unlock full history" flow ([ADR 0009](../decisions/0009-preview-then-full-history.md), [mechanism](../open-questions/full-history-unlock.md)).
+- Video export ([export](../decisions/0011-sharing.md)).
 
 # Standing recommendations
 

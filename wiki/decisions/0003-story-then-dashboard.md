@@ -13,9 +13,9 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 
 1. A linear, full-screen **Wrapped story** plays first.
 2. It ends in a **dashboard/hub** for exploring the stats freely.
-3. The story must be **exportable/shareable**. The format is pending in [export format](../open-questions/export-format.md).
+3. The story must be **exportable/shareable**. See [sharing](../decisions/0011-sharing.md).
 
 # Related
 
-- [v1 slide list](../open-questions/v1-story-slides.md)
-- [Layout](../open-questions/layout-aspect.md)
+- [v1 slide list](../decisions/0015-v1-slides.md)
+- [Layout](../decisions/0012-phone-first.md)

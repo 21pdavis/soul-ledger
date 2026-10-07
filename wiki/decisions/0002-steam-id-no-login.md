@@ -13,7 +13,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 
 - Players are identified by pasting a **Steam profile URL or ID** (vanity URL, profile URL, SteamID64, or account ID). No login is needed.
 - **Steam OpenID** sign-in may be added later.
-- **Squad mode**: friends load themselves in to compare: average rank, head-to-head stats, and so on. Details are pending in [squad mode](../open-questions/squad-mode.md).
+- **Squad mode**: friends load themselves in to compare: average rank, head-to-head stats, and so on. See [squad mode](../decisions/0010-squad-mode.md).
 
 # Notes
 

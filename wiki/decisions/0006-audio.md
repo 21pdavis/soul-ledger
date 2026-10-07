@@ -18,4 +18,4 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
 
 # Related
 
-- [Loading sequence](../open-questions/loading-sequence.md): the themed loader can double as the audio-unlock click.
+- [Loading sequence](../decisions/0014-staged-loading.md): the themed loader can double as the audio-unlock click.

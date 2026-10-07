@@ -2,9 +2,9 @@
 okf_version: "0.2"
 ---
 
-# Deadlock Wrapped knowledge base
+# Soul Ledger knowledge base
 
-* [Vision](vision.md) - What Deadlock Wrapped is, who it is for, and the experience it should deliver.
+* [Vision](vision.md) - What Soul Ledger is, who it is for, and the experience it should deliver.
 * [Change log](log.md) - Chronological history of updates to this knowledge base.
 
 # Sections
