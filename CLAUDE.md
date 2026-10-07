@@ -36,6 +36,10 @@ After every change to the wiki:
 - **Add an entry to `wiki/log.md`**: newest date first, `## YYYY-MM-DD` headings, bullets that start with a bold verb (`**Creation**`, `**Update**`, `**Decision**`, `**Deprecation**`, `**Research**`).
 - Commit wiki changes alongside the code they explain.
 
+### Release notes: `CHANGELOG.md`
+
+Any PR that changes what the app does (features, fixes, deploy or config changes users would notice) adds a line under **Unreleased** in `CHANGELOG.md`, in plain language for players. Releases happen per milestone ([ADR 0041](wiki/decisions/0041-changelog-and-releases.md)): move Unreleased into a dated version section, bump `package.json`, merge, then tag `vX.Y.Z` and publish a GitHub Release.
+
 ### OKF rules (summary of the spec as applied here)
 
 - Every `.md` file under `wiki/` except `index.md` and `log.md` is a **concept** and **must** start with YAML frontmatter containing `type`.

@@ -12,6 +12,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
 | Priority | Item | Links |
 |---|---|---|
 | P0 | Start M2: the 11-slide story in 2D, fed by `/api/lookup` | [ADR 0028](../decisions/0028-milestones.md) |
+| P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md) |
 | P1 | Bump GitHub Actions to Node 24 versions (checkout, setup-node, pnpm action), which CI flags as deprecated | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |

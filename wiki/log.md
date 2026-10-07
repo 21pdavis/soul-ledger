@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-07
+* **Decision**: [ADR 0041](decisions/0041-changelog-and-releases.md) adds `CHANGELOG.md` and a GitHub Release per milestone. M1 is released as **v0.1.0**.
 * **Decision**: [ADR 0040](decisions/0040-m1-implementation-choices.md) confirms the M1 implementation choices and raises the parry-king line to 60%. The [open question](open-questions/m1-implementation-choices.md) is resolved, and no open questions remain.
 * **Milestone**: M1 is live at https://soul-ledger.onrender.com, running against Neon `main`.
 * **Research**: Intermittent failures resolving [Steam vanity URLs](research/steam-vanity-resolution.md) from Render. Failures are now logged, and an optional `STEAM_API_KEY` switches to the official ResolveVanityURL API.
