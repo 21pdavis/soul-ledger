@@ -84,7 +84,10 @@ Every change to app behaviour follows **red → green → refactor**. This is a 
 Rules for agents:
 
 - **PRs gate every change.** Never push directly to `staging` or `main`, never force-push either, and never push to a branch after its PR has merged. Every change, including one-line doc fixes, goes through a PR with green CI.
-- Cut feature branches from `staging` and open PRs **into `staging`**. You may merge your own PR into `staging` only after CI passes on its final commit.
+- Cut feature branches from `staging` and open PRs **into `staging`**. You may merge your own PR into `staging` only when **both** of these hold:
+  1. **CI passes** on the PR's final commit.
+  2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts its findings as a PR comment (`gh pr comment`), even when it finds nothing. Every finding is either fixed in a new commit, which needs CI again, or answered in a reply explaining why not.
+- PRs into `staging` don't need the owner's review. **`staging` → `main` always does**, and only the owner merges it.
 - Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
