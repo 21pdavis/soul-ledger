@@ -88,6 +88,7 @@ Rules for agents:
   1. **CI passes** on the PR's final commit.
   2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts its findings as a PR comment (`gh pr comment`), even when it finds nothing. Every finding is either fixed in a new commit, which needs CI again, or answered in a reply explaining why not.
 - PRs into `staging` don't need the owner's review. **`staging` → `main` always does**, and only the owner merges it.
+- **Tell the owner about every merge.** Whenever you merge a PR, report it in the conversation straight away: PR number and link, a one-line summary, the agent review outcome, and the CI result. During long unattended runs, also send a push notification. Don't batch merges silently into an end-of-run summary.
 - Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
