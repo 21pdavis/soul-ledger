@@ -4,7 +4,7 @@ okf_version: "0.2"
 
 # Soul Ledger knowledge base
 
-* [Vision](vision.md) - What Soul Ledger is, who it is for, and the experience it should deliver.
+* [Vision](vision.md) - A Spotify-Wrapped-style animated stat story for Deadlock players, with rankings, squad comparisons and shareable exports.
 * [Change log](log.md) - Chronological history of updates to this knowledge base.
 
 # Sections

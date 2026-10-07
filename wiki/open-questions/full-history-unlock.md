@@ -1,10 +1,11 @@
 ---
 type: Open Question
 title: "How players unlock full match history"
-description: Which mechanism the second-step unlock uses: bot-friend, deadlock-api Patreon tier, ingest tool, or our own key/sponsorship.
+description: "Findings on bot-friend, the Patreon tier and the ingest tool; dev approach decided in ADR 0017; outreach deferred."
 tags: [data, api]
 status: draft
 question_status: resolved
+resolved_by: ../decisions/0017-full-history-via-patreon-for-now.md
 recommendation: "Ask the deadlock-api maintainers how third-party sites should use the bot-friend flow; meanwhile link the ingest tool and Patreon tier."
 raised_on: 2026-10-06
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T12:00:00Z }

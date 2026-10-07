@@ -46,4 +46,4 @@
 
 * [0020: Squad roles list and assignment](0020-squad-roles.md) - Ten squad roles, each awarded for the highest per-match value of one stat; every player gets one headline role, and extras show as badges.
 * [0036: A one-trick plays their main in at least 60% of matches](0036-one-trick-threshold.md) - The roster slide labels a player a one-trick when their most-played hero accounts for 60% or more of counted matches, otherwise flex.
-* [0042: A private staging environment behind Google sign-in, fed by a staging branch](0042-staging-environment.md) - Environments and branches still stand; the Google sign-in part was superseded by 0043 and the merge rule by 0044. Staging is a second Render service deploying the staging branch against a Neon staging branch, gated by Google sign-in for allowlisted emails plus a bypass token for automation.
+* [0042: A private staging environment behind Google sign-in, fed by a staging branch](0042-staging-environment.md) - Staging is a second Render service deploying the staging branch against a Neon staging branch; its Google sign-in was superseded by ADR 0043 and its merge rule by ADR 0044.

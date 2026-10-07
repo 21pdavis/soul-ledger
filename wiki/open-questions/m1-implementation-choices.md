@@ -1,7 +1,7 @@
 ---
 type: Open Question
 title: "M1 implementation choices awaiting confirmation"
-description: Libraries, schema shape, API format and tunable thresholds chosen while building M1 that no ADR covers yet.
+description: The libraries, schema and tuning values chosen while building M1; confirmed by ADR 0040.
 tags: [m1, tooling, backend, tuning]
 status: stable
 question_status: resolved

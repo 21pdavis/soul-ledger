@@ -1,7 +1,7 @@
 ---
 type: Open Question
 title: "Source of the current patch date for the this-patch toggle"
-description: Which date marks the start of the current patch; M1 provisionally parses the date from the newest /v1/patches changelog title.
+description: Findings on /v1/patches title dates versus pub_date; resolved by ADR 0035.
 tags: [data, api, patches]
 status: stable
 question_status: resolved
