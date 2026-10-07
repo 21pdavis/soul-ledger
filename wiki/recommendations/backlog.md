@@ -14,7 +14,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
 | P0 | Confirm the [M1 implementation choices](../open-questions/m1-implementation-choices.md) | |
 | P0 | Start M2: the 11-slide story in 2D, fed by `/api/lookup` | [ADR 0028](../decisions/0028-milestones.md) |
 | P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md) |
-| P1 | Run migrations on Neon `main` and set `DATABASE_URL` on Render when deploying | [ADR 0033](../decisions/0033-neon-project.md) |
+| P1 | Bump GitHub Actions to Node 24 versions (checkout, setup-node, pnpm action), which CI flags as deprecated | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |
 
@@ -22,6 +22,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
 
 - **M1 data layer** (2026-10-06): Steam input parsing and resolution, the deadlock-api client with rate limits, the Postgres cache with job lock, incremental sync, story stats, global and same-hero percentiles, and `GET /api/lookup` (NDJSON stream). Covered by unit, integration (PGlite) and e2e smoke tests, with CI.
 - Cache schema designed (`src/db/schema.ts`).
+- Neon `main` migrated, and the Render Blueprint added ([ADR 0039](../decisions/0039-render-free-blueprint.md)).
 - Metrics supported by the percentile endpoint: see [percentile metrics](../research/percentile-metrics.md).
 - Full accolade list: see [match fields](../research/match-metadata-fields.md).
 - Patch dates: [ADR 0035](../decisions/0035-patch-date-from-changelog-title.md).

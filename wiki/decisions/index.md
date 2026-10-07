@@ -36,6 +36,7 @@
 * [0035: The current patch starts on the date in the newest changelog title](0035-patch-date-from-changelog-title.md) - The this-patch window starts at UTC midnight of the MM-DD-YYYY date in the newest /v1/patches title, falling back to pub_date.
 * [0037: Squad roles list, without The Backseat Gamer](0037-squad-roles-without-backseat-gamer.md) - Nine squad roles, each awarded for the highest per-match value of one stat; The Backseat Gamer (pings) is dropped.
 * [0038: A one-trick plays their main in at least 50% of matches](0038-one-trick-threshold-50.md) - The roster slide labels a player a one-trick when their most-played hero accounts for 50% or more of counted matches, otherwise flex.
+* [0039: Deploy from main via a Render Blueprint on the free plan](0039-render-free-blueprint.md) - The app deploys as one free-plan Render web service in Oregon, defined in render.yaml, built from main after PR review, using the migrated Neon main branch.
 
 # Superseded decisions
 

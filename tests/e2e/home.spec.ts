@@ -18,3 +18,9 @@ test("lookup API rejects a request without a query", async ({ request }) => {
   const res = await request.get("/api/lookup");
   expect(res.status()).toBe(400);
 });
+
+test("health endpoint answers for Render's health check", async ({ request }) => {
+  const res = await request.get("/api/health");
+  expect(res.status()).toBe(200);
+  expect(await res.json()).toEqual({ ok: true });
+});
