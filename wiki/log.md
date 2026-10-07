@@ -1,5 +1,10 @@
 # Directory Update Log
 
+## 2026-10-07
+* **Decision**: [ADR 0040](decisions/0040-m1-implementation-choices.md) confirms the M1 implementation choices and raises the parry-king line to 60%. The [open question](open-questions/m1-implementation-choices.md) is resolved, and no open questions remain.
+* **Milestone**: M1 is live at https://soul-ledger.onrender.com, running against Neon `main`.
+* **Research**: Intermittent failures resolving [Steam vanity URLs](research/steam-vanity-resolution.md) from Render. Failures are now logged, and an optional `STEAM_API_KEY` switches to the official ResolveVanityURL API.
+
 ## 2026-10-06
 * **Update**: First Render deploy failed: `npm install -g pnpm` hit a read-only file system. The build now runs pnpm through `npx` ([ADR 0039](decisions/0039-render-free-blueprint.md)).
 * **Decision**: [ADR 0039](decisions/0039-render-free-blueprint.md): deploy from `main` via a Render Blueprint on the free plan in Oregon. Migrated Neon `main`. M1 is in [PR #1](https://github.com/21pdavis/soul-ledger/pull/1) with CI green.
