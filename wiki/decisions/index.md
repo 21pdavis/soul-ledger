@@ -37,6 +37,7 @@
 * [0037: Squad roles list, without The Backseat Gamer](0037-squad-roles-without-backseat-gamer.md) - Nine squad roles, each awarded for the highest per-match value of one stat; The Backseat Gamer (pings) is dropped.
 * [0038: A one-trick plays their main in at least 50% of matches](0038-one-trick-threshold-50.md) - The roster slide labels a player a one-trick when their most-played hero accounts for 50% or more of counted matches, otherwise flex.
 * [0039: Deploy from main via a Render Blueprint on the free plan](0039-render-free-blueprint.md) - The app deploys as one free-plan Render web service in Oregon, defined in render.yaml, built from main after PR review, using the migrated Neon main branch.
+* [0040: M1 implementation choices confirmed; parry king at 60%](0040-m1-implementation-choices.md) - Confirms M1's libraries, flattened stat schema and tuning values as built, and sets the parry-king line at a 60% success rate.
 
 # Superseded decisions
 

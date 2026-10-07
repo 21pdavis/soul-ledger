@@ -3,8 +3,9 @@ type: Open Question
 title: "M1 implementation choices awaiting confirmation"
 description: Libraries, schema shape, API format and tunable thresholds chosen while building M1 that no ADR covers yet.
 tags: [m1, tooling, backend, tuning]
-status: draft
-question_status: open
+status: stable
+question_status: resolved
+resolved_by: ../decisions/0040-m1-implementation-choices.md
 recommendation: "Accept as built; tune the thresholds once real players' stories can be seen in M2."
 raised_on: 2026-10-06
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:30:00Z }

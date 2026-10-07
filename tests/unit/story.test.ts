@@ -174,6 +174,22 @@ describe("computeStory edge cases", () => {
     expect(s.roster.label).toBe("one-trick");
   });
 
+  it.each([
+    [6, "king"],
+    [5, "clown"],
+  ] as const)(
+    "parry king line is 60 percent: %i of 10 parries landed is %s (ADR 0040)",
+    (n, label) => {
+      const s = computeStory({
+        matches: [row({ parrySuccess: n, parryMiss: 10 - n })],
+        rankHistory: [],
+        globalMetrics: {},
+        mainHeroMetrics: {},
+      });
+      expect(s.precision.parryLabel).toBe(label);
+    },
+  );
+
   it("labels parries", () => {
     const king = computeStory({
       matches: [row({ parrySuccess: 8, parryMiss: 2 })],
