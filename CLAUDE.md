@@ -28,6 +28,7 @@ Don't batch wiki updates to the end. When something is learned or decided, write
 | A new undecided question comes up | `wiki/open-questions/short-slug.md` with `question_status: open` and a `recommendation`. |
 | A fact about an external API, data or library | A concept in `wiki/research/`, with `sources` in frontmatter and footnotes keyed to `sources[].id` for specific claims. |
 | An idea, improvement or future task | `wiki/recommendations/backlog.md`, or a new concept in `wiki/recommendations/` if it is large. |
+| A shortcut taken, or a known gap or security weakness | A new `TD-n` row in `wiki/recommendations/tech-debt.md` plus a GitHub issue labelled `tech-debt` (and `security` if relevant). Before the repo is public, issues are private; after that, describe security gaps generally and fix them before disclosing details. |
 | A decision gets reversed | Write a new ADR. Set the old one to `status: deprecated` and add `superseded_by:`. Never delete it. |
 
 After every change to the wiki:
