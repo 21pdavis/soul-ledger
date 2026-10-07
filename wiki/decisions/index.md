@@ -44,6 +44,7 @@
 * [0045: Lighter wiki upkeep: CI checks the bookkeeping, the log records only what matters](0045-lighter-wiki-upkeep.md) - The OKF wiki stays, but pnpm check:wiki enforces its structure in CI and log.md records only decisions, research, new concepts, deprecations and milestones.
 * [0046: Strict red-first TDD on every behaviour change](0046-strict-red-first-tdd.md) - TDD is mandatory, not "where possible" - every behaviour change is red, green, refactor with the failing test run and seen failing first, and PRs show the evidence.
 * [0047: Streamlined review and CI: re-review only for blocking findings, one CI run per change, docs-only fast path](0047-streamlined-review-and-ci.md) - Re-reviews happen only after blocking findings or substantial fixes; each review round's fixes go in one commit; CI runs once per change and skips tests for docs-only PRs; reviewer effort scales with the change.
+* [0048: Hard limits in .claude/settings.json and an escalation procedure for unattended runs](0048-unattended-run-guardrails.md) - Claude Code permission rules deny pushes to main/staging, force-pushes, destructive Neon actions, Render env changes and reading .env files, while routine commands are pre-allowed; blocked runs commit their work, write up options and send a push notification.
 
 # Superseded decisions
 
