@@ -115,10 +115,10 @@ Rules for agents:
 
 | Denied | Examples |
 |---|---|
-| Pushing to `main` or `staging` in any form; force-push; deleting remote branches | `git push origin staging`, `git push -f`, `git push origin :x` |
+| Pushing to `main` or `staging` (common forms, including `HEAD:`, `refs/heads/` and `--all`/`--mirror`); force-push; deleting remote branches | `git push origin staging`, `git push -f`, `git push origin :x` |
 | Admin merges and repo settings changes | `gh pr merge --admin`, `gh repo edit` |
-| Reading `.env` files with the Read tool or `cat` | Use the exact `grep ... \| cut` exports in the agent briefs |
-| Destructive Neon actions | Delete or reset branches, projects, databases or roles; rotate credentials |
+| Reading `.env.local` with the Read tool, `cat`, `head`, `tail`, `less` or PowerShell `Get-Content` | Use the exact `grep ... \| cut` exports in the agent briefs |
+| Destructive Neon actions | Delete or reset branches, projects, databases, roles or snapshots; rotate credentials; apply migrations to the main branch |
 | Render changes | Updating environment variables, creating services |
 
 Routine work is pre-allowed so runs don't stall on prompts:
@@ -127,7 +127,7 @@ Routine work is pre-allowed so runs don't stall on prompts:
 - `gh pr` / `run` / `issue` / `label`;
 - read-only Render tools.
 
-Running SQL on Neon and triggering Render deploys always ask. These are pattern rules: a strong guardrail, not a guarantee. GitHub branch protection (#10) is the backstop.
+Running SQL on Neon, other risky Neon changes and triggering Render deploys always ask. **Always name the branch when pushing** (`git push -u origin <feature-branch>`): a bare `git push` is denied. These are pattern rules: a strong guardrail, not a guarantee. GitHub branch protection (#10) is the backstop.
 
 **When blocked**, don't keep retrying. The orchestrator:
 1. Commits work in progress to the feature branch (never to `staging` or `main`) and pushes it, so nothing is lost.

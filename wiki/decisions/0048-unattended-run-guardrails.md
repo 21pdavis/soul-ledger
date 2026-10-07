@@ -17,9 +17,9 @@ The owner approved two of the six readiness steps for unattended milestone runs:
 
 | List | Contents |
 |---|---|
-| **deny** | Every form of push to `main`/`staging` (direct, `HEAD:`, refspec); force-push (`-f`, `--force`, `+refspec`); remote branch deletion; `gh pr merge --admin`; `gh repo delete/edit`; reading `.env` files with the Read tool or `cat`; destructive Neon tools (delete or reset branches, projects, databases, roles, endpoints; restore snapshots; rotate or revoke credentials; change the default branch); Render environment-variable updates and service creation |
+| **deny** | The common forms of push to `main`/`staging` (direct, `HEAD:`, `refs/heads/`, refspecs, `--all`, `--mirror`, `git -C`, and a bare `git push`); force-push (`-f`, `--force`, `+refspec`); remote branch deletion; `gh pr merge --admin`; `gh api` ref updates; `gh repo delete/edit`; reading `.env.local` with Read, `cat`, `head`, `tail`, `less` or PowerShell; destructive Neon tools (delete or reset branches, projects, databases, roles, endpoints, snapshots; restore snapshots; apply migrations to main; rotate or revoke credentials; change the default branch); Render environment-variable updates and service creation |
 | **allow** | `pnpm`, `npx --yes pnpm@…`, everyday `git` subcommands including `git push` (feature branches; the deny list catches the rest), `gh pr/run/issue/label`, read-only Render tools |
-| **ask** | Neon `run_sql`, `run_sql_transaction` and `get_connection_string`; Render `trigger_deploy` |
+| **ask** | Neon `run_sql`, `run_sql_transaction`, `get_connection_string`, branch and endpoint updates, and storage, auth, function, trigger and data-API deletions; Render `trigger_deploy` |
 
 - Deny rules beat allow rules and apply to every session and subagent, whatever the permission mode.
 - **Verified:** `git push origin staging --dry-run` was refused by the permission system, and the denied Neon and Render tools were removed from the session.
