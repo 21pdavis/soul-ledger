@@ -220,6 +220,19 @@ describe("checkWiki review fixes (PR #18)", () => {
     );
   });
 
+  it("accepts a closing --- line with trailing whitespace", () => {
+    const b = bundle();
+    b["vision.md"] = "---\ntype: Vision\ndescription: The vision.\n---  \nBody\n";
+    expect(checkWiki(b)).toEqual([]);
+  });
+
+  it("ignores links in four-backtick fences and indented code blocks", () => {
+    const b = bundle();
+    b["vision.md"] +=
+      "\n````md\n[a](missing-a.md)\n```\n[b](missing-b.md)\n````\n\n- item\n\n      [c](missing-c.md)\n";
+    expect(checkWiki(b)).toEqual([]);
+  });
+
   it("recognises ./-prefixed index entries", () => {
     const b = bundle();
     b["decisions/index.md"] = "# Decisions\n\n* [0001: Thing](./0001-thing.md) - Does a thing.\n";

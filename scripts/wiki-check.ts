@@ -37,8 +37,9 @@ function readFrontmatter(
   content: string,
 ): { ok: true; data: Frontmatter } | { ok: false; reason: string } | null {
   const lines = content.replace(/\r\n/g, "\n").split("\n");
-  if (lines[0] !== "---") return null;
-  const end = lines.indexOf("---", 1); // the closing line must be exactly ---
+  if (lines[0].trimEnd() !== "---") return null;
+  // The closing line must be exactly --- (trailing whitespace allowed).
+  const end = lines.findIndex((line, i) => i > 0 && line.trimEnd() === "---");
   if (end === -1) return { ok: false, reason: "unterminated" };
   try {
     const data: unknown = parse(lines.slice(1, end).join("\n")) ?? {};
@@ -194,8 +195,15 @@ function checkLinks(
   exists: (p: string) => boolean,
   errors: string[],
 ): void {
-  // Code isn't links: drop fenced blocks (``` or ~~~) and inline code first.
-  const text = content.replace(/^(```|~~~)[\s\S]*?^\1/gm, "").replace(/`[^`\n]*`/g, "");
+  // Code isn't links. Drop, in order:
+  // - fenced blocks of any length (```, ````, ~~~), closed by a fence at least as long;
+  // - indented code blocks (4+ spaces after a blank line);
+  // - inline code.
+  const text = content
+    .replace(/\r\n/g, "\n")
+    .replace(/^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1[`~]*[ \t]*$/gm, "")
+    .replace(/(^|\n)[ \t]*\n(?:(?: {4,}|\t)[^\n]*(?:\n|$))+/g, "$1\n")
+    .replace(/`[^`\n]*`/g, "");
   for (const [, raw] of text.matchAll(LINK)) {
     if (/^(https?:|mailto:|#|\/)/.test(raw)) continue;
     const target = cleanTarget(raw.split("#")[0].split("?")[0]);

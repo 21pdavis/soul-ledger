@@ -23,4 +23,4 @@ The operational wording lives in CLAUDE.md under "Testing: strict TDD".
 
 # Why
 
-When asked, the agent reported that tests had always come first or alongside the code, but in about half the cases nobody watched them fail first. The owner asked for strict TDD to be a rule. An independent review of PR #14 then noted that ADR 0029 was weaker than that rule.
+When asked, the agent reported that tests had always come first or alongside the code, but the failing test was not always run and seen to fail first. The owner asked for strict TDD to be a rule. An independent review of PR #14 then noted that ADR 0029 was weaker than that rule.
