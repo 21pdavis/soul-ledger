@@ -60,6 +60,19 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
 - Prefer structure (headings, tables, lists) over prose.
 - File names: lowercase kebab-case. ADRs are numbered `NNNN-slug.md`.
 
+## Testing: strict TDD (ADR 0029)
+
+Every change to app behaviour follows **red → green → refactor**. This is a rule, not a preference.
+
+1. **Red.** Write the test first and **run it**. Watch it fail for the *expected reason*: an assertion failure or a missing export, not a typo or a broken test setup. Don't write the implementation in the same step.
+2. **Green.** Write the minimum code to pass, then run the test again and see it pass.
+3. **Refactor** with the suite green, then run the full suite (`pnpm test`, plus `pnpm test:e2e` when UI or routing changed).
+
+- **Bugs:** first write a regression test that reproduces the bug and fails, then fix it.
+- **Tests:** never delete, skip or weaken a test to get green without saying why in the PR.
+- **PR descriptions:** list the red → green evidence for each behaviour (the failing test name and what made it pass). Reviewers, human or subagent, check that every new behaviour has a test that was seen failing first.
+- **Exceptions**, which need no failing test: docs, config, generated migrations and pure wiring with no logic. Name them in the PR.
+
 ## Environments and branches (ADR 0042, 0043)
 
 | Environment | Branch | URL | Database |
