@@ -7,7 +7,7 @@ status: deprecated
 decision: superseded
 superseded_by: [0043-staging-access-link.md, 0044-pr-gated-changes-and-agent-review.md]
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T07:00:00Z }
 ---
 
 > **Partly superseded** by [ADR 0043](0043-staging-access-link.md): staging is unlocked with a secret link and cookie, not Google sign-in. The merge rule is superseded by [ADR 0044](0044-pr-gated-changes-and-agent-review.md): agents merge into `staging` only after CI **and** an independent agent review. The environments and branches below still stand.
