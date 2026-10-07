@@ -24,3 +24,8 @@ test("health endpoint answers for Render's health check", async ({ request }) =>
   expect(res.status()).toBe(200);
   expect(await res.json()).toEqual({ ok: true });
 });
+
+test("production hides the sign-in routes", async ({ request }) => {
+  test.skip(!!process.env.STAGING_URL, "staging has sign-in routes by design");
+  expect((await request.get("/api/auth/signin")).status()).toBe(404);
+});

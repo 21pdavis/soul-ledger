@@ -15,3 +15,32 @@ services:
         sync: false # Neon main branch connection string, set in the Render Dashboard
       - key: STEAM_API_KEY
         sync: false # optional; set only if vanity lookups start failing (wiki/research/steam-vanity-resolution.md)
+
+  # Staging (ADR 0042): deploys the `staging` branch against the Neon `staging` branch, behind
+  # Google sign-in for allowlisted emails. Agents may merge to `staging`; only the owner merges to `main`.
+  - type: web
+    name: soul-ledger-staging
+    runtime: node
+    plan: free
+    region: oregon
+    branch: staging
+    buildCommand: npx --yes pnpm@12.9.1 install --frozen-lockfile && npx --yes pnpm@12.9.1 build
+    startCommand: node_modules/.bin/next start
+    healthCheckPath: /api/health
+    envVars:
+      - key: STAGING_GATE
+        value: "on"
+      - key: AUTH_SECRET
+        generateValue: true # signs Auth.js session cookies
+      - key: DATABASE_URL
+        sync: false # Neon staging branch connection string
+      - key: STAGING_ALLOWED_EMAILS
+        sync: false # comma-separated Google accounts allowed in
+      - key: STAGING_BYPASS_TOKEN
+        sync: false # 32+ random chars; lets tests and agents through via the x-staging-token header
+      - key: AUTH_GOOGLE_ID
+        sync: false # Google OAuth client id
+      - key: AUTH_GOOGLE_SECRET
+        sync: false # Google OAuth client secret
+      - key: STEAM_API_KEY
+        sync: false # optional, as in production
