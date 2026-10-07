@@ -1,0 +1,89 @@
+import type { BulkMatch } from "@/lib/deadlock-api/schemas";
+import type { PlayerMatch } from "./types";
+
+/** Accolade ids from /v1/assets/accolades (wiki/research/match-metadata-fields.md). */
+export const ACCOLADE = {
+  breakablesDestroyed: 11,
+  powerupsCollected: 12,
+  returnedIdol: 13,
+  sinnersSacrificeJackpot: 14,
+  closeupKills: 17,
+  longDistanceKills: 18,
+} as const;
+
+/** Keys inside final_stats.custom_user_stats. */
+const CUSTOM = {
+  heroShots: "Enemy Hero Accuracy##Shots",
+  heroHits: "Enemy Hero Accuracy##Hits",
+  heroHeadshots: "Enemy Hero Accuracy##Headshots",
+  parrySuccess: "Parry Success",
+  parryMiss: "Parry Miss",
+  unspentGoldMinutes: "Unspent Gold Minutes",
+} as const;
+
+/** "StreetBrawl" -> "street_brawl", "Normal" -> "normal". */
+function snake(value: string): string {
+  return value.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
+}
+
+export function normalizePlayerMatch(match: BulkMatch, accountId: number): PlayerMatch {
+  const p = match.players.find((pl) => pl.account_id === accountId);
+  if (!p) throw new Error(`Account ${accountId} is not in match ${match.match_id}`);
+
+  const fs = p.final_stats ?? {};
+  const custom = fs.custom_user_stats ?? {};
+  const accolade = (id: number) =>
+    p.accolades.find((a) => a.accolade_id === id)?.accolade_stat_value ?? 0;
+
+  const claimed = match.mid_boss.filter((b) => b.team_claimed === p.team);
+
+  return {
+    accountId,
+    matchId: match.match_id,
+    startTime: new Date(match.start_time.replace(" ", "T") + "Z"),
+    durationS: match.duration_s,
+    gameMode: snake(match.game_mode),
+    matchMode: snake(match.match_mode),
+    heroId: p.hero_id,
+    won: match.winning_team === p.team,
+
+    kills: p.kills,
+    deaths: p.deaths,
+    assists: p.assists,
+    netWorth: p.net_worth,
+    lastHits: p.last_hits,
+    denies: p.denies,
+
+    bulletKills: fs.bullet_kills ?? 0,
+    abilityKills: fs.ability_kills ?? 0,
+    meleeKills: fs.melee_kills ?? 0,
+    headshotKills: fs.headshot_kills ?? 0,
+    closeupKills: accolade(ACCOLADE.closeupKills),
+    longDistanceKills: accolade(ACCOLADE.longDistanceKills),
+
+    shotsHit: fs.shots_hit ?? 0,
+    shotsMissed: fs.shots_missed ?? 0,
+    heroBulletsHit: fs.hero_bullets_hit ?? 0,
+    heroBulletsHitCrit: fs.hero_bullets_hit_crit ?? 0,
+    heroShots: custom[CUSTOM.heroShots] ?? 0,
+    heroHits: custom[CUSTOM.heroHits] ?? 0,
+    heroHeadshots: custom[CUSTOM.heroHeadshots] ?? 0,
+    parrySuccess: custom[CUSTOM.parrySuccess] ?? 0,
+    parryMiss: custom[CUSTOM.parryMiss] ?? 0,
+    unspentGoldMinutes: custom[CUSTOM.unspentGoldMinutes] ?? 0,
+
+    breakables: accolade(ACCOLADE.breakablesDestroyed),
+    sinnerJackpots: accolade(ACCOLADE.sinnersSacrificeJackpot),
+    idolsReturned: accolade(ACCOLADE.returnedIdol),
+    powerupsCollected: accolade(ACCOLADE.powerupsCollected),
+
+    playerDamage: fs.player_damage ?? 0,
+    teammateHealing: fs.teammate_healing ?? 0,
+    bossDamage: fs.boss_damage ?? 0,
+
+    midBossClaimed: claimed.length,
+    midBossStolen: claimed.filter((b) => b.team_killed !== p.team).length,
+
+    deathPositions: p.death_details.map((d) => [d.death_pos[0], d.death_pos[1]]),
+  };
+}

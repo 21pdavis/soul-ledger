@@ -1,0 +1,433 @@
+{
+  "id": "55920f98-22b7-497e-aef9-44906b6ab85d",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.api_cache": {
+      "name": "api_cache",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fetched_at": {
+          "name": "fetched_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fetch_jobs": {
+      "name": "fetch_jobs",
+      "schema": "",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "heartbeat_at": {
+          "name": "heartbeat_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error": {
+          "name": "error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.player_matches": {
+      "name": "player_matches",
+      "schema": "",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "match_id": {
+          "name": "match_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_time": {
+          "name": "start_time",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "duration_s": {
+          "name": "duration_s",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "game_mode": {
+          "name": "game_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "match_mode": {
+          "name": "match_mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_id": {
+          "name": "hero_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "won": {
+          "name": "won",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kills": {
+          "name": "kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deaths": {
+          "name": "deaths",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "assists": {
+          "name": "assists",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "net_worth": {
+          "name": "net_worth",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_hits": {
+          "name": "last_hits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "denies": {
+          "name": "denies",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bullet_kills": {
+          "name": "bullet_kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ability_kills": {
+          "name": "ability_kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "melee_kills": {
+          "name": "melee_kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "headshot_kills": {
+          "name": "headshot_kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "closeup_kills": {
+          "name": "closeup_kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "long_distance_kills": {
+          "name": "long_distance_kills",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "shots_hit": {
+          "name": "shots_hit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "shots_missed": {
+          "name": "shots_missed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_bullets_hit": {
+          "name": "hero_bullets_hit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_bullets_hit_crit": {
+          "name": "hero_bullets_hit_crit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_shots": {
+          "name": "hero_shots",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_hits": {
+          "name": "hero_hits",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hero_headshots": {
+          "name": "hero_headshots",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parry_success": {
+          "name": "parry_success",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parry_miss": {
+          "name": "parry_miss",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "unspent_gold_minutes": {
+          "name": "unspent_gold_minutes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "breakables": {
+          "name": "breakables",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sinner_jackpots": {
+          "name": "sinner_jackpots",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "idols_returned": {
+          "name": "idols_returned",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "powerups_collected": {
+          "name": "powerups_collected",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_damage": {
+          "name": "player_damage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "teammate_healing": {
+          "name": "teammate_healing",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "boss_damage": {
+          "name": "boss_damage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mid_boss_claimed": {
+          "name": "mid_boss_claimed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mid_boss_stolen": {
+          "name": "mid_boss_stolen",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "death_positions": {
+          "name": "death_positions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "player_matches_match_id_idx": {
+          "name": "player_matches_match_id_idx",
+          "columns": [
+            {
+              "expression": "match_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "player_matches_account_id_match_id_pk": {
+          "name": "player_matches_account_id_match_id_pk",
+          "columns": [
+            "account_id",
+            "match_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.players": {
+      "name": "players",
+      "schema": "",
+      "columns": {
+        "account_id": {
+          "name": "account_id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "persona_name": {
+          "name": "persona_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profile_url": {
+          "name": "profile_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rank_history": {
+          "name": "rank_history",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "last_synced_at": {
+          "name": "last_synced_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

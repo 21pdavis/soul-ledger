@@ -20,6 +20,8 @@ There are **44 playable heroes** as of 2026-10-06. This matches the "currently p
 
 The roster changes with patches, so the app must read it from the API, not hard-code it.
 
+**Don't use `?only_active=true`:** on 2026-10-06 it returned 40 heroes, not 44. Fetch the full list and apply the filter above.
+
 - Abrams
 - Apollo
 - Baba

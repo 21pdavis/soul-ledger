@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><profile>
+	<steamID64>76561198095017559</steamID64>
+	<steamID><![CDATA[Pol]]></steamID>
+	<onlineState>online</onlineState>
+	<stateMessage><![CDATA[Online]]></stateMessage>
+	<privacyState>public</privacyState>
+	<visibilityState>3</visibilityState>
+	<avatarIcon><![CDATA[https://avatars.fastly.steamstatic.com/aa088e277766c604294ed2dd577c63eb2e07f285.jpg]]></avatarIcon>
+	<avatarMedium><![CDATA[https://avatars.fastly.steamstatic.com/aa088e277766c604294ed2dd577c63eb2e07f285_medium.jpg]]></avatarMedium>
+	<avatarFull><![CDATA[https://avatars.fastly.steamstatic.com/aa088e277766c604294ed2dd577c63eb2e07f285_full.jpg]]></avatarFull>
+	<vacBanned>0</vacBanned>
+	<tradeBanState>None</tradeBanState>
+	<isLimitedAccount>0</isLimitedAccount>
+	<customURL><![CDATA[DoctorPol]]></customURL>
+	<memberSince>June 19, 2013</memberSince>
+	<steamRating></steamRating>
+	<hoursPlayed2Wk>0.0</hoursPlayed2Wk>
+	<headline><![CDATA[]]></headline>
+	<location><![CDATA[United States]]></location>
+	<realname><![CDATA[Dr. Jan-Harm Pol]]></realname>
+	<summary><![CDATA[Veterinarian<br>]]></summary>
+ 	<mostPlayedGames>
+		<mostPlayedGame>
+			<gameName><![CDATA[Deadlock]]></gameName>
+			<gameLink><![CDATA[https://steamcommunity.com/app/1422450]]></gameLink>
+			<gameIcon><![CDATA[https://shared.fastly.steamstatic.com/community_assets/images/apps/1422450/f6da1420a173324d49bcd470fa3eee781ad0fa5e.jpg]]></gameIcon>
+			<gameLogo><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/88b400eca727f0547232b49b3e62827f07900c77/capsule_184x69.jpg?t=1790716179]]></gameLogo>
+			<gameLogoSmall><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/88b400eca727f0547232b49b3e62827f07900c77/capsule_184x69.jpg?t=1790716179]]></gameLogoSmall>
+			<hoursPlayed>39.1</hoursPlayed>
+			<hoursOnRecord>528</hoursOnRecord>
+		</mostPlayedGame>
+		<mostPlayedGame>
+			<gameName><![CDATA[The Blood of Dawnwalker]]></gameName>
+			<gameLink><![CDATA[https://steamcommunity.com/app/3751260]]></gameLink>
+			<gameIcon><![CDATA[https://shared.fastly.steamstatic.com/community_assets/images/apps/3751260/49fefdf2ae0e6171985509acec890b756cedc694.jpg]]></gameIcon>
+			<gameLogo><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3751260/512cea7b8d6470681fc081ab933290bf14a8f956/capsule_184x69.jpg?t=1791298326]]></gameLogo>
+			<gameLogoSmall><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3751260/512cea7b8d6470681fc081ab933290bf14a8f956/capsule_184x69.jpg?t=1791298326]]></gameLogoSmall>
+			<hoursPlayed>17.1</hoursPlayed>
+			<hoursOnRecord>31</hoursOnRecord>
+			<statsName><![CDATA[3751260]]></statsName>
+		</mostPlayedGame>
+		<mostPlayedGame>
+			<gameName><![CDATA[Overwatch®]]></gameName>
+			<gameLink><![CDATA[https://steamcommunity.com/app/2357570]]></gameLink>
+			<gameIcon><![CDATA[https://shared.fastly.steamstatic.com/community_assets/images/apps/2357570/da42bd294c941d5947b1bc2c2b2efa1313d36a91.jpg]]></gameIcon>
+			<gameLogo><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2357570/4dd87b23d0fb4b6295f8e77178f3a080a03ebf3a/capsule_184x69.jpg?t=1791311522]]></gameLogo>
+			<gameLogoSmall><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2357570/4dd87b23d0fb4b6295f8e77178f3a080a03ebf3a/capsule_184x69.jpg?t=1791311522]]></gameLogoSmall>
+			<hoursPlayed>14.6</hoursPlayed>
+			<hoursOnRecord>497</hoursOnRecord>
+			<statsName><![CDATA[2357570]]></statsName>
+		</mostPlayedGame>
+		<mostPlayedGame>
+			<gameName><![CDATA[Crusader Kings III]]></gameName>
+			<gameLink><![CDATA[https://steamcommunity.com/app/1158310]]></gameLink>
+			<gameIcon><![CDATA[https://shared.fastly.steamstatic.com/community_assets/images/apps/1158310/8a0d88dfaff790ea1aa2b9fcf50d4e3b4f49cf56.jpg]]></gameIcon>
+			<gameLogo><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1158310/969346b7534d84360e80d8997c3f58636140893f/capsule_184x69.jpg?t=1790873953]]></gameLogo>
+			<gameLogoSmall><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1158310/969346b7534d84360e80d8997c3f58636140893f/capsule_184x69.jpg?t=1790873953]]></gameLogoSmall>
+			<hoursPlayed>1.6</hoursPlayed>
+			<hoursOnRecord>227</hoursOnRecord>
+			<statsName><![CDATA[1158310]]></statsName>
+		</mostPlayedGame>
+		<mostPlayedGame>
+			<gameName><![CDATA[RimWorld]]></gameName>
+			<gameLink><![CDATA[https://steamcommunity.com/app/294100]]></gameLink>
+			<gameIcon><![CDATA[https://shared.fastly.steamstatic.com/community_assets/images/apps/294100/addbe3b704b267060b4d5d7649cfb292de61bd70.jpg]]></gameIcon>
+			<gameLogo><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/294100/a805ac5e3ceb54a2d7d3e1c1049907f1ef8bbb89/capsule_184x69.jpg?t=1782756789]]></gameLogo>
+			<gameLogoSmall><![CDATA[https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/294100/a805ac5e3ceb54a2d7d3e1c1049907f1ef8bbb89/capsule_184x69.jpg?t=1782756789]]></gameLogoSmall>
+			<hoursPlayed>0.6</hoursPlayed>
+			<hoursOnRecord>171</hoursOnRecord>
+		</mostPlayedGame>
+	</mostPlayedGames>
+
+
+</profile>

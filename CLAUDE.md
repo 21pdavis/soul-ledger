@@ -4,7 +4,9 @@ Guidance for agents (Claude Code and others) working in this repo.
 
 ## Project state
 
-**Pre-code.** The design is still being settled in an interview with the user. Do not write application code until the user asks for it. The knowledge base under `wiki/` is the source of truth for what has been decided.
+**M1 (data layer) is built; M2 is next** ([milestones](wiki/decisions/0028-milestones.md)). The knowledge base under `wiki/` is the source of truth for what has been decided. Next.js-specific agent rules are in [`AGENTS.md`](AGENTS.md).
+
+Commands: `pnpm test` (unit + integration), `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm db:generate` / `pnpm db:migrate`. Integration tests run on in-process PGlite. `.env.local` holds the Neon `dev` branch `DATABASE_URL` and is never committed.
 
 ## The knowledge base: `wiki/` (Open Knowledge Format v0.2)
 

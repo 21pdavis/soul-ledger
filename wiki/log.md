@@ -1,6 +1,15 @@
 # Directory Update Log
 
 ## 2026-10-06
+* **Decision**: [ADR 0038](decisions/0038-one-trick-threshold-50.md) lowers the one-trick line to 50%.
+* **Deprecation**: [ADR 0036](decisions/0036-one-trick-threshold.md) is superseded by ADR 0038.
+* **Decision**: [ADR 0035](decisions/0035-patch-date-from-changelog-title.md) takes the patch date from the changelog title, resolving the [open question](open-questions/patch-date-source.md). [ADR 0036](decisions/0036-one-trick-threshold.md) sets the one-trick line at 60%; no established threshold exists in gaming communities. [ADR 0037](decisions/0037-squad-roles-without-backseat-gamer.md) drops The Backseat Gamer and supersedes ADR 0020.
+* **Deprecation**: [ADR 0020](decisions/0020-squad-roles.md) is superseded by ADR 0037.
+* **Research**: Breakables show healthy spread (CV 0.41, about 1.8 to 4.2 per minute between p10 and p90) in [bulk metadata](research/bulk-match-metadata.md).
+* **Milestone**: Built **M1, the data layer**, test-first: Steam input resolution, the rate-limited deadlock-api client, the Neon cache with job lock, incremental sync, story stats, percentiles, and `GET /api/lookup` (NDJSON). There are 128 unit and integration tests plus e2e smoke on phone and desktop, and CI on every push. The Neon `dev` branch is migrated, and a live lookup of the test account works (about 8 s cold, 1.4 s cached).
+* **Research**: Added [bulk match metadata](research/bulk-match-metadata.md) and [percentile metrics](research/percentile-metrics.md). The [accolade list](research/match-metadata-fields.md) is now complete (31). Noted that `only_active=true` undercounts the [hero roster](research/hero-roster.md).
+* **Creation**: Open questions on [M1 implementation choices](open-questions/m1-implementation-choices.md) and the [patch date source](open-questions/patch-date-source.md).
+* **Update**: Refreshed the [backlog](recommendations/backlog.md) for M2.
 * **Milestone**: The user confirmed shared understanding. The interview is complete. Username search was added to the [backlog](recommendations/backlog.md); the prototype stays URL-only.
 * **Decision**: Recorded round-5 answers as [ADRs 0031-0034](decisions/index.md): visual identity, GitHub private with CI, the Neon project, tooling. No open questions remain.
 * **Infra**: Created the Neon project `soul-ledger` (`icy-bread-38573768`) with `main` and `dev` branches. Created the private GitHub repo `21pdavis/soul-ledger`.
