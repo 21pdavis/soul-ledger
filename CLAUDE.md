@@ -109,6 +109,37 @@ Rules for agents:
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
 
+## Unattended runs: hard limits and escalation (ADR 0048)
+
+**Hard limits** live in `.claude/settings.json`. Deny rules beat allow rules and apply to every session and subagent:
+
+| Denied | Examples |
+|---|---|
+| Pushing to `main` or `staging` (common forms, including `HEAD:`, `refs/heads/` and `--all`/`--mirror`); force-push; deleting remote branches | `git push origin staging`, `git push -f`, `git push origin :x` |
+| Admin merges and repo settings changes | `gh pr merge --admin`, `gh repo edit` |
+| Reading `.env.local` with the Read tool, `cat`, `head`, `tail`, `less` or PowerShell `Get-Content` | Use the exact `grep ... \| cut` exports in the agent briefs |
+| Destructive Neon actions | Delete or reset branches, projects, databases, roles or snapshots; rotate credentials; apply migrations to the main branch |
+| Render changes | Updating environment variables, creating services |
+
+Routine work is pre-allowed so runs don't stall on prompts:
+- `pnpm`;
+- `git` on feature branches;
+- `gh pr` / `run` / `issue` / `label`;
+- read-only Render tools.
+
+Running SQL on Neon, other risky Neon changes and triggering Render deploys always ask. **Always name the branch when pushing** (`git push -u origin <feature-branch>`): a bare `git push` is denied. These are pattern rules: a strong guardrail, not a guarantee. GitHub branch protection (#10) is the backstop.
+
+**When blocked**, don't keep retrying. The orchestrator:
+1. Commits work in progress to the feature branch (never to `staging` or `main`) and pushes it, so nothing is lost.
+2. Writes the blocker up in the conversation:
+   - what was attempted;
+   - the error or the decision needed;
+   - 2–3 options with a recommendation.
+3. Sends a **push notification** so the owner doesn't have to watch the terminal.
+4. Keeps working on tasks that don't depend on the blocker. If nothing can proceed, it stops.
+
+**Blocked means:** the same failure survives about 3 genuinely different attempts; a product or business decision the plan and ADRs don't answer; a needed action is denied by the hard limits above; or an external service (deadlock-api, Steam, Render, Neon, GitHub) is down.
+
 ## Agent roster (`.claude/agents/`)
 
 For autonomous runs, the **main session is the orchestrator**. It splits the milestone plan into PR-sized tasks, dispatches the specialists below, merges into `staging` when the rules above allow, reports every merge, and escalates only real blockers. The specialists carry their role in their agent file; every rule in this CLAUDE.md applies to all of them.
