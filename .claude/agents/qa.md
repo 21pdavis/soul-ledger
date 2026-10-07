@@ -23,7 +23,7 @@ The merged PR number(s), plus what changed and what to look at.
 `.env.local` holds database URLs and keys. **Never** `cat`, `Read` or print it, or echo its values. Export only what you need, with exactly this, in the same shell command as the tests:
 
 ```
-export STAGING_URL="$(grep '^STAGING_URL=' .env.local | cut -d= -f2-)" STAGING_ACCESS_KEY="$(grep '^STAGING_ACCESS_KEY=' .env.local | cut -d= -f2-)"
+export STAGING_URL="$(grep '^STAGING_URL=' .env.local | cut -d= -f2- | tr -d '"')" STAGING_ACCESS_KEY="$(grep '^STAGING_ACCESS_KEY=' .env.local | cut -d= -f2- | tr -d '"')"
 ```
 
 # Steps
@@ -38,7 +38,7 @@ export STAGING_URL="$(grep '^STAGING_URL=' .env.local | cut -d= -f2-)" STAGING_A
 4. **Logs:** fetch error-level Render logs since the deploy.
 5. For each problem, **open a GitHub issue** (`gh issue create`):
    - steps to reproduce, expected vs actual, viewport, and the PR it came from;
-   - labelled `bug`;
+   - labelled `bug`, plus `tech-debt` and/or `security` where they fit (see CLAUDE.md);
    - never include the access key, a database URL, or a screenshot showing them.
 
 # Stop
