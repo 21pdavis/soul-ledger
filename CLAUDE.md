@@ -97,6 +97,26 @@ Rules for agents:
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
 
+## Agent roster (`.claude/agents/`)
+
+For autonomous runs, the **main session is the orchestrator**. It splits the milestone plan into PR-sized tasks, dispatches the specialists below, merges into `staging` when the rules above allow, reports every merge, and escalates only real blockers. The specialists carry their role in their agent file; every rule in this CLAUDE.md applies to all of them.
+
+| Agent | Does | Can't |
+|---|---|---|
+| `implementer` | One task → one branch (in its own worktree) → one PR into `staging`, with strict TDD | Merge, push to `staging`/`main`, touch production or secrets |
+| `reviewer` | Independent review of one PR, posted as a comment with a verdict and findings | Edit, push or merge |
+| `qa` | After a merge, checks live staging: e2e suites, phone and desktop screenshots, Render logs; files bug issues | Change code or settings |
+| `wiki-keeper` | Brings the wiki in line with what a run built or decided, via its own PR | Edit code, or invent decisions |
+
+**Separate writers from checkers:** an implementer never reviews its own PR, and the reviewer and QA never edit. Each agent ends with a fixed-format report, so the orchestrator can act on it.
+
+**Flow for a milestone:**
+1. The orchestrator builds the shared foundation itself.
+2. Implementers work the remaining tasks in parallel batches.
+3. Each PR goes to `reviewer`, then the fix loop, then CI, then the merge, then a report to the owner.
+4. `qa` checks live staging after merges.
+5. `wiki-keeper` runs before the final `staging` → `main` PR to the owner.
+
 ## Planned stack (accepted, see wiki/decisions/0005)
 
 Next.js (TypeScript), React Three Fiber/drei, Framer Motion, Neon Postgres, Render.
