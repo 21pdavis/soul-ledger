@@ -31,11 +31,21 @@ Don't batch wiki updates to the end. When something is learned or decided, write
 | A shortcut taken, or a known gap or security weakness | A **GitHub issue** labelled `tech-debt` (plus `security`/`infra` where they fit). Issues are the source of truth; refer to them by number (#10). Rules: `wiki/recommendations/tech-debt.md`. |
 | A decision gets reversed | Write a new ADR. Set the old one to `status: deprecated` and add `superseded_by:`. Never delete it. |
 
-After every change to the wiki:
+After changing the wiki ([ADR 0045](wiki/decisions/0045-lighter-wiki-upkeep.md)):
 
-- **Update the `index.md`** of every directory you touched, and the root `wiki/index.md` if you added a section. Every entry is `* [Title](path) - description`, and the description matches the concept's frontmatter `description`.
-- **Add an entry to `wiki/log.md`**: newest date first, `## YYYY-MM-DD` headings, bullets that start with a bold verb (`**Creation**`, `**Update**`, `**Decision**`, `**Deprecation**`, `**Research**`).
+- **Run `pnpm check:wiki`** (CI runs it too). It catches the bookkeeping, so you don't have to remember it, and its messages say exactly what to fix:
+  - frontmatter that won't parse, or lacks `type` or `description`;
+  - a concept missing from its directory `index.md`, or an index description that doesn't match the frontmatter;
+  - broken relative links;
+  - a superseded ADR without `superseded_by`, or a resolved question without `resolved_by`;
+  - log dates out of order;
+  - CRLF line endings.
+- **Index entries** are `* [Title](file.md) - description`, with the description copied from the frontmatter. To change the wording, change the frontmatter and copy it across.
+- **Log only what a future agent needs to know happened**, under `## YYYY-MM-DD` (newest first), one bullet per item, each starting with a bold verb: `**Decision**`, `**Research**`, `**Creation**` (a new concept), `**Deprecation**` or `**Milestone**`. Skip routine edits (wording, timestamps, index tweaks, link fixes); git history has those.
+- **Quote YAML values that contain `: ` or start with a quote**, e.g. `description: "Uses X: a, b."`. Otherwise the frontmatter breaks.
 - Commit wiki changes alongside the code they explain.
+
+**Where things live:** CLAUDE.md states the **operational rules**, briefly, and links the ADR. The ADR holds the **decision and its reasoning**. Don't restate an ADR's reasoning here; link to it.
 
 ### Release notes: `CHANGELOG.md`
 
@@ -49,7 +59,7 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
   - `title` and `description`: description is one sentence.
   - `tags`.
   - `status`: `draft` | `stable` | `deprecated`.
-  - `generated: { by: <actor>, at: <ISO-8601 UTC> }`: update this whenever you meaningfully change the content.
+  - `generated: { by: <actor>, at: <ISO-8601 UTC> }`: update this whenever you meaningfully change the content. Description syncs and formatting fixes don't count.
   - `sources`: list of `{ id, resource, title }` when the content derives from external material.
   - `verified`: only when content was actually checked. Add `{ by: human:paul, at: ... }` only when the user explicitly confirms the written content.
   - `stale_after`: use it on research about fast-moving things such as the API.
@@ -60,7 +70,7 @@ Any PR that changes what the app does (features, fixes, deploy or config changes
 - Prefer structure (headings, tables, lists) over prose.
 - File names: lowercase kebab-case. ADRs are numbered `NNNN-slug.md`.
 
-## Testing: strict TDD (ADR 0029)
+## Testing: strict TDD (ADR 0029, 0046)
 
 Every change to app behaviour follows **red → green → refactor**. This is a rule, not a preference.
 
@@ -73,7 +83,7 @@ Every change to app behaviour follows **red → green → refactor**. This is a 
 - **PR descriptions:** list the red → green evidence for each behaviour (the failing test name and what made it pass). Reviewers, human or subagent, check that every new behaviour has a test that was seen failing first.
 - **Exceptions**, which need no failing test: docs, config, generated migrations and pure wiring with no logic. Name them in the PR.
 
-## Environments and branches (ADR 0042, 0043, 0044)
+## Environments and branches (ADR 0042, 0043, 0044, 0047)
 
 | Environment | Branch | URL | Database |
 |---|---|---|---|
@@ -90,12 +100,34 @@ Rules for agents:
 - **Act on agent review feedback without being asked**, as if the owner had said "go fix the feedback on this PR".
   - **Blocking** findings must be fixed. The only exception is a finding that turns on a business decision only the owner can make: ask the owner and don't merge until they answer. Never dismiss a blocking finding on your own.
   - **Non-blocking** findings and nits are fixed, or answered in a PR reply explaining why not.
-  - Every fix commit needs CI to pass again before merging.
+  - Fix **all findings from a review round in one commit and one push**, with one PR reply listing each fix. Every fix commit needs CI to pass again before merging.
+  - **Re-review only if the review had a blocking finding or the fixes were substantial.** If only non-blocking findings and nits remained, fix them and merge once CI passes, with no extra review pass (ADR 0047).
+  - **Scale reviewer effort to the change:** `medium` for docs or config only, `high` for code, `xhigh` for auth, data integrity, migrations or security.
 - PRs into `staging` don't need the owner's review. **`staging` → `main` always does**, and only the owner merges it.
 - **Tell the owner about every merge.** Whenever you merge a PR, or notice that one was merged (including the owner's `staging` → `main`), report it in the conversation straight away: PR number and link, a one-line summary, the agent review outcome, and the CI result. During long unattended runs, also send a push notification. Don't batch merges silently into an end-of-run summary.
 - Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
+
+## Agent roster (`.claude/agents/`)
+
+For autonomous runs, the **main session is the orchestrator**. It splits the milestone plan into PR-sized tasks, dispatches the specialists below, merges into `staging` when the rules above allow, reports every merge, and escalates only real blockers. The specialists carry their role in their agent file; every rule in this CLAUDE.md applies to all of them.
+
+| Agent | Does | Can't |
+|---|---|---|
+| `implementer` | One task → one branch (in its own worktree) → one PR into `staging`, with strict TDD | Merge, push to `staging`/`main`, touch production or secrets |
+| `reviewer` | Independent review of one PR, posted as a comment with a verdict and findings | Edit, push or merge |
+| `qa` | After a merge, checks live staging: e2e suites, phone and desktop screenshots, Render logs; files bug issues | Change code or settings |
+| `wiki-keeper` | Brings the wiki in line with what a run built or decided, via its own PR | Edit code, or invent decisions |
+
+**Separate writers from checkers:** an implementer never reviews its own PR, and the reviewer and QA never edit. Each agent ends with a fixed-format report, so the orchestrator can act on it.
+
+**Flow for a milestone:**
+1. The orchestrator builds the shared foundation itself.
+2. Implementers work the remaining tasks in parallel batches.
+3. Each PR goes to `reviewer`, then the fix loop, then CI, then the merge, then a report to the owner.
+4. `qa` checks live staging after merges.
+5. `wiki-keeper` runs before the final `staging` → `main` PR to the owner.
 
 ## Planned stack (accepted, see wiki/decisions/0005)
 
