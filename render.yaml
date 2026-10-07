@@ -6,8 +6,8 @@ services:
     plan: free
     region: oregon # next to Neon aws-us-west-2
     branch: main
-    # Install the exact pnpm pinned in package.json rather than relying on the platform's version.
-    buildCommand: npm install -g pnpm@12.9.1 && pnpm install --frozen-lockfile && pnpm build
+    # Run the pnpm pinned in package.json via npx; Render's global node_modules is read-only.
+    buildCommand: npx --yes pnpm@12.9.1 install --frozen-lockfile && npx --yes pnpm@12.9.1 build
     startCommand: node_modules/.bin/next start
     healthCheckPath: /api/health
     envVars:

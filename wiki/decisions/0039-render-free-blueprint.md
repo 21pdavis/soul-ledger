@@ -22,7 +22,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T06:30:00Z }
 
 # Notes
 
-- The build installs the pnpm version pinned in `package.json`. The start command runs `next start` directly.
+- The build runs the pnpm version pinned in `package.json` through `npx`, because a global `npm install -g` fails on Render (read-only `/usr/lib/node_modules`). The start command runs `next start` directly.
 - Migrations are run by hand (`pnpm db:migrate` with main's `DATABASE_URL`) before merging a PR that changes the schema.
 
 Implements [ADR 0005](0005-stack.md).

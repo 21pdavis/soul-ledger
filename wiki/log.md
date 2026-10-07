@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-06
+* **Update**: First Render deploy failed: `npm install -g pnpm` hit a read-only file system. The build now runs pnpm through `npx` ([ADR 0039](decisions/0039-render-free-blueprint.md)).
 * **Decision**: [ADR 0039](decisions/0039-render-free-blueprint.md): deploy from `main` via a Render Blueprint on the free plan in Oregon. Migrated Neon `main`. M1 is in [PR #1](https://github.com/21pdavis/soul-ledger/pull/1) with CI green.
 * **Decision**: [ADR 0038](decisions/0038-one-trick-threshold-50.md) lowers the one-trick line to 50%.
 * **Deprecation**: [ADR 0036](decisions/0036-one-trick-threshold.md) is superseded by ADR 0038.
