@@ -1,5 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { heroName } from "@/story/heroes";
+import { heroMonogram, heroName } from "@/story/heroes";
+
+describe("heroMonogram", () => {
+  it("uses the first letter of a one-word name", () => {
+    expect(heroMonogram(1)).toBe("I");
+  });
+
+  it("uses the initials of the first two words, skipping symbols like &", () => {
+    expect(heroMonogram(18)).toBe("MK");
+    expect(heroMonogram(39)).toBe("TB");
+    expect(heroMonogram(4)).toBe("LG");
+  });
+
+  it("falls back to a question mark for ids the map does not know", () => {
+    expect(heroMonogram(9999)).toBe("?");
+    expect(heroMonogram(83)).toBe("?");
+  });
+});
 
 describe("heroName", () => {
   it("names known heroes", () => {

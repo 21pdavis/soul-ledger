@@ -2,6 +2,7 @@
 
 ## 2026-10-08
 * **Research**: "Unspent Gold Minutes" fits souls × minutes in the recorded bulk metadata (every value exceeds the match length in minutes; value per minute stays below net worth). The roast slide states a souls figure and never says "minutes"; the [open question](open-questions/m2-unspent-souls-unit.md) stays open until the owner accepts the inference.
+* **Decision**: Audio-unlock on the entry Enter click is deferred out of M2 (no audio layer exists; music is a P2 backlog item). [ADR 0052](decisions/0052-m2-entry-loading-error-states.md), the [M2 plan](recommendations/m2-plan.md) and the [backlog](recommendations/backlog.md) say so.
 
 ## 2026-10-07
 * **Decision**: The ADR 0004 this-patch toggle moves into M2 as an extensible window control, recorded in [ADR 0052](decisions/0052-m2-entry-loading-error-states.md) and the [M2 plan](recommendations/m2-plan.md); more detailed filters go on the backlog.
