@@ -59,7 +59,11 @@ export function RankJourney({ points, current }: Props) {
         {points.map((p) => {
           const isCurrent = p.matchId === current.matchId;
           return (
-            <li key={p.matchId} className={styles.item} aria-current={isCurrent ? "step" : undefined}>
+            <li
+              key={p.matchId}
+              className={styles.item}
+              aria-current={isCurrent ? "step" : undefined}
+            >
               <span className={styles.name}>{rankLabel(p)}</span>
               <time className={styles.date} dateTime={p.at}>
                 {monthYear(p.at)}

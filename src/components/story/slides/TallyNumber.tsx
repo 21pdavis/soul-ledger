@@ -28,15 +28,12 @@ export function TallyNumber({
   format = withCommas,
 }: Props) {
   const instant = reducedMotion || skipAnimation;
-  const [shown, setShown] = useState(instant ? value : 0);
+  const [counted, setShown] = useState(0);
   const controls = useRef<AnimationPlaybackControls | null>(null);
 
   useEffect(() => {
-    if (instant) {
-      setShown(value);
-      return;
-    }
-    setShown(0);
+    // Instant (reduced motion or skip): the value is shown as it is, with nothing to run.
+    if (instant) return;
     const c = animate(0, value, {
       duration,
       ease: "easeOut",
@@ -55,5 +52,5 @@ export function TallyNumber({
     else controls.current?.play();
   }, [paused, instant, value]);
 
-  return <span>{format(shown)}</span>;
+  return <span>{format(instant ? value : counted)}</span>;
 }

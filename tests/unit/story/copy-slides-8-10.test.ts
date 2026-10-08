@@ -167,13 +167,16 @@ describe("mvp copy", () => {
   });
 
   it("uses same-hero phrasing with the hero name for the hero scope", () => {
-    const c = mvpCopy(fixtureStory({ mvp: { ...pct("melee", "Melee kills", 0.5), scope: "hero", heroId: 1 } }));
+    const c = mvpCopy(
+      fixtureStory({ mvp: { ...pct("melee", "Melee kills", 0.5), scope: "hero", heroId: 1 } }),
+    );
     expect(c).toMatchObject({
       kind: "hero",
       headline: headlineFor("mvp"),
       label: "Melee kills",
       topPercent: "0.5",
       scopeLine: "of Infernus players",
+      heroName: "Infernus",
     });
   });
 
@@ -193,7 +196,11 @@ describe("mvp copy", () => {
     const c = mvpCopy(
       fixtureStory({
         mvp: { ...pct("deaths", "Deaths", 61), scope: "hero", heroId: 1 },
-        percentiles: [pct("kills", "Kills", 72), pct("assists", "Assists", 58), pct("kda", "KDA", 90)],
+        percentiles: [
+          pct("kills", "Kills", 72),
+          pct("assists", "Assists", 58),
+          pct("kda", "KDA", 90),
+        ],
       }),
     );
     expect(c).toMatchObject({
@@ -213,9 +220,11 @@ describe("mvp copy", () => {
 
   it("has its own friendly copy when mvp is null", () => {
     const c = mvpCopy(fixtureStory({ mvp: null, percentiles: [] }));
-    expect(c.kind).toBe("none");
-    expect(c.headline).toBe(MVP_NONE_HEADLINE);
-    expect(c.line).toMatch(/matches/i);
+    expect(c).toMatchObject({
+      kind: "none",
+      headline: MVP_NONE_HEADLINE,
+      line: expect.stringMatching(/matches/i),
+    });
   });
 
   it("has the friendly copy too when the fallback has no global stat to show", () => {

@@ -1,0 +1,80 @@
+/* MVP slide: one very large percentage inside a double deco frame; nothing else competes. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: 24rem;
+  padding: 2rem 1rem;
+  border: 1px solid var(--brass);
+  outline: 1px solid var(--rule);
+  outline-offset: -8px;
+  background: radial-gradient(ellipse 80% 50% at 50% 45%, rgb(79 179 124 / 0.1), transparent 70%);
+  text-align: center;
+}
+
+.label {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--bone);
+}
+
+.big {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 17vw, 4.75rem);
+  line-height: 1;
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
+}
+
+.scope {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.scopeLine {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--bone);
+}
+
+/* A placeholder for hero art (ADR 0051): a diamond tile with the hero's initial. */
+.monogram {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--brass);
+  background: var(--ink);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--brass);
+}
+
+.flavor {
+  margin: 0.5rem 0 0;
+  max-width: 20rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--bone-muted);
+  text-wrap: balance;
+}
+
+.friendly {
+  margin: 0;
+  padding: 2rem 1.25rem;
+  border: 1px solid var(--rule);
+  outline: 1px solid var(--rule);
+  outline-offset: -6px;
+  color: var(--bone-muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}

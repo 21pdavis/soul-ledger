@@ -144,6 +144,8 @@ export type MvpCopy =
       /** "of Infernus players" (hero scope only) or "of all players". */
       scopeLine: string;
       flavor: string;
+      /** Set for the hero scope only. */
+      heroName?: string;
     }
   | { kind: "none"; headline: string; line: string };
 
@@ -157,14 +159,17 @@ const NONE: MvpCopy = { kind: "none", headline: MVP_NONE_HEADLINE, line: MVP_NON
 export function mvpCopy({ mvp, percentiles }: Pick<StoryData, "mvp" | "percentiles">): MvpCopy {
   if (!mvp) return NONE;
   if (mvp.topPercent <= 50) {
-    return {
-      kind: mvp.scope,
+    const shared = {
       headline: headlineFor("mvp"),
       label: mvp.label,
       topPercent: formatTopPercent(mvp.topPercent),
-      scopeLine: mvp.scope === "hero" ? `of ${heroName(mvp.heroId)} players` : "of all players",
       flavor: mvpFlavor(mvp.topPercent),
     };
+    if (mvp.scope === "hero") {
+      const hero = heroName(mvp.heroId);
+      return { kind: "hero", ...shared, scopeLine: `of ${hero} players`, heroName: hero };
+    }
+    return { kind: "global", ...shared, scopeLine: "of all players" };
   }
   const best = percentiles.reduce<(typeof percentiles)[number] | null>(
     (b, p) => (!b || p.topPercent < b.topPercent ? p : b),

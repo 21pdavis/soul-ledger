@@ -63,9 +63,12 @@ describe("StaggerIn", () => {
     );
     expect(screen.getByText("hello")).toBeInTheDocument();
     expect(screen.getByText("hello").parentElement).toHaveStyle({ opacity: "0" });
-    await waitFor(() => expect(screen.getByText("hello").parentElement).toHaveStyle({ opacity: "1" }), {
-      timeout: 1500,
-    });
+    await waitFor(
+      () => expect(screen.getByText("hello").parentElement).toHaveStyle({ opacity: "1" }),
+      {
+        timeout: 1500,
+      },
+    );
   });
 
   it("appears at once when skip arrives mid-entrance", async () => {
@@ -79,8 +82,11 @@ describe("StaggerIn", () => {
         <p>hello</p>
       </StaggerIn>,
     );
-    await waitFor(() => expect(screen.getByText("hello").parentElement).toHaveStyle({ opacity: "1" }), {
-      timeout: 100,
-    });
+    await waitFor(
+      () => expect(screen.getByText("hello").parentElement).toHaveStyle({ opacity: "1" }),
+      {
+        timeout: 100,
+      },
+    );
   });
 });

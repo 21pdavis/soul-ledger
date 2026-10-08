@@ -11,7 +11,9 @@ const motion = { active: true, skipAnimation: false, reducedMotion: false, pause
 function renderRoast(
   roast: Partial<StoryData["roast"]> = {},
   extra: Partial<StoryData> = {},
-  flags: Partial<Pick<SlideComponentProps, "active" | "skipAnimation" | "reducedMotion" | "paused">> = {},
+  flags: Partial<
+    Pick<SlideComponentProps, "active" | "skipAnimation" | "reducedMotion" | "paused">
+  > = {},
 ) {
   const base = fixtureStory();
   const story = fixtureStory({ ...extra, roast: { ...base.roast, ...roast } });
@@ -77,7 +79,17 @@ describe("RoastSlide", () => {
     });
 
     it("draws one rect per occupied cell", () => {
-      renderRoast({ deathPositions: [[0, 0], [9000, 9000], [9100, 9100]] }, {}, still);
+      renderRoast(
+        {
+          deathPositions: [
+            [0, 0],
+            [9000, 9000],
+            [9100, 9100],
+          ],
+        },
+        {},
+        still,
+      );
       const plot = screen.getByRole("img", { name: /where you died/i });
       expect(plot.querySelectorAll("rect[data-count]")).toHaveLength(2);
     });
@@ -129,7 +141,9 @@ describe("RoastSlide", () => {
     it("states the average stash in souls, derived from soul-minutes and match length", () => {
       // 84,800 soul-minutes per match over 84.5h / 120 matches (42.25 min) is about 2,000 souls.
       renderRoast({}, {}, still);
-      expect(sentence()).toHaveTextContent("In a typical match you sat on about 2,000 unspent souls.");
+      expect(sentence()).toHaveTextContent(
+        "In a typical match you sat on about 2,000 unspent souls.",
+      );
     });
 
     it("never claims minutes", () => {
@@ -138,11 +152,7 @@ describe("RoastSlide", () => {
     });
 
     it("shows a neutral sentence with no number when the stash cannot be worked out", () => {
-      renderRoast(
-        { avgUnspentGoldMinutes: 0 },
-        {},
-        still,
-      );
+      renderRoast({ avgUnspentGoldMinutes: 0 }, {}, still);
       expect(sentence().textContent).not.toMatch(/\d/);
       expect(sentence().textContent).not.toMatch(/minute/i);
     });

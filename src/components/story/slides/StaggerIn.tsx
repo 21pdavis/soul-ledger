@@ -35,16 +35,14 @@ export function StaggerIn({
   useEffect(() => {
     const el = scope.current;
     if (!el) return;
-    if (instant) {
-      el.style.opacity = "1";
-      el.style.transform = "none";
-      return;
-    }
-    const c = animate(
-      el,
-      { opacity: [0, 1], y: [10, 0] },
-      { duration: FADE_S, delay: Math.min(index, 4) * STEP_S, ease: "easeOut" },
-    );
+    // Instant: land on the final state in zero time (also finishes an entrance cut short by a skip).
+    const c = instant
+      ? animate(el, { opacity: 1, y: 0 }, { duration: 0 })
+      : animate(
+          el,
+          { opacity: [0, 1], y: [10, 0] },
+          { duration: FADE_S, delay: Math.min(index, 4) * STEP_S, ease: "easeOut" },
+        );
     controls.current = c;
     return () => {
       c.stop();

@@ -61,7 +61,7 @@ Checked against the live API on 2026-10-06 with the [test account](test-account.
   - by hero (median per minute, at least 10 games): 2.3 (Dynamo) to 3.7 (The Doorman).
 
   There is real spread, and it tracks game length and play style, so it works for ranking and the Crate Goblin role. The absolute count probably includes every breakable prop, not just crates, so slide copy should say "breakables smashed" rather than "crates". **What it counts is unverified.**
-- **Unspent Gold Minutes** averages about 84,800 per match. That looks like souls × minutes, not minutes. **Unit unverified**, so roast copy should not say "minutes".
+- **Unspent Gold Minutes** averages about 84,800 per match. That looks like souls × minutes, not minutes. Checked against the recorded fixture on 2026-10-08: it fits souls × minutes (see the [open question](../open-questions/m2-unspent-souls-unit.md)), but Valve has not documented it, so roast copy never says "minutes".
 - An accolade missing from the list means a value of 0.
 - **Pings are not in the bulk player data.** The Backseat Gamer role was dropped ([ADR 0037](../decisions/0037-squad-roles-without-backseat-gamer.md)).
 
