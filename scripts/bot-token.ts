@@ -42,8 +42,11 @@ export function loadBotConfig(opts: {
 
 /** Reads a user-scope Windows environment variable via `reg query`. */
 export function parseRegQuery(stdout: string, name: string): string | undefined {
-  const m = stdout.match(new RegExp(`^\\s*${name}\\s+REG_(?:EXPAND_)?SZ\\s+(.*)$`, "m"));
-  return m?.[1].trim() || undefined;
+  const m = stdout.match(new RegExp(`^\\s*${name}\\s+REG_(EXPAND_)?SZ\\s+(.*)$`, "m"));
+  if (m?.[1] && m[2].includes("%")) {
+    throw new Error(`${name} is a REG_EXPAND_SZ value with %VAR% in it; store it as plain REG_SZ`);
+  }
+  return m?.[2].trim() || undefined;
 }
 
 export async function mintInstallationToken(opts: {
@@ -66,5 +69,8 @@ export async function mintInstallationToken(opts: {
     throw new Error(`Could not mint a bot installation token: GitHub returned HTTP ${res.status}`);
   }
   const body = (await res.json()) as { token: string; expires_at: string };
+  if (typeof body.token !== "string" || body.token === "") {
+    throw new Error("GitHub's response did not include a token");
+  }
   return { token: body.token, expiresAt: body.expires_at };
 }

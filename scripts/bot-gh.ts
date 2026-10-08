@@ -6,12 +6,16 @@ import { buildAppJwt, loadBotConfig, mintInstallationToken, parseRegQuery } from
 
 export type BotGhDeps = {
   getToken: () => Promise<string>;
-  spawn: (cmd: string, args: string[], env: Record<string, string | undefined>) => number;
+  spawn: (cmd: string, args: string[], env: Record<string, string | undefined>) => number | null;
   env: Record<string, string | undefined>;
   err: (line: string) => void;
 };
 
 export async function runBotGh(args: string[], deps: BotGhDeps): Promise<number> {
+  if (args[0] === "auth") {
+    deps.err("bot:gh: `gh auth` is refused so the bot token can never be printed");
+    return 1;
+  }
   let token: string;
   try {
     token = await deps.getToken();
@@ -20,19 +24,26 @@ export async function runBotGh(args: string[], deps: BotGhDeps): Promise<number>
     deps.err(`bot:gh: cannot authenticate as the bot (${msg}); not falling back to the owner`);
     return 1;
   }
-  return deps.spawn("gh", args, { ...deps.env, GH_TOKEN: token });
+  const code = deps.spawn("gh", args, { ...deps.env, GH_TOKEN: token });
+  if (code === null) {
+    deps.err("bot:gh: could not run gh");
+    return 1;
+  }
+  return code;
 }
 
 function regQuery(name: string): string | undefined {
+  const reg = `${process.env.SystemRoot ?? "C:\\Windows"}\\System32\\reg.exe`;
+  let out: string;
   try {
-    const out = execFileSync("reg", ["query", "HKCU\\Environment", "/v", name], {
+    out = execFileSync(reg, ["query", "HKCU\\Environment", "/v", name], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
     });
-    return parseRegQuery(out, name);
   } catch {
     return undefined;
   }
+  return parseRegQuery(out, name);
 }
 
 async function mintToken(): Promise<string> {
@@ -56,7 +67,7 @@ if (process.argv[1] && /bot-gh\.ts$/.test(process.argv[1].replace(/\\/g, "/"))) 
   runBotGh(process.argv.slice(2), {
     getToken: mintToken,
     spawn: (cmd, args, env) =>
-      spawnSync(cmd, args, { env: env as NodeJS.ProcessEnv, stdio: "inherit" }).status ?? 1,
+      spawnSync(cmd, args, { env: env as NodeJS.ProcessEnv, stdio: "inherit" }).status,
     env: process.env,
     err: (l) => console.error(l),
   }).then((code) => process.exit(code));

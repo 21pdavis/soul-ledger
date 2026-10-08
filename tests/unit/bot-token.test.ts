@@ -92,6 +92,11 @@ describe("parseRegQuery", () => {
     expect(parseRegQuery(out, "CLAUDE_BOT_APP_ID")).toBe("5240783");
     expect(parseRegQuery("", "CLAUDE_BOT_APP_ID")).toBeUndefined();
   });
+
+  it("rejects unexpanded REG_EXPAND_SZ values with a clear error", () => {
+    const out = "    CLAUDE_BOT_KEY_PATH    REG_EXPAND_SZ    %USERPROFILE%\\k.pem\r\n";
+    expect(() => parseRegQuery(out, "CLAUDE_BOT_KEY_PATH")).toThrow(/CLAUDE_BOT_KEY_PATH.*REG_SZ/);
+  });
 });
 
 describe("mintInstallationToken", () => {
@@ -112,6 +117,16 @@ describe("mintInstallationToken", () => {
     expect(h.Accept).toBe("application/vnd.github+json");
     expect(h["X-GitHub-Api-Version"]).toBe("2022-11-28");
   });
+
+  it.each([{}, { token: "" }, { token: 5 }])(
+    "throws when the 201 body lacks a token: %j",
+    async (body) => {
+      const fetch = vi.fn(async () => new Response(JSON.stringify(body), { status: 201 }));
+      await expect(mintInstallationToken({ jwt: "J", installationId: "1", fetch })).rejects.toThrow(
+        /token/,
+      );
+    },
+  );
 
   it("throws a clear error on non-201 without leaking the jwt", async () => {
     const fetch = vi.fn(async () => new Response("bad", { status: 401 }));
