@@ -13,11 +13,11 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 
 | Priority | Item | Links |
 |---|---|---|
-| P0 | Before the repo goes public at M2, fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public) | [ADR 0032](../decisions/0032-github-private-ci.md) |
+| P0 | Before the repo goes public at M2, fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public), including #8 and #9. This is not part of the M2 PRs | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P0 | Build M2: the 11-slide story in 2D, fed by `/api/lookup` | [M2 plan](m2-plan.md), [ADR 0028](../decisions/0028-milestones.md) |
-| P0 | Fix tech-debt issues #8 and #9 before the repo goes public with M2 (not part of the M2 PRs) | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
-| P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md) |
+| P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
+| P1 | Build the this-patch toggle (accepted in ADR 0004, deferred from M2) | [ADR 0004](../decisions/0004-time-window.md), [M2 plan](m2-plan.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |
 

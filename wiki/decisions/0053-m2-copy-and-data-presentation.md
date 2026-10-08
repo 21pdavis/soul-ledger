@@ -27,4 +27,4 @@ The owner confirmed this on 2026-10-07. Applies [ADR 0007](0007-tone-hype-with-r
 | Death heatmap | Bin raw `[x, y]` death positions into a grid, draw an SVG density plot on an abstract deco frame (no map). The binning is pure and unit tested. Copy names the hottest cell ("You died here N times"). |
 | Unspent souls | Verify the [unit](../open-questions/m2-unspent-souls-unit.md) first, then show it as a plain sentence. |
 | Rank | Static tier-name map from research, fallback "Tier 4 · 2". Names need [confirmation](../open-questions/m2-rank-tier-names.md). |
-| MVP | One generic template: label + `topPercent` + scope. If nothing is notable, fall back to the best global percentile without same-hero phrasing. Per-metric one-liners are a backlog item. |
+| MVP | One generic template: label + `topPercent` + scope. "Not notable" means the best `topPercent` is above 50; then show the best global stat with neutral copy, no same-hero phrasing. A null `mvp` gets its own friendly copy. Per-metric one-liners are a backlog item. |

@@ -50,7 +50,7 @@ Each is testable at the layer in brackets.
 
 ## 1. Intro
 
-- Shows `intro.matches` and `intro.hoursPlayed` (rounded to whole hours) as count-up counters.
+- Shows `intro.matches` and `intro.hoursPlayed` as count-up counters. Hours show one decimal under 10 hours and whole hours from 10 up, and never read "0 hours" (a unit test covers 0.2, 9.96 and 120).
 - Shows "Based on N matches" from `matchCount` and a Refresh action.
 - Optionally shows first and last match dates when `firstMatchAt` and `lastMatchAt` are non-null; omits them when null.
 - Counters show final values instantly under reduced motion.
@@ -58,8 +58,9 @@ Each is testable at the layer in brackets.
 ## 2. Your main
 
 - Shows the hero name and monogram tile for `main.heroId`, `main.matches` and `main.winRate` as a percentage.
-- Shows the global percentile line from `main.percentiles` only when it is non-empty (10 or more main-hero matches, `MIN_HERO_SAMPLE`); otherwise the line is absent and nothing breaks.
-- When `main` is null the slide is skipped or shows the zero-matches state (never crashes).
+- With 10 or more main-hero matches (`MIN_HERO_SAMPLE`), `main.percentiles` is non-empty and the slide shows the **same-hero** line, "Top X% of <Hero> players", from its best entry (lowest `topPercent`). It is never labelled global.
+- Below 10 matches, `main.percentiles` is empty. The slide then shows the best entry from the global `story.percentiles` with global phrasing (no hero name), or no percentile line if that is also empty. Nothing breaks either way.
+- `main` is null only when `matchCount === 0`, and the story never mounts then (see the zero-matches rule below). The story always has exactly 11 slides and 11 checkpoints; no slide is ever skipped.
 
 ## 3. Roster
 
@@ -108,8 +109,9 @@ Each is testable at the layer in brackets.
 
 - Uses one generic template: label, `topPercent` and scope (`global` or `hero`, with the hero name in the hero case).
 - The `hero` scope uses same-hero phrasing; the `global` scope never mentions a hero.
-- When nothing is notable (or `mvp` is null), falls back to the best global percentile without same-hero phrasing.
-- Copy selection is unit tested for hero scope, global scope and the fallback.
+- "Not notable" means the best `topPercent` is above 50. Then the slide shows the best global stat from `story.percentiles` with neutral copy and no same-hero phrasing.
+- `mvp === null` (only when `story.percentiles` is empty) has its own friendly copy.
+- Copy selection is unit tested for hero scope, global scope, the above-50 fallback and null.
 
 ## 11. Summary
 
@@ -117,11 +119,18 @@ Each is testable at the layer in brackets.
 - Offers Replay (returns to slide 1) and "Look up another player" (returns to entry).
 - Refresh action reruns the lookup with `refresh=1`.
 
+# Not in M2
+
+The [ADR 0004](../decisions/0004-time-window.md) this-patch toggle is **deferred**: no M2 PR builds it, although `LookupEvent.story` carries `window` and `patchStart`. M2 shows the all-time story. It is a P1 [backlog](backlog.md) item.
+
 # Entry, loading and error criteria
 
 - [component] Entry screen has the URL input, "no login needed" line, and remembers the last URL in `localStorage`; invalid input shows an inline error on submit.
 - [e2e] Entering a URL starts the lookup; the Enter click is the audio-unlock gesture.
 - [component] The loader moves through three stages driven only by NDJSON events (profile, history with hero ids, details fetched/total) and never advances on a timer alone.
+- [e2e] The story never mounts when `matchCount === 0`. This includes players whose only games are Street Brawl (`excludedMatches > 0`). They get the zero-matches screen.
+- [component] When the story event has `stale: true` (a refresh failed and the story comes from older cached matches), a short "showing cached matches" note appears.
+- [component] The loader tolerates a `waiting` event (shows a waiting state, does not error or skip a stage).
 - [e2e] `not_found`, `unavailable` / `fetch_failed` and zero-matches each render their full-screen state; unavailable has a working retry.
 - [e2e] A player with few matches still plays the story, with no same-hero claims and the N-matches line shown.
 
