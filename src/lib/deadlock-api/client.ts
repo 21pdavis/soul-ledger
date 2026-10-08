@@ -69,6 +69,7 @@ export function createDeadlockApi({
     path: string,
     params: Params,
     schema: z.ZodType<T>,
+    onWait?: (ms: number) => void,
   ): Promise<T> {
     const url = new URL(path, baseUrl);
     for (const [k, v] of Object.entries(params)) {
@@ -76,7 +77,7 @@ export function createDeadlockApi({
     }
 
     const res = await limiter
-      .schedule(() => fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs) }))
+      .schedule(() => fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs) }), { onWait })
       .catch((cause: unknown) => {
         throw new DeadlockApiError(`Request to ${path} failed`, undefined, { cause });
       });
@@ -102,7 +103,11 @@ export function createDeadlockApi({
     },
 
     /** One player's full data in the given matches, chunked to keep URLs short. */
-    async getBulkMetadata(accountId: number, matchIds: number[]): Promise<BulkMatch[]> {
+    async getBulkMetadata(
+      accountId: number,
+      matchIds: number[],
+      { onWait }: { onWait?: (ms: number) => void } = {},
+    ): Promise<BulkMatch[]> {
       const out: BulkMatch[] = [];
       for (let i = 0; i < matchIds.length; i += BULK_CHUNK) {
         const chunk = matchIds.slice(i, i + BULK_CHUNK);
@@ -120,6 +125,7 @@ export function createDeadlockApi({
             limit: chunk.length,
           },
           z.array(bulkMatch),
+          onWait,
         );
         out.push(...matches);
       }

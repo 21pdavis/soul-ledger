@@ -5,6 +5,10 @@ interface RateLimiterOptions {
   sleep?: (ms: number) => Promise<void>;
 }
 
+export interface ScheduleOptions {
+  onWait?: (ms: number) => void;
+}
+
 /**
  * A sliding-window limiter: at most `maxRequests` tasks may start in any `perMs` window.
  * Callers are admitted in order. Tasks themselves run concurrently once admitted.
@@ -24,13 +28,14 @@ export class RateLimiter {
     this.sleep = options.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
   }
 
-  schedule<T>(task: () => Promise<T>): Promise<T> {
-    const admitted = this.queue.then(() => this.acquire());
+  /** `onWait` is told how long (ms) the task must wait for a free slot, each time it has to. */
+  schedule<T>(task: () => Promise<T>, options: ScheduleOptions = {}): Promise<T> {
+    const admitted = this.queue.then(() => this.acquire(options.onWait));
     this.queue = admitted;
     return admitted.then(task);
   }
 
-  private async acquire(): Promise<void> {
+  private async acquire(onWait?: (ms: number) => void): Promise<void> {
     for (;;) {
       const now = this.now();
       this.starts = this.starts.filter((t) => t + this.perMs > now);
@@ -38,7 +43,9 @@ export class RateLimiter {
         this.starts.push(now);
         return;
       }
-      await this.sleep(this.starts[0] + this.perMs - now);
+      const waitMs = this.starts[0] + this.perMs - now;
+      onWait?.(waitMs);
+      await this.sleep(waitMs);
     }
   }
 }

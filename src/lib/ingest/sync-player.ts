@@ -6,6 +6,17 @@ import { normalizePlayerMatch } from "@/lib/stats/normalize";
 /** Progress events that drive the staged loading screen (ADR 0014). */
 export type SyncEvent =
   | { type: "waiting" }
+  /** What the server is doing right now, so the loader never sits silent. */
+  | {
+      type: "status";
+      step: "contacting" | "batch" | "rate_limited" | "finishing";
+      /** batch: matches read so far. */
+      fetched?: number;
+      /** batch: matches to read in all. */
+      total?: number;
+      /** rate_limited: how long the request waits for a free slot. */
+      waitMs?: number;
+    }
   | {
       type: "profile";
       accountId: number;
@@ -96,6 +107,10 @@ async function fetchAndStore(
   accountId: number,
   { db, api, onEvent, now }: SyncOptions & Required<Pick<SyncOptions, "onEvent" | "now">>,
 ): Promise<void> {
+  onEvent({ type: "status", step: "contacting" });
+  // The two calls do not depend on each other, so they run side by side.
+  const historyRequest = api.getMatchHistory(accountId);
+  historyRequest.catch(() => {}); // a failure is raised where it is awaited below
   const profile = await api.getSteamProfile(accountId);
   await repo.upsertPlayer(db, {
     accountId,
@@ -110,9 +125,7 @@ async function fetchAndStore(
     avatarUrl: profile?.avatarfull ?? null,
   });
 
-  const history = (await api.getMatchHistory(accountId)).filter((m) =>
-    MATCHMAKING_MODES.has(m.match_mode),
-  );
+  const history = (await historyRequest).filter((m) => MATCHMAKING_MODES.has(m.match_mode));
   const known = await repo.getKnownMatchIds(db, accountId);
   const missing = history.filter((m) => !known.has(m.match_id)).map((m) => m.match_id);
   onEvent({
@@ -126,9 +139,12 @@ async function fetchAndStore(
   let saved = 0;
   for (let i = 0; i < missing.length; i += DETAILS_BATCH) {
     const batch = missing.slice(i, i + DETAILS_BATCH);
-    const rows = (await api.getBulkMetadata(accountId, batch)).map((m) =>
-      normalizePlayerMatch(m, accountId),
-    );
+    onEvent({ type: "status", step: "batch", fetched: i, total: missing.length });
+    const rows = (
+      await api.getBulkMetadata(accountId, batch, {
+        onWait: (waitMs) => onEvent({ type: "status", step: "rate_limited", waitMs }),
+      })
+    ).map((m) => normalizePlayerMatch(m, accountId));
     await repo.savePlayerMatches(db, rows);
     saved += rows.length;
     await repo.heartbeatJob(db, accountId, now());
@@ -144,6 +160,8 @@ async function fetchAndStore(
       ...counters,
     });
   }
+
+  onEvent({ type: "status", step: "finishing" });
 
   // Rank history only feeds one slide, so its failure should not sink the whole lookup.
   try {

@@ -30,7 +30,12 @@ describe("syncPlayer", () => {
     const { api, state } = fakeApi();
     const events: SyncEvent[] = [];
 
-    const result = await syncPlayer(TEST_ACCOUNT_ID, { db, api, onEvent: (e) => events.push(e) });
+    // Status events (sync-status.test.ts) are asides; this test follows the stages.
+    const result = await syncPlayer(TEST_ACCOUNT_ID, {
+      db,
+      api,
+      onEvent: (e) => e.type !== "status" && events.push(e),
+    });
 
     expect(result).toBe("synced");
     expect(await repo.getKnownMatchIds(db, TEST_ACCOUNT_ID)).toHaveProperty("size", 352);
