@@ -60,9 +60,9 @@ async function tabTo(page: Page, name: string | RegExp, max = 30) {
       await expectFocusRing(page);
       return;
     }
-    // Stops on the way are not all visible at once (a skipped slide control, say), but any that
-    // takes focus must show it.
-    if (stop && stop.onScreen) await expectFocusRing(page);
+    // Every stop on the way must show its ring and be on screen (a focused control that is
+    // off screen or hidden fails WCAG 2.4.11), so there is no whitelist of exceptions.
+    await expectFocusRing(page);
   }
   throw new Error(`Tab never reached "${name}"`);
 }

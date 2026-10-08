@@ -21,8 +21,9 @@ import {
 const stage = (page: Page) => page.getByTestId("story-stage");
 
 /**
- * Waits for every finite animation and transition to end (loops are left running). Entrances start
- * a frame or two after the render that causes them, so it looks again until a pass finds nothing.
+ * Waits for every finite animation and transition to end. Entrances start a frame or two after the
+ * render that causes them, so it looks again until a pass finds nothing. Looping animations are
+ * handled by `freezeLoops`.
  */
 const settleAnimations = (page: Page) =>
   page.evaluate(async () => {
@@ -38,18 +39,46 @@ const settleAnimations = (page: Page) =>
     }
   });
 
-async function expectNoViolations(page: Page, where: string) {
-  await settleAnimations(page);
+/**
+ * Looping animations (the loading note's "breathe" fades its text) are measured at the start of
+ * the loop and at its midpoint, where every loop in the app is at its extreme, so contrast has to
+ * hold at both. Pauses each loop at that phase; returns how many there are.
+ */
+const freezeLoops = (page: Page, phase: number) =>
+  page.evaluate((at) => {
+    const loops = document
+      .getAnimations()
+      .filter((a) => a.effect?.getComputedTiming().iterations === Infinity);
+    for (const a of loops) {
+      a.pause();
+      a.currentTime = at * Number(a.effect!.getComputedTiming().duration);
+    }
+    return loops.length;
+  }, phase);
+
+async function scan(page: Page) {
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"])
     .analyze();
-  const report = results.violations.map((v) => ({
+  return results.violations.map((v) => ({
     rule: v.id,
     impact: v.impact,
     help: v.help,
     nodes: v.nodes.map((n) => ({ target: n.target, summary: n.failureSummary })),
   }));
-  expect(report, `axe violations on ${where}`).toEqual([]);
+}
+
+async function expectNoViolations(page: Page, where: string) {
+  await settleAnimations(page);
+  const loops = await freezeLoops(page, 0);
+  expect(await scan(page), `axe violations on ${where}`).toEqual([]);
+  if (loops > 0) {
+    await freezeLoops(page, 0.5);
+    expect(
+      await scan(page),
+      `axe violations on ${where}, looping animation at its midpoint`,
+    ).toEqual([]);
+  }
 }
 
 /** A lookup that found a player with next to nothing: every optional part of every slide is empty. */

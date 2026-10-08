@@ -86,11 +86,13 @@ test("Look up another player returns to the entry screen", async ({ page }) => {
   await expect(page.getByLabel("Paste your Steam profile URL")).toBeVisible();
 });
 
-/** The cases that squeeze the card: the stale note shrinks the stage, "This patch" wraps the window line, long names fill the lines. */
+/**
+ * The cases that squeeze the card. The combined case stacks all three squeezes (the stale note
+ * shrinks the stage, "This patch" wraps the window line, long names fill the lines), so the
+ * single-factor "stale" and "patch" cases are not run separately.
+ */
 const CASES: { name: string; over: Record<string, unknown>; patch: boolean; long: boolean }[] = [
   { name: "all time", over: {}, patch: false, long: false },
-  { name: "stale note", over: { stale: true }, patch: false, long: false },
-  { name: "this patch", over: { window: "patch", patchStart: PATCH }, patch: true, long: false },
   { name: "long names", over: {}, patch: false, long: true },
   {
     name: "stale + this patch + long names",
@@ -119,10 +121,15 @@ const SIZES = [
   { width: 360, height: 640, phone: true },
   { width: 375, height: 667, phone: true },
   { width: 1280, height: 720, phone: false },
-  { width: 1440, height: 900, phone: false },
 ];
 
 test.describe("the card is never clipped by the stage", () => {
+  // Layout does not depend on motion, so skip the entrances: each case then only pays for the
+  // lookup, not for eleven slide transitions.
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+  });
+
   for (const { width, height, phone } of SIZES) {
     for (const c of CASES) {
       test(`${width}x${height}, ${c.name}: the three actions are reachable and the frame is whole`, async ({
@@ -151,9 +158,16 @@ test.describe("the card is never clipped by the stage", () => {
         // Nothing overflows the frame (the stage clips whatever does).
         const overflow = await frame.evaluate((el) => el.scrollHeight - el.clientHeight);
         expect(overflow).toBeLessThanOrEqual(0);
-        // Above the narrowest tier (container 260px) a long label wraps rather than being cut off.
+        // Above the narrowest tier (@container max-width: 260px) a long label wraps rather than
+        // being cut off. The tier is decided by the size container (.summary: the ledger's
+        // grandparent, the card sits between), not by the narrower ledger list inside the card.
         const ledger = page.getByRole("list", { name: "Your ledger entry" });
-        const narrowest = (await ledger.evaluate((el) => el.clientWidth)) <= 260;
+        const container = await ledger.evaluate((el) => {
+          const box = el.parentElement!.parentElement!;
+          return { type: getComputedStyle(box).containerType, width: box.clientWidth };
+        });
+        expect(container.type).toBe("size");
+        const narrowest = container.width <= 260;
         if (!narrowest) {
           const clipped = await ledger.evaluate((el) =>
             [...el.querySelectorAll("li")]

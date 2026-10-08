@@ -158,7 +158,7 @@ The ADR 0004 this-patch toggle is in M2 ([ADR 0052](../decisions/0052-m2-entry-l
 
 - [component] An `aria-live` region announces each slide change.
 - [e2e] One Playwright test completes the whole story, entry to summary, by keyboard only, with visible focus rings.
-- [e2e] `@axe-core/playwright` (pinned) scans the entry screen, every loading stage, the error and zero-matches screens and all 11 slides (a full and a sparse story) on phone and desktop. Any violation fails, not only serious and critical ones, and no rule is disabled (`tests/e2e/a11y.spec.ts`, built in PR 9). Its one finding was a missing h1 on the loading screen.
+- [e2e] `@axe-core/playwright` (pinned) scans the entry screen, every loading stage, the error and zero-matches screens and all 11 slides (a full and a sparse story) on phone and desktop. Any violation fails, not only serious and critical ones, and no rule is disabled (`tests/e2e/a11y.spec.ts`, built in PR 9). Looping animations are scanned at the start and midpoint of the loop. Its findings were a missing h1 on the loading screen and the loading note dimming to 0.45 opacity (contrast 2.5) while it breathed; the floor is now 0.8.
 - Playwright ports are overridable (`PLAYWRIGHT_PORT`, `PLAYWRIGHT_GATE_PORT`) so several worktrees can run e2e at once; a server already listening is only reused on the default ports (`PLAYWRIGHT_REUSE_SERVER=0` turns reuse off there too).
 
 # Related
