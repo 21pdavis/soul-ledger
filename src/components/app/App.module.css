@@ -1,5 +1,14 @@
+/* The story page: the player takes the height the notices strip leaves, so the strip is always on screen. */
+.storyPage {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--ink);
+}
+
 /* The strip after the story: notices that must not sit on top of the player. */
 .notices {
+  flex: none;
   display: flex;
   flex-direction: column;
   align-items: center;
