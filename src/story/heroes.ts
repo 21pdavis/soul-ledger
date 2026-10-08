@@ -69,3 +69,14 @@ const HERO_NAMES: Record<number, string> = {
 export function heroName(heroId: number): string {
   return HERO_NAMES[heroId] ?? `Hero #${heroId}`;
 }
+
+/** Stand-in for hero art while art is placeholder: initials of the first two words, "?" if unknown. */
+export function heroMonogram(heroId: number): string {
+  const name = HERO_NAMES[heroId];
+  if (!name) return "?";
+  const words = name.split(/\s+/).filter((w) => /^\p{L}/u.test(w));
+  return words
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+}
