@@ -54,7 +54,7 @@ describe("PrecisionSlide", () => {
     expect(within(parry).getByText("Parry king")).toBeInTheDocument();
     expect(within(parry).getByText("30 landed, 20 missed")).toBeInTheDocument();
     expect(parry).toHaveAttribute("data-label", "king");
-    expect(within(parry).getByText(/parry king starts at 60%/i)).toBeInTheDocument();
+    expect(within(parry).getByText(/parry king starts at 40%/i)).toBeInTheDocument();
   });
 
   it("pins the shown king line to PARRY_KING_RATE", () => {

@@ -468,6 +468,49 @@ export function mvpCopy({ mvp, percentiles }: Pick<StoryData, "mvp" | "percentil
   };
 }
 
+export const MENTIONS_HEADING = "Honorable mentions";
+/** How many runner-up stats sit under the signature stat. */
+export const MAX_MENTIONS = 2;
+
+/** A short hype line for a runner-up stat, by how rare it is (ADR 0007). */
+export function mentionLine(topPercent: number): string {
+  if (topPercent <= 1) return "Rare air.";
+  if (topPercent <= 10) return "Elite company.";
+  if (topPercent <= 25) return "Well ahead of the pack.";
+  return "Quietly good.";
+}
+
+export interface MvpMention {
+  label: string;
+  topPercent: string;
+  note: string;
+  line: string;
+}
+
+/**
+ * Up to two more standout stats for the signature slide: the best global stats other than the one
+ * already on show, each in the top 50% (the same "notable" line as the MVP). None when there is no
+ * signature stat, since that slide then shows its friendly empty copy.
+ */
+export function mvpMentions({
+  mvp,
+  percentiles,
+}: Pick<StoryData, "mvp" | "percentiles">): MvpMention[] {
+  if (!mvp) return [];
+  const best = bestPercentile(percentiles);
+  const shown = mvp.topPercent <= NOT_NOTABLE_ABOVE ? mvp.label : best?.label;
+  return percentiles
+    .filter((p) => p.label !== shown && p.topPercent <= NOT_NOTABLE_ABOVE)
+    .sort((a, b) => a.topPercent - b.topPercent)
+    .slice(0, MAX_MENTIONS)
+    .map((p) => ({
+      label: p.label,
+      topPercent: formatTopPercent(p.topPercent),
+      note: "of all players",
+      line: mentionLine(p.topPercent),
+    }));
+}
+
 // ===================================================================== Slide 11: summary
 
 /** Copy for the summary slide (slide 11). Plain, short, in the ledger's voice (ADR 0053). */

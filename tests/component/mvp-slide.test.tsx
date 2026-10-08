@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MvpSlide } from "@/components/story/slides/MvpSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
@@ -90,6 +90,37 @@ describe("MvpSlide", () => {
     expect(screen.getByText("of all players")).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/Infernus|Hero #|Deaths/);
     expect(screen.queryByTestId("hero-monogram")).not.toBeInTheDocument();
+  });
+
+  it("shows honorable mentions under the signature stat, as DOM text", () => {
+    renderMvp(
+      fixtureStory({
+        mvp: { ...stat("melee", "Melee kills", 1), scope: "global" },
+        percentiles: [
+          stat("melee", "Melee kills", 1),
+          stat("assists", "Assists", 8),
+          stat("kills", "Kills", 20),
+        ],
+      }),
+      { reducedMotion: true },
+    );
+    const list = screen.getByRole("list", { name: /honorable mentions/i });
+    const items = within(list).getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveTextContent("Assists");
+    expect(items[0]).toHaveTextContent("Top 8%");
+    expect(items[1]).toHaveTextContent("Kills");
+  });
+
+  it("shows no mentions list when no other stat is notable", () => {
+    renderMvp(
+      fixtureStory({
+        mvp: { ...stat("melee", "Melee kills", 1), scope: "global" },
+        percentiles: [stat("melee", "Melee kills", 1), stat("deaths", "Deaths", 70)],
+      }),
+      { reducedMotion: true },
+    );
+    expect(screen.queryByRole("list", { name: /honorable mentions/i })).not.toBeInTheDocument();
   });
 
   it("has its own friendly copy when mvp is null", () => {

@@ -4,6 +4,11 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Changed
+
+- **You are a parry king from 40%, not 60%.** Landing 40% or more of your parries now earns the king badge; only below that are you a clown.
+- **Your signature stat slide now has honorable mentions.** Under your top stat you also see your next two best stats, each with a short line about how rare it is.
+
 ### Removed
 
 - The death slide no longer ends with the "souls that never made it to the shop" line. The stat behind it was unclear, so it is dropped.

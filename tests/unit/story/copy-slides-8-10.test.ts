@@ -4,8 +4,10 @@ import {
   RANK_EMPTY_LINE,
   deathsLabel,
   hotspotLine,
+  mentionLine,
   mvpCopy,
   mvpFlavor,
+  mvpMentions,
   noDeathMapLine,
   rankSummary,
   worstMatchLine,
@@ -188,5 +190,59 @@ describe("mvp copy", () => {
     expect(mvpFlavor(0.5)).not.toBe(mvpFlavor(5));
     expect(mvpFlavor(5)).not.toBe(mvpFlavor(30));
     expect(mvpFlavor(30)).not.toBe(mvpFlavor(70));
+  });
+});
+
+describe("mvp honorable mentions", () => {
+  const pct = (label: string, topPercent: number) => ({
+    metric: label.toLowerCase(),
+    label,
+    value: 10,
+    percentile: 100 - topPercent,
+    topPercent,
+    higherIsBetter: true,
+    weight: 1,
+  });
+  const story = (over: Parameters<typeof fixtureStory>[0] = {}) =>
+    fixtureStory({
+      mvp: { ...pct("Melee kills", 0.5), scope: "global" },
+      percentiles: [
+        pct("Melee kills", 0.5),
+        pct("Assists", 8),
+        pct("Kills", 20),
+        pct("Denies", 35),
+      ],
+      ...over,
+    });
+
+  it("lists the next two best stats, never the signature stat itself", () => {
+    const m = mvpMentions(story());
+    expect(m.map((x) => x.label)).toEqual(["Assists", "Kills"]);
+    expect(m[0]).toMatchObject({ topPercent: "8", note: "of all players" });
+    expect(m[0].line).toBe(mentionLine(8));
+  });
+
+  it("skips stats that are not notable (above the top 50%)", () => {
+    const m = mvpMentions(story({ percentiles: [pct("Melee kills", 0.5), pct("Deaths", 61)] }));
+    expect(m).toEqual([]);
+  });
+
+  it("when the signature is the fallback, leaves out the best stat it already shows", () => {
+    const m = mvpMentions(
+      story({
+        mvp: { ...pct("Deaths", 61), scope: "global" },
+        percentiles: [pct("Assists", 30), pct("Kills", 40), pct("Denies", 45)],
+      }),
+    );
+    expect(m.map((x) => x.label)).toEqual(["Kills", "Denies"]);
+  });
+
+  it("is empty with no percentiles", () => {
+    expect(mvpMentions(story({ mvp: null, percentiles: [] }))).toEqual([]);
+  });
+
+  it("has a distinct short line per tier", () => {
+    expect(mentionLine(1)).not.toBe(mentionLine(8));
+    expect(mentionLine(8)).not.toBe(mentionLine(30));
   });
 });

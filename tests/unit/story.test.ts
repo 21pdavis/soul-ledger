@@ -175,10 +175,10 @@ describe("computeStory edge cases", () => {
   });
 
   it.each([
-    [6, "king"],
-    [5, "clown"],
+    [4, "king"],
+    [3, "clown"],
   ] as const)(
-    "parry king line is 60 percent: %i of 10 parries landed is %s (ADR 0040)",
+    "parry king line is 40 percent: %i of 10 parries landed is %s (ADR 0061)",
     (n, label) => {
       const s = computeStory({
         matches: [row({ parrySuccess: n, parryMiss: 10 - n })],
