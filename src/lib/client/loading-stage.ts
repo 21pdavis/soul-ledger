@@ -30,6 +30,8 @@ export interface LoadingView {
     breakables: number;
     sinnerJackpots: number;
   } | null;
+  /** A line saying what is happening right now. Never empty, so the page is never blank. */
+  note: string;
   /** What a screen reader hears. It changes on stage changes only, never on counter ticks. */
   announcement: string;
 }
@@ -62,12 +64,19 @@ export function loadingStage(progress: readonly ClientLookupEvent[]): LoadingVie
   let details: Of<"details"> | null = null;
   let waiting = false;
   let done = false;
+  let status: Of<"status"> | null = null;
 
   for (const event of progress) {
     if (event.type === "waiting") {
       waiting = true;
       continue;
     }
+    if (event.type === "status") {
+      status = event;
+      waiting = false;
+      continue;
+    }
+    status = null; // any real progress replaces the last status
     if (event.type === "profile") profile = event;
     else if (event.type === "history") history = event;
     else if (event.type === "details") {
@@ -85,7 +94,7 @@ export function loadingStage(progress: readonly ClientLookupEvent[]): LoadingVie
 
   const stage: LoadingStageNumber = details ? 3 : history ? 2 : profile ? 1 : 0;
 
-  const view: Omit<LoadingView, "announcement"> = {
+  const view: Omit<LoadingView, "announcement" | "note"> = {
     stage,
     waiting,
     done,
@@ -117,10 +126,28 @@ export function loadingStage(progress: readonly ClientLookupEvent[]): LoadingVie
       : null,
   };
 
-  return { ...view, announcement: announce(view) };
+  return { ...view, note: noteFor(view, status), announcement: announce(view) };
 }
 
-function announce(view: Omit<LoadingView, "announcement">): string {
+type BaseView = Omit<LoadingView, "announcement" | "note">;
+
+function noteFor(view: BaseView, status: Of<"status"> | null): string {
+  const copy = LOADING_COPY.status;
+  if (view.done) return LOADING_COPY.sealing;
+  if (view.waiting) return LOADING_COPY.waiting;
+  if (status?.step === "rate_limited") {
+    return copy.rateLimited(Math.max(1, Math.ceil((status.waitMs ?? 0) / 1000)));
+  }
+  if (status?.step === "batch") {
+    return copy.batch(Math.max(0, (status.total ?? 0) - (status.fetched ?? 0)));
+  }
+  if (status?.step === "finishing") return copy.finishing;
+  if (status?.step === "contacting") return copy.contacting;
+  if (view.stage === 0) return LOADING_COPY.title;
+  return view.stage === 1 ? copy.reading : copy.fetching;
+}
+
+function announce(view: BaseView): string {
   if (view.done) return LOADING_COPY.sealing;
   if (view.waiting) return LOADING_COPY.waiting;
   if (view.stage === 3) return LOADING_COPY.announceDetails;

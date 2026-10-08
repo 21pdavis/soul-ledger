@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Fixed
+
+- The loading screen no longer sits blank during a slow lookup. It now says what it is doing from the first second (contacting Deadlock, how many matches are left, waiting in line when Deadlock's servers ask us to slow down). If nothing has happened for 20 seconds, it says so and offers a Try again button. Looking up a player is also a little faster, because the profile and match list are asked for together.
+
 ### Removed
 
 - The death slide no longer ends with the "souls that never made it to the shop" line. The stat behind it was unclear, so it is dropped.
