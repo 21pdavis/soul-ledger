@@ -1,0 +1,170 @@
+/*
+ * The story shell (ADR 0050, 0051). Placeholder-grade art: an ink diamond lattice, brass double
+ * rules, type and shapes only. One 9:16 stage, sized the same in both modes.
+ */
+
+.root {
+  /* The stage is as wide as --story-width allows and 9:16 tall, but never taller than the screen. */
+  --stage-h: min(100dvh, calc(min(100vw, var(--story-width)) * 16 / 9));
+  position: relative;
+  min-height: 100dvh;
+  color: var(--bone);
+  background-color: var(--ink);
+  /* Art-deco diamond lattice with a faint green glow from the top. */
+  background-image:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(79 179 124 / 0.12), transparent 70%),
+    repeating-linear-gradient(45deg, rgb(201 162 75 / 0.09) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(-45deg, rgb(201 162 75 / 0.09) 0 1px, transparent 1px 44px);
+}
+
+/* Phone: the stage fills the screen, letterboxed to 9:16 if the screen is taller. */
+.phone {
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  height: var(--stage-h);
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: var(--panel);
+  /* Double brass-and-rule frame around the stage. */
+  box-shadow:
+    0 0 0 1px var(--brass),
+    0 0 0 7px var(--ink),
+    0 0 0 8px var(--rule),
+    0 24px 80px rgb(0 0 0 / 0.7);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* Hold to pause: CSS animations inside slides freeze while the reader presses. */
+.stage[data-paused="true"] * {
+  animation-play-state: paused !important;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  /* The slide never swallows taps meant for the tap zones; only real controls take the pointer. */
+  pointer-events: none;
+  z-index: 1;
+}
+
+.slide :is(button, a, input, select, textarea, summary, label) {
+  pointer-events: auto;
+}
+
+.zones {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.zone {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.progress {
+  position: absolute;
+  inset: 0.75rem 0.75rem auto;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.progress[data-interactive="true"] {
+  pointer-events: auto;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Previous/next for keyboard and screen readers: invisible until focused, then a brass pill. */
+.srNav {
+  position: absolute;
+  bottom: 0.75rem;
+  z-index: 3;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  color: var(--bone);
+  background: var(--panel);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+}
+
+.srNav[data-side="back"] {
+  left: 0.75rem;
+}
+
+.srNav[data-side="next"] {
+  right: 0.75rem;
+}
+
+.srNav:focus-visible {
+  width: auto;
+  height: auto;
+  padding: 0.5rem 0.875rem;
+  overflow: visible;
+  clip-path: none;
+  border: 1px solid var(--brass);
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* Desktop scroll controller: one viewport-high snap checkpoint per slide, the stage pinned over them. */
+.track {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+}
+
+.trackContent {
+  position: relative;
+  height: calc(var(--count) * 100dvh);
+}
+
+.checkpoints {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.checkpoint {
+  height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.pin {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    scroll-behavior: auto;
+  }
+}
