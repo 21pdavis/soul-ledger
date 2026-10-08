@@ -69,7 +69,6 @@ export interface Story {
   roast: {
     deaths: number;
     deathPositions: [number, number][];
-    avgUnspentGoldMinutes: number;
     worstMatch: { matchId: number; heroId: number; deaths: number } | null;
   };
   rank: { journey: RankPoint[]; current: RankPoint | null };
@@ -206,10 +205,6 @@ export function computeStory(input: StoryInput): Story {
     roast: {
       deaths: total((r) => r.deaths),
       deathPositions: rows.flatMap((r) => r.deathPositions),
-      avgUnspentGoldMinutes: rate(
-        total((r) => r.unspentGoldMinutes),
-        rows.length,
-      ),
       worstMatch: worst
         ? { matchId: worst.matchId, heroId: worst.heroId, deaths: worst.deaths }
         : null,

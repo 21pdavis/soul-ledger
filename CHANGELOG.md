@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Removed
+
+- The death slide no longer ends with the "souls that never made it to the shop" line. The stat behind it was unclear, so it is dropped.
+
 ## [0.2.0] - 2026-10-08
 
 **Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with placeholder art. The 3D world arrives in M3.

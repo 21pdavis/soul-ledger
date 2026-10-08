@@ -369,56 +369,6 @@ export function worstMatchLine({ deaths, heroName: hero }: { deaths: number; her
   return `Worst night: ${deaths} ${plural(deaths, "death", "deaths")} as ${hero}`;
 }
 
-// -------------------------------------------------------- Unspent souls (slide 8)
-//
-// `avgUnspentGoldMinutes` is the mean per match of "Unspent Gold Minutes". Checked against the
-// recorded bulk metadata (see wiki/open-questions/m2-unspent-souls-unit.md): it is souls x
-// minutes, not minutes, so dividing by the match length gives the souls held on average. The
-// mean of the sums over the mean match length is the duration-weighted average exactly.
-
-/** Mean match length in minutes, or 0 when there are no matches. */
-export function avgMatchMinutes(hoursPlayed: number, matchCount: number): number {
-  return matchCount > 0 ? (hoursPlayed * 60) / matchCount : 0;
-}
-
-/** Souls held unspent on average during a match, rounded to the nearest 100, or null if unknown. */
-export function typicalUnspentSouls(avgUnspentGoldMinutes: number, avgMinutes: number) {
-  if (
-    !Number.isFinite(avgUnspentGoldMinutes) ||
-    !Number.isFinite(avgMinutes) ||
-    avgUnspentGoldMinutes <= 0 ||
-    avgMinutes <= 0
-  ) {
-    return null;
-  }
-  return Math.round(avgUnspentGoldMinutes / avgMinutes / 100) * 100;
-}
-
-export const UNSPENT_NEUTRAL_LINE =
-  "Somewhere in your matches there are souls that never made it to the shop.";
-export const UNSPENT_SPENDER_LINE =
-  "You spend your souls almost as fast as you earn them. Not much hoarding here.";
-
-/**
- * Whether the slide shows the souls figure. Off until #36 is done: the owner has not accepted the
- * soul-minutes reading of the unit, and matches with no "Unspent Gold Minutes" key are stored as 0,
- * which understates the average. Until then the slide shows the neutral sentence (no number, no
- * unit), as the plan requires before the unit is verified.
- */
-export const SHOW_UNSPENT_SOULS_FIGURE = false;
-
-export function unspentSoulsLine(
-  avgUnspentGoldMinutes: number,
-  avgMinutes: number,
-  showFigure: boolean = SHOW_UNSPENT_SOULS_FIGURE,
-): string {
-  if (!showFigure) return UNSPENT_NEUTRAL_LINE;
-  const souls = typicalUnspentSouls(avgUnspentGoldMinutes, avgMinutes);
-  if (souls === null) return UNSPENT_NEUTRAL_LINE;
-  if (souls <= 100) return UNSPENT_SPENDER_LINE;
-  return `In a typical match you sat on about ${souls.toLocaleString("en-US")} unspent souls.`;
-}
-
 // ------------------------------------------------------------ Rank journey (slide 9)
 
 export const RANK_EMPTY_LINE =

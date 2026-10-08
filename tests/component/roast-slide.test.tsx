@@ -1,8 +1,8 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { RoastSlide } from "@/components/story/slides/RoastSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
-import { UNSPENT_NEUTRAL_LINE, headlineFor } from "@/story/copy";
+import { headlineFor } from "@/story/copy";
 import type { StoryData } from "@/story/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 
@@ -178,29 +178,10 @@ describe("RoastSlide", () => {
   });
 
   describe("unspent souls", () => {
-    const sentence = () => screen.getByTestId("unspent-souls");
-
-    it("shows the neutral sentence, with no number and no unit, until the unit is accepted (#36)", () => {
+    it("no longer shows an unspent-souls line (the stat was dropped)", () => {
       renderRoast({}, {}, still);
-      expect(sentence()).toHaveTextContent(UNSPENT_NEUTRAL_LINE);
-      expect(sentence().textContent).not.toMatch(/\d/);
-    });
-
-    it("never claims minutes", () => {
-      renderRoast({}, {}, still);
-      expect(sentence().textContent).not.toMatch(/minute/i);
-    });
-
-    it("shows a neutral sentence with no number when the stash cannot be worked out", () => {
-      renderRoast({ avgUnspentGoldMinutes: 0 }, {}, still);
-      expect(sentence().textContent).not.toMatch(/\d/);
-      expect(sentence().textContent).not.toMatch(/minute/i);
-    });
-
-    it("is neutral too when there is no play time to divide by", () => {
-      const base = fixtureStory();
-      renderRoast({}, { intro: { ...base.intro, hoursPlayed: 0 } }, still);
-      expect(within(sentence()).queryByText(/\d/)).not.toBeInTheDocument();
+      expect(screen.queryByTestId("unspent-souls")).not.toBeInTheDocument();
+      expect(screen.queryByText(/never made it to the shop/i)).not.toBeInTheDocument();
     });
   });
 });

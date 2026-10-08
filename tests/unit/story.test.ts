@@ -96,10 +96,10 @@ describe("computeStory on the test account", () => {
     });
   });
 
-  it("roast: every death position, hoarded souls and the worst match", () => {
+  it("roast: every death position and the worst match", () => {
     expect(story.roast.deaths).toBe(total((r) => r.deaths));
     expect(story.roast.deathPositions).toHaveLength(total((r) => r.deathPositions.length));
-    expect(story.roast.avgUnspentGoldMinutes).toBeCloseTo(total((r) => r.unspentGoldMinutes) / 351);
+    expect(story.roast).not.toHaveProperty("avgUnspentGoldMinutes");
     const worst = Math.max(...normal.map((r) => r.deaths));
     expect(story.roast.worstMatch).toMatchObject({ deaths: worst });
   });
