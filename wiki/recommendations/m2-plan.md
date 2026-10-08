@@ -22,7 +22,7 @@ The orchestrator may deviate from this plan where useful. Every PR follows [ADR 
 | # | PR | Contents | Depends on |
 |---|---|---|---|
 | 1 | Foundation (orchestrator) | framer-motion, palette tokens as CSS variables, `next/font` fonts, `copy` module, hero-name and tier maps, slide shell and segmented progress bar, Vitest jsdom plus React Testing Library if missing, shortlist of font pairings | none |
-| 2 | Entry screen and error states | URL input, inline validation, remembered URL, "no login needed" line, full-screen error states | 1 |
+| 2 | Entry screen, window control and error states | URL input, inline validation, remembered URL, "no login needed" line, extensible window control (All time / This patch), full-screen error states | 1 |
 | 3 | Staged loading | Three real stages from the NDJSON events, themed teasers, audio-unlock on Enter | 1, 2 |
 | 4 | Slide controllers | Phone tap controller and desktop snap-scroll controller over one slide index, aria-live announcer | 1 |
 | 5 | Slides 1-4 | Intro, main, roster, scavenger | 1, 4 |
@@ -119,10 +119,6 @@ Each is testable at the layer in brackets.
 - Offers Replay (returns to slide 1) and "Look up another player" (returns to entry).
 - Refresh action reruns the lookup with `refresh=1`.
 
-# Not in M2
-
-The [ADR 0004](../decisions/0004-time-window.md) this-patch toggle is **deferred**: no M2 PR builds it, although `LookupEvent.story` carries `window` and `patchStart`. M2 shows the all-time story. It is a P1 [backlog](backlog.md) item.
-
 # Entry, loading and error criteria
 
 - [component] Entry screen has the URL input, "no login needed" line, and remembers the last URL in `localStorage`; invalid input shows an inline error on submit.
@@ -133,6 +129,20 @@ The [ADR 0004](../decisions/0004-time-window.md) this-patch toggle is **deferred
 - [component] The loader tolerates a `waiting` event (shows a waiting state, does not error or skip a stage).
 - [e2e] `not_found`, `unavailable` / `fetch_failed` and zero-matches each render their full-screen state; unavailable has a working retry.
 - [e2e] A player with few matches still plays the story, with no same-hero claims and the N-matches line shown.
+
+# Window control criteria (PR 2)
+
+The ADR 0004 this-patch toggle is in M2 ([ADR 0052](../decisions/0052-m2-entry-loading-error-states.md)). It is built as an extensible filter/window control, a first step towards the "more detailed filters" in the [backlog](backlog.md), not a one-off boolean.
+
+- [component] The entry screen has a selector with **All time** (default) and **This patch**.
+- [unit] The control's state is a typed filter object (today only `window: "all" | "patch"`), so a new filter is a new field and option, not a new component. No other filters are added in M2.
+- [unit] The selection maps to the lookup URL as `window=all|patch` (default `all`).
+- [component] The selection is remembered in `localStorage` like the last URL, and restored on return.
+- [component] The story shows which window it is: "All time", or "since patch <date>" using `patchStart` from the lookup response. The label never uses a client-computed date.
+- [component] "Based on N matches" uses `matchCount` of the returned story, so it reflects the window.
+- [e2e] Choosing This patch sends `window=patch` to `/api/lookup`.
+- [e2e] A patch window with zero counted matches shows the zero-matches screen. Under 10 main-hero matches follows the few-matches rule (story plays, same-hero claims dropped, N-matches line shown). The copy for both can mention the window, for example "no matches since the latest patch".
+- Dependency: patch dates are settled ([ADR 0035](../decisions/0035-patch-date-from-changelog-title.md), implemented in `src/lib/patches.ts`). A hotfix with no changelog post would not move the window; this is accepted.
 
 # Accessibility criteria
 

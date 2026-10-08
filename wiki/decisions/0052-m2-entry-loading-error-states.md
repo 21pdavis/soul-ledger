@@ -26,6 +26,12 @@ Three **real** stages driven by the streamed NDJSON events of `/api/lookup`, eac
 2. history, with hero ids;
 3. details fetched / total counters.
 
+## Window control
+
+- The ADR 0004 **this-patch toggle is in M2** (owner, 2026-10-07; [ADR 0004](0004-time-window.md) stays accepted). The entry screen has a selector, **All time** (default) or **This patch**, sent as `window=all|patch` to `/api/lookup` and remembered in `localStorage` like the URL.
+- It is built as an **extensible filter/window control** (a typed filter object, not a boolean) as a test run for more detailed filters later. No specific extra filters are decided; see the [backlog](../recommendations/backlog.md).
+- The story shows its window ("since patch <date>" from the response's `patchStart`). Patch dates come from [ADR 0035](0035-patch-date-from-changelog-title.md). An empty or thin patch window uses the zero-matches and few-matches states below.
+
 ## Completeness
 
 - "Based on N matches" (`story.matchCount`) on the intro and summary slides, plus a **Refresh** action (lookup with `refresh=1`).
