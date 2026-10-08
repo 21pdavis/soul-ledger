@@ -164,6 +164,8 @@ For autonomous runs, the **main session is the orchestrator**. It splits the mil
 | `qa` | After a merge, checks live staging: e2e suites, phone and desktop screenshots, Render logs; files bug issues | Change code or settings |
 | `wiki-keeper` | Brings the wiki in line with what a run built or decided, via its own PR | Edit code, or invent decisions |
 
+**Bot identity ([ADR 0059](wiki/decisions/0059-claude-posts-as-github-app-bot.md)):** `reviewer` and `qa` post comments and issues as the "Soul Ledger Claude" GitHub App with `pnpm bot:gh <gh args>`, never as the owner. Never read or print the bot's `.pem` key.
+
 **Separate writers from checkers:** an implementer never reviews its own PR, and the reviewer and QA never edit. Each agent ends with a fixed-format report, so the orchestrator can act on it.
 
 **Flow for a milestone:**

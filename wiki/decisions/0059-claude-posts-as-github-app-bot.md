@@ -1,0 +1,30 @@
+---
+type: Decision Record
+title: "0059: Claude posts as a GitHub App bot"
+description: Reviewer and QA agents post PR comments and issues as the "Soul Ledger Claude" GitHub App through pnpm bot:gh, so they no longer appear as the owner.
+tags: [process, agents, github, security]
+status: stable
+decision: accepted
+decided_on: 2026-10-08
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T18:00:00Z }
+---
+
+# Context
+
+Agent review comments and QA issues were posted through the owner's `gh` login, so they looked like the owner's own words ([ADR 0044](0044-pr-gated-changes-and-agent-review.md)).
+
+# Decision
+
+1. **A GitHub App, "Soul Ledger Claude"** (app id 5240783, installation id 169337374; neither is secret) is the identity for agent comments and issues.
+2. **Permissions:** pull requests read/write, issues read/write, contents **read-only**, checks read, actions read. With contents read-only the bot cannot push or merge, which keeps the hard limits of [ADR 0048](0048-unattended-run-guardrails.md) intact.
+3. **Short-lived tokens.** `pnpm bot:gh <gh args>` ([`scripts/bot-gh.ts`](../../scripts/bot-gh.ts)) signs an RS256 app JWT, exchanges it for a one-hour installation token, and runs `gh` with it as `GH_TOKEN`. The token is never printed. If the bot cannot authenticate, the command fails with a one-line message and does **not** fall back to the owner's identity.
+4. **Key outside the repo.** The private key lives at a path named by `CLAUDE_BOT_KEY_PATH`, with `CLAUDE_BOT_APP_ID` and `CLAUDE_BOT_INSTALLATION_ID`. They come from the environment, or on Windows from the user registry (`HKCU\Environment`) when the process environment is empty. Environment wins.
+5. **Agents:** `reviewer` and `qa` post with `pnpm bot:gh pr comment` / `pnpm bot:gh issue create` and start each comment with **Claude reviewer agent** / **Claude QA agent**.
+
+# Recommended, needs owner approval
+
+Add a deny rule on reading the `.pem` to `.claude/settings.json`. That file is a hard-limit file, so this change was not made here.
+
+# Open item
+
+Whether an Approve review from the bot counts toward required reviews. Test once branch protection (#10) exists.

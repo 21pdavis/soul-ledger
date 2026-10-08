@@ -36,7 +36,7 @@ export STAGING_URL="$(grep '^STAGING_URL=' .env.local | cut -d= -f2- | tr -d '"\
    - Write a throwaway Playwright script in a `mktemp -d` directory, using a Bash heredoc (you have no Write tool). It should send the `x-staging-token` header and capture every changed screen at a phone viewport (Pixel 7) and a desktop one (1440×900). For a story change, capture every slide.
    - Read the screenshots and judge them: layout broken or overflowing, text unreadable, wrong data, placeholder art missing, desktop layout not deliberate (ADR 0012/0028).
 4. **Logs:** fetch error-level Render logs since the deploy.
-5. For each problem, **open a GitHub issue** (`gh issue create`):
+5. For each problem, **open a GitHub issue** as the bot (`pnpm bot:gh issue create`, ADR 0059; never plain `gh`). Start the body with `**Claude QA agent**`:
    - steps to reproduce, expected vs actual, viewport, and the PR it came from;
    - labelled `bug`, plus `tech-debt` and/or `security` where they fit (see CLAUDE.md);
    - never include the access key, a database URL, or a screenshot showing them.
