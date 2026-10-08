@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-07
+* **Decision**: [ADR 0049](decisions/0049-agent-model-assignment.md): qa agent moves to Haiku 5.5; implementer, wiki-keeper and reviewer keep their models.
 * **Decision**: [ADR 0048](decisions/0048-unattended-run-guardrails.md): hard limits in `.claude/settings.json` (verified live) and an escalation procedure for unattended runs.
 * **Decision**: [ADR 0047](decisions/0047-streamlined-review-and-ci.md): re-review only after blocking findings, one commit per review round, CI once per change with a docs-only fast path, and reviewer effort scaled to the change.
 * **Decision**: [ADR 0046](decisions/0046-strict-red-first-tdd.md) makes strict red-first TDD mandatory, strengthening ADR 0029.
