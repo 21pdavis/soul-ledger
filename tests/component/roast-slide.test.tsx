@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { RoastSlide } from "@/components/story/slides/RoastSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
