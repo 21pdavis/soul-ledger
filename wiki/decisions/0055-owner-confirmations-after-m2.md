@@ -26,3 +26,5 @@ The owner answered four of the questions left open at the end of M2 on 2026-10-0
 - Nothing about the unspent-souls figure changes in the app. #36 stays open as a to-do: confirm the unit, fix the missing-key bias, then flip the switch.
 - The rank map and fonts need no code change. They are now confirmed rather than provisional.
 - The caption change is in `src/story/copy.ts` (`SCAVENGER_COPY.urnMule.detail`), covered by a component test.
+
+> **Superseded in part ([ADR 0060](0060-owner-decisions-m2-open-questions.md)):** the unspent-souls decision (row 1 and the first consequence) is replaced by dropping the stat; #36 is closed as not planned.

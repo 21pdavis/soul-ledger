@@ -5,10 +5,10 @@ description: "Which open-licence deco display face and grotesk to pair via next/
 tags: [m2, design, fonts]
 status: stable
 question_status: resolved
-resolved_by: ../decisions/0055-owner-confirmations-after-m2.md
-recommendation: "Resolved: Limelight (display) with Space Grotesk (body) ships and the owner accepted it for now (ADR 0055). Revisit once real screens and art exist (ADR 0031)."
+resolved_by: ../decisions/0060-owner-decisions-m2-open-questions.md
+recommendation: "Resolved: keep Limelight with Space Grotesk; a big style pass comes after M3 or later (ADR 0060)."
 raised_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T20:00:00Z }
 ---
 
 # Context
@@ -18,3 +18,5 @@ generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 # Status
 
 The foundation PR ships the default pairing: **Limelight** (art-deco display) with **Space Grotesk** (body and numerals), both Google Fonts via `next/font`, wired as `--font-display` and `--font-body` in `src/app/tokens.css`. The owner accepted this pairing **for now** on 2026-10-08 ([ADR 0055](../decisions/0055-owner-confirmations-after-m2.md)). It may be revisited once real screens and art exist ([ADR 0031](../decisions/0031-visual-identity.md) already says so); swapping is a one-line change in `src/app/layout.tsx`.
+
+Owner decision, 2026-10-08: keep the pairing; a big style pass follows after M3 or later ([ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md)).

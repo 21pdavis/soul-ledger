@@ -3,11 +3,12 @@ type: Open Question
 title: "Terms for using deadlock-api hero images as story art"
 description: "Whether the hero images served by deadlock-api assets may be shown on the site, which gates replacing the M2 monogram tiles with real hero art."
 tags: [m2, legal, assets]
-status: draft
-question_status: open
-recommendation: "Keep the monogram tiles for now (option A). Before M3, read the deadlock-api asset terms and Valve's fan content policy, record what they say in a research page, and then choose between linking to the API's pictures (B) and drawing our own (C)."
+status: stable
+question_status: resolved
+resolved_by: ../decisions/0060-owner-decisions-m2-open-questions.md
+recommendation: "Resolved: deadlock-api hero images may be used, with a visible not-affiliated-with-Valve disclaimer and quick removal if Valve asks (ADR 0060)."
 raised_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T20:00:00Z }
 ---
 
 # Context
@@ -37,3 +38,7 @@ generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 # Status
 
 Open. The owner asked on 2026-10-08 what this meant, so this page was rewritten in plain language for them to decide; no decision yet. Recommendation: stay on A for now and read the two sets of terms before M3.
+
+# Resolution
+
+Owner decision, 2026-10-08 ([ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md)): option B, following what deadlock-api does, plus a visible disclaimer. The risk stands: others using the images is not a licence, and Valve's fan content policy was not read. Keep removal cheap; the monogram tiles are the fallback.
