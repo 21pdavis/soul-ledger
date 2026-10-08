@@ -8,6 +8,19 @@ Guidance for agents (Claude Code and others) working in this repo.
 
 Commands: `pnpm test` (unit + integration), `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm db:generate` / `pnpm db:migrate`. Integration tests run on in-process PGlite. `.env.local` holds the Neon `dev` branch `DATABASE_URL` and is never committed.
 
+## Talking to the owner
+
+The owner doesn't read code day to day, so messages to them are in plain words:
+
+- **Lead with what happened and why it matters.** Put any decision they need to make in its own short, labelled section.
+- **Explain a technical term in a few words the first time** (and again if it hasn't come up for a while). Say "the settings file that blocks agents", not "hard-limit file".
+- **Say it in words, then link the number.** PR and ADR numbers go after the plain description, never instead of it.
+- **Keep test and build jargon out of the owner's messages** (red-green, hydration, e2e, container queries). It belongs in PR descriptions and agent reports.
+- **Keep it short.** Give the conclusion and offer the detail.
+- **When asked "what's X?", answer simply and fix the habit**, don't just define the word.
+
+Exceptions: the owner asks for technical detail, and agents' own reports to the orchestrator.
+
 ## The knowledge base: `wiki/` (Open Knowledge Format v0.2)
 
 `wiki/` is an OKF bundle. Spec: https://github.com/GoogleCloudPlatform/open-knowledge-format/blob/main/SPEC.md
