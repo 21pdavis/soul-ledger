@@ -12,9 +12,12 @@ export function share(part: number, whole: number): number {
   return Math.min(1, Math.max(0, part / whole));
 }
 
-/** One breakdown row per kill type, each with its share of all kills. */
+/**
+ * One breakdown row per kill type, each with its share of all kills. Headshots are a subset of
+ * bullet kills, so they sit right under bullets and the slide labels them "of which".
+ */
 export function killRows(kills: Kills): { key: KillType; count: number; share: number }[] {
-  const keys: KillType[] = ["bullet", "ability", "melee", "headshot"];
+  const keys: KillType[] = ["bullet", "headshot", "ability", "melee"];
   return keys.map((key) => ({ key, count: kills[key], share: share(kills[key], kills.total) }));
 }
 
@@ -22,15 +25,6 @@ export function killRows(kills: Kills): { key: KillType; count: number; share: n
 export function rangeShares(closeup: number, longDistance: number) {
   const whole = closeup + longDistance;
   return { closeup: share(closeup, whole), longDistance: share(longDistance, whole) };
-}
-
-/** The biggest of bullet, ability and melee (ties go in that order); null with none of them. */
-export function leadKillType(
-  kills: Pick<Kills, "bullet" | "ability" | "melee">,
-): "bullet" | "ability" | "melee" | null {
-  const order = ["bullet", "ability", "melee"] as const;
-  const lead = order.reduce((best, key) => (kills[key] > kills[best] ? key : best), order[0]);
-  return kills[lead] > 0 ? lead : null;
 }
 
 /** Parries landed over parries tried; 0 when there were none. */

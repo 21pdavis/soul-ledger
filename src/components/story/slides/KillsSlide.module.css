@@ -89,6 +89,20 @@
   background: var(--green);
 }
 
+/* Headshots are part of the bullet kills above: indented, lighter, so the bars don't read as a split. */
+.ledger > li[data-subset="true"] {
+  padding-left: 1rem;
+  font-size: 0.875rem;
+}
+
+.ledger > li[data-subset="true"] .name {
+  color: var(--bone-muted);
+}
+
+.ledger > li[data-subset="true"] .track {
+  height: 4px;
+}
+
 .range {
   display: flex;
   flex-direction: column;
@@ -150,12 +164,6 @@
 .splitValue {
   font-variant-numeric: tabular-nums;
   color: var(--bone);
-}
-
-.rangeLine {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--bone-muted);
 }
 
 /* Entrance: bars grow from the left, staggered; the player's finish line is 800ms. */

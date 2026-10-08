@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { killRows, leadKillType, parryRate, rangeShares, share } from "@/story/kill-shares";
+import { killRows, parryRate, rangeShares, share } from "@/story/kill-shares";
 
 const kills = {
   total: 1500,
@@ -29,12 +29,12 @@ describe("share", () => {
 });
 
 describe("killRows", () => {
-  it("lists bullet, ability, melee and headshot with their share of all kills", () => {
+  it("lists bullet, then its headshot subset, then ability and melee, with their share of all kills", () => {
     expect(killRows(kills)).toEqual([
       { key: "bullet", count: 900, share: 0.6 },
+      { key: "headshot", count: 300, share: 0.2 },
       { key: "ability", count: 400, share: 400 / 1500 },
       { key: "melee", count: 100, share: 100 / 1500 },
-      { key: "headshot", count: 300, share: 0.2 },
     ]);
   });
   it("gives every row a share of 0 when there are no kills", () => {
@@ -49,20 +49,6 @@ describe("rangeShares", () => {
   });
   it("is 0 and 0 with no ranged kills", () => {
     expect(rangeShares(0, 0)).toEqual({ closeup: 0, longDistance: 0 });
-  });
-});
-
-describe("leadKillType", () => {
-  it("is the biggest of bullet, ability and melee", () => {
-    expect(leadKillType(kills)).toBe("bullet");
-    expect(leadKillType({ ...kills, bullet: 10 })).toBe("ability");
-    expect(leadKillType({ ...kills, bullet: 10, ability: 5 })).toBe("melee");
-  });
-  it("prefers bullet, then ability, on a tie", () => {
-    expect(leadKillType({ ...kills, bullet: 5, ability: 5, melee: 5 })).toBe("bullet");
-  });
-  it("is null with no kills", () => {
-    expect(leadKillType({ ...kills, bullet: 0, ability: 0, melee: 0 })).toBeNull();
   });
 });
 

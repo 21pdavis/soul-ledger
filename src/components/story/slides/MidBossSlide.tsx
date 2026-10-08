@@ -1,7 +1,7 @@
 import { headlineFor } from "@/story/copy";
 import { midBossCopy } from "@/story/copy-slides-5-7";
-import { KillStat } from "../KillStat";
 import { SlideFrame } from "../SlideFrame";
+import { StoryCountUp } from "../StoryCountUp";
 import type { SlideComponent } from "./contract";
 import styles from "./MidBossSlide.module.css";
 
@@ -40,10 +40,11 @@ export const MidBossSlide: SlideComponent = ({ story, skipAnimation, reducedMoti
         <Gem filled={claimed} />
         {claimed ? (
           <div className={styles.count}>
-            <KillStat
+            <StoryCountUp
               className={styles.numeral}
               value={midBoss.claimed}
-              animate={animate}
+              reducedMotion={reducedMotion}
+              skipAnimation={skipAnimation}
               paused={paused}
               delayMs={150}
               durationMs={600}

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
+import { formatPercent } from "@/story/format";
 import { share } from "@/story/kill-shares";
-import { KillStat } from "./KillStat";
+import { StoryCountUp } from "./StoryCountUp";
 import styles from "./PrecisionDial.module.css";
 
 interface Props {
@@ -9,12 +10,23 @@ interface Props {
   /** 0..1 */
   rate: number;
   animate: boolean;
+  skipAnimation: boolean;
+  reducedMotion: boolean;
   paused: boolean;
   delayMs?: number;
 }
 
 /** A deco half-dial with the rate stamped under the arc (slide 6). The arc is decoration; the figure is text. */
-export function PrecisionDial({ id, label, rate, animate, paused, delayMs = 0 }: Props) {
+export function PrecisionDial({
+  id,
+  label,
+  rate,
+  animate,
+  skipAnimation,
+  reducedMotion,
+  paused,
+  delayMs = 0,
+}: Props) {
   const clamped = share(rate, 1);
   return (
     <div className={styles.dial} data-testid={`dial-${id}`} data-animate={animate}>
@@ -30,11 +42,12 @@ export function PrecisionDial({ id, label, rate, animate, paused, delayMs = 0 }:
         />
         <path className={styles.ticks} d="M10 60 A50 50 0 0 1 110 60" pathLength={100} />
       </svg>
-      <KillStat
+      <StoryCountUp
         className={styles.figure}
-        value={Math.round(clamped * 100)}
-        format={(n) => `${n}%`}
-        animate={animate}
+        value={clamped}
+        format={formatPercent}
+        reducedMotion={reducedMotion}
+        skipAnimation={skipAnimation}
         paused={paused}
         delayMs={delayMs}
         durationMs={550}

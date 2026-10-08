@@ -1,11 +1,9 @@
-import { act, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { render, screen, within, waitFor } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { PrecisionSlide } from "@/components/story/slides/PrecisionSlide";
 import { PARRY_KING_RATE } from "@/lib/stats/story";
 import { headlineFor } from "@/story/copy";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
-
-afterEach(() => vi.useRealTimers());
 
 const flags = { active: true, skipAnimation: false, reducedMotion: true, paused: false };
 
@@ -35,6 +33,11 @@ describe("PrecisionSlide", () => {
     const headshot = screen.getByTestId("dial-headshot");
     expect(within(headshot).getByText("19%")).toBeInTheDocument();
     expect(within(headshot).getByText("Headshot rate")).toBeInTheDocument();
+  });
+
+  it("has no extra landmark: the parry block is not a named region inside the slide's own", () => {
+    renderPrecision();
+    expect(screen.getAllByRole("region")).toHaveLength(1);
   });
 
   it("fills each dial to its rate", () => {
@@ -94,13 +97,16 @@ describe("PrecisionSlide", () => {
   });
 
   describe("entrance", () => {
-    it("counts the percentages up and lands on the final values inside the entrance window", () => {
-      vi.useFakeTimers();
+    it("counts the percentages up and lands on the final values inside the entrance window", async () => {
       renderPrecision({}, { reducedMotion: false });
       expect(within(screen.getByTestId("dial-accuracy")).getByText("0%")).toBeInTheDocument();
-      act(() => vi.advanceTimersByTime(800));
-      expect(within(screen.getByTestId("dial-accuracy")).getByText("46%")).toBeInTheDocument();
-      expect(within(screen.getByTestId("dial-headshot")).getByText("19%")).toBeInTheDocument();
+      await waitFor(
+        () => {
+          expect(within(screen.getByTestId("dial-accuracy")).getByText("46%")).toBeInTheDocument();
+          expect(within(screen.getByTestId("dial-headshot")).getByText("19%")).toBeInTheDocument();
+        },
+        { timeout: 1500 },
+      );
     });
 
     it("shows final values at once on skipAnimation and under reduced motion", () => {
@@ -113,10 +119,9 @@ describe("PrecisionSlide", () => {
       expect(screen.getByTestId("precision-slide")).toHaveAttribute("data-animate", "false");
     });
 
-    it("holds while the reader presses and holds", () => {
-      vi.useFakeTimers();
+    it("holds while the reader presses and holds", async () => {
       renderPrecision({}, { reducedMotion: false, paused: true });
-      act(() => vi.advanceTimersByTime(2000));
+      await new Promise((r) => setTimeout(r, 400));
       expect(within(screen.getByTestId("dial-accuracy")).getByText("0%")).toBeInTheDocument();
     });
   });

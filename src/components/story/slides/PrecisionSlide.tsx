@@ -24,6 +24,8 @@ export const PrecisionSlide: SlideComponent = ({ story, skipAnimation, reducedMo
             label={PRECISION_COPY.accuracy}
             rate={precision.heroAccuracy}
             animate={animate}
+            skipAnimation={skipAnimation}
+            reducedMotion={reducedMotion}
             paused={paused}
           />
           <PrecisionDial
@@ -31,17 +33,15 @@ export const PrecisionSlide: SlideComponent = ({ story, skipAnimation, reducedMo
             label={PRECISION_COPY.headshotRate}
             rate={precision.headshotRate}
             animate={animate}
+            skipAnimation={skipAnimation}
+            reducedMotion={reducedMotion}
             paused={paused}
             delayMs={120}
           />
         </div>
 
-        <section
-          className={styles.parry}
-          data-testid="parry"
-          data-label={precision.parryLabel}
-          aria-label={PRECISION_COPY.parryHeading}
-        >
+        <div className={styles.parry} data-testid="parry" data-label={precision.parryLabel}>
+          <h3 className={styles.parryHeading}>{PRECISION_COPY.parryHeading}</h3>
           {parry.badge && (
             <p className={styles.stamp} data-label={precision.parryLabel}>
               {parry.badge}
@@ -67,7 +67,7 @@ export const PrecisionSlide: SlideComponent = ({ story, skipAnimation, reducedMo
               <p className={styles.threshold}>{parryKingLine()}</p>
             </>
           )}
-        </section>
+        </div>
       </div>
     </SlideFrame>
   );

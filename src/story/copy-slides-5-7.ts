@@ -1,52 +1,36 @@
 import { PARRY_KING_RATE } from "@/lib/stats/story";
-import { leadKillType, type KillType } from "./kill-shares";
+import type { KillType } from "./kill-shares";
 import type { StoryData } from "./types";
 
 /**
  * Copy for slides 5 to 7 (How you kill, Precision, Mid Boss), kept apart from `copy.ts` so the
  * slide PRs don't collide (ADR 0053). Tone: hype, playful, PG-13 (ADR 0007). Headlines stay in
- * `copy.ts`; this file holds the labels and the data-driven lines.
+ * `copy.ts`; this file holds the labels, one fixed line per slide, and the plan-sanctioned branches (parry king, clown or none; Mid Boss with 0 claimed).
  */
 
-type Kills = StoryData["kills"];
 type Precision = StoryData["precision"];
 type MidBoss = StoryData["midBoss"];
 
 // ---- Slide 5: How you kill ------------------------------------------------------------------
 
 export const KILLS_COPY = {
-  total: "kills on the ledger",
+  /** The one fixed line for this slide (ADR 0053: data-driven variants only on roast and MVP). */
+  line: "Every takedown, entered in the ledger.",
   types: {
     bullet: "Bullets",
+    // Headshots are a subset of bullet kills, so the row says so.
+    headshot: "of which headshots",
     ability: "Abilities",
     melee: "Melee",
-    headshot: "Headshots",
   } satisfies Record<KillType, string>,
   rangeHeading: "Range",
   closeup: "Close-up",
   longDistance: "Long-distance",
 } as const;
 
-/** One line about the kind of kill that leads. */
-export function killsLead(kills: Pick<Kills, "bullet" | "ability" | "melee">): string {
-  switch (leadKillType(kills)) {
-    case "bullet":
-      return "Guns blazing. Most of your kills came down the barrel.";
-    case "ability":
-      return "Spells over bullets. Your abilities do the talking.";
-    case "melee":
-      return "Up close and personal. You love a good smack.";
-    default:
-      return "No kills on the ledger yet. The streets are quiet, for now.";
-  }
-}
-
-/** One line about close-up versus long-distance; null when neither was recorded. */
-export function rangeLine(closeup: number, longDistance: number): string | null {
-  if (closeup + longDistance <= 0) return null;
-  if (closeup > longDistance) return "You like to see their faces.";
-  if (longDistance > closeup) return "Distance is no obstacle. Long shots are your thing.";
-  return "Equally happy up close and from afar.";
+/** The label under the kill total, so one kill never reads "1 kills". */
+export function killsTotalLabel(total: number): string {
+  return total === 1 ? "kill on the ledger" : "kills on the ledger";
 }
 
 // ---- Slide 6: Precision ---------------------------------------------------------------------
@@ -92,22 +76,28 @@ export interface MidBossCopy {
   /** The label that sits under the big count, or the whole message when nothing was claimed. */
   lead: string;
   line: string;
-  /** Only when something was stolen. */
+  /** Only when something was stolen (and so something was claimed). */
   stolen: string | null;
 }
 
+/** Claimed and stolen are both the player's TEAM's counts (types.ts), so the copy says so. */
 export function midBossCopy(m: MidBoss): MidBossCopy {
-  const stolen =
-    m.stolen > 0 ? `Stolen: ${m.stolen}. The other team did the work, you took the prize.` : null;
   if (m.claimed <= 0) {
     return {
-      lead: "No Rejuvenators claimed yet",
+      lead: "No Rejuvenators claimed by your team yet",
       line: "The Mid Boss is still waiting for you. Go say hello, he brings gifts.",
-      stolen,
+      stolen: null,
     };
   }
-  const lead = m.claimed === 1 ? "Rejuvenator claimed" : "Rejuvenators claimed";
-  if (m.claimed < 5) return { lead, line: "A taste of the Mid Boss life.", stolen };
-  if (m.claimed < 25) return { lead, line: "You know the way to the pit by heart.", stolen };
-  return { lead, line: "The Mid Boss has you on speed dial.", stolen };
+  // Stolen is a subset of claimed, so it only ever shows next to a claimed count.
+  const stolen =
+    m.stolen > 0
+      ? `Stolen by your team: ${m.stolen}. The other team killed the boss, your team took the prize.`
+      : null;
+  return {
+    lead:
+      m.claimed === 1 ? "Rejuvenator claimed by your team" : "Rejuvenators claimed by your team",
+    line: "Your team knows the way to the pit.",
+    stolen,
+  };
 }

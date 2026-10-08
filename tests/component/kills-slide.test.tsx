@@ -1,10 +1,9 @@
-import { act, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { render, screen, within, waitFor } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { KillsSlide } from "@/components/story/slides/KillsSlide";
 import { headlineFor } from "@/story/copy";
+import { KILLS_COPY } from "@/story/copy-slides-5-7";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
-
-afterEach(() => vi.useRealTimers());
 
 const flags = { active: true, skipAnimation: false, reducedMotion: false, paused: false };
 
@@ -32,6 +31,30 @@ describe("KillsSlide", () => {
     expect(screen.getByText("kills on the ledger")).toBeInTheDocument();
   });
 
+  it("shows one fixed line, whatever the data (ADR 0053)", () => {
+    renderKills({ bullet: 1, ability: 900, melee: 2 }, { reducedMotion: true });
+    expect(screen.getByText(KILLS_COPY.line)).toBeInTheDocument();
+  });
+
+  it("reads 'kill', not '1 kills', for exactly one", () => {
+    renderKills({ total: 1 }, { reducedMotion: true });
+    expect(screen.getByText("kill on the ledger")).toBeInTheDocument();
+    expect(screen.queryByText("kills on the ledger")).toBeNull();
+  });
+
+  it("sets headshots apart as a subset of bullet kills, right under bullets", () => {
+    renderKills({}, { reducedMotion: true });
+    const rows = screen.getAllByTestId(/^kill-row-/).map((r) => r.dataset.testid);
+    expect(rows).toEqual([
+      "kill-row-bullet",
+      "kill-row-headshot",
+      "kill-row-ability",
+      "kill-row-melee",
+    ]);
+    expect(row("headshot")).toHaveAttribute("data-subset", "true");
+    expect(row("bullet")).not.toHaveAttribute("data-subset");
+  });
+
   it("shows the bullet, ability, melee and headshot breakdown as real text", () => {
     renderKills({}, { reducedMotion: true });
     expect(within(row("bullet")).getByText("Bullets")).toBeInTheDocument();
@@ -40,7 +63,7 @@ describe("KillsSlide", () => {
     expect(within(row("ability")).getByText("400")).toBeInTheDocument();
     expect(within(row("melee")).getByText("Melee")).toBeInTheDocument();
     expect(within(row("melee")).getByText("100")).toBeInTheDocument();
-    expect(within(row("headshot")).getByText("Headshots")).toBeInTheDocument();
+    expect(within(row("headshot")).getByText("of which headshots")).toBeInTheDocument();
     expect(within(row("headshot")).getByText("300")).toBeInTheDocument();
   });
 
@@ -68,20 +91,24 @@ describe("KillsSlide", () => {
     for (const bar of screen.getAllByTestId("kill-bar")) {
       expect(bar).toHaveAttribute("data-share", "0");
     }
-    expect(screen.getByText(/no kills on the ledger yet/i)).toBeInTheDocument();
+    expect(screen.getByText(KILLS_COPY.line)).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/NaN|Infinity/);
     expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
   });
 
   describe("entrance", () => {
-    it("counts up from 0 and lands on the final values inside the entrance window", () => {
-      vi.useFakeTimers();
+    it("counts up from 0 and lands on the final values inside the entrance window", async () => {
       renderKills();
       expect(within(screen.getByTestId("kill-total")).getByText("0")).toBeInTheDocument();
       expect(screen.getByTestId("kill-slide")).toHaveAttribute("data-animate", "true");
-      act(() => vi.advanceTimersByTime(800));
-      expect(within(screen.getByTestId("kill-total")).getByText("1,500")).toBeInTheDocument();
-      expect(within(row("bullet")).getByText("900")).toBeInTheDocument();
+      await waitFor(
+        () =>
+          expect(within(screen.getByTestId("kill-total")).getByText("1,500")).toBeInTheDocument(),
+        { timeout: 1500 },
+      );
+      await waitFor(() => expect(within(row("bullet")).getByText("900")).toBeInTheDocument(), {
+        timeout: 1500,
+      });
     });
 
     it("shows final values at once on skipAnimation", () => {
@@ -96,10 +123,9 @@ describe("KillsSlide", () => {
       expect(screen.getByTestId("kill-slide")).toHaveAttribute("data-animate", "false");
     });
 
-    it("holds while the reader presses and holds", () => {
-      vi.useFakeTimers();
+    it("holds while the reader presses and holds", async () => {
       renderKills({}, { paused: true });
-      act(() => vi.advanceTimersByTime(2000));
+      await new Promise((r) => setTimeout(r, 400));
       expect(within(screen.getByTestId("kill-total")).getByText("0")).toBeInTheDocument();
     });
   });

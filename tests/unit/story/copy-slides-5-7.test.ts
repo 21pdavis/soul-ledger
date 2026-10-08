@@ -1,37 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { PARRY_KING_RATE } from "@/lib/stats/story";
-import {
-  killsLead,
-  midBossCopy,
-  parryCopy,
-  parryKingLine,
-  rangeLine,
-} from "@/story/copy-slides-5-7";
+import { killsTotalLabel, midBossCopy, parryCopy, parryKingLine } from "@/story/copy-slides-5-7";
 
-const kills = { total: 1500, bullet: 900, ability: 400, melee: 100, headshot: 300 };
-
-describe("killsLead", () => {
-  it("names the kind of kill that leads", () => {
-    const lines = new Set([
-      killsLead(kills),
-      killsLead({ ...kills, bullet: 1 }),
-      killsLead({ ...kills, bullet: 1, ability: 1 }),
-    ]);
-    expect(lines.size).toBe(3);
-  });
-  it("has friendly copy for no kills", () => {
-    expect(killsLead({ ...kills, bullet: 0, ability: 0, melee: 0 })).toMatch(/no kills/i);
-  });
-});
-
-describe("rangeLine", () => {
-  it("differs for close-up, long-distance and even", () => {
-    const lines = new Set([rangeLine(700, 300), rangeLine(300, 700), rangeLine(5, 5)]);
-    expect(lines.size).toBe(3);
-    expect(lines).not.toContain(null);
-  });
-  it("is null when there are no ranged kills", () => {
-    expect(rangeLine(0, 0)).toBeNull();
+describe("killsTotalLabel", () => {
+  it("pluralises, so one kill never reads '1 kills'", () => {
+    expect(killsTotalLabel(1)).toBe("kill on the ledger");
+    expect(killsTotalLabel(0)).toBe("kills on the ledger");
+    expect(killsTotalLabel(1500)).toBe("kills on the ledger");
   });
 });
 
@@ -69,16 +44,21 @@ describe("midBossCopy", () => {
     expect(c.lead).toMatch(/no rejuvenators/i);
     expect(c.line.length).toBeGreaterThan(10);
   });
-  it("counts claimed Rejuvenators with the right plural", () => {
-    expect(midBossCopy({ claimed: 1, stolen: 0 }).lead).toBe("Rejuvenator claimed");
-    expect(midBossCopy({ claimed: 12, stolen: 0 }).lead).toBe("Rejuvenators claimed");
+  it("counts claimed Rejuvenators as your team's, with the right plural", () => {
+    expect(midBossCopy({ claimed: 1, stolen: 0 }).lead).toBe("Rejuvenator claimed by your team");
+    expect(midBossCopy({ claimed: 12, stolen: 0 }).lead).toBe("Rejuvenators claimed by your team");
   });
-  it("picks a different line for few, some and many", () => {
+  it("uses one fixed line however many were claimed (ADR 0053: no data-driven variants here)", () => {
     const lines = new Set([2, 8, 40].map((claimed) => midBossCopy({ claimed, stolen: 0 }).line));
-    expect(lines.size).toBe(3);
+    expect(lines.size).toBe(1);
   });
-  it("only has a stolen line when stolen is above 0", () => {
+  it("only has a stolen line when stolen is above 0, and says it was your team", () => {
     expect(midBossCopy({ claimed: 12, stolen: 0 }).stolen).toBeNull();
-    expect(midBossCopy({ claimed: 12, stolen: 2 }).stolen).toContain("2");
+    const stolen = midBossCopy({ claimed: 12, stolen: 2 }).stolen;
+    expect(stolen).toContain("2");
+    expect(stolen).toMatch(/your team/i);
+  });
+  it("never shows a steal when nothing was claimed (stolen is a subset of claimed)", () => {
+    expect(midBossCopy({ claimed: 0, stolen: 3 }).stolen).toBeNull();
   });
 });
