@@ -1,5 +1,5 @@
 import { headlineFor } from "@/story/copy";
-import { MAIN_COPY, mainPercentileLine } from "@/story/copy-slides-1-4";
+import { MAIN_COPY, mainPercentileLine, matchesUnit } from "@/story/copy-slides-1-4";
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { MonogramTile } from "../MonogramTile";
@@ -12,7 +12,7 @@ import styles from "./MainSlide.module.css";
 /** Slide 2: the most-played hero, its record, and where that ranks. */
 export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
   const { main } = story;
-  const motion = !reducedMotion && !skipAnimation;
+  const playing = !reducedMotion && !skipAnimation;
   const count = { reducedMotion, skipAnimation, paused };
   // `main` is only null with zero matches, when the story never mounts; render the frame anyway.
   const line = main ? mainPercentileLine(main, story.percentiles) : null;
@@ -21,7 +21,7 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
     <SlideFrame headline={headlineFor("main")}>
       {main && (
         <div className={styles.slide}>
-          <SlideReveal index={0} motion={motion} kind="stamp" className={styles.hero}>
+          <SlideReveal index={0} animate={playing} kind="stamp" className={styles.hero}>
             <MonogramTile heroId={main.heroId} size="lg" />
             <div>
               <p className={styles.name}>{heroName(main.heroId)}</p>
@@ -29,10 +29,10 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
             </div>
           </SlideReveal>
 
-          <SlideReveal index={1} motion={motion} className={styles.stats}>
+          <SlideReveal index={1} animate={playing} className={styles.stats}>
             <p data-testid="main-matches" className={styles.stat}>
               <StoryCountUp value={main.matches} className={styles.number} {...count} />{" "}
-              <span className={styles.unit}>{MAIN_COPY.matchesUnit}</span>
+              <span className={styles.unit}>{matchesUnit(main.matches)}</span>
             </p>
             <p data-testid="main-winrate" className={styles.stat}>
               <StoryCountUp
@@ -46,10 +46,14 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
           </SlideReveal>
 
           {line && (
-            <SlideReveal index={2} motion={motion} kind="stamp">
-              <div className={styles.stamp} data-scope={line.scope}>
+            <SlideReveal index={2} animate={playing} kind="stamp">
+              <div
+                className={styles.stamp}
+                data-scope={line.scope}
+                data-testid={line.scope === "neutral" ? "main-neutral" : undefined}
+              >
                 <p className={styles.rank}>{line.text}</p>
-                <p className={styles.metric}>{line.metric}</p>
+                {line.metric && <p className={styles.metric}>{line.metric}</p>}
               </div>
             </SlideReveal>
           )}

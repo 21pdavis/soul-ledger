@@ -12,7 +12,7 @@ import styles from "./ScavengerSlide.module.css";
  */
 export const ScavengerSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
   const { scavenger } = story;
-  const motion = !reducedMotion && !skipAnimation;
+  const playing = !reducedMotion && !skipAnimation;
   const count = { reducedMotion, skipAnimation, paused };
 
   const stats = [
@@ -43,14 +43,14 @@ export const ScavengerSlide: SlideComponent = ({ story, skipAnimation, reducedMo
           <SlideReveal
             key={s.id}
             index={i}
-            motion={motion}
+            animate={playing}
             kind="stamp"
             className={styles.stat}
             data-testid={`scavenger-${s.id}`}
             data-place={s.place}
           >
-            <span className={styles.title}>{s.copy.title}</span>
-            <StoryCountUp value={s.value} className={styles.number} {...count} />
+            <span className={styles.title}>{s.copy.title}</span>{" "}
+            <StoryCountUp value={s.value} className={styles.number} {...count} />{" "}
             <span className={styles.detail}>{s.copy.detail}</span>
           </SlideReveal>
         ))}

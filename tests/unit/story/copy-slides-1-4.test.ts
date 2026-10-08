@@ -97,3 +97,32 @@ describe("formatLedgerDate", () => {
     expect(formatLedgerDate("2026-01-02T10:00:00.000Z")).toBe("Jan 2, 2026");
   });
 });
+
+describe("mainPercentileLine not-notable rule (best topPercent above 50)", () => {
+  const withMain = (percentiles: ReturnType<typeof pct>[]) => ({
+    ...fixtureStory().main!,
+    percentiles,
+  });
+
+  it("keeps a claim at exactly 50", () => {
+    expect(mainPercentileLine(withMain([pct("a", "A", 50)]), [])?.scope).toBe("hero");
+  });
+
+  it("goes neutral, with no percentile in the text, when the best same-hero entry is above 50", () => {
+    const line = mainPercentileLine(withMain([pct("a", "A", 87), pct("b", "B", 64)]), [
+      pct("g", "G", 1),
+    ]);
+    expect(line?.scope).toBe("neutral");
+    expect(line?.text).not.toMatch(/\d/);
+    expect(line?.metric).toBe("");
+  });
+
+  it("goes neutral when only a weak global entry exists", () => {
+    const line = mainPercentileLine(withMain([]), [pct("g", "G", 51)]);
+    expect(line?.scope).toBe("neutral");
+  });
+
+  it("is still null with nothing to rank", () => {
+    expect(mainPercentileLine(withMain([]), [])).toBeNull();
+  });
+});

@@ -189,6 +189,57 @@ describe("slide 2: Your main", () => {
     expect(screen.queryByText(/^Top /)).not.toBeInTheDocument();
   });
 
+  it("says '1 match' for a single main-hero match", () => {
+    show(MainSlide, { story: { main: { ...fixtureStory().main!, matches: 1 } } });
+    expect(screen.getByTestId("main-matches")).toHaveTextContent("1 match");
+    expect(screen.getByTestId("main-matches")).not.toHaveTextContent("1 matches");
+  });
+
+  it("shows neutral copy and no percentile claim when the best same-hero entry is above 50", () => {
+    const pct = fixtureStory().percentiles[0];
+    show(MainSlide, {
+      story: {
+        main: {
+          ...fixtureStory().main!,
+          percentiles: [
+            { ...pct, label: "Accuracy", topPercent: 87 },
+            { ...pct, label: "Kills per match", topPercent: 64 },
+          ],
+        },
+      },
+    });
+    expect(screen.queryByText(/^Top /)).not.toBeInTheDocument();
+    expect(screen.queryByText("Kills per match")).not.toBeInTheDocument();
+    expect(screen.getByTestId("main-neutral")).toBeInTheDocument();
+  });
+
+  it("still claims the percentile when the best entry is exactly 50", () => {
+    const pct = fixtureStory().percentiles[0];
+    show(MainSlide, {
+      story: { main: { ...fixtureStory().main!, percentiles: [{ ...pct, topPercent: 50 }] } },
+    });
+    expect(screen.getByText("Top 50% of Infernus players")).toBeInTheDocument();
+  });
+
+  it("shows neutral copy when only a weak global entry exists", () => {
+    const pct = fixtureStory().percentiles[0];
+    show(MainSlide, {
+      story: {
+        main: { ...fixtureStory().main!, percentiles: [] },
+        percentiles: [{ ...pct, topPercent: 70 }],
+      },
+    });
+    expect(screen.queryByText(/^Top /)).not.toBeInTheDocument();
+    expect(screen.getByTestId("main-neutral")).toBeInTheDocument();
+  });
+
+  it("shows neither a claim nor neutral copy when there are no percentiles at all", () => {
+    show(MainSlide, {
+      story: { main: { ...fixtureStory().main!, percentiles: [] }, percentiles: [] },
+    });
+    expect(screen.queryByTestId("main-neutral")).not.toBeInTheDocument();
+  });
+
   it("does not break when main is null", () => {
     show(MainSlide, { story: { main: null } });
     expect(screen.getByRole("heading", { name: headlineFor("main") })).toBeInTheDocument();
@@ -287,6 +338,19 @@ describe("slide 3: Roster", () => {
     expect(screen.getByRole("listitem")).toHaveTextContent("0% win rate");
   });
 
+  it("says '1 match' for a hero with a single match", () => {
+    show(RosterSlide, {
+      story: {
+        roster: {
+          ...fixtureStory().roster,
+          topHeroes: [{ heroId: 1, matches: 1, winRate: 1 }],
+        },
+      },
+    });
+    expect(screen.getByRole("listitem")).toHaveTextContent("1 match");
+    expect(screen.getByRole("listitem")).not.toHaveTextContent("1 matches");
+  });
+
   it("copes with no top heroes", () => {
     show(RosterSlide, { story: { roster: { ...fixtureStory().roster, topHeroes: [] } } });
     expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
@@ -337,16 +401,16 @@ describe("slide 4: Scavenger card", () => {
     });
     const goblin = screen.getByTestId("scavenger-crate-goblin");
     expect(goblin).toHaveTextContent("Crate Goblin");
-    expect(goblin).toHaveTextContent(/^Crate Goblin0/);
-    expect(screen.getByTestId("scavenger-gambler")).toHaveTextContent(/^Gambler0/);
-    expect(screen.getByTestId("scavenger-urn-mule")).toHaveTextContent(/^Urn Mule5/);
+    expect(goblin).toHaveTextContent(/^Crate Goblin 0 breakables smashed$/);
+    expect(screen.getByTestId("scavenger-gambler")).toHaveTextContent(/^Gambler 0 /);
+    expect(screen.getByTestId("scavenger-urn-mule")).toHaveTextContent(/^Urn Mule 5 /);
   });
 
   it("counts up from 0 with motion on and lands on the values", async () => {
     show(ScavengerSlide, { reducedMotion: false });
-    expect(screen.getByTestId("scavenger-gambler")).toHaveTextContent(/^Gambler0/);
+    expect(screen.getByTestId("scavenger-gambler")).toHaveTextContent(/^Gambler 0 /);
     await waitFor(
-      () => expect(screen.getByTestId("scavenger-gambler")).toHaveTextContent(/^Gambler42/),
+      () => expect(screen.getByTestId("scavenger-gambler")).toHaveTextContent(/^Gambler 42 /),
       { timeout: 2000 },
     );
   });

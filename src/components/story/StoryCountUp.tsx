@@ -13,6 +13,8 @@ interface Props {
   paused: boolean;
   /** Keep this under ENTRANCE_MS so a tap only ever has to complete a short count. */
   durationMs?: number;
+  /** Wait this long before counting starts (for a staggered entrance). Ignored when instant. */
+  delayMs?: number;
   className?: string;
 }
 
@@ -29,10 +31,11 @@ export function StoryCountUp({
   skipAnimation,
   paused,
   durationMs = 700,
+  delayMs = 0,
   className,
 }: Props) {
   const instant = reducedMotion || skipAnimation;
-  const [counted, setCounted] = useState(0);
+  const [counted, setCounted] = useState(() => (instant ? value : 0));
   // Instant (reduced motion or skip) is derived, so the final value shows with no extra render.
   const shown = instant ? value : counted;
   const controls = useRef<AnimationPlaybackControlsWithThen | null>(null);
@@ -47,6 +50,7 @@ export function StoryCountUp({
     if (live.current.instant) return;
     const run = animate(0, value, {
       duration: durationMs / 1000,
+      delay: delayMs / 1000,
       ease: "easeOut",
       onUpdate: setCounted,
       onComplete: () => setCounted(value),
@@ -57,11 +61,11 @@ export function StoryCountUp({
       run.stop();
       controls.current = null;
     };
-  }, [value, durationMs]);
+  }, [value, durationMs, delayMs]);
 
-  // Skip (or reduced motion arriving) ends the count; `shown` is already the final value.
+  // Skip (or reduced motion arriving) completes the count, so the state is final too.
   useEffect(() => {
-    if (instant) controls.current?.stop();
+    if (instant) controls.current?.complete();
   }, [instant]);
 
   useEffect(() => {

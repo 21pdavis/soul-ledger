@@ -4,7 +4,7 @@ title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
 status: draft
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:30:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:50:00Z }
 ---
 
 # Context
@@ -29,9 +29,11 @@ The orchestrator may deviate from this plan where useful. Every PR follows [ADR 
 | 6 | Slides 5-7 | How you kill, precision, Mid Boss | 1, 4 |
 | 7 | Slides 8-10 | Roast (heatmap and unspent souls), rank journey, MVP | 1, 4 |
 | 8 | Slide 11 | Summary card, Replay, Look up another player, Refresh | 1, 4 |
-| 9 | Hardening | Playwright suites (phone and desktop), a11y pass, `CHANGELOG.md` | all |
+| 9 | Hardening | Playwright suites (phone and desktop), a11y pass, `CHANGELOG.md`, fold the per-slide copy files into `copy.ts` | all |
 
 PRs 5 to 8 can run in parallel once PRs 1 and 4 are merged.
+
+**Follow-up: copy is split per slide group.** To avoid merge conflicts between the parallel slide PRs, each one keeps its own slide copy in a sibling module (`src/story/copy-slides-1-4.ts` for PR 5) instead of the single `copy` module that [ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md) calls for. PR 9 (hardening) folds these files into `src/story/copy.ts` (or re-exports them from it) so copy is edited in one place again.
 
 # Cross-cutting acceptance criteria
 
@@ -60,6 +62,7 @@ Each is testable at the layer in brackets.
 - Shows the hero name and monogram tile for `main.heroId`, `main.matches` and `main.winRate` as a percentage.
 - With 10 or more main-hero matches (`MIN_HERO_SAMPLE`), `main.percentiles` is non-empty and the slide shows the **same-hero** line, "Top X% of <Hero> players", from its best entry (lowest `topPercent`). It is never labelled global.
 - Below 10 matches, `main.percentiles` is empty. The slide then shows the best entry from the global `story.percentiles` with global phrasing (no hero name), or no percentile line if that is also empty. Nothing breaks either way.
+- Not notable (same rule as the MVP slide): if the best entry of whichever list applies is above 50, the slide shows neutral copy with no percentile claim ("Top 87% of ..." is never shown). Exactly 50 still shows the claim.
 - `main` is null only when `matchCount === 0`, and the story never mounts then (see the zero-matches rule below). The story always has exactly 11 slides and 11 checkpoints; no slide is ever skipped.
 
 ## 3. Roster

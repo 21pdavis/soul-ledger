@@ -20,7 +20,7 @@ export const IntroSlide: SlideComponent = ({
   paused,
 }) => {
   const { intro } = story;
-  const motion = !reducedMotion && !skipAnimation;
+  const playing = !reducedMotion && !skipAnimation;
   const count = { reducedMotion, skipAnimation, paused };
   const dates: { label: string; at: string }[] = [];
   if (intro.firstMatchAt) dates.push({ label: INTRO_COPY.firstEntry, at: intro.firstMatchAt });
@@ -29,13 +29,13 @@ export const IntroSlide: SlideComponent = ({
   return (
     <SlideFrame headline={headlineFor("intro")}>
       <div className={styles.slide}>
-        <SlideReveal index={0} motion={motion} kind="stamp" className={styles.figure}>
+        <SlideReveal index={0} animate={playing} kind="stamp" className={styles.figure}>
           <p data-testid="intro-matches" className={styles.line}>
             <StoryCountUp value={intro.matches} className={styles.number} {...count} />{" "}
             <span className={styles.unit}>{matchesUnit(intro.matches)}</span>
           </p>
         </SlideReveal>
-        <SlideReveal index={1} motion={motion} kind="stamp" className={styles.figure}>
+        <SlideReveal index={1} animate={playing} kind="stamp" className={styles.figure}>
           <p data-testid="intro-hours" className={styles.line}>
             <StoryCountUp
               value={intro.hoursPlayed}
@@ -48,7 +48,7 @@ export const IntroSlide: SlideComponent = ({
         </SlideReveal>
 
         {dates.length > 0 && (
-          <SlideReveal index={2} motion={motion} className={styles.dates}>
+          <SlideReveal index={2} animate={playing} className={styles.dates}>
             {dates.map((d) => (
               <p key={d.label} className={styles.entry}>
                 <span>{d.label}</span>
@@ -59,7 +59,7 @@ export const IntroSlide: SlideComponent = ({
           </SlideReveal>
         )}
 
-        <SlideReveal index={3} motion={motion} className={styles.footer}>
+        <SlideReveal index={3} animate={playing} className={styles.footer}>
           <div>
             <p className={styles.basedOn}>{basedOnMatches(story.matchCount)}</p>
             <WindowLabel meta={meta} className={styles.window} />

@@ -44,4 +44,42 @@ describe("StoryCountUp", () => {
     await new Promise((r) => setTimeout(r, 300));
     expect(screen.getByText("0")).toBeInTheDocument();
   });
+
+  it("still shows the final value when reduced motion turns off after mount", () => {
+    const { rerender } = render(<StoryCountUp value={77} {...still} reducedMotion />);
+    rerender(<StoryCountUp value={77} {...still} reducedMotion={false} />);
+    expect(screen.getByText("77")).toBeInTheDocument();
+  });
+
+  it("keeps the final value, not a partial one, if skip ends while motion stays on", async () => {
+    const { rerender } = render(<StoryCountUp value={77} {...still} />);
+    rerender(<StoryCountUp value={77} {...still} skipAnimation />);
+    rerender(<StoryCountUp value={77} {...still} />);
+    await waitFor(() => expect(screen.getByText("77")).toBeInTheDocument());
+    await new Promise((r) => setTimeout(r, 200));
+    expect(screen.getByText("77")).toBeInTheDocument();
+  });
+
+  it("lands on the final value after a pause and a resume", async () => {
+    const { rerender } = render(<StoryCountUp value={77} {...still} paused />);
+    await new Promise((r) => setTimeout(r, 150));
+    expect(screen.getByText("0")).toBeInTheDocument();
+    rerender(<StoryCountUp value={77} {...still} />);
+    await waitFor(() => expect(screen.getByText("77")).toBeInTheDocument(), { timeout: 2000 });
+  });
+
+  it("waits delayMs before it starts counting, then lands on the final value", async () => {
+    render(<StoryCountUp value={77} {...still} delayMs={400} durationMs={200} />);
+    await new Promise((r) => setTimeout(r, 250));
+    expect(screen.getByText("0")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("77")).toBeInTheDocument(), { timeout: 2000 });
+  });
+
+  it("ignores delayMs when skipped or reduced", () => {
+    const { unmount } = render(<StoryCountUp value={77} {...still} delayMs={400} skipAnimation />);
+    expect(screen.getByText("77")).toBeInTheDocument();
+    unmount();
+    render(<StoryCountUp value={77} {...still} delayMs={400} reducedMotion />);
+    expect(screen.getByText("77")).toBeInTheDocument();
+  });
 });

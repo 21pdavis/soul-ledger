@@ -1,5 +1,5 @@
 import { headlineFor } from "@/story/copy";
-import { ROSTER_COPY, rosterVerdict } from "@/story/copy-slides-1-4";
+import { ROSTER_COPY, matchesUnit, rosterVerdict } from "@/story/copy-slides-1-4";
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { clampShare } from "@/story/monogram";
@@ -13,13 +13,13 @@ import styles from "./RosterSlide.module.css";
 /** Slide 3: how many heroes, one-trick or flex (ADR 0038), and the top five played. */
 export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
   const { roster } = story;
-  const motion = !reducedMotion && !skipAnimation;
+  const playing = !reducedMotion && !skipAnimation;
   const verdict = rosterVerdict(roster.label);
 
   return (
     <SlideFrame headline={headlineFor("roster")}>
       <div className={styles.slide}>
-        <SlideReveal index={0} motion={motion} kind="stamp">
+        <SlideReveal index={0} animate={playing} kind="stamp">
           <p data-testid="roster-heroes" className={styles.count}>
             <StoryCountUp
               value={roster.heroesPlayed}
@@ -32,7 +32,7 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
           </p>
         </SlideReveal>
 
-        <SlideReveal index={1} motion={motion} kind="stamp" className={styles.verdict}>
+        <SlideReveal index={1} animate={playing} kind="stamp" className={styles.verdict}>
           <p className={styles.stamp} data-label={roster.label}>
             {verdict.title}
           </p>
@@ -48,14 +48,14 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
                   as="li"
                   key={h.heroId}
                   index={i + 2}
-                  motion={motion}
+                  animate={playing}
                   className={styles.row}
                 >
                   <MonogramTile heroId={h.heroId} />
                   <div className={styles.who}>
                     <p className={styles.heroName}>{heroName(h.heroId)}</p>
                     <p className={styles.meta}>
-                      {h.matches.toLocaleString("en-US")} {ROSTER_COPY.matchesUnit}
+                      {h.matches.toLocaleString("en-US")} {matchesUnit(h.matches)}
                     </p>
                   </div>
                   <div className={styles.rate}>

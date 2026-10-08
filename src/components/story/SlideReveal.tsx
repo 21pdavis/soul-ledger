@@ -8,7 +8,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   /** Position in the stagger (0 first). */
   index: number;
   /** False when reduced motion or skip is on: the element is simply in its final state. */
-  motion: boolean;
+  animate: boolean;
   /** "rise" eases a row up; "stamp" lands a figure like an inked stamp. */
   kind?: "rise" | "stamp";
   as?: "div" | "li" | "p" | "section";
@@ -16,12 +16,12 @@ interface Props extends HTMLAttributes<HTMLElement> {
 
 /**
  * One staggered, one-shot entrance step for slide content. Pure CSS animation, so the stage's
- * press-and-hold pause freezes it (StoryPlayer.module.css) and removing `motion` shows the final
+ * press-and-hold pause freezes it (StoryPlayer.module.css) and setting `animate` to false shows the final
  * state at once.
  */
 export function SlideReveal({
   index,
-  motion,
+  animate,
   kind = "rise",
   as = "div",
   className,
@@ -35,7 +35,7 @@ export function SlideReveal({
     {
       ...rest,
       className: [styles.reveal, className].filter(Boolean).join(" "),
-      "data-motion": motion ? kind : "none",
+      "data-motion": animate ? kind : "none",
       style: { ...style, "--step": slot } as CSSProperties,
     },
     children,

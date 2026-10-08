@@ -18,14 +18,12 @@ export const INTRO_COPY = {
 
 export const MAIN_COPY = {
   mostPlayed: "Your most-played hero",
-  matchesUnit: "matches",
   winRate: "win rate",
 } as const;
 
 export const ROSTER_COPY = {
   heroesPlayedUnit: (n: number) => (n === 1 ? "hero played" : "heroes played"),
   topHeroes: "Most played",
-  matchesUnit: "matches",
   winRate: "win rate",
 } as const;
 
@@ -59,23 +57,31 @@ export function bestPercentile<T extends { topPercent: number }>(entries: T[]): 
 }
 
 export interface MainPercentileLine {
-  scope: "hero" | "global";
-  /** "Top 12% of Infernus players" or "Top 12% of all players". */
+  /** "neutral" is the not-notable case: no ranking claim at all. */
+  scope: "hero" | "global" | "neutral";
+  /** "Top 12% of Infernus players", "Top 12% of all players", or neutral copy without a number. */
   text: string;
-  /** The stat the ranking is for, e.g. "Kills per match". */
+  /** The stat the ranking is for, e.g. "Kills per match". Empty for neutral copy. */
   metric: string;
 }
+
+/** A best ranking above this is "not notable" (ADR 0053): no claim, neutral copy instead. */
+export const NOT_NOTABLE_ABOVE = 50;
+
+const NEUTRAL_RANK_LINE = "Nothing here is topping the charts yet. The ledger is still filling up.";
 
 /**
  * The main slide's percentile line. With enough main-hero matches `main.percentiles` is non-empty
  * and we rank against that hero's players (never labelled global). Below that it is empty, so we
  * fall back to the best global entry with global phrasing (no hero name), or to nothing.
+ * Whichever list applies, a best entry above 50 is not notable: neutral copy, no percentile.
  */
 export function mainPercentileLine(
   main: { heroId: number; percentiles: PercentileEntry[] },
   globalPercentiles: PercentileEntry[],
 ): MainPercentileLine | null {
   const heroBest = bestPercentile(main.percentiles);
+  if (heroBest && heroBest.topPercent > NOT_NOTABLE_ABOVE) return neutralLine();
   if (heroBest) {
     return {
       scope: "hero",
@@ -84,6 +90,7 @@ export function mainPercentileLine(
     };
   }
   const globalBest = bestPercentile(globalPercentiles);
+  if (globalBest && globalBest.topPercent > NOT_NOTABLE_ABOVE) return neutralLine();
   if (globalBest) {
     return {
       scope: "global",
@@ -92,6 +99,10 @@ export function mainPercentileLine(
     };
   }
   return null;
+}
+
+function neutralLine(): MainPercentileLine {
+  return { scope: "neutral", text: NEUTRAL_RANK_LINE, metric: "" };
 }
 
 /** The roster verdict (ADR 0038): one-trick at 50% or more on the main, flex otherwise. */
