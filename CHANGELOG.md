@@ -6,6 +6,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Added
 
+- **A real front door.** The home page now asks you to paste your Steam profile URL (no login needed), remembers it for next time, and lets you choose **All time** or **This patch** before you look yourself up. If something goes wrong, you get a clear full-screen message instead of an error code: profile not found (check that it's public), the service is down (try again in a minute), or no Deadlock matches found. The story itself is still a placeholder.
 - A private **staging** site for reviewing changes before they go live. It is unlocked with a private access link and deploys from the `staging` branch with its own database. Production is unchanged and still needs no login.
 
 ## [0.1.0] - 2026-10-07

@@ -8,7 +8,7 @@ export const ENTRY_COPY = {
   title: "Soul Ledger",
   tagline: "Your Deadlock year, wrapped.",
   inputLabel: "Paste your Steam profile URL",
-  inputPlaceholder: "https://steamcommunity.com/id/yourname",
+  inputPlaceholder: "steamcommunity.com/id/yourname",
   noLogin: "No login needed. We only read the match history your profile already makes public.",
   submit: "Open the ledger",
   invalidInput: "That doesn't look like a Steam profile URL.",
