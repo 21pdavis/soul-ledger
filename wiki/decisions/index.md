@@ -45,10 +45,10 @@
 * [0046: Strict red-first TDD on every behaviour change](0046-strict-red-first-tdd.md) - TDD is mandatory, not "where possible" - every behaviour change is red, green, refactor with the failing test run and seen failing first, and PRs show the evidence.
 * [0047: Streamlined review and CI: re-review only for blocking findings, one CI run per change, docs-only fast path](0047-streamlined-review-and-ci.md) - Re-reviews happen only after blocking findings or substantial fixes; each review round's fixes go in one commit; CI runs once per change and skips tests for docs-only PRs; reviewer effort scales with the change.
 * [0048: Hard limits in .claude/settings.json and an escalation procedure for unattended runs](0048-unattended-run-guardrails.md) - Claude Code permission rules deny pushes to main/staging, force-pushes, destructive Neon actions, Render env changes and reading .env files, while routine commands are pre-allowed; blocked runs commit their work, write up options and send a push notification.
+* [0049: Agent models: qa moves to Haiku 5.5, the other agents keep their models](0049-agent-model-assignment.md) - The qa agent runs on Haiku 5.5; implementer and wiki-keeper stay on Sonnet and reviewer stays on Opus.
 
 # Superseded decisions
 
 * [0020: Squad roles list and assignment](0020-squad-roles.md) - Ten squad roles, each awarded for the highest per-match value of one stat; every player gets one headline role, and extras show as badges.
 * [0036: A one-trick plays their main in at least 60% of matches](0036-one-trick-threshold.md) - The roster slide labels a player a one-trick when their most-played hero accounts for 60% or more of counted matches, otherwise flex.
 * [0042: A private staging environment behind Google sign-in, fed by a staging branch](0042-staging-environment.md) - Staging is a second Render service deploying the staging branch against a Neon staging branch; its environments and branches still stand, while its Google sign-in was superseded by ADR 0043 and its merge rule by ADR 0044.
-* [0049: Agent models: qa moves to Haiku 5.5, the other agents keep their models](0049-agent-model-assignment.md) - The qa agent runs on Haiku 5.5; implementer and wiki-keeper stay on Sonnet and reviewer stays on Opus.
