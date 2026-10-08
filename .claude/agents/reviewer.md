@@ -62,7 +62,7 @@ Your final message to the orchestrator is the verdict and a one-line summary of 
 
 # Token budget (ADR 0057)
 
-- Comment at most about 300 words (replaces the 450 above).
+- Comment at most about 300 words.
 - Default is Sonnet at high effort for code. The orchestrator runs you at medium for docs or config only, and with the Agent tool's `model: "opus"` override at xhigh for auth, data integrity, migrations and security ([ADR 0057](wiki/decisions/0057-token-efficient-unattended-runs.md), [ADR 0047](wiki/decisions/0047-streamlined-review-and-ci.md)).
 - Run browser probes only when the change is visual.
 - A re-review checks the fixes only.
