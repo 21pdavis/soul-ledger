@@ -122,3 +122,49 @@
     font-size: 0.75rem;
   }
 }
+
+/*
+ * Wide cards (the desktop vertical layout, ADR 0062): the three stats sit side by side, still
+ * staggered (centre, low, high), instead of stacked in rows.
+ */
+@container (min-width: 720px) {
+  .card {
+    grid-template-rows: none;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 2rem 2.5rem;
+  }
+
+  .stat,
+  .stat[data-place="middle-right"] {
+    max-width: none;
+    justify-self: stretch;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .stat[data-place="top-left"] {
+    align-self: start;
+    margin-top: 12%;
+  }
+
+  .stat[data-place="middle-right"] {
+    align-self: center;
+  }
+
+  .stat[data-place="bottom-left"] {
+    align-self: end;
+    margin-bottom: 12%;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .number {
+    font-size: clamp(3rem, 8cqw, 6rem);
+  }
+
+  .detail {
+    font-size: 1.125rem;
+  }
+}

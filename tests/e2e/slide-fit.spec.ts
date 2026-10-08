@@ -9,6 +9,11 @@ import { mockLookup, ndjson, openEntry, PROFILE, stageSettled, storyEvent } from
 // numbers, the longest rank journey), and checks that every element sits inside the slide frame.
 
 const stage = (page: Page) => page.getByTestId("story-stage");
+/** The slide on screen: the current card on desktop, the stage itself on a phone. */
+const current = (page: Page) =>
+  page.locator(
+    "[data-testid=story-card][data-current=true], [data-testid=story-stage]:not(:has([data-testid=story-card]))",
+  );
 
 /** The longest names, the biggest numbers, and a rank journey that is capped at the most rows. */
 function worstCaseStory() {
@@ -120,7 +125,7 @@ test.describe("every slide fits its frame, worst case", () => {
       for (const slide of SLIDES) {
         await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
         await stageSettled(page);
-        const frame = stage(page).locator("section").first();
+        const frame = current(page).locator("section").first();
         const found = await frame.evaluate((el, inset) => {
           const f = el.getBoundingClientRect();
           const out: string[] = [];

@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-08
+* **Decision**: [ADR 0062](decisions/0062-desktop-vertical-card-stack.md): the desktop story becomes a vertical stack of wide cards with a vertical progress rail, replacing the pinned 9:16 column (refines ADR 0050; phone unchanged).
 * **Decision**: [ADR 0061](decisions/0061-parry-king-at-40-percent.md): the owner lowered the parry-king line to 40% (a 40%-or-better parrier is not a clown), superseding the parry row of ADR 0040.
 * **Decision**: [ADR 0014](decisions/0014-staged-loading.md) amended: the loader also gets `status` events (contacting, batch left, rate-limit wait, finishing), a note that is never empty, and a 20 s stall message with a retry. A lookup that sat on a blank screen for over a minute was silent between the history event and the first details batch, with no sign of rate-limit waits.
 * **Decision**: [ADR 0060](decisions/0060-owner-decisions-m2-open-questions.md): the owner closed the four M2 open questions: keep Limelight and Space Grotesk, accept the rank tier names, allow deadlock-api hero art with a not-affiliated-with-Valve disclaimer (risk noted, fan content policy unread), and drop the unspent-souls stat (supersedes parts of ADRs 0015, 0053, 0055). New open question: [source for the Hoarder role](open-questions/hoarder-role-source.md).

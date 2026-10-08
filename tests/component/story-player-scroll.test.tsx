@@ -46,6 +46,65 @@ describe("StoryPlayer, scroll mode (desktop)", () => {
     expect(screen.queryByTestId("tap-zone-next")).not.toBeInTheDocument();
   });
 
+  it("lays the slides out as a vertical stack of cards, one inside each checkpoint", () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    const cards = within(track()).getAllByTestId("story-card");
+    expect(cards).toHaveLength(11);
+    cards.forEach((card, i) => {
+      expect(card.closest('[data-testid="checkpoint"]')).toHaveAttribute("data-checkpoint", `${i}`);
+    });
+    expect(cards[0]).toHaveAttribute("data-current", "true");
+    expect(cards[1]).toHaveAttribute("data-current", "false");
+  });
+
+  it("shows a slide's content once the reader reaches its card, and keeps the earlier ones", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    const headings = () => within(track()).getAllByRole("heading", { level: 2 });
+    expect(headings()).toHaveLength(1);
+    scrollToCheckpoint(3);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "scavenger"));
+    expect(headings()).toHaveLength(4);
+    expect(within(track()).getByTestId("scavenger-card")).toBeInTheDocument();
+    // scrolling back up keeps what was already shown
+    scrollToCheckpoint(1);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "main"));
+    expect(headings()).toHaveLength(4);
+  });
+
+  it("a reader scroll right after an arrival commits is not dragged back to that arrival", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    // Scroll again in the microtask right after the arrival's commit, before React has run the
+    // effects that follow it (the CI-runner timing): the track must not be pulled back to 3.
+    const observer = new MutationObserver(() => {
+      if (stage().getAttribute("data-slide") === "scavenger") {
+        observer.disconnect();
+        scrollToCheckpoint(1);
+      }
+    });
+    observer.observe(stage(), { attributes: true, attributeFilter: ["data-slide"] });
+    scrollToCheckpoint(3);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "main"));
+    expect(scrollTo).not.toHaveBeenCalled();
+  });
+
+  it("marks only the current card as current", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.keyboard("{ArrowRight}");
+    const current = within(track())
+      .getAllByTestId("story-card")
+      .filter((c) => c.dataset.current === "true");
+    expect(current).toHaveLength(1);
+    expect(current[0]).toHaveAttribute("data-slide", "main");
+  });
+
+  it("draws the progress bar down the side instead of across the top", () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    expect(screen.getByRole("list", { name: "Story progress" })).toHaveAttribute(
+      "data-orientation",
+      "vertical",
+    );
+  });
+
   it("arriving at a checkpoint sets the slide once the scroll settles", async () => {
     render(<StoryPlayer {...fixtureSlideProps()} />);
     scrollToCheckpoint(3);

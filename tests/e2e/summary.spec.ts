@@ -14,6 +14,11 @@ import {
 // same locally and against staging.
 
 const stage = (page: Page) => page.getByTestId("story-stage");
+/** The slide on screen: the current card on desktop, the stage itself on a phone. */
+const slide = (page: Page) =>
+  page.locator(
+    "[data-testid=story-card][data-current=true], [data-testid=story-stage]:not(:has([data-testid=story-card]))",
+  );
 
 /** From slide 1, play the story through to the summary slide with the keyboard. */
 async function playToSummary(page: Page) {
@@ -53,8 +58,8 @@ test("the summary shows the card, the window and the matches it is based on", as
   const card = page.getByRole("list", { name: "Your ledger entry" });
   await expect(card).toContainText("Infernus");
   await expect(card).toContainText("Oracle 1");
-  await expect(page.getByText("All time")).toBeVisible();
-  await expect(page.getByText("Based on 120 matches")).toBeVisible();
+  await expect(slide(page).getByText("All time")).toBeVisible();
+  await expect(slide(page).getByText("Based on 120 matches")).toBeVisible();
   // The Valve notice (ADR 0016) is the app's strip under the player, exactly once.
   const notice = page.getByText(/Not affiliated with or endorsed by Valve/);
   await expect(notice).toHaveCount(1);
@@ -65,8 +70,8 @@ test("Refresh on the summary reruns the lookup with refresh=1 and the same windo
   page,
 }) => {
   const urls = await openSummary(page, { window: "patch", patchStart: PATCH }, true);
-  await expect(page.getByText("Since patch Sep 30, 2026")).toBeVisible();
-  await page.getByRole("button", { name: "Refresh" }).click();
+  await expect(slide(page).getByText("Since patch Sep 30, 2026")).toBeVisible();
+  await slide(page).getByRole("button", { name: "Refresh" }).click();
   await expect.poll(() => urls.length).toBe(2);
   expect(urls[1].searchParams.get("refresh")).toBe("1");
   expect(urls[1].searchParams.get("window")).toBe("patch");
@@ -76,13 +81,13 @@ test("Refresh on the summary reruns the lookup with refresh=1 and the same windo
 
 test("Replay returns to slide 1", async ({ page }) => {
   await openSummary(page);
-  await page.getByRole("button", { name: "Replay" }).click();
+  await slide(page).getByRole("button", { name: "Replay" }).click();
   await expect(stage(page)).toHaveAttribute("data-slide", "intro");
 });
 
 test("Look up another player returns to the entry screen", async ({ page }) => {
   await openSummary(page);
-  await page.getByRole("button", { name: "Look up another player" }).click();
+  await slide(page).getByRole("button", { name: "Look up another player" }).click();
   await expect(page.getByLabel("Paste your Steam profile URL")).toBeVisible();
 });
 
@@ -140,14 +145,14 @@ test.describe("the card is never clipped by the stage", () => {
         await page.setViewportSize({ width, height });
         await openSummary(page, c.over, c.patch, c.long ? longNamesStory() : fixtureStory());
         const stageBox = (await stage(page).boundingBox())!;
-        const frame = stage(page).locator("section").first();
+        const frame = slide(page).locator("section").first();
         const frameBox = (await frame.boundingBox())!;
         // The frame itself sits inside the stage, so its bottom border is not cut off.
         expect(frameBox.y + frameBox.height).toBeLessThanOrEqual(
           stageBox.y + stageBox.height + 0.5,
         );
         for (const name of ["Replay", "Look up another player", "Refresh"]) {
-          const button = page.getByRole("button", { name });
+          const button = slide(page).getByRole("button", { name });
           await expect(button).toBeVisible();
           const box = (await button.boundingBox())!;
           expect(box.y).toBeGreaterThanOrEqual(stageBox.y);

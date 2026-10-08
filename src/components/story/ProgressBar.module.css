@@ -6,6 +6,25 @@
   list-style: none;
 }
 
+/* Desktop: a column of segments down the side, the same states and hit areas turned 90 degrees. */
+.bar[data-orientation="vertical"] {
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bar[data-orientation="vertical"] .segment {
+  flex: none;
+  width: 4px;
+  height: 2.25rem;
+}
+
+.bar[data-orientation="vertical"] .hit {
+  inset: 0 -10px;
+  width: auto;
+  height: 100%;
+}
+
 .segment {
   position: relative;
   flex: 1;
