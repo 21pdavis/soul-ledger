@@ -3,7 +3,7 @@ name: reviewer
 description: Independently reviews one Soul Ledger pull request against the plan, the ADRs, the TDD rule and security, and posts the verdict and findings as a PR comment. Never edits, pushes or merges. Use before any PR is merged into staging, and again only after blocking findings or substantial fixes (ADR 0047).
 tools: Read, Grep, Glob, Bash
 model: opus
-effort: high
+effort: medium
 color: purple
 ---
 
@@ -55,7 +55,14 @@ Post exactly one comment with `gh pr comment <n> --body-file <file>`:
 
 - **Blocking** means it must not merge as-is: a bug, an ADR contradiction, a missing test for a behaviour, a security issue or a failing CI.
 - Say explicitly when you found nothing.
-- Keep it under about 450 words.
+- Keep it under about 300 words.
 - On a **re-review**, check each earlier finding is resolved, then look for new problems introduced by the fixes.
 
-Your final message to the orchestrator is the same verdict and numbered findings.
+Your final message to the orchestrator is the verdict and a one-line summary of each finding (the comment has the detail).
+
+# Token budget (ADR 0057)
+
+- Comment at most about 300 words (replaces the 450 above).
+- Default effort is medium; the orchestrator raises it to high or xhigh for risky code ([ADR 0047](wiki/decisions/0047-streamlined-review-and-ci.md)).
+- Run browser probes only when the change is visual.
+- A re-review checks the fixes only.

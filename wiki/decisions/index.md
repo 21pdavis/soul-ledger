@@ -51,6 +51,7 @@
 * [0052: M2 entry, staged loading, error and completeness states](0052-m2-entry-loading-error-states.md) - A URL entry screen with an All time / This patch window control, three real loading stages from the NDJSON stream, in-voice full-screen error states, and a matches-count line with a Refresh action.
 * [0053: M2 copy rules and data-presentation choices](0053-m2-copy-and-data-presentation.md) - Claude drafts the copy in one module with one fixed headline per slide; heroes, death heatmap, unspent souls, rank and MVP each have a fixed M2 presentation.
 * [0054: M2 testing layers and accessibility rules](0054-m2-testing-and-accessibility.md) - M2 adds component tests per slide, phone and desktop Playwright suites with a mocked NDJSON lookup, and an accessibility baseline checked by tests.
+* [0057: Token-efficient unattended runs](0057-token-efficient-unattended-runs.md) - Ten policies that cut token use in agent runs: orchestrator context hygiene, fresh narrow subagents, short briefs and reports, cheaper models and effort, foundation-first and fewer PRs, targeted tests, bounded fix loops, per-milestone measurement, and small always-loaded context.
 
 # Superseded decisions
 

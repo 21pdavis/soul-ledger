@@ -140,6 +140,18 @@ Running SQL on Neon, other risky Neon changes and triggering Render deploys alwa
 
 **Blocked means:** the same failure survives about 3 genuinely different attempts; a product or business decision the plan and ADRs don't answer; a needed action is denied by the hard limits above; or an external service (deadlock-api, Steam, Render, Neon, GitHub) is down.
 
+## Token budget for runs (ADR 0057)
+
+Runs are limited by usage, so every agent follows these (reasoning and the rest of the policy in [ADR 0057](wiki/decisions/0057-token-efficient-unattended-runs.md)):
+
+- **Hand-backs are short:** at most about 150 words to the orchestrator. Detail goes in the PR description or review comment, and reports are never pasted into other replies.
+- **Fresh, narrow agents:** don't resume an agent for a small fix. Use a fresh agent given the PR number and review link, or the orchestrator for fixes of about 20 lines or fewer.
+- **Briefs are short** (200 to 300 words): goal, areas, acceptance criteria (link the plan), constraints. Pass references, not pasted contents, and don't restate this file.
+- **Tests are targeted:** run unit and component tests plus only the e2e spec files you touched. CI runs the full e2e suite. Filter long output (`tail`, `grep`) and never read whole logs.
+- **Loops are bounded:** at most 2 fix rounds per PR. A third means the orchestrator re-plans or asks the owner.
+- **Owner:** run `/clear` between phases and milestones (agents can't), and share `/usage` at each milestone's end.
+- Don't edit CLAUDE.md or agent files mid-run (it breaks the prompt cache), and keep this file under about 200 lines.
+
 ## Agent roster (`.claude/agents/`)
 
 For autonomous runs, the **main session is the orchestrator**. It splits the milestone plan into PR-sized tasks, dispatches the specialists below, merges into `staging` when the rules above allow, reports every merge, and escalates only real blockers. The specialists carry their role in their agent file; every rule in this CLAUDE.md applies to all of them.
