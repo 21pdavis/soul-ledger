@@ -1,0 +1,98 @@
+.slide {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  height: 100%;
+}
+
+/* A stamped figure: big deco numerals over a brass double rule, the unit set small beneath. */
+.figure {
+  padding-bottom: 1rem;
+  border-bottom: 3px double var(--brass);
+}
+
+.line {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: clamp(3.75rem, 19vw, 6.25rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: 1.125rem;
+  color: var(--bone-muted);
+}
+
+.dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* A ledger line: label, dotted leader, date. */
+.entry {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--bone);
+}
+
+.leader {
+  flex: 1;
+  border-bottom: 1px dotted var(--rule);
+}
+
+.footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-bottom: 0.5rem;
+}
+
+.basedOn {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--bone);
+}
+
+.window {
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  color: var(--bone-muted);
+}
+
+.refresh {
+  flex: none;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.125rem;
+  border: 1px solid var(--brass);
+  background: transparent;
+  color: var(--brass);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.refresh:hover {
+  background: var(--brass);
+  color: var(--ink);
+}
+
+.refresh:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}

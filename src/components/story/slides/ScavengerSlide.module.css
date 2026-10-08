@@ -1,0 +1,64 @@
+/* One card, three stats staggered down it: left, right, left. */
+.card {
+  position: relative;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  height: 100%;
+  padding: 1.5rem 1.25rem;
+  border: 1px solid var(--brass);
+  background: var(--ink);
+}
+
+/* An inner rule, like the frame it sits in. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--rule);
+  pointer-events: none;
+}
+
+.stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 0.375rem;
+  max-width: 78%;
+}
+
+.stat[data-place="top-left"],
+.stat[data-place="bottom-left"] {
+  justify-self: start;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.stat[data-place="middle-right"] {
+  justify-self: end;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--brass);
+}
+
+.stat[data-place="middle-right"] .title {
+  color: var(--green);
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 16vw, 5rem);
+  line-height: 1;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.detail {
+  font-size: 1rem;
+  color: var(--bone-muted);
+}
