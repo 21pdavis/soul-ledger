@@ -6,7 +6,7 @@ tags: [m2, ux, loading, errors]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:30:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T14:00:00Z }
 ---
 
 # Decision
@@ -25,6 +25,10 @@ Three **real** stages driven by the streamed NDJSON events of `/api/lookup`, eac
 1. resolved / profile;
 2. history, with hero ids;
 3. details fetched / total counters.
+
+### Pacing
+
+Each stage is held on screen for a minimum time, the tally counters take a minimum time to count up, and the story waits for the last stage plus a short tail, so a quick lookup can still be read. Events still decide every stage: time only delays showing them, and never advances one. See [ADR 0056](0056-loader-pacing.md).
 
 ## Window control
 

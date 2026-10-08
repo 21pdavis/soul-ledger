@@ -52,6 +52,7 @@
 * [0053: M2 copy rules and data-presentation choices](0053-m2-copy-and-data-presentation.md) - Claude drafts the copy in one module with one fixed headline per slide; heroes, death heatmap, unspent souls, rank and MVP each have a fixed M2 presentation.
 * [0054: M2 testing layers and accessibility rules](0054-m2-testing-and-accessibility.md) - M2 adds component tests per slide, phone and desktop Playwright suites with a mocked NDJSON lookup, and an accessibility baseline checked by tests.
 * [0055: Owner confirmations after M2: names, fonts, caption, unspent-souls number deferred](0055-owner-confirmations-after-m2.md) - The owner confirmed the rank tier names and the Limelight and Space Grotesk pairing, chose urns returned for the Urn Mule caption, and deferred any unspent-souls number.
+* [0056: Loader pacing: minimum dwell per stage, real events still gate stages](0056-loader-pacing.md) - The staged loader holds each real stage on screen for a minimum time and holds the story back for the last stage's dwell plus a tail, so a quick lookup can be read; a timer never advances a stage.
 * [0057: Token-efficient unattended runs](0057-token-efficient-unattended-runs.md) - Eleven policies that cut token use in agent runs: orchestrator context hygiene, fresh narrow subagents, short briefs and reports, cheaper models and effort (reviewer on Sonnet, Opus for security work), foundation-first and fewer PRs, targeted tests, bounded fix loops, per-milestone measurement, small always-loaded context, and CI watched by the orchestrator.
 
 # Superseded decisions

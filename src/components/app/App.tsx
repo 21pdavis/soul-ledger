@@ -6,6 +6,12 @@ import {
   type ClientLookupEvent,
   type ClientLookupRequest,
 } from "@/lib/client/lookup-stream";
+import {
+  createLoadingPacer,
+  resolvePace,
+  type FinalEvent,
+  type PaceConfig,
+} from "@/lib/client/loading-pace";
 import { defaultPrefs, readPrefsSnapshot, savePrefs, type Prefs } from "@/lib/client/prefs";
 import type { StoryWindow } from "@/lib/lookup";
 import type { ErrorKind } from "@/story/copy";
@@ -23,23 +29,26 @@ import styles from "./App.module.css";
 /**
  * Where the app is (ADR 0052). The flow: entry -> loading -> story | error.
  *
- * - `loading.progress` collects every non-final event, for the staged loader (PR 3).
+ * - `loading.progress` is the non-final events the loader has been allowed to show so far: the
+ *   pacer releases them one stage at a time so each can be read (ADR 0056).
  * - `story` is only ever entered with `story.matchCount > 0`; zero matches is an error screen.
  */
 export type Phase =
   | { name: "entry" }
-  | { name: "loading"; progress: ClientLookupEvent[] }
+  | { name: "loading"; progress: ClientLookupEvent[]; countMs: number }
   | { name: "story"; story: StoryData; meta: StoryMeta }
   | { name: "error"; kind: ErrorKind; window: StoryWindow; excludedMatches: number };
 
 interface Props {
   /** For tests: replaces the global `fetch` used for the lookup. */
   fetchImpl?: typeof fetch;
+  /** For tests: replaces the loader pacing (`NO_PACE` skips every wait). Default: `resolvePace()`. */
+  pace?: PaceConfig;
 }
 
 const subscribeNothing = () => () => {};
 
-export function App({ fetchImpl }: Props) {
+export function App({ fetchImpl, pace }: Props) {
   const [phase, setPhase] = useState<Phase>({ name: "entry" });
   const [request, setRequest] = useState<ClientLookupRequest | null>(null);
   // Bumped by Replay: remounting the story starts it again at slide 1.
@@ -58,13 +67,15 @@ export function App({ fetchImpl }: Props) {
       const controller = new AbortController();
       running.current = controller;
       setRequest(next);
-      setPhase({ name: "loading", progress: [] });
+      // The pacer holds real events back so each stage can be read (ADR 0056). It never invents
+      // one: the loader only shows what arrived, and the story or error is released through it.
+      const config = pace ?? resolvePace();
+      const pacer = createLoadingPacer(config);
+      setPhase({ name: "loading", progress: [], countMs: config.tallyCountMs });
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      controller.signal.addEventListener("abort", () => clearTimeout(timer));
 
-      for await (const event of streamLookup(next, {
-        fetch: fetchImpl,
-        signal: controller.signal,
-      })) {
-        if (controller.signal.aborted) return;
+      const finish = (event: FinalEvent) => {
         if (event.type === "error") {
           setPhase({
             name: "error",
@@ -72,30 +83,49 @@ export function App({ fetchImpl }: Props) {
             window: next.window,
             excludedMatches: 0,
           });
-        } else if (event.type === "story") {
-          if (event.story.matchCount === 0) {
-            // Nothing to tell: the story never mounts without matches (ADR 0052).
-            setPhase({
-              name: "error",
-              kind: "no_matches",
-              // The window the server really used: a patch request without a patch date was
-              // served all-time data (#25), so it must not blame the patch.
-              window: event.window === "patch" && event.patchStart ? "patch" : "all",
-              excludedMatches: event.story.excludedMatches,
-            });
-          } else {
-            setPhase({
-              name: "story",
-              story: event.story,
-              meta: { window: event.window, patchStart: event.patchStart, stale: event.stale },
-            });
-          }
+        } else if (event.story.matchCount === 0) {
+          // Nothing to tell: the story never mounts without matches (ADR 0052).
+          setPhase({
+            name: "error",
+            kind: "no_matches",
+            // The window the server really used: a patch request without a patch date was
+            // served all-time data (#25), so it must not blame the patch.
+            window: event.window === "patch" && event.patchStart ? "patch" : "all",
+            excludedMatches: event.story.excludedMatches,
+          });
         } else {
-          setPhase((p) => (p.name === "loading" ? { ...p, progress: [...p.progress, event] } : p));
+          setPhase({
+            name: "story",
+            story: event.story,
+            meta: { window: event.window, patchStart: event.patchStart, stale: event.stale },
+          });
         }
+      };
+
+      const apply = (out: ReturnType<typeof pacer.advance>) => {
+        if (controller.signal.aborted) return;
+        clearTimeout(timer);
+        if (out.final) return finish(out.final);
+        setPhase((p) =>
+          p.name === "loading" && p.progress !== out.shown ? { ...p, progress: out.shown } : p,
+        );
+        if (out.wakeAt !== null) {
+          timer = setTimeout(
+            () => apply(pacer.advance(performance.now())),
+            Math.max(0, out.wakeAt - performance.now()),
+          );
+        }
+      };
+
+      for await (const event of streamLookup(next, {
+        fetch: fetchImpl,
+        signal: controller.signal,
+      })) {
+        if (controller.signal.aborted) return;
+        apply(pacer.push(event, performance.now()));
       }
     },
-    [fetchImpl],
+    [fetchImpl, pace],
   );
 
   const submit = useCallback(
@@ -144,7 +174,9 @@ export function App({ fetchImpl }: Props) {
           onSubmit={submit}
         />
       )}
-      {phase.name === "loading" && <LoadingScreen progress={phase.progress} />}
+      {phase.name === "loading" && (
+        <LoadingScreen progress={phase.progress} countMs={phase.countMs} />
+      )}
       {phase.name === "error" && (
         <ErrorScreen
           kind={phase.kind}

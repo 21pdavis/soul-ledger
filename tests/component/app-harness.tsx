@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, vi } from "vitest";
 import { App } from "@/components/app/App";
+import { NO_PACE } from "@/lib/client/loading-pace";
 import { fixtureStory } from "../fixtures/story";
 
 // Shared by the App component tests: a mocked lookup stream, and an entry-screen driver.
@@ -24,7 +25,10 @@ export const storyEvent = (over: Record<string, unknown> = {}, story = fixtureSt
   ...over,
 });
 
-/** Renders App over a fetch that answers each lookup with the next response (or throws an Error). */
+/**
+ * Renders App over a fetch that answers each lookup with the next response (or throws an Error).
+ * Loader pacing is off (`NO_PACE`) so these tests do not wait; app-pacing.test.tsx covers the pacing.
+ */
 export function setup(...responses: (Response | Promise<Response> | Error)[]) {
   const queue = [...responses];
   const fetchMock = vi.fn(async (url: RequestInfo | URL) => {
@@ -34,7 +38,7 @@ export function setup(...responses: (Response | Promise<Response> | Error)[]) {
     return next ?? ndjson({ type: "error", reason: "unavailable" });
   });
   const user = userEvent.setup();
-  render(<App fetchImpl={fetchMock as unknown as typeof fetch} />);
+  render(<App fetchImpl={fetchMock as unknown as typeof fetch} pace={NO_PACE} />);
   const requested = (n = 0) => new URL(String(fetchMock.mock.calls[n][0]), "http://x");
   const enter = async (url = URL_A) => {
     await user.type(screen.getByLabelText("Paste your Steam profile URL"), url);
