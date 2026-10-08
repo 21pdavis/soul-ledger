@@ -10,6 +10,7 @@ describe("SlideFrame", () => {
       </SlideFrame>,
     );
     expect(screen.getByRole("heading", { name: "Welcome to the Cursed City" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Welcome to the Cursed City" })).toBeInTheDocument();
     expect(screen.getByText("120 matches")).toBeInTheDocument();
   });
 });

@@ -14,6 +14,23 @@ describe("ProgressBar", () => {
     expect(items[4].dataset.state).toBe("todo");
   });
 
+  it("names each read-only segment for screen readers", () => {
+    render(<ProgressBar count={11} current={3} />);
+    expect(screen.getByText("Slide 1 of 11")).toBeInTheDocument();
+    expect(screen.getByText("Slide 11 of 11")).toBeInTheDocument();
+  });
+
+  it("marks the current button when segments are clickable", () => {
+    render(<ProgressBar count={11} current={3} onSelect={() => {}} />);
+    expect(screen.getByRole("button", { name: "Go to slide 4" })).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
+    expect(screen.getByRole("button", { name: "Go to slide 5" })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
+
   it("jumps to a slide when a segment is chosen", async () => {
     const onSelect = vi.fn();
     render(<ProgressBar count={11} current={0} onSelect={onSelect} />);

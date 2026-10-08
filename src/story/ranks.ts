@@ -17,5 +17,5 @@ const TIER_NAMES: Record<number, string> = {
 /** "Oracle 1", or "Tier 99 · 2" for a tier the map does not know. */
 export function rankLabel({ tier, subrank }: { tier: number; subrank: number }): string {
   const name = TIER_NAMES[tier];
-  return name ? `${name} ${subrank}` : `Tier ${tier} · ${subrank}`;
+  return name ? (subrank > 0 ? `${name} ${subrank}` : name) : `Tier ${tier} · ${subrank}`;
 }

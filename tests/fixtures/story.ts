@@ -1,4 +1,4 @@
-import type { StoryData } from "@/story/types";
+import type { SlideProps, StoryData } from "@/story/types";
 
 /** A full story for component tests: every slide has data. */
 export function fixtureStory(overrides: Partial<StoryData> = {}): StoryData {
@@ -82,6 +82,16 @@ export function fixtureStory(overrides: Partial<StoryData> = {}): StoryData {
     },
     percentiles: [pct("melee", "Melee kills", 3)],
     mvp: { ...pct("melee", "Melee kills", 0.5), scope: "hero", heroId: 1 },
+    ...overrides,
+  };
+}
+
+/** Props for any slide component in a test. */
+export function fixtureSlideProps(overrides: Partial<SlideProps> = {}): SlideProps {
+  return {
+    story: fixtureStory(),
+    meta: { window: "all", patchStart: null, stale: false },
+    actions: { onRefresh: () => {}, onReplay: () => {}, onNewLookup: () => {} },
     ...overrides,
   };
 }

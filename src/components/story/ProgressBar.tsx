@@ -25,9 +25,12 @@ export function ProgressBar({ count, current, onSelect }: Props) {
                 type="button"
                 className={styles.hit}
                 aria-label={`Go to slide ${i + 1}`}
+                aria-current={state === "current" ? "step" : undefined}
                 onClick={() => onSelect(i)}
               />
-            ) : null}
+            ) : (
+              <span className={styles.visuallyHidden}>{`Slide ${i + 1} of ${count}`}</span>
+            )}
           </li>
         );
       })}

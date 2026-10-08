@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { formatHours, formatPatchDate, formatPercent } from "@/story/format";
 
 describe("formatHours", () => {
@@ -21,8 +21,10 @@ describe("formatPercent", () => {
 });
 
 describe("formatPatchDate", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
   it("formats in UTC so the date is the same everywhere", () => {
-    process.env.TZ = "America/Los_Angeles";
+    vi.stubEnv("TZ", "America/Los_Angeles");
     expect(formatPatchDate("2026-09-30T00:00:00.000Z")).toBe("Sep 30, 2026");
   });
 });

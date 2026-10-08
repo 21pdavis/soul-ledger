@@ -14,8 +14,7 @@
   background: var(--rule);
 }
 
-.segment[data-state="done"],
-.segment[data-state="current"] {
+.segment[data-state="done"] {
   background: var(--brass);
 }
 
@@ -36,4 +35,13 @@
 .hit:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 2px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
