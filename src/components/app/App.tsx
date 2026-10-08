@@ -111,8 +111,8 @@ export function App({ fetchImpl, pace }: Props) {
         );
         if (out.wakeAt !== null) {
           timer = setTimeout(
-            () => apply(pacer.advance(Date.now())),
-            Math.max(0, out.wakeAt - Date.now()),
+            () => apply(pacer.advance(performance.now())),
+            Math.max(0, out.wakeAt - performance.now()),
           );
         }
       };
@@ -122,7 +122,7 @@ export function App({ fetchImpl, pace }: Props) {
         signal: controller.signal,
       })) {
         if (controller.signal.aborted) return;
-        apply(pacer.push(event, Date.now()));
+        apply(pacer.push(event, performance.now()));
       }
     },
     [fetchImpl, pace],

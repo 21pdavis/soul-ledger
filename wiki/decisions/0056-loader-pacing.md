@@ -22,7 +22,7 @@ Only **display pacing** changes:
 | Tally count-up | Counters take at least `tallyCountMs` to count up, however fast the data came (a burst of details, or a cached player). |
 | Final tail | The story replaces the loader only after the last stage has had its dwell plus `finalTailMs`. |
 | Errors | An `error` event shows its screen at once, with no dwell, and drops the queue. |
-| Slow lookups | A lookup whose real events are slower than the dwell and tail is not delayed: pacing only holds back events that arrive faster. |
+| Slow lookups | A lookup whose real events are slower than the dwell and tail is not delayed: pacing only holds back events that arrive faster. The tail is measured from when the last stage first appeared, not from its last counter update, so after a slow lookup the story can replace the loader right after the final counter jump and that last (small) count-up is cut off. Accepted: holding for it would add time to slow lookups. |
 | Reduced motion | Same dwell (players still need time to read), just no animation. |
 | Screen readers | One polite announcement per stage change, made when the stage is **shown**, not when its event arrives. |
 | Skip | No Skip button. |
@@ -43,4 +43,5 @@ A fully cached lookup (resolved, profile, history with nothing new, done and the
 
 - `createLoadingPacer` is a pure state machine over an explicit clock: `push(event, now)` and `advance(now)` return the events to show, the story or error once it may be released, and `wakeAt` (when to call again). `App` owns the one timer and routes every stream event, including the final one, through the pacer; the `LoadingScreen` still renders purely from the events it is given.
 - **Turning pacing off for tests.** A `localStorage` value `soul-ledger:loading-pace` = `"off"` selects `NO_PACE` (all zeros). It can only remove delay and never changes what is shown, so a player setting it just sees the loader go by faster; it cannot be used to slow or alter anything. `playwright.config.ts` starts every browser context with it set, so the existing suites do not slow down; `tests/e2e/loading-pace.spec.ts` opts out and proves the real pacing (stages in order, a dwell apart, the story after the last dwell plus the tail, and the cached-lookup duration). The App component tests pass `pace={NO_PACE}`; `tests/component/app-pacing.test.tsx` covers the pacing with fake timers.
+- Under [ADR 0057](0057-token-efficient-unattended-runs.md) the full e2e suite runs in CI; locally only the touched specs are run.
 - A build-time `NEXT_PUBLIC_` flag was rejected: e2e builds once, and staging e2e (`pnpm test:e2e:staging`) runs against a deployed build, so the switch has to be a runtime one.
