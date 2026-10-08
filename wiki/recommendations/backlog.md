@@ -4,7 +4,7 @@ title: Backlog and recommendations
 description: Prioritized list of recommended next steps, research to do, and deferred features.
 tags: [backlog, planning]
 status: stable
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:30:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
 ---
 
 # Next
@@ -14,15 +14,18 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | Priority | Item | Links |
 |---|---|---|
 | P0 | Before the repo goes public at M2, fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public), including #8 and #9. This is not part of the M2 PRs | [ADR 0032](../decisions/0032-github-private-ci.md) |
-| P0 | Build M2: the 11-slide story in 2D, fed by `/api/lookup` | [M2 plan](m2-plan.md), [ADR 0028](../decisions/0028-milestones.md) |
+| P0 | Build M3: the 3D scene behind the story column | [ADR 0028](../decisions/0028-milestones.md), [ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
-| P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
+| P1 | Confirm what "Unspent Gold Minutes" counts (#36) and, if possible, what accolade 11 (breakables) includes | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
+| P1 | Make the cached-matches note an overlay so it stops squeezing the stage on tiny phones (#38) | [M2 plan](m2-plan.md) |
+| P2 | Fold the slide 8-10 helpers into the shared primitives and `copy.ts` (#37) | [M2 plan](m2-plan.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |
 | P2 | When audio lands, unlock it on the entry screen's Enter click (deferred from M2 PR 3, which has no audio layer) | [ADR 0006](../decisions/0006-audio.md), [ADR 0052](../decisions/0052-m2-entry-loading-error-states.md) |
 
 # Done
 
+- **M2 playable story** (2026-10-08): entry, window control, staged loading, 11 slides, summary card, error states, axe and keyboard e2e. See the [M2 plan](m2-plan.md) outcome.
 - **M1 data layer** (2026-10-06): Steam input parsing and resolution, the deadlock-api client with rate limits, the Postgres cache with job lock, incremental sync, story stats, global and same-hero percentiles, and `GET /api/lookup` (NDJSON stream). Covered by unit, integration (PGlite) and e2e smoke tests, with CI.
 - Cache schema designed (`src/db/schema.ts`).
 - Neon `main` migrated, and the Render Blueprint added ([ADR 0039](../decisions/0039-render-free-blueprint.md)).

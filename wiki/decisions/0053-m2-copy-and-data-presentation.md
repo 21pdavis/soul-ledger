@@ -6,7 +6,7 @@ tags: [m2, copy, data]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T12:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
 ---
 
 # Decision
@@ -28,3 +28,9 @@ The owner confirmed this on 2026-10-07. Applies [ADR 0007](0007-tone-hype-with-r
 | Unspent souls | Verify the [unit](../open-questions/m2-unspent-souls-unit.md) first, then show it as a plain sentence. |
 | Rank | Static tier-name map from research, fallback "Tier 4 · 2". Names need [confirmation](../open-questions/m2-rank-tier-names.md). |
 | MVP | One generic template: label + `topPercent` + scope. "Not notable" means the best `topPercent` is above 50; then show the best global stat with neutral copy, no same-hero phrasing. A null `mvp` gets its own friendly copy. Per-metric one-liners are a backlog item. |
+
+# As built
+
+- Copy lives in the single `src/story/copy.ts`. Slide PRs briefly kept per-group copy files to avoid merge conflicts; PR 9 (#39) folded them in. Helpers for slides 8-10 still need consolidating (#37).
+- Unspent souls ships as a neutral sentence with no unit claimed, until the [unit](../open-questions/m2-unspent-souls-unit.md) is confirmed (#36).
+- The rank tier map was built from the API fixture and still awaits [owner confirmation](../open-questions/m2-rank-tier-names.md).
