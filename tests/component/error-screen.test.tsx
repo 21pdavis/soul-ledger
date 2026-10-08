@@ -73,6 +73,13 @@ describe("ErrorScreen", () => {
     expect(screen.getByText(/street brawl/i)).toBeInTheDocument();
   });
 
+  it("moves focus to the title when it appears, so screen readers announce the error", () => {
+    setup("not_found");
+    const title = screen.getByRole("heading", { level: 1 });
+    expect(title).toHaveAttribute("tabindex", "-1");
+    expect(title).toHaveFocus();
+  });
+
   it("never renders a bare error code", () => {
     for (const kind of ["not_found", "unavailable", "fetch_failed", "invalid"] as const) {
       const { container } = render(

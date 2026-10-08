@@ -60,6 +60,10 @@
   text-wrap: balance;
 }
 
+.title:focus {
+  outline: none;
+}
+
 .body,
 .detail {
   margin: 0;

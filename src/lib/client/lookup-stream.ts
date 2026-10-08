@@ -5,7 +5,7 @@ import type { Jsonify } from "@/story/types";
 /**
  * A lookup event as the browser receives it: the same shape as the server's `LookupEvent`, with
  * Dates turned into ISO strings, so `story` is a `StoryData` and `patchStart` is `string | null`.
- * The stream always ends with exactly one `story` or `error` event.
+ * The stream always ends with exactly one `story` or `error` event, and nothing follows it.
  */
 export type ClientLookupEvent = Jsonify<LookupEvent>;
 
@@ -31,6 +31,13 @@ export function lookupUrl({ input, refresh, ...filters }: ClientLookupRequest): 
   if (refresh) params.set("refresh", "1");
   return `/api/lookup?${params}`;
 }
+
+const KNOWN_REASONS: readonly string[] = [
+  "invalid",
+  "not_found",
+  "unavailable",
+  "fetch_failed",
+] satisfies LookupErrorReason[];
 
 const failed = (reason: LookupErrorReason): ClientLookupEvent => ({ type: "error", reason });
 
@@ -59,12 +66,13 @@ export async function* streamLookup(
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-  let finished = false;
 
   const parse = (text: string): ClientLookupEvent | null | "bad" => {
     if (!text.trim()) return null;
     try {
-      return JSON.parse(text) as ClientLookupEvent;
+      const event: unknown = JSON.parse(text);
+      if (!event || typeof event !== "object") return "bad";
+      return event as ClientLookupEvent;
     } catch {
       return "bad";
     }
@@ -84,8 +92,16 @@ export async function* streamLookup(
           yield failed("fetch_failed");
           return;
         }
+        if (event.type === "story") {
+          yield event;
+          return;
+        }
+        if (event.type === "error") {
+          // A reason this client does not know (a newer server) still gets a screen.
+          yield KNOWN_REASONS.includes(event.reason) ? event : failed("fetch_failed");
+          return;
+        }
         yield event;
-        if (event.type === "story" || event.type === "error") finished = true;
       }
       if (done) break;
     }
@@ -95,5 +111,6 @@ export async function* streamLookup(
   } finally {
     void reader.cancel().catch(() => {});
   }
-  if (!finished) yield failed("fetch_failed");
+  // The connection ended without a story or an error.
+  yield failed("fetch_failed");
 }

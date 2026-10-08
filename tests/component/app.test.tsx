@@ -184,6 +184,32 @@ describe("App flow", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(/showing cached matches/i);
   });
 
+  it("zero matches after a patch request that fell back to all time does not blame the patch (#25)", async () => {
+    const empty = fixtureStory({ matchCount: 0, main: null, mvp: null });
+    const { enter, user } = setup(ndjson(storyEvent({ window: "patch", patchStart: null }, empty)));
+    await user.click(screen.getByRole("radio", { name: "This patch" }));
+    await enter();
+    expect(await screen.findByRole("heading", { name: "No Deadlock matches found" })).toBeVisible();
+    expect(screen.queryByText(/since the latest patch/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps the Valve notice on screen while the story plays", async () => {
+    const { enter } = setup(ndjson(storyEvent()));
+    await enter();
+    await screen.findByText("Story ready: 120 matches");
+    expect(screen.getByText(/Not affiliated with or endorsed by Valve/)).toBeInTheDocument();
+  });
+
+  it("puts the cached-matches note after the story, where it cannot cover it, and lets you dismiss it", async () => {
+    const { enter, user } = setup(ndjson(storyEvent({ stale: true })));
+    await enter();
+    const note = await screen.findByRole("status");
+    const story = screen.getByText("Story ready: 120 matches");
+    expect(story.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Dismiss" }));
+    expect(screen.queryByText(/cached matches/i)).not.toBeInTheDocument();
+  });
+
   it("shows no cached-matches note for a fresh story", async () => {
     const { enter } = setup(ndjson(storyEvent()));
     await enter();

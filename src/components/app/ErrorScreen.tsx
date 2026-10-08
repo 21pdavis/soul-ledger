@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { StoryWindow } from "@/lib/lookup";
 import {
   ERROR_COPY,
@@ -24,6 +25,9 @@ interface Props {
 /** Full-screen, in-voice screen for a lookup that did not produce a story (ADR 0052). */
 export function ErrorScreen({ kind, window, excludedMatches = 0, onRetry, onNewLookup }: Props) {
   const copy = ERROR_COPY[kind];
+  // The loader that had focus is gone, so move focus to the title: screen readers read it out.
+  const title = useRef<HTMLHeadingElement>(null);
+  useEffect(() => title.current?.focus(), []);
   const details = kind === "no_matches" ? noMatchesDetails(window, excludedMatches) : [];
   const retries = copy.action.does === "retry";
   return (
@@ -36,7 +40,9 @@ export function ErrorScreen({ kind, window, excludedMatches = 0, onRetry, onNewL
           {copy.seal}
         </text>
       </svg>
-      <h1 className={styles.title}>{copy.title}</h1>
+      <h1 ref={title} tabIndex={-1} className={styles.title}>
+        {copy.title}
+      </h1>
       <p className={styles.body}>{copy.body}</p>
       {details.map((d) => (
         <p key={d} className={styles.detail}>

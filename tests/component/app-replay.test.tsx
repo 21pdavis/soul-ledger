@@ -45,6 +45,9 @@ describe("App replay", () => {
     );
     await user.click(screen.getByRole("button", { name: /open the ledger/i }));
     await screen.findByText("Slide 1");
+    // The Valve notice belongs to the app, not to the story player that gets swapped in.
+    expect(screen.getByText(/Not affiliated with or endorsed by Valve/)).toBeInTheDocument();
+    expect(screen.getByText(/Deadlock is a trademark of Valve Corporation/)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Next" }));
     await user.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByText("Slide 3")).toBeInTheDocument();

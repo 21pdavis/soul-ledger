@@ -11,10 +11,3 @@
   flex: 1;
   place-items: center;
 }
-
-.footer {
-  padding-top: 1.5rem;
-  text-align: center;
-  color: var(--bone-muted);
-  font-size: 0.8rem;
-}

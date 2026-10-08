@@ -12,11 +12,13 @@ import type { ErrorKind } from "@/story/copy-entry";
 import type { LookupFilters } from "@/story/filters";
 import type { SlideProps, StoryActions, StoryData, StoryMeta } from "@/story/types";
 import { EntryScreen } from "./EntryScreen";
+import { Disclaimer } from "./Disclaimer";
 import { ErrorScreen } from "./ErrorScreen";
 import { LoadingScreen } from "./LoadingScreen";
 import { ScreenShell } from "./ScreenShell";
 import { StaleNote } from "./StaleNote";
 import { StoryStage } from "./StoryStage";
+import styles from "./App.module.css";
 
 /**
  * Where the app is (ADR 0052). The flow: entry -> loading -> story | error.
@@ -76,7 +78,9 @@ export function App({ fetchImpl }: Props) {
             setPhase({
               name: "error",
               kind: "no_matches",
-              window: next.window,
+              // The window the server really used: a patch request without a patch date was
+              // served all-time data (#25), so it must not blame the patch.
+              window: event.window === "patch" && event.patchStart ? "patch" : "all",
               excludedMatches: event.story.excludedMatches,
             });
           } else {
@@ -121,8 +125,11 @@ export function App({ fetchImpl }: Props) {
     const props: SlideProps = { story: phase.story, meta: phase.meta, actions };
     return (
       <>
-        {phase.meta.stale && <StaleNote />}
         <StoryStage key={replayCount} {...props} />
+        <div className={styles.notices}>
+          {phase.meta.stale && <StaleNote />}
+          <Disclaimer />
+        </div>
       </>
     );
   }

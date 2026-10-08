@@ -1,5 +1,5 @@
 import { WindowLabel } from "@/components/story/WindowLabel";
-import { ENTRY_COPY, STORY_ACTIONS_COPY } from "@/story/copy-entry";
+import { STORY_ACTIONS_COPY } from "@/story/copy-entry";
 import type { SlideProps } from "@/story/types";
 import { basedOnMatches } from "@/story/window-label";
 import styles from "./StoryStage.module.css";
@@ -8,6 +8,9 @@ import styles from "./StoryStage.module.css";
  * THE swap point for the story (M2 PR 4 / orchestrator): App renders exactly this with the
  * slide props, remounting it on Replay. Replace the body with `<StoryPlayer {...props} />`.
  * Until then it is a clearly marked placeholder that still exercises the actions.
+ *
+ * Not in here, on purpose: the Valve notice and the cached-matches note. App renders both in a
+ * footer strip after the stage, so they survive the swap and cannot cover the player.
  */
 export function StoryStage({ story, meta, actions }: SlideProps) {
   return (
@@ -27,7 +30,6 @@ export function StoryStage({ story, meta, actions }: SlideProps) {
           {STORY_ACTIONS_COPY.newLookup}
         </button>
       </div>
-      <p className={styles.marker}>{ENTRY_COPY.disclaimer}</p>
     </main>
   );
 }

@@ -12,7 +12,8 @@ export const ENTRY_COPY = {
   noLogin: "No login needed. We only read the match history your profile already makes public.",
   submit: "Open the ledger",
   invalidInput: "That doesn't look like a Steam profile URL.",
-  disclaimer: "Non-commercial fan project. Not affiliated with or endorsed by Valve.",
+  disclaimer:
+    "Non-commercial fan project. Not affiliated with or endorsed by Valve. Deadlock is a trademark of Valve Corporation.",
 } as const;
 
 export const LOADING_COPY = {
@@ -20,6 +21,7 @@ export const LOADING_COPY = {
 } as const;
 
 export const STALE_NOTE = "Showing cached matches. We couldn't reach the latest ones just now.";
+export const DISMISS = "Dismiss";
 
 export const STORY_ACTIONS_COPY = {
   refresh: "Refresh",

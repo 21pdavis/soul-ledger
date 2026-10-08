@@ -131,6 +131,33 @@ describe("streamLookup", () => {
     expect(events.at(-1)).toEqual({ type: "error", reason: "fetch_failed" });
   });
 
+  it("stops at the final story or error event: nothing after it is yielded, junk included", async () => {
+    const afterError = await collect(
+      fetchOf([
+        line({ type: "error", reason: "not_found" }),
+        line({ type: "resolved", accountId: 7 }),
+        "<html>junk\n",
+      ]),
+    );
+    expect(afterError).toEqual([{ type: "error", reason: "not_found" }]);
+
+    const story = {
+      type: "story",
+      player: { accountId: 1, personaName: null, avatarUrl: null },
+      window: "all",
+      patchStart: null,
+      stale: false,
+      story: { matchCount: 4 },
+    };
+    const afterStory = await collect(fetchOf([line(story), "junk\n", line({ type: "waiting" })]));
+    expect(afterStory.map((e) => e.type)).toEqual(["story"]);
+  });
+
+  it("maps an error reason it does not know to fetch_failed", async () => {
+    const events = await collect(fetchOf([line({ type: "error", reason: "rate_limited" })]));
+    expect(events).toEqual([{ type: "error", reason: "fetch_failed" }]);
+  });
+
   it("stops quietly when the caller aborts", async () => {
     const controller = new AbortController();
     const fetchImpl: typeof fetch = async () => {
