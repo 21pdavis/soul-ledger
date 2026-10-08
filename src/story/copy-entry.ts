@@ -16,8 +16,35 @@ export const ENTRY_COPY = {
     "Non-commercial fan project. Not affiliated with or endorsed by Valve. Deadlock is a trademark of Valve Corporation.",
 } as const;
 
+const count = (n: number) => n.toLocaleString("en-US");
+
+/**
+ * The staged loader (ADR 0014, 0052). Teasers are shown as each real stage arrives; the
+ * `announce*` strings are what screen readers hear, one per stage change.
+ */
 export const LOADING_COPY = {
   title: "Looking up your ledger...",
+  waiting: "Another lookup of this ledger is already running. Waiting our turn.",
+  sealing: "Almost ready. Sealing the ledger.",
+  /** Headings of the three ledger entries; the later ones show as blank lines until their stage. */
+  entries: { profile: "The soul", history: "The matches", details: "The tally" },
+  profileTeaser: (name: string | null) =>
+    name ? `Found you, ${name}. Your page was already open.` : "Found you. Your page was already open.",
+  historyTeaser: "Every one of these is evidence.",
+  heroesMore: (n: number) => `+${count(n)} more`,
+  detailsTeaser: "Counting every kill and crate. The ledger does not round up.",
+  nothingToRead: "Nothing new to read. The ledger is already up to date.",
+  tally: { fetched: "Matches read", kills: "Kills", breakables: "Crates smashed" },
+  announceProfile: (name: string | null) => (name ? `Found ${name}.` : "Found your profile."),
+  announceDetails: "Reading your match details.",
+  /** "120 matches on the books", "120 matches, 14 new to the ledger". */
+  matchesSummary: (total: number, added: number) => {
+    if (total === 0) return "No matches on the books yet";
+    const matches = `${count(total)} ${total === 1 ? "match" : "matches"}`;
+    if (added === 0) return `${matches}, all already in the ledger`;
+    if (added >= total) return `${matches} on the books`;
+    return `${matches}, ${count(added)} new to the ledger`;
+  },
 } as const;
 
 export const STALE_NOTE = "Showing cached matches. We couldn't reach the latest ones just now.";
