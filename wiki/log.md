@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-08
+* **Decision**: [ADR 0059](decisions/0059-claude-posts-as-github-app-bot.md) amended on the owner's say-so: the GitHub App bot is for `reviewer` and `qa` output only (PRs, implementer replies, orchestrator comments, merges and pushes stay under the owner's name), and deny rules now block agents from reading the bot's `.pem` key.
 * **Decision**: [ADR 0059](decisions/0059-claude-posts-as-github-app-bot.md): reviewer and QA agents post comments and issues as the "Soul Ledger Claude" GitHub App via `pnpm bot:gh` (read-only contents, one-hour tokens, key outside the repo). Open: whether a bot Approve counts for required reviews (test once #10 exists); a deny rule on reading the `.pem` needs owner approval.
 * **Decision**: [ADR 0055](decisions/0055-owner-confirmations-after-m2.md), owner confirmations after M2: rank tier names and the Limelight and Space Grotesk fonts confirmed (their open questions are resolved), the Scavenger caption becomes "urns returned", and no unspent-souls number for now (#36 and its open question stay open). The hero art question stays open, rewritten in plain language.
 * **Decision**: [ADR 0058](decisions/0058-contact-maintainers-and-respect-rate-limits.md): contact the deadlock-api maintainers before launch (reverses the deferral in ADR 0017), never evade their per-IP rate limits, and don't self-host a clone of the API (it can't fix the coverage gap).

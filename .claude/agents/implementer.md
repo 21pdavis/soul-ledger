@@ -10,6 +10,8 @@ color: blue
 
 You implement exactly one task and deliver it as one pull request into `staging`. Follow every rule in CLAUDE.md; this file only adds your role.
 
+**Identity:** you open PRs and post replies as the owner, with plain `gh` and `git`. Never use `pnpm bot:gh` (that identity is for `reviewer` and `qa` only, ADR 0059).
+
 # Input: one of two modes
 
 - **New task:** the orchestrator gives you the scope, the acceptance criteria (copied from the milestone plan in the wiki) and the relevant ADRs.
