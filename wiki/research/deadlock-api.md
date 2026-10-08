@@ -5,7 +5,7 @@ description: The deadlock-api.com endpoints Soul Ledger needs, with their rate l
 resource: https://api.deadlock-api.com/openapi.json
 tags: [data-source, api, deadlock-api]
 status: stable
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T00:35:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 verified: { by: claude-code/claude-opus-5-5, at: 2026-10-06T00:00:00Z }
 stale_after: 2027-01-06T00:00:00Z
 sources:
@@ -27,7 +27,8 @@ Verified against the live API on 2026-10-06.[^openapi]
 | `/v1/players/{id}/rank`, `/v1/players/rank` | Rank (single / batch) | Batch is useful for [squad mode](../decisions/0010-squad-mode.md). |
 | `/v1/players/{id}/mate-stats`, `/v1/players/{id}/enemy-stats` | Duo and rival stats | |
 | `/v1/players/steam`, `/v1/players/steam-search` | Steam profile lookup / search | For resolving pasted URLs ([ADR 0002](../decisions/0002-steam-id-no-login.md)). |
-| `account-stats` | | **Patreon-only**. Not usable. |
+| `/v1/players/hero-stats` | Per-hero totals for `account_ids` (matches played, kills, deaths, assists, per-minute rates, accuracy, `last_played`) | Public, **100 req/s per IP**. Filterable by game and match mode, hero, time, duration, badge. **Computed from the matches the API has stored**, so it has the same partial-history gap as match-history. Found 2026-10-08. |
+| `/v1/players/{id}/account-stats` | Valve's own account stats (`CMsgAccountStats`), the data behind the in-game profile | **Patreon-only**: the account must friend one of the API's bots. 5 req/min per IP. Not usable for public lookups. Whether it includes per-hero match and win totals is **unverified**. |
 
 # Match endpoints
 
@@ -60,6 +61,7 @@ All analytics endpoints share **200 req/min per IP**.
 
 # Implications
 
+- **Capacity:** bulk metadata is 30 req/min per IP and a 650-match player takes about 7 requests, so one server IP handles roughly 200 to 250 cold lookups an hour. Cached and returning players are nearly free. Squad mode multiplies the cost. We queue rather than evade the limits ([ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md)).
 - Rate limits are per IP, so the server must cache in Postgres ([ADR 0001](../decisions/0001-public-site-postgres-cache.md)) and queue fetches.
 
 [^openapi]: deadlock-api OpenAPI spec

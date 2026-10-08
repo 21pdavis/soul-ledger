@@ -9,6 +9,8 @@ decided_on: 2026-10-06
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T14:00:00Z }
 ---
 
+> **Outreach part superseded** by [ADR 0058](0058-contact-maintainers-and-respect-rate-limits.md): contact the maintainers before launch. The rest stands.
+
 # Decision
 
 - **Development:** the user personally subscribes to deadlock-api's **$1.50/mo prioritized-account tier** and tests with their own account's full history.

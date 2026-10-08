@@ -18,6 +18,10 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P1 | Trial Haiku 5.5 for one well-specified implementer task in M3; record cost and quality in the milestone log, then decide | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md) |
 | P2 | Add a PreToolUse hook that filters test output down to failures (`.claude/settings.json` is the hard-limit file, so this needs owner approval) | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md), [Claude Code costs](https://code.claude.com/docs/en/costs) |
 | P2 | Move the OKF/wiki detail out of CLAUDE.md into a skill, keeping CLAUDE.md small (it loads in every agent every turn) | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md) |
+| P1 | Draft and send the message to the deadlock-api maintainers: bot-friend flow for third-party sites, API key or higher limits, data-lake use | [ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md) |
+| P1 | Cold-lookup queue with position and estimated wait, plus a burst load test against a stubbed API | [ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md), [ADR 0014](../decisions/0014-staged-loading.md) |
+| P2 | Once the $1.50 tier is on the test account, compare in-game hero counts with `hero-stats` and our bulk-metadata counts to see what the unlock adds | [API](../research/deadlock-api.md), [test account](../research/test-account.md) |
+| P2 | Pre-warm popular accounts off-peak | [ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | Confirm what "Unspent Gold Minutes" counts (#36) and, if possible, what accolade 11 (breakables) includes | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
 | P1 | Make the cached-matches note an overlay so it stops squeezing the stage on tiny phones (#38) | [M2 plan](m2-plan.md) |
@@ -43,7 +47,7 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 
 - Steam OpenID login ([ADR 0002](../decisions/0002-steam-id-no-login.md)).
 - Username search like Statlocker's, after the URL-only prototype. The API already has `/v1/players/steam-search` (search by account id or persona name, with a recent-activity weighting) ([API](../research/deadlock-api.md)).
-- The "unlock full history" flow and its UI; M2 shows only "Based on N matches" plus Refresh ([ADR 0009](../decisions/0009-preview-then-full-history.md), [ADR 0052](../decisions/0052-m2-entry-loading-error-states.md), [mechanism](../open-questions/full-history-unlock.md)).
+- The "unlock full history" flow and its UI (link the deadlock-api [ingest-cache page](https://deadlock-api.com/ingest-cache): background tool or one-time cache upload); M2 shows only "Based on N matches" plus Refresh ([ADR 0009](../decisions/0009-preview-then-full-history.md), [ADR 0052](../decisions/0052-m2-entry-loading-error-states.md), [mechanism](../open-questions/full-history-unlock.md)).
 - Streaming and auto-play for the story, once the tap/scroll flow is proven ([ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md)).
 - Full-width desktop slide layouts that use more than the 9:16 column ([ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md)).
 - Per-metric MVP one-liners, replacing the single generic template ([ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md)).
@@ -54,3 +58,4 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 
 - Filter Street Brawl (`game_mode` 4) out of the main stats or show it separately ([match fields](../research/match-metadata-fields.md)).
 - Queue every API fetch server-side behind the per-IP rate limits. Never call the API from the browser.
+- Never evade the per-IP limits (IP rotation, extra outbound IPs). Ask the maintainers for more headroom instead ([ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md)).
