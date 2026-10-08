@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  bestPercentile,
   formatLedgerDate,
-  formatTopPercent,
   mainPercentileLine,
   matchesUnit,
   rosterVerdict,
@@ -15,32 +13,6 @@ const pct = (metric: string, label: string, topPercent: number) => ({
   metric,
   label,
   topPercent,
-});
-
-describe("formatTopPercent", () => {
-  it("keeps one decimal under 10 and drops a trailing .0", () => {
-    expect(formatTopPercent(0.5)).toBe("0.5");
-    expect(formatTopPercent(3.04)).toBe("3");
-    expect(formatTopPercent(3.46)).toBe("3.5");
-  });
-
-  it("rounds to whole percent from 10 up", () => {
-    expect(formatTopPercent(12.4)).toBe("12");
-    expect(formatTopPercent(49.6)).toBe("50");
-  });
-});
-
-describe("bestPercentile", () => {
-  it("picks the lowest topPercent, the first on a tie", () => {
-    const a = pct("a", "A", 20);
-    const b = pct("b", "B", 5);
-    const c = pct("c", "C", 5);
-    expect(bestPercentile([a, b, c])).toBe(b);
-  });
-
-  it("is null for an empty list", () => {
-    expect(bestPercentile([])).toBeNull();
-  });
 });
 
 describe("mainPercentileLine", () => {

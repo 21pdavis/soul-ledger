@@ -1,4 +1,4 @@
-import { formatPatchDate } from "./format";
+import { bestPercentile, formatPatchDate, formatTopPercent } from "./format";
 import { heroName } from "./heroes";
 import type { StoryData } from "./types";
 
@@ -39,22 +39,6 @@ export function matchesUnit(n: number): string {
 
 /** Intro first/last dates are ISO instants shown as the same UTC day for every viewer. */
 export const formatLedgerDate = formatPatchDate;
-
-/**
- * "Top N%": one decimal under 10 (a trailing .0 dropped), whole percent from 10 up. `topPercent`
- * is already in [0.5, 99.5], so it never reads "Top 0%".
- */
-export function formatTopPercent(topPercent: number): string {
-  if (topPercent >= 10) return String(Math.round(topPercent));
-  return String(Math.round(topPercent * 10) / 10);
-}
-
-/** The percentile entry with the lowest `topPercent` (the first on a tie), or null if there are none. */
-export function bestPercentile<T extends { topPercent: number }>(entries: T[]): T | null {
-  let best: T | null = null;
-  for (const e of entries) if (!best || e.topPercent < best.topPercent) best = e;
-  return best;
-}
 
 export interface MainPercentileLine {
   /** "neutral" is the not-notable case: no ranking claim at all. */

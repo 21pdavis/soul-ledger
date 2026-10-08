@@ -10,6 +10,23 @@ export function formatPercent(rate: number): string {
   return `${Math.round(rate * 100)}%`;
 }
 
+/**
+ * The number in "Top N%": one decimal under 10 (a trailing .0 dropped), whole percent from 10 up.
+ * `topPercent` is already in [0.5, 99.5], so it never reads "Top 0%". The one formatter for every
+ * slide, so the same stat reads the same everywhere.
+ */
+export function formatTopPercent(topPercent: number): string {
+  if (topPercent >= 10) return String(Math.round(topPercent));
+  return String(Math.round(topPercent * 10) / 10);
+}
+
+/** The percentile entry with the lowest `topPercent` (the first on a tie), or null if there are none. */
+export function bestPercentile<T extends { topPercent: number }>(entries: T[]): T | null {
+  let best: T | null = null;
+  for (const e of entries) if (!best || e.topPercent < best.topPercent) best = e;
+  return best;
+}
+
 /** Patch dates are UTC midnight (ADR 0035); format in UTC so every viewer sees the same day. */
 export function formatPatchDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
