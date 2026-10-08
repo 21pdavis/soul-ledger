@@ -6,7 +6,7 @@ tags: [m2, ux, loading, errors]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T14:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:30:00Z }
 ---
 
 # Decision
@@ -16,7 +16,7 @@ The owner confirmed this on 2026-10-07. Builds on [ADR 0002](0002-steam-id-no-lo
 ## Entry
 
 - URL input (no login): "Paste your Steam profile URL". Inline validation on submit. A "no login needed" line. The last URL is remembered in `localStorage`.
-- The Enter button doubles as the audio-unlock gesture.
+- The Enter button is meant to double as the audio-unlock gesture, but **M2 has no audio layer** (music is a P2 [backlog](../recommendations/backlog.md) item), so there is nothing to unlock and the unlock is deferred until audio lands.
 
 ## Loading
 
