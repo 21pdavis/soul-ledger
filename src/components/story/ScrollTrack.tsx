@@ -46,9 +46,13 @@ export function ScrollTrack({ index, smooth, onArrive, renderCard }: Props) {
   /** The checkpoint a programmatic scroll is heading to, or null when none is in flight. */
   const pending = useRef<number | null>(null);
   const onArriveRef = useRef(onArrive);
+  const indexRef = useRef(index);
+  /** The checkpoint the reader last scrolled to, until the index effect has seen it. */
+  const arrivedAt = useRef<number | null>(null);
 
   useEffect(() => {
     onArriveRef.current = onArrive;
+    indexRef.current = index;
   });
 
   const nearest = (el: HTMLElement) =>
@@ -60,6 +64,13 @@ export function ScrollTrack({ index, smooth, onArrive, renderCard }: Props) {
     const firstRun = first.current;
     first.current = false;
     if (!el || !el.clientHeight) return;
+    // The reader scrolled here: the index is following the track. The track may have moved on
+    // again before this effect ran, and must not be pulled back.
+    if (arrivedAt.current === index) {
+      arrivedAt.current = null;
+      return;
+    }
+    arrivedAt.current = null;
     const top = index * el.clientHeight;
     // Already resting on it. (Not merely nearest to it: a jump in flight passing this checkpoint
     // would otherwise be left to carry on to its old target.) Snap makes rest positions exact.
@@ -98,6 +109,8 @@ export function ScrollTrack({ index, smooth, onArrive, renderCard }: Props) {
       if (arrived !== pending.current) return; // still on the way
     }
     pending.current = null;
+    // Only a real change of slide leads to an index effect run, so only then mark the arrival.
+    if (arrived !== indexRef.current) arrivedAt.current = arrived;
     onArriveRef.current(arrived);
   };
   const onScroll = () => {

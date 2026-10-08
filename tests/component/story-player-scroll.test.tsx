@@ -71,6 +71,22 @@ describe("StoryPlayer, scroll mode (desktop)", () => {
     expect(headings()).toHaveLength(4);
   });
 
+  it("a reader scroll right after an arrival commits is not dragged back to that arrival", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    // Scroll again in the microtask right after the arrival's commit, before React has run the
+    // effects that follow it (the CI-runner timing): the track must not be pulled back to 3.
+    const observer = new MutationObserver(() => {
+      if (stage().getAttribute("data-slide") === "scavenger") {
+        observer.disconnect();
+        scrollToCheckpoint(1);
+      }
+    });
+    observer.observe(stage(), { attributes: true, attributeFilter: ["data-slide"] });
+    scrollToCheckpoint(3);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "main"));
+    expect(scrollTo).not.toHaveBeenCalled();
+  });
+
   it("marks only the current card as current", async () => {
     render(<StoryPlayer {...fixtureSlideProps()} />);
     await userEvent.keyboard("{ArrowRight}");
