@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Changed
+
+- **The Scavenger card says "urns returned"** under Urn Mule, instead of "idols returned".
+
 ## [0.2.0] - 2026-10-08
 
 **Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with placeholder art. The 3D world arrives in M3.

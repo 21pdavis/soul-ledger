@@ -3,11 +3,12 @@ type: Open Question
 title: "Font pairing for the M2 story"
 description: "Which open-licence deco display face and grotesk to pair via next/font for the art-deco occult look."
 tags: [m2, design, fonts]
-status: draft
-question_status: open
+status: stable
+question_status: resolved
+resolved_by: ../decisions/0055-owner-confirmations-after-m2.md
 recommendation: "The foundation PR shortlists two or three open-licence pairings (for example a Google Fonts deco display face with a clean grotesk), shows them on a sample slide in the plan, and the owner picks one. Default to the first pairing until then."
 raised_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T16:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 ---
 
 # Context
@@ -16,4 +17,4 @@ generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T16:00:00Z }
 
 # Status
 
-The foundation PR ships the default pairing: **Limelight** (art-deco display) with **Space Grotesk** (body and numerals), both Google Fonts via `next/font`, wired as `--font-display` and `--font-body` in `src/app/tokens.css`. Still open for the owner to confirm or swap once real slides exist; swapping is a one-line change in `src/app/layout.tsx`.
+The foundation PR ships the default pairing: **Limelight** (art-deco display) with **Space Grotesk** (body and numerals), both Google Fonts via `next/font`, wired as `--font-display` and `--font-body` in `src/app/tokens.css`. The owner accepted this pairing **for now** on 2026-10-08 ([ADR 0055](../decisions/0055-owner-confirmations-after-m2.md)). It may be revisited once real screens and art exist ([ADR 0031](../decisions/0031-visual-identity.md) already says so); swapping is a one-line change in `src/app/layout.tsx`.

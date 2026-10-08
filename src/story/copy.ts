@@ -182,7 +182,7 @@ export const ROSTER_COPY = {
 export const SCAVENGER_COPY = {
   crateGoblin: { title: "Crate Goblin", detail: "breakables smashed" },
   gambler: { title: "Gambler", detail: "Sinner's Sacrifice jackpots" },
-  urnMule: { title: "Urn Mule", detail: "idols returned" },
+  urnMule: { title: "Urn Mule", detail: "urns returned" },
 } as const;
 
 export function matchesUnit(n: number): string {

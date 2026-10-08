@@ -7,7 +7,7 @@ status: draft
 question_status: open
 recommendation: "Check src/lib/stats/normalize.ts and the deadlock-api docs or source, and compare against known matches. Until verified, phrase the roast without a unit, as a plain sentence about hoarding souls."
 raised_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 ---
 
 # Context
@@ -36,5 +36,7 @@ Checks on `tests/fixtures/api/bulk-metadata.json`: one account's 352 matches, of
 Conclusion: the value behaves like **soul-minutes** (unspent souls summed over each minute). The mean per match divided by the mean match length (`intro.hoursPlayed * 60 / matchCount`) would be the duration-weighted average souls held unspent, once the missing-key bias is fixed.
 
 What ships: the roast slide shows a **neutral sentence with no number and no unit**. The numeric line ("In a typical match you sat on about 2,500 unspent souls", rounded to the nearest 100) is built and tested but switched off by `SHOW_UNSPENT_SOULS_FIGURE` in `src/story/copy.ts`.
+
+**Owner decision, 2026-10-08 ([ADR 0055](../decisions/0055-owner-confirmations-after-m2.md)):** no number for now. Showing one is a to-do for the owner or the next milestone, tracked in #36. The question stays open because the unit is still unconfirmed.
 
 To close this question: confirm the unit with Valve or the deadlock-api maintainers, fix the missing-key bias in `normalize.ts`, add an ADR, set `question_status: resolved` with `resolved_by`, and flip the switch (all in #36).
