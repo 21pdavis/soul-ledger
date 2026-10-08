@@ -4,7 +4,7 @@ title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
 status: draft
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T05:30:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T09:00:00Z }
 ---
 
 # Context
@@ -158,6 +158,8 @@ The ADR 0004 this-patch toggle is in M2 ([ADR 0052](../decisions/0052-m2-entry-l
 
 - [component] An `aria-live` region announces each slide change.
 - [e2e] One Playwright test completes the whole story, entry to summary, by keyboard only, with visible focus rings.
+- [e2e] `@axe-core/playwright` (pinned) scans the entry screen, every loading stage, the error and zero-matches screens and all 11 slides (a full and a sparse story) on phone and desktop. Any violation fails, not only serious and critical ones, and no rule is disabled (`tests/e2e/a11y.spec.ts`, built in PR 9). Its one finding was a missing h1 on the loading screen.
+- Playwright ports are overridable (`PLAYWRIGHT_PORT`, `PLAYWRIGHT_GATE_PORT`) so several worktrees can run e2e at once; a server already listening is only reused on the default ports (`PLAYWRIGHT_REUSE_SERVER=0` turns reuse off there too).
 
 # Related
 
