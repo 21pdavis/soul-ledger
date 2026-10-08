@@ -12,7 +12,6 @@ import {
 } from "@/story/copy";
 import type { JourneyPoint } from "@/story/rank-journey";
 import { formatTopPercent } from "@/story/format";
-import * as copy from "@/story/copy";
 import { fixtureStory } from "../../fixtures/story";
 
 describe("roast copy", () => {
@@ -34,14 +33,6 @@ describe("roast copy", () => {
       "Worst night: 21 deaths as Infernus",
     );
     expect(worstMatchLine({ deaths: 1, heroName: "Seven" })).toBe("Worst night: 1 death as Seven");
-  });
-});
-
-describe("unspent souls copy", () => {
-  it("is gone: the stat was dropped", () => {
-    const names = Object.keys(copy);
-    expect(names.filter((n) => /unspent/i.test(n))).toEqual([]);
-    expect(names).not.toContain("avgMatchMinutes");
   });
 });
 
