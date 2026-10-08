@@ -12,7 +12,15 @@ describe("slide registry", () => {
 
   it.each(SLIDES.map((s) => s.id))("%s renders its headline from a fixture story", (id) => {
     const Slide = SLIDE_COMPONENTS[id];
-    render(<Slide {...fixtureSlideProps()} active skipAnimation={false} paused={false} />);
+    render(
+      <Slide
+        {...fixtureSlideProps()}
+        active
+        skipAnimation={false}
+        reducedMotion={false}
+        paused={false}
+      />,
+    );
     expect(screen.getByRole("heading", { name: headlineFor(id) })).toBeInTheDocument();
   });
 });

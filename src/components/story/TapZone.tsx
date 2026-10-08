@@ -36,7 +36,9 @@ export function TapZone({ side, onTap, onHoldChange }: Props) {
     [],
   );
 
+  // Only the primary pointer's main button counts: not a right-click, not a second finger.
   const onPointerDown = (e: PointerEvent) => {
+    if (!e.isPrimary || e.button !== 0) return;
     clear();
     const state = { x: e.clientX, y: e.clientY, held: false, timer: 0 };
     state.timer = window.setTimeout(() => {
@@ -48,7 +50,7 @@ export function TapZone({ side, onTap, onHoldChange }: Props) {
 
   const onPointerUp = (e: PointerEvent) => {
     const p = press.current;
-    if (!p) return;
+    if (!p || !e.isPrimary) return;
     const wasTap = !p.held && Math.hypot(e.clientX - p.x, e.clientY - p.y) <= TAP_SLOP;
     clear();
     if (wasTap) onTap();

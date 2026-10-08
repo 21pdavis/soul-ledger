@@ -16,6 +16,7 @@ test.describe("phone: tap controller", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/preview");
     await expect(stage(page)).toHaveAttribute("data-slide", "intro");
+    await settled(page); // the opening entrance, so the first tap below really advances
   });
 
   async function tapSide(page: Page, side: "left" | "right") {
@@ -24,6 +25,16 @@ test.describe("phone: tap controller", () => {
       position: { x: box.width * (side === "right" ? 0.85 : 0.15), y: box.height * 0.5 },
     });
   }
+
+  test("the first tap during the opening slide's entrance only completes it", async ({ page }) => {
+    await page.reload();
+    await expect(stage(page)).toHaveAttribute("data-animating", "true");
+    await tapSide(page, "right");
+    await expect(stage(page)).toHaveAttribute("data-animating", "false");
+    await expect(stage(page)).toHaveAttribute("data-slide", "intro");
+    await tapSide(page, "right");
+    await expect(stage(page)).toHaveAttribute("data-slide", "main");
+  });
 
   test("is the tap controller, with 11 segments and the first one current", async ({ page }) => {
     await expect(page.getByTestId("story-player")).toHaveAttribute("data-mode", "tap");

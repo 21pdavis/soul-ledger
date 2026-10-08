@@ -84,6 +84,30 @@ describe("StoryPlayer, scroll mode (desktop)", () => {
     expect(scrollTo).toHaveBeenCalledTimes(1);
   });
 
+  it("a pause partway through a jump's smooth scroll does not count as an arrival", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));
+    expect(stage()).toHaveAttribute("data-slide", "roast");
+    // The page stalls for over 100ms while still passing checkpoint 3 on the way to 7.
+    scrollToCheckpoint(3);
+    await new Promise((r) => setTimeout(r, 250));
+    expect(stage()).toHaveAttribute("data-slide", "roast");
+    // It then reaches the target; and a later scroll by the reader works as normal.
+    scrollToCheckpoint(7);
+    await new Promise((r) => setTimeout(r, 250));
+    expect(stage()).toHaveAttribute("data-slide", "roast");
+    scrollToCheckpoint(2);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "roster"));
+  });
+
+  it("reader input (wheel) during a jump hands control back to the reader", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));
+    fireEvent.wheel(track());
+    scrollToCheckpoint(2);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "roster"));
+  });
+
   it("arrow keys and space jump a slide at a time and the scroll follows", async () => {
     render(<StoryPlayer {...fixtureSlideProps()} />);
     await userEvent.keyboard("{ArrowRight}");

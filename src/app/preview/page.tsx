@@ -9,7 +9,7 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
 /**
- * Temporary: the story player over fixture data, until the entry flow (M2 PR 2) lands.
+ * Temporary (removal tracked in #29): the story player over fixture data, until the entry flow lands.
  * 404s in production unless STORY_PREVIEW=1 (set only by the e2e web server).
  */
 export default function PreviewPage() {

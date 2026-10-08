@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { SLIDES, SLIDE_COUNT } from "@/story/copy";
 import { ENTRANCE_MS, initialPlayerState, reducePlayer } from "@/story/slide-index";
 import type { SlideProps } from "@/story/types";
@@ -8,6 +8,7 @@ import { ProgressBar } from "./ProgressBar";
 import { ScrollTrack } from "./ScrollTrack";
 import { SlideStage } from "./SlideStage";
 import { TapZone } from "./TapZone";
+import { useIsClient } from "./useIsClient";
 import { usePrefersReducedMotion } from "./useMediaQuery";
 import { useStoryMode } from "./useStoryMode";
 import styles from "./StoryPlayer.module.css";
@@ -24,6 +25,7 @@ interface Props extends SlideProps {
  * Slides never navigate themselves and are the same components in both modes.
  */
 export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: Props) {
+  const ready = useIsClient();
   const mode = useStoryMode();
   const reduced = usePrefersReducedMotion();
   const motion = !reduced;
@@ -35,16 +37,38 @@ export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: 
     indexRef.current = state.index;
   });
 
-  // An entrance ends by itself after entranceMs; a tap can end it sooner (reducer `skip`).
+  // The opening slide has an entrance too, so a first tap completes it rather than skipping it.
+  const started = useRef(false);
   useEffect(() => {
-    if (!state.animating) return;
+    if (!ready || started.current) return;
+    started.current = true;
+    dispatch({ type: "start", motion });
+  }, [ready, motion]);
+
+  // An entrance ends by itself after entranceMs; a tap can end it sooner (reducer `skip`). Holding
+  // pauses the clock, and it restarts in full on release.
+  useEffect(() => {
+    if (!state.animating || paused) return;
     const timer = window.setTimeout(() => dispatch({ type: "settled" }), entranceMs);
     return () => window.clearTimeout(timer);
-  }, [state.animating, state.index, entranceMs]);
+  }, [state.animating, state.index, paused, entranceMs]);
 
   const next = useCallback(() => dispatch({ type: "next", motion }), [motion]);
   const back = useCallback(() => dispatch({ type: "back", motion }), [motion]);
   const goTo = useCallback((index: number) => dispatch({ type: "goTo", index, motion }), [motion]);
+
+  // Only the player owns the index, so Replay (back to slide 1) goes through it, then tells the app.
+  const { onReplay } = actions;
+  const slideActions = useMemo(
+    () => ({
+      ...actions,
+      onReplay: () => {
+        goTo(0);
+        onReplay();
+      },
+    }),
+    [actions, goTo, onReplay],
+  );
 
   // Keyboard, both modes. Tap mode taps complete a running entrance first; in scroll mode a key is
   // a deliberate jump, so it always moves.
@@ -92,7 +116,7 @@ export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: 
         paused={paused}
         story={story}
         meta={meta}
-        actions={actions}
+        actions={slideActions}
       />
       <div className={styles.progress} data-interactive={!tap}>
         <ProgressBar count={SLIDE_COUNT} current={state.index} onSelect={tap ? undefined : goTo} />
@@ -109,6 +133,15 @@ export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: 
       )}
     </div>
   );
+
+  // The server cannot know the controller (it depends on the screen), and rendering a guess would
+  // mount the stage in one place and then move it, replaying the entrance. So the stage appears
+  // only once the browser has taken over; until then there is just the ink background.
+  if (!ready) {
+    return (
+      <div className={styles.root} data-testid="story-player" data-mode="tap" aria-busy="true" />
+    );
+  }
 
   return (
     <div className={styles.root} data-testid="story-player" data-mode={mode}>

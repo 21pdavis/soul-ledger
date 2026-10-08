@@ -15,6 +15,44 @@ describe("slide index logic", () => {
     expect(initialPlayerState).toEqual({ index: 0, animating: false, skip: false, direction: 1 });
   });
 
+  it("start puts the opening slide into its entrance when there is motion", () => {
+    expect(reducePlayer(initialPlayerState, { type: "start", motion: true })).toEqual({
+      index: 0,
+      animating: true,
+      skip: false,
+      direction: 1,
+    });
+  });
+
+  it("start does nothing without motion (reduced motion), so no tap is spent on it", () => {
+    expect(reducePlayer(initialPlayerState, { type: "start", motion: false })).toBe(
+      initialPlayerState,
+    );
+  });
+
+  it("a tap during the opening entrance completes it instead of leaving slide 1", () => {
+    const started = reducePlayer(initialPlayerState, { type: "start", motion: true });
+    const s = reducePlayer(started, { type: "next", motion: true });
+    expect(s.index).toBe(0);
+    expect(s.animating).toBe(false);
+    expect(s.skip).toBe(true);
+    expect(reducePlayer(s, { type: "next", motion: true }).index).toBe(1);
+  });
+
+  it("a next during the last slide's entrance completes it (the bounds check comes second)", () => {
+    const s = reducePlayer(at(LAST, true), { type: "next", motion: true });
+    expect(s.index).toBe(LAST);
+    expect(s.animating).toBe(false);
+    expect(s.skip).toBe(true);
+  });
+
+  it("a back during the first slide's entrance completes it too", () => {
+    const s = reducePlayer(at(0, true), { type: "back", motion: true });
+    expect(s.index).toBe(0);
+    expect(s.animating).toBe(false);
+    expect(s.skip).toBe(true);
+  });
+
   it("next advances by one and starts the entrance animation", () => {
     expect(reducePlayer(at(3), { type: "next", motion: true })).toEqual({
       index: 4,

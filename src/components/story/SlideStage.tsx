@@ -32,11 +32,25 @@ function SlideHost({
   id,
   skipAnimation,
   paused,
+  reducedMotion,
   ...slideProps
-}: SlideProps & { id: SlideId; skipAnimation: boolean; paused: boolean }) {
+}: SlideProps & {
+  id: SlideId;
+  skipAnimation: boolean;
+  paused: boolean;
+  reducedMotion: boolean;
+}) {
   const active = useIsPresent();
   const Slide = SLIDE_COMPONENTS[id];
-  return <Slide {...slideProps} active={active} skipAnimation={skipAnimation} paused={paused} />;
+  return (
+    <Slide
+      {...slideProps}
+      active={active}
+      skipAnimation={skipAnimation}
+      paused={paused}
+      reducedMotion={reducedMotion}
+    />
+  );
 }
 
 /** The current slide, sliding and fading in from the direction of travel (instant crossfade if reduced). */
@@ -71,6 +85,7 @@ export function SlideStage({
           actions={actions}
           skipAnimation={skipAnimation}
           paused={paused}
+          reducedMotion={reduced}
         />
       </motion.div>
     </AnimatePresence>

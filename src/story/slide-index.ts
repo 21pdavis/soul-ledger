@@ -18,13 +18,16 @@ export interface PlayerState {
  * `motion` is false under prefers-reduced-motion: nothing animates, so nothing can be "still
  * animating" and no tap is ever spent on completing an animation.
  *
+ * `start` is dispatched once when the player appears, for the opening slide's own entrance.
+ *
  * `next` and `back` are the tap and key moves: while a slide is still animating they only complete
- * that animation. `goTo` is a deliberate jump (progress bar, scroll arrival) and always moves.
+ * that animation (even on the first or last slide, where they would otherwise do nothing). `goTo` is a deliberate jump (progress bar, scroll arrival) and always moves.
  */
 export type PlayerAction =
   | { type: "next"; motion: boolean }
   | { type: "back"; motion: boolean }
   | { type: "goTo"; index: number; motion: boolean }
+  | { type: "start"; motion: boolean }
   | { type: "settled" };
 
 export const LAST_INDEX = SLIDE_COUNT - 1;
@@ -47,11 +50,15 @@ export function reducePlayer(state: PlayerState, action: PlayerAction): PlayerSt
   switch (action.type) {
     case "next":
     case "back": {
+      // Completing a running entrance comes first, so it works on the first and last slide too.
+      if (state.animating) return { ...state, animating: false, skip: true };
       const to = state.index + (action.type === "next" ? 1 : -1);
       if (to < 0 || to > LAST_INDEX) return state;
-      if (state.animating) return { ...state, animating: false, skip: true };
       return move(state, to, action.motion);
     }
+    case "start":
+      // The opening slide has an entrance of its own; without motion there is nothing to complete.
+      return action.motion && !state.animating ? { ...state, animating: true } : state;
     case "goTo": {
       if (Number.isNaN(action.index)) return state;
       const to = Math.min(Math.max(Math.round(action.index), 0), LAST_INDEX);

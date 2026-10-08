@@ -1,7 +1,8 @@
 "use client";
 
 import { StoryPlayer } from "@/components/story/StoryPlayer";
-// Temporary: the fixture story stands in for a real lookup until the entry flow replaces this route.
+// TECH DEBT (#29): temporary. App code importing test fixtures is a shortcut; remove this file and
+// the /preview route once the entry flow is integrated with the player.
 import { fixtureSlideProps } from "../../../tests/fixtures/story";
 
 const props = fixtureSlideProps();
