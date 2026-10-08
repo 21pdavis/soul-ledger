@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { RateLimiter } from "./rate-limiter";
+import { RateLimiter, type ScheduleOptions } from "./rate-limiter";
 import {
   bulkMatch,
   matchHistoryEntry,
@@ -69,7 +69,7 @@ export function createDeadlockApi({
     path: string,
     params: Params,
     schema: z.ZodType<T>,
-    onWait?: (ms: number) => void,
+    hooks: ScheduleOptions = {},
   ): Promise<T> {
     const url = new URL(path, baseUrl);
     for (const [k, v] of Object.entries(params)) {
@@ -77,7 +77,7 @@ export function createDeadlockApi({
     }
 
     const res = await limiter
-      .schedule(() => fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs) }), { onWait })
+      .schedule(() => fetchImpl(url, { signal: AbortSignal.timeout(timeoutMs) }), hooks)
       .catch((cause: unknown) => {
         throw new DeadlockApiError(`Request to ${path} failed`, undefined, { cause });
       });
@@ -106,7 +106,7 @@ export function createDeadlockApi({
     async getBulkMetadata(
       accountId: number,
       matchIds: number[],
-      { onWait }: { onWait?: (ms: number) => void } = {},
+      hooks: ScheduleOptions = {},
     ): Promise<BulkMatch[]> {
       const out: BulkMatch[] = [];
       for (let i = 0; i < matchIds.length; i += BULK_CHUNK) {
@@ -125,7 +125,7 @@ export function createDeadlockApi({
             limit: chunk.length,
           },
           z.array(bulkMatch),
-          onWait,
+          hooks,
         );
         out.push(...matches);
       }

@@ -7,6 +7,8 @@ interface RateLimiterOptions {
 
 export interface ScheduleOptions {
   onWait?: (ms: number) => void;
+  /** Called when the task is admitted and about to run (after any wait). */
+  onStart?: () => void;
 }
 
 /**
@@ -32,7 +34,10 @@ export class RateLimiter {
   schedule<T>(task: () => Promise<T>, options: ScheduleOptions = {}): Promise<T> {
     const admitted = this.queue.then(() => this.acquire(options.onWait));
     this.queue = admitted;
-    return admitted.then(task);
+    return admitted.then(() => {
+      options.onStart?.();
+      return task();
+    });
   }
 
   private async acquire(onWait?: (ms: number) => void): Promise<void> {

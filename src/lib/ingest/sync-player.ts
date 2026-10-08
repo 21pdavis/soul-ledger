@@ -139,10 +139,25 @@ async function fetchAndStore(
   let saved = 0;
   for (let i = 0; i < missing.length; i += DETAILS_BATCH) {
     const batch = missing.slice(i, i + DETAILS_BATCH);
-    onEvent({ type: "status", step: "batch", fetched: i, total: missing.length });
+    const batchStatus = {
+      type: "status",
+      step: "batch",
+      fetched: i,
+      total: missing.length,
+    } as const;
+    onEvent(batchStatus);
+    let waited = false;
     const rows = (
       await api.getBulkMetadata(accountId, batch, {
-        onWait: (waitMs) => onEvent({ type: "status", step: "rate_limited", waitMs }),
+        onWait: (waitMs) => {
+          waited = true;
+          onEvent({ type: "status", step: "rate_limited", waitMs });
+        },
+        // The wait is over and the request is going out: drop the "waiting" note.
+        onStart: () => {
+          if (waited) onEvent(batchStatus);
+          waited = false;
+        },
       })
     ).map((m) => normalizePlayerMatch(m, accountId));
     await repo.savePlayerMatches(db, rows);
