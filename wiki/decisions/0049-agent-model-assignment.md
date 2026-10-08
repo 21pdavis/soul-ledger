@@ -1,13 +1,15 @@
 ---
 type: Decision Record
 title: "0049: Agent models: qa moves to Haiku 5.5, the other agents keep their models"
-description: "The qa agent runs on Haiku 5.5; implementer and wiki-keeper stay on Sonnet and reviewer stays on Opus."
+description: "The qa agent runs on Haiku 5.5 and implementer and wiki-keeper stay on Sonnet; the reviewer row was amended by ADR 0057 (Sonnet, Opus only for security work)."
 tags: [process, agents, models]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T09:00:00Z }
 ---
+
+> **Amended by [ADR 0057](0057-token-efficient-unattended-runs.md) (2026-10-08):** the `reviewer` row below no longer holds. The reviewer runs on Sonnet; Opus is used only for `xhigh` work (auth, data integrity, migrations, security). The other rows stand.
 
 # Decision
 

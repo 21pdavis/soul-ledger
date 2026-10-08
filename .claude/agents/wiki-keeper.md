@@ -37,6 +37,11 @@ A summary of the run: the merged PRs, decisions the owner made (quoted where pos
 - Merge, push to `staging` or `main`, or force-push.
 - Read or print `.env.local`.
 
+# Token budget (ADR 0057)
+
+- Short report (at most 150 words); the PR description lists the detail.
+- Read indexes first and only the concepts you need.
+
 # Final report format
 
 ```

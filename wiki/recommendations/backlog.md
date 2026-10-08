@@ -15,6 +15,9 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 |---|---|---|
 | P0 | Before the repo goes public (ADR 0032), fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public), including #8 and #9. They gate the M2 staging to main promotion | [ADR 0032](../decisions/0032-github-private-ci.md) |
 | P0 | Build M3: the 3D world behind the story column, then hero models for all playable heroes in batches | [ADR 0028](../decisions/0028-milestones.md), [ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md) |
+| P1 | Trial Haiku 5.5 for one well-specified implementer task in M3; record cost and quality in the milestone log, then decide | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md) |
+| P2 | Add a PreToolUse hook that filters test output down to failures (`.claude/settings.json` is the hard-limit file, so this needs owner approval) | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md), [Claude Code costs](https://code.claude.com/docs/en/costs) |
+| P2 | Move the OKF/wiki detail out of CLAUDE.md into a skill, keeping CLAUDE.md small (it loads in every agent every turn) | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | To-do for the owner or the next milestone: confirm what "Unspent Gold Minutes" counts (#36) and, if possible, what accolade 11 (breakables) includes. The owner decided on 2026-10-08 that the roast slide shows no number until then ([ADR 0055](../decisions/0055-owner-confirmations-after-m2.md)) | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
 | P1 | Make the cached-matches note an overlay so it stops squeezing the stage on tiny phones (#38) | [M2 plan](m2-plan.md) |

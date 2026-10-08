@@ -15,7 +15,7 @@ Refines [ADR 0044](0044-pr-gated-changes-and-agent-review.md) to cut wasted revi
 
 | Concern | Rule |
 |---|---|
-| **Re-review** | Only when the review had a **blocking** finding, or the fixes were substantial (new logic, not just wording). If only non-blocking findings and nits remain: fix them, reply on the PR, wait for CI and merge. No further review pass. |
+| **Re-review** | Only when the review had a **blocking** finding, or the fixes were substantial (new logic, not just wording). If only non-blocking findings and nits remain: fix them, reply on the PR, wait for CI and merge (who waits for CI: [ADR 0057](0057-token-efficient-unattended-runs.md), policy k). No further review pass. |
 | **Fix batching** | All findings from one review round are fixed in **one commit** and **one push**, with one PR reply and one CI wait. Rule changes the owner raises mid-PR are batched the same way where possible. |
 | **CI triggers** | `pull_request`, plus `push` to `main` and `staging` only. Before this, every commit ran twice (push and PR). |
 | **Docs-only fast path** | A PR that changes only `*.md`, `wiki/**` or `.claude/**` runs format, lint and the wiki check, and skips typecheck, unit/integration tests and e2e (which includes the production build, since `pnpm test:e2e` builds first). Any other file, including `.github/` and `package.json`, runs everything. So do pushes to `main` and `staging`. |

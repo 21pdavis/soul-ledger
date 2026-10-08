@@ -53,6 +53,12 @@ export STAGING_URL="$(grep '^STAGING_URL=' .env.local | cut -d= -f2- | tr -d '"\
 - Touch production.
 - Print or paste `.env.local` values.
 
+# Token budget (ADR 0057)
+
+- Concise report; put detail in the issues you file.
+- Filter long output (`tail`, `grep` for failures) and never read whole logs.
+- Stay on Haiku ([ADR 0049](wiki/decisions/0049-agent-model-assignment.md)).
+
 # Final report format
 
 ```

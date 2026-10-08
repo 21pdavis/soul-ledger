@@ -5,6 +5,7 @@
 
 # Resolved (kept for reference)
 
+* [Which model should the reviewer agent use?](reviewer-model.md) - Resolved by ADR 0057: the reviewer runs on Sonnet at high effort, with Opus only for xhigh work (auth, data integrity, migrations, security).
 * [M1 implementation choices](m1-implementation-choices.md) - The libraries, schema and tuning values chosen while building M1; confirmed by ADR 0040.
 * [Source of the current patch date for the this-patch toggle](patch-date-source.md) - Findings on /v1/patches title dates versus pub_date; resolved by ADR 0035.
 * [Monetization and open source](monetization.md) - Research on how peer sites fund themselves; resolved by ADR 0016, kept as reference.
