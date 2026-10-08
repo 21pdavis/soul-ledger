@@ -47,7 +47,6 @@ function worstCaseStory() {
   story.roast = {
     ...story.roast,
     deaths: 98765,
-    avgUnspentGoldMinutes: 987654,
     worstMatch: { matchId: 99, heroId: 87, deaths: 99 },
   };
   story.mvp = {

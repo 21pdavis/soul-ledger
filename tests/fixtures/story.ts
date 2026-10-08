@@ -73,7 +73,6 @@ export function fixtureStory(overrides: Partial<StoryData> = {}): StoryData {
         [110, 210],
         [-3000, 4000],
       ],
-      avgUnspentGoldMinutes: 84800,
       worstMatch: { matchId: 99, heroId: 1, deaths: 21 },
     },
     rank: {

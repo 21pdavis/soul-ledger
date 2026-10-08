@@ -1,22 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
   MVP_FALLBACK_LEAD,
-  SHOW_UNSPENT_SOULS_FIGURE,
-  UNSPENT_NEUTRAL_LINE,
   RANK_EMPTY_LINE,
-  avgMatchMinutes,
   deathsLabel,
   hotspotLine,
   mvpCopy,
   mvpFlavor,
   noDeathMapLine,
   rankSummary,
-  typicalUnspentSouls,
-  unspentSoulsLine,
   worstMatchLine,
 } from "@/story/copy";
 import type { JourneyPoint } from "@/story/rank-journey";
 import { formatTopPercent } from "@/story/format";
+import * as copy from "@/story/copy";
 import { fixtureStory } from "../../fixtures/story";
 
 describe("roast copy", () => {
@@ -42,47 +38,10 @@ describe("roast copy", () => {
 });
 
 describe("unspent souls copy", () => {
-  it("ships the neutral sentence by default, until the unit is accepted (#36)", () => {
-    expect(SHOW_UNSPENT_SOULS_FIGURE).toBe(false);
-    expect(unspentSoulsLine(90_000, 36)).toBe(UNSPENT_NEUTRAL_LINE);
-    expect(UNSPENT_NEUTRAL_LINE).not.toMatch(/\d|minute/i);
-  });
-
-  it("is souls x minutes, so a typical stash is the average divided by the average match length", () => {
-    // 90,000 soul-minutes over a 36-minute match is 2,500 souls held on average.
-    expect(typicalUnspentSouls(90_000, 36)).toBe(2500);
-    // Rounded to the nearest 100.
-    expect(typicalUnspentSouls(84_800, 35)).toBe(2400);
-  });
-
-  it("gives no figure when it cannot be worked out", () => {
-    expect(typicalUnspentSouls(0, 30)).toBeNull();
-    expect(typicalUnspentSouls(90_000, 0)).toBeNull();
-    expect(typicalUnspentSouls(Number.NaN, 30)).toBeNull();
-  });
-
-  it("states the stash in souls with a thousands separator", () => {
-    expect(unspentSoulsLine(90_000, 36, true)).toBe(
-      "In a typical match you sat on about 2,500 unspent souls.",
-    );
-  });
-
-  it("praises a player who spends, and shows no number", () => {
-    const line = unspentSoulsLine(2_000, 36, true);
-    expect(line).not.toMatch(/\d/);
-    expect(line).toMatch(/spend/i);
-  });
-
-  it("falls back to a neutral sentence with no number or unit", () => {
-    const line = unspentSoulsLine(0, 36, true);
-    expect(line).not.toMatch(/\d/);
-    expect(line).not.toMatch(/minute/i);
-    expect(unspentSoulsLine(90_000, 0, true)).toBe(line);
-  });
-
-  it("works out the average match length in minutes", () => {
-    expect(avgMatchMinutes(3, 5)).toBe(36);
-    expect(avgMatchMinutes(3, 0)).toBe(0);
+  it("is gone: the stat was dropped", () => {
+    const names = Object.keys(copy);
+    expect(names.filter((n) => /unspent/i.test(n))).toEqual([]);
+    expect(names).not.toContain("avgMatchMinutes");
   });
 });
 
