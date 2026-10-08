@@ -4,7 +4,7 @@ title: Backlog and recommendations
 description: Prioritized list of recommended next steps, research to do, and deferred features.
 tags: [backlog, planning]
 status: stable
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T07:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:30:00Z }
 ---
 
 # Next
@@ -19,6 +19,7 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |
+| P2 | When audio lands, unlock it on the entry screen's Enter click (deferred from M2 PR 3, which has no audio layer) | [ADR 0006](../decisions/0006-audio.md), [ADR 0052](../decisions/0052-m2-entry-loading-error-states.md) |
 
 # Done
 

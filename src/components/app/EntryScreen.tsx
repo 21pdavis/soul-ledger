@@ -28,8 +28,9 @@ export function EntryScreen({ initial, onSubmit }: Props) {
       setInvalid(true);
       return;
     }
-    // This click is the user gesture browsers require before audio may play. When the audio
-    // layer lands (ADR 0006, PR 3), unlock it here, before the lookup starts.
+    // This click is the user gesture browsers require before audio may play. M2 has no audio
+    // layer (deferred, see the backlog and ADR 0052); when it lands (ADR 0006), unlock it here,
+    // before the lookup starts.
     onSubmit(result.value, filters);
   }
 
