@@ -28,7 +28,7 @@ export const KILLS_COPY = {
 } as const;
 
 /** One line about the kind of kill that leads. */
-export function killsLead(kills: Kills): string {
+export function killsLead(kills: Pick<Kills, "bullet" | "ability" | "melee">): string {
   switch (leadKillType(kills)) {
     case "bullet":
       return "Guns blazing. Most of your kills came down the barrel.";

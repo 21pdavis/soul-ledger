@@ -20,9 +20,7 @@ describe("killsLead", () => {
     expect(lines.size).toBe(3);
   });
   it("has friendly copy for no kills", () => {
-    expect(killsLead({ ...kills, total: 0, bullet: 0, ability: 0, melee: 0, headshot: 0 })).toMatch(
-      /no kills/i,
-    );
+    expect(killsLead({ ...kills, bullet: 0, ability: 0, melee: 0 })).toMatch(/no kills/i);
   });
 });
 

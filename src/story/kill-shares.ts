@@ -25,7 +25,9 @@ export function rangeShares(closeup: number, longDistance: number) {
 }
 
 /** The biggest of bullet, ability and melee (ties go in that order); null with none of them. */
-export function leadKillType(kills: Kills): "bullet" | "ability" | "melee" | null {
+export function leadKillType(
+  kills: Pick<Kills, "bullet" | "ability" | "melee">,
+): "bullet" | "ability" | "melee" | null {
   const order = ["bullet", "ability", "melee"] as const;
   const lead = order.reduce((best, key) => (kills[key] > kills[best] ? key : best), order[0]);
   return kills[lead] > 0 ? lead : null;

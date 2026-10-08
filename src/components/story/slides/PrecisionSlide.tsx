@@ -9,12 +9,7 @@ import type { SlideComponent } from "./contract";
 import styles from "./PrecisionSlide.module.css";
 
 /** Slide 6: precision. Two dials (accuracy, headshot rate) and the parry king or clown stamp. */
-export const PrecisionSlide: SlideComponent = ({
-  story,
-  skipAnimation,
-  reducedMotion,
-  paused,
-}) => {
+export const PrecisionSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
   const { precision } = story;
   const animate = !skipAnimation && !reducedMotion;
   const parry = parryCopy(precision);

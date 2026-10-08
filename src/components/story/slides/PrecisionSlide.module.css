@@ -3,7 +3,9 @@
 .slide {
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   gap: 1.5rem;
+  height: 100%;
   min-height: 0;
 }
 
