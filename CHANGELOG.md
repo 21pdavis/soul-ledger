@@ -6,6 +6,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Changed
 
+- **The Scavenger card says "urns returned"** under Urn Mule, instead of "idols returned".
 - **The loading screen now takes its time, so you can read it.** Each step (your profile, your matches, the tally) stays on screen for a moment, the counters count up a little slower, and the story waits a beat after the last step. It still follows what is really happening, so a slow lookup is not made any slower.
 
 ## [0.2.0] - 2026-10-08

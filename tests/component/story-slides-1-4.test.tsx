@@ -382,6 +382,13 @@ describe("slide 4: Scavenger card", () => {
     expect(screen.getByTestId("scavenger-urn-mule")).toHaveTextContent("77");
   });
 
+  it("captions the Urn Mule stat as urns returned, not idols", () => {
+    show(ScavengerSlide);
+    const mule = screen.getByTestId("scavenger-urn-mule");
+    expect(mule).toHaveTextContent(/^Urn Mule 77 urns returned$/);
+    expect(mule).not.toHaveTextContent(/idols/i);
+  });
+
   it("places Crate Goblin top-left, Gambler middle-right and Urn Mule bottom-left, on one card", () => {
     show(ScavengerSlide);
     expect(screen.getByTestId("scavenger-card")).toBeInTheDocument();

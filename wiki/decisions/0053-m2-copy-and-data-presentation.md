@@ -6,7 +6,7 @@ tags: [m2, copy, data]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 ---
 
 # Decision
@@ -32,5 +32,5 @@ The owner confirmed this on 2026-10-07. Applies [ADR 0007](0007-tone-hype-with-r
 # As built
 
 - Copy lives in the single `src/story/copy.ts`. Slide PRs briefly kept per-group copy files to avoid merge conflicts; PR 9 (#39) folded them in. Helpers for slides 8-10 still need consolidating (#37).
-- Unspent souls ships as a neutral sentence with no unit claimed, until the [unit](../open-questions/m2-unspent-souls-unit.md) is confirmed (#36).
-- The rank tier map was built from the API fixture and still awaits [owner confirmation](../open-questions/m2-rank-tier-names.md).
+- Unspent souls ships as a neutral sentence with no unit claimed, until the [unit](../open-questions/m2-unspent-souls-unit.md) is confirmed (#36). The owner decided on 2026-10-08 that there is no number for now ([ADR 0055](0055-owner-confirmations-after-m2.md)).
+- The rank tier map was built from the API fixture and was [confirmed by the owner](../open-questions/m2-rank-tier-names.md) on 2026-10-08 ([ADR 0055](0055-owner-confirmations-after-m2.md)).
