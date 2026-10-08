@@ -6,7 +6,7 @@ tags: [m2, data, ranks]
 status: stable
 question_status: resolved
 resolved_by: ../decisions/0055-owner-confirmations-after-m2.md
-recommendation: "Build the map from /v1/assets/ranks, record it in a research page, and ask the owner to confirm the names. Until then, show the fallback 'Tier N · subrank'."
+recommendation: "Resolved: the map built from /v1/assets/ranks ships, and the owner confirmed the names match the game (ADR 0055). Unknown tiers still use the fallback 'Tier N · subrank'."
 raised_on: 2026-10-07
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 ---

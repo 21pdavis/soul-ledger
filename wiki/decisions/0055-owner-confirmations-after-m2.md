@@ -7,7 +7,7 @@ status: stable
 decision: accepted
 decided_on: 2026-10-08
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
-verified: { by: human:paul, at: 2026-10-08T00:00:00Z }
+verified: { by: human:paul, at: 2026-10-08T13:22:00Z }
 ---
 
 # Decision

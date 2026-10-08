@@ -12,7 +12,7 @@ generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
 
 # Context
 
-**The question in plain words.** Deadlock-api serves a picture for every hero (icons and portraits, at `assets-bucket.deadlock-api.com`). May we show those pictures in Soul Ledger? Today the app does not: each hero appears as a **monogram tile**, a letter in a circle on a deco-styled badge. The pictures are Valve's artwork, and we have not yet read what deadlock-api or Valve allow people to do with them. Nobody has decided this, and this page does not claim to know the answer.
+**The question in plain words.** Deadlock-api serves a picture for every hero (icons and portraits, at `assets-bucket.deadlock-api.com`). May we show those pictures in Soul Ledger? Today the app does not: each hero appears as a **monogram tile**, a letter in a circle on a deco-styled badge. The pictures are Valve's artwork, and we have not yet read what deadlock-api or Valve allow people to do with them. Nobody has decided this yet, and nothing on this page is a legal conclusion.
 
 **Why it matters.**
 
