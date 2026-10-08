@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 import { lookupUrl, streamLookup, type ClientLookupEvent } from "@/lib/client/lookup-stream";
 
 /** A fetch that answers with the given chunks, split exactly as written. */
-function fetchOf(chunks: (string | Uint8Array)[], init: ResponseInit = { status: 200 }): typeof fetch {
+function fetchOf(
+  chunks: (string | Uint8Array)[],
+  init: ResponseInit = { status: 200 },
+): typeof fetch {
   return async () => {
     const encoder = new TextEncoder();
     const body = new ReadableStream<Uint8Array>({

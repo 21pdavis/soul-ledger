@@ -37,6 +37,25 @@ export function loadPrefs(storage: ReadableStorage | undefined = browserStorage(
   }
 }
 
+let snapshot: { raw: string | null; prefs: Prefs } | undefined;
+
+/**
+ * For `useSyncExternalStore`: the stored prefs, with a stable identity while the stored text is
+ * unchanged. (The server renders with `null`, then the browser swaps the real values in.)
+ */
+export function readPrefsSnapshot(): Prefs {
+  let raw: string | null = null;
+  try {
+    raw = browserStorage()?.getItem(PREFS_KEY) ?? null;
+  } catch {
+    raw = null;
+  }
+  if (!snapshot || snapshot.raw !== raw) {
+    snapshot = { raw, prefs: loadPrefs({ getItem: () => raw }) };
+  }
+  return snapshot.prefs;
+}
+
 export function savePrefs(prefs: Prefs, storage: WritableStorage | undefined = browserStorage()) {
   try {
     storage?.setItem(PREFS_KEY, JSON.stringify(prefs));

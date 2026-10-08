@@ -22,7 +22,10 @@ const throwing = {
 describe("prefs", () => {
   it("round-trips the last URL and filters", () => {
     const storage = memoryStorage();
-    const prefs: Prefs = { url: "https://steamcommunity.com/id/gaben", filters: { window: "patch" } };
+    const prefs: Prefs = {
+      url: "https://steamcommunity.com/id/gaben",
+      filters: { window: "patch" },
+    };
     savePrefs(prefs, storage);
     expect(loadPrefs(storage)).toEqual(prefs);
   });
@@ -31,9 +34,9 @@ describe("prefs", () => {
     const defaults = { url: "", filters: { window: "all" } };
     expect(loadPrefs(memoryStorage())).toEqual(defaults);
     expect(loadPrefs(memoryStorage({ "soul-ledger:prefs": "{nope" }))).toEqual(defaults);
-    expect(loadPrefs(memoryStorage({ "soul-ledger:prefs": '{"url":5,"filters":{"window":"x"}}' }))).toEqual(
-      defaults,
-    );
+    expect(
+      loadPrefs(memoryStorage({ "soul-ledger:prefs": '{"url":5,"filters":{"window":"x"}}' })),
+    ).toEqual(defaults);
   });
 
   it("works without storage: reads give defaults and writes are silent no-ops", () => {
