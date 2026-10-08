@@ -4,7 +4,7 @@ title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
 status: draft
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T14:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:30:00Z }
 ---
 
 # Context
@@ -23,7 +23,7 @@ The orchestrator may deviate from this plan where useful. Every PR follows [ADR 
 |---|---|---|---|
 | 1 | Foundation (orchestrator) | framer-motion, palette tokens as CSS variables, `next/font` fonts, `copy` module, hero-name and tier maps, slide shell and segmented progress bar, Vitest jsdom plus React Testing Library if missing, shortlist of font pairings | none |
 | 2 | Entry screen, window control and error states | URL input, inline validation, remembered URL, "no login needed" line, extensible window control (All time / This patch), full-screen error states | 1 |
-| 3 | Staged loading | Three real stages from the NDJSON events, themed teasers, audio-unlock on Enter | 1, 2 |
+| 3 | Staged loading | Three real stages from the NDJSON events, themed teasers (audio-unlock on Enter is deferred until the audio layer exists, see [backlog](backlog.md)) | 1, 2 |
 | 4 | Slide controllers | Phone tap controller and desktop snap-scroll controller over one slide index, aria-live announcer | 1 |
 | 5 | Slides 1-4 | Intro, main, roster, scavenger | 1, 4 |
 | 6 | Slides 5-7 | How you kill, precision, Mid Boss | 1, 4 |
@@ -122,7 +122,7 @@ Each is testable at the layer in brackets.
 # Entry, loading and error criteria
 
 - [component] Entry screen has the URL input, "no login needed" line, and remembers the last URL in `localStorage`; invalid input shows an inline error on submit.
-- [e2e] Entering a URL starts the lookup; the Enter click is the audio-unlock gesture.
+- [e2e] Entering a URL starts the lookup. (The Enter click becoming the audio-unlock gesture is deferred: M2 has no audio layer, see [backlog](backlog.md).)
 - [component] The loader moves through three stages driven only by NDJSON events (profile, history with hero ids, details fetched/total) and never advances on a timer alone.
 - [e2e] The story never mounts when `matchCount === 0`. This includes players whose only games are Street Brawl (`excludedMatches > 0`). They get the zero-matches screen.
 - [component] When the story event has `stale: true` (a refresh failed and the story comes from older cached matches), a short "showing cached matches" note appears.
