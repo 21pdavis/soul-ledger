@@ -4,7 +4,7 @@ title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
 status: stable
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T11:34:10Z }
 ---
 
 # Outcome
@@ -29,6 +29,7 @@ M2 is built and on `staging` (2026-10-08). The criteria below still describe wha
 - **Copy:** the per-slide copy files were folded into the single `src/story/copy.ts` in PR 9, as [ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md) says.
 - **Slide contract:** every slide is a `SlideComponent` taking `SlideComponentProps` (`src/components/story/slides/contract.ts`): the slide's data plus `active`, `skipAnimation`, `reducedMotion` and `paused`. The player owns the index and the entrance clock.
 - **Desktop:** a scroll column with snap checkpoints, as in [ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md). The stage mounts only after hydration (`useIsClient`), so server and client markup match.
+- **Fit:** slides never scroll, so what does not fit gets smaller, and long lists drop rows to fit (rank climb 7 down to 3 keeping first, peak and current; roster top heroes 5 down to 3). See `useFitCount` and `tests/e2e/slide-fit.spec.ts` (#41).
 - **Valve notice:** owned by App's notices strip below the player, not by any slide.
 - **Unspent souls:** slide 8 ships the neutral sentence, with no unit claimed, pending #36.
 - **Cached-matches note:** it squeezes the stage on tiny phones (#38, make it an overlay).

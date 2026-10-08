@@ -150,6 +150,9 @@ test("Enter before the page has hydrated never reloads it, and the lookup works 
   await page.keyboard.type(PROFILE);
   await page.keyboard.press("Enter");
   // Enter on another control of the form submits it too, unless the form is held back.
+  // The window choice is held back as well: a pick made now would be reset by hydration.
+  await expect(page.getByRole("radio", { name: "This patch" })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: "All time" })).toBeDisabled();
   await page.getByRole("radio", { name: "This patch" }).focus();
   await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Open the ledger" }).click({ force: true });
@@ -167,8 +170,10 @@ test("Enter before the page has hydrated never reloads it, and the lookup works 
   released = true;
   await Promise.all(held.map((route) => route.continue()));
   await field.fill(PROFILE);
+  await page.getByRole("radio", { name: "This patch" }).check();
   await field.press("Enter");
   await expect(storyUp(page)).toBeVisible();
   expect(urls).toHaveLength(1);
   expect(urls[0].searchParams.get("q")).toBe(PROFILE);
+  expect(urls[0].searchParams.get("window")).toBe("patch");
 });

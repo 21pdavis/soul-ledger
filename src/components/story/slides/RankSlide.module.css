@@ -60,6 +60,8 @@
 .plot {
   width: 100%;
   height: auto;
+  /* A roomy stage must not spend its room here: it would then list fewer rows than a small one. */
+  max-height: 7.5rem;
 }
 
 .guide {
@@ -119,10 +121,11 @@
 }
 
 /*
- * Smaller stages (the frame's tiers, see SlideFrame.module.css): everything tightens so the current
+ * Smaller stages (the frame's tiers, see SlideFrame.module.css; the first one starts at 700px here,
+ * not 640px, so a 720p desktop window still lists every row): everything tightens so the current
  * rank is always whole and in view. RankSlide drops the middle rows when this is still not enough.
  */
-@container (max-height: 639px) {
+@container (max-height: 699px) {
   .content {
     gap: 0.75rem;
   }

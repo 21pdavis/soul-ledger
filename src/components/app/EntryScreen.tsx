@@ -21,7 +21,8 @@ export function EntryScreen({ initial, onSubmit }: Props) {
   const [invalid, setInvalid] = useState(false);
   // Until React has hydrated, this form is plain HTML and its submit is the browser's own: it would
   // reload the page and drop what was typed (#42). The field and the button stay disabled until
-  // the handler is attached; a disabled default button also stops Enter inside the form.
+  // the handler is attached, and so do the window choices (a pick made before hydration would be
+  // reset by it). A disabled default button also stops Enter inside the form.
   const ready = useIsClient();
   const inputId = useId();
   const errorId = useId();
@@ -81,7 +82,7 @@ export function EntryScreen({ initial, onSubmit }: Props) {
           <p className={styles.hint}>{ENTRY_COPY.noLogin}</p>
         </div>
 
-        <FilterControls value={filters} onChange={setFilters} />
+        <FilterControls value={filters} onChange={setFilters} disabled={!ready} />
 
         <button type="submit" className={styles.submit} disabled={!ready}>
           {ENTRY_COPY.submit}

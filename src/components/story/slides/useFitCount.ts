@@ -24,6 +24,14 @@ export function useFitCount(
     if (el && count > min && el.scrollHeight > el.clientHeight + 0.5) setCount(count - 1);
   }, [count, min, pass]);
 
+  // A different list length (new data without a remount) starts the fit again from the full list.
+  const [seenMax, setSeenMax] = useState(max);
+  if (seenMax !== max) {
+    setSeenMax(max);
+    setCount(max);
+    setPass((n) => n + 1);
+  }
+
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el || typeof ResizeObserver === "undefined") return;

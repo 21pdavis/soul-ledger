@@ -23,12 +23,17 @@ describe("EntryScreen", () => {
     const doc = new DOMParser().parseFromString(html, "text/html");
     expect(doc.querySelector("input[type=text]")?.hasAttribute("disabled")).toBe(true);
     expect(doc.querySelector("button[type=submit]")?.hasAttribute("disabled")).toBe(true);
+    // The window choice too: a pick made before hydration is reset by it (a lost input).
+    const radios = [...doc.querySelectorAll("input[type=radio]")];
+    expect(radios.length).toBeGreaterThan(0);
+    for (const radio of radios) expect(radio.hasAttribute("disabled")).toBe(true);
   });
 
   it("has the field and the button enabled once running in the browser", () => {
     const { input } = setup();
     expect(input).toBeEnabled();
     expect(screen.getByRole("button", { name: /open the ledger/i })).toBeEnabled();
+    for (const radio of screen.getAllByRole("radio")) expect(radio).toBeEnabled();
   });
 
   it("asks for a profile URL and says no login is needed", () => {

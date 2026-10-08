@@ -122,18 +122,23 @@ describe("RosterSlide fits the stage it is in", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(5);
   });
 
+  it("shows the new full list when the number of heroes grows without a remount", () => {
+    const few = story();
+    few.roster.topHeroes = few.roster.topHeroes.slice(0, 3);
+    const { rerender } = render(<RosterSlide {...fixtureSlideProps({ story: few })} {...motion} />);
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+    rerender(<RosterSlide {...fixtureSlideProps({ story: story() })} {...motion} />);
+    expect(screen.getAllByRole("listitem")).toHaveLength(5);
+  });
+
   it("lists as many top heroes as fit, most played first, and at least three", () => {
     box.height = 100 + 4 * 40;
-    renderRoster();
+    const first = renderRoster();
     expect(screen.getAllByRole("listitem")).toHaveLength(4);
     expect(screen.getAllByRole("listitem")[0]).toHaveTextContent("Infernus");
-    cleanupRoster();
+    first.unmount();
     box.height = 10;
     renderRoster();
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
   });
 });
-
-function cleanupRoster() {
-  document.body.innerHTML = "";
-}

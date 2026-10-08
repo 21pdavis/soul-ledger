@@ -140,6 +140,9 @@ test.describe("every slide fits its frame, worst case", () => {
           const current = frame.locator("li[aria-current=step]");
           await expect(current).toBeVisible();
           await expect(current).toContainText("Oracle");
+          // A bigger stage never shows fewer rows than a smaller one: the climb has 14 distinct
+          // badges, so every stage with the stage's usual room shows the full 7.
+          if (!stale) await expect(frame.locator("ol li")).toHaveCount(7);
         }
         for (const f of found.slice(0, 2)) problems.push(`${slide.id}: ${f}`);
         if (slide.id !== SLIDES.at(-1)!.id) await page.keyboard.press("ArrowRight");
