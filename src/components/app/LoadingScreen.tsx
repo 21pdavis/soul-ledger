@@ -2,6 +2,7 @@
 
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
+import { LOADING_PACE } from "@/lib/client/loading-pace";
 import { loadingStage } from "@/lib/client/loading-stage";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
 import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
@@ -11,6 +12,8 @@ import styles from "./LoadingScreen.module.css";
 interface Props {
   /** The progress events received so far, in order (never the final story or error). */
   progress: ClientLookupEvent[];
+  /** The least time the tally counters take to count up, in ms (ADR 0056). 0 shows values at once. */
+  countMs?: number;
 }
 
 /** Hero tiles shown before the rest are counted ("+8 more"). */
@@ -18,19 +21,23 @@ const MAX_TILES = 12;
 
 const format = (n: number) => Math.round(n).toLocaleString("en-US");
 
-function CountingNumber({ value }: { value: number }) {
+function CountingNumber({ value, ms }: { value: number; ms: number }) {
   const shown = useMotionValue(0);
   const text = useTransform(shown, format);
   useEffect(() => {
-    const controls = animate(shown, value, { duration: 0.6, ease: "easeOut" });
+    const controls = animate(shown, value, { duration: ms / 1000, ease: "easeOut" });
     return () => controls.stop();
-  }, [value, shown]);
+  }, [value, ms, shown]);
   return <motion.span>{text}</motion.span>;
 }
 
 /** A number that counts up to its value, or just shows it when motion is reduced. */
-function CountUp({ value, reduced }: { value: number; reduced: boolean }) {
-  return reduced ? <span>{format(value)}</span> : <CountingNumber value={value} />;
+function CountUp({ value, reduced, ms }: { value: number; reduced: boolean; ms: number }) {
+  return reduced || ms <= 0 ? (
+    <span>{format(value)}</span>
+  ) : (
+    <CountingNumber value={value} ms={ms} />
+  );
 }
 
 /** The Steam avatar in its octagon, or a placeholder sigil if there is none or it fails to load. */
@@ -54,7 +61,7 @@ function Avatar({ url }: { url: string | null }) {
  * tally of match details. It never advances on a timer. Screen readers hear one polite line per
  * stage change; the animated counters stay out of the live region.
  */
-export function LoadingScreen({ progress }: Props) {
+export function LoadingScreen({ progress, countMs = LOADING_PACE.tallyCountMs }: Props) {
   const view = loadingStage(progress);
   const reduced = usePrefersReducedMotion();
   const { profile, history, details } = view;
@@ -149,7 +156,7 @@ export function LoadingScreen({ progress }: Props) {
                   <>
                     <p className={styles.counter}>
                       <span className={styles.count}>
-                        <CountUp value={details.fetched} reduced={reduced} />
+                        <CountUp value={details.fetched} reduced={reduced} ms={countMs} />
                       </span>
                       <span className={styles.of}>/ {details.total.toLocaleString("en-US")}</span>
                       <span className={styles.unit}>{LOADING_COPY.tally.fetched}</span>
@@ -166,20 +173,22 @@ export function LoadingScreen({ progress }: Props) {
                         className={styles.fill}
                         initial={false}
                         animate={{ scaleX: details.fraction }}
-                        transition={reduced ? { duration: 0 } : { duration: 0.5, ease: "easeOut" }}
+                        transition={
+                          reduced ? { duration: 0 } : { duration: countMs / 1000, ease: "easeOut" }
+                        }
                       />
                     </div>
                     <dl className={styles.tally}>
                       <div>
                         <dt>{LOADING_COPY.tally.kills}</dt>
                         <dd>
-                          <CountUp value={details.kills} reduced={reduced} />
+                          <CountUp value={details.kills} reduced={reduced} ms={countMs} />
                         </dd>
                       </div>
                       <div>
                         <dt>{LOADING_COPY.tally.breakables}</dt>
                         <dd>
-                          <CountUp value={details.breakables} reduced={reduced} />
+                          <CountUp value={details.breakables} reduced={reduced} ms={countMs} />
                         </dd>
                       </div>
                     </dl>

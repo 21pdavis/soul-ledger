@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Changed
+
+- **The loading screen now takes its time, so you can read it.** Each step (your profile, your matches, the tally) stays on screen for a moment, the counters count up a little slower, and the story waits a beat after the last step. It still follows what is really happening, so a slow lookup is not made any slower.
+
 ## [0.2.0] - 2026-10-08
 
 **Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with placeholder art. The 3D world arrives in M3.
