@@ -32,7 +32,9 @@ export function StoryCountUp({
   className,
 }: Props) {
   const instant = reducedMotion || skipAnimation;
-  const [shown, setShown] = useState(instant ? value : 0);
+  const [counted, setCounted] = useState(0);
+  // Instant (reduced motion or skip) is derived, so the final value shows with no extra render.
+  const shown = instant ? value : counted;
   const controls = useRef<AnimationPlaybackControlsWithThen | null>(null);
   // Read inside the effects without making them restart the count.
   const live = useRef({ instant, paused });
@@ -42,15 +44,12 @@ export function StoryCountUp({
 
   // Start the count on mount (or when the value changes).
   useEffect(() => {
-    if (live.current.instant) {
-      setShown(value);
-      return;
-    }
+    if (live.current.instant) return;
     const run = animate(0, value, {
       duration: durationMs / 1000,
       ease: "easeOut",
-      onUpdate: setShown,
-      onComplete: () => setShown(value),
+      onUpdate: setCounted,
+      onComplete: () => setCounted(value),
     });
     controls.current = run;
     if (live.current.paused) run.pause();
@@ -60,12 +59,10 @@ export function StoryCountUp({
     };
   }, [value, durationMs]);
 
-  // Skip (or reduced motion arriving) finishes the count now.
+  // Skip (or reduced motion arriving) ends the count; `shown` is already the final value.
   useEffect(() => {
-    if (!instant) return;
-    controls.current?.stop();
-    setShown(value);
-  }, [instant, value]);
+    if (instant) controls.current?.stop();
+  }, [instant]);
 
   useEffect(() => {
     const run = controls.current;

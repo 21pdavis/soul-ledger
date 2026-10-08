@@ -1,0 +1,24 @@
+/* Entrance steps finish within ENTRANCE_MS (800ms): last start 7 * 60 = 420ms + 380ms. */
+.reveal[data-motion="rise"] {
+  animation: rise 380ms ease-out both;
+  animation-delay: calc(var(--step) * 60ms);
+}
+
+.reveal[data-motion="stamp"] {
+  animation: stamp 380ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  animation-delay: calc(var(--step) * 60ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}

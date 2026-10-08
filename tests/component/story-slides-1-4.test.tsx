@@ -182,7 +182,9 @@ describe("slide 2: Your main", () => {
   });
 
   it("shows no percentile line when both lists are empty, and still renders", () => {
-    show(MainSlide, { story: { main: { ...fixtureStory().main!, percentiles: [] }, percentiles: [] } });
+    show(MainSlide, {
+      story: { main: { ...fixtureStory().main!, percentiles: [] }, percentiles: [] },
+    });
     expect(screen.getByText("Infernus")).toBeInTheDocument();
     expect(screen.queryByText(/^Top /)).not.toBeInTheDocument();
   });
