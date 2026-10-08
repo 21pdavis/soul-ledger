@@ -4,11 +4,6 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
-### Changed
-
-- **The Scavenger card says "urns returned"** under Urn Mule, instead of "idols returned".
-- **The loading screen now takes its time, so you can read it.** Each step (your profile, your matches, the tally) stays on screen for a moment, the counters count up a little slower, and the story waits a beat after the last step. It still follows what is really happening, so a slow lookup is not made any slower.
-
 ## [0.2.0] - 2026-10-08
 
 **Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with placeholder art. The 3D world arrives in M3.
@@ -17,8 +12,8 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 - **Paste your Steam profile link and get your story.** The home page asks for your Steam profile URL (no login needed) and remembers it for next time.
 - **All time or This patch.** Choose whether the story covers your whole history or only matches since the latest patch. The story says which one you are looking at, and "Based on N matches" shows how many games it counts.
-- **A loading screen that shows real progress.** While your ledger is being built you see your Steam name and avatar, then your match count with the heroes you have played, then a live tally of matches read, kills and crates smashed. It follows what is actually happening instead of a fake timer and says so when it is waiting its turn.
-- **The 11-slide story.** Your hours and matches, your main hero and how you rank on it, your roster, your Scavenger stats (Crate Goblin, Gambler, Urn Mule), how you kill, your precision and parries, Mid Boss, where you like to die (a heatmap of your deaths), your rank climb, and your signature stat. It plays with placeholder art, and players with only a few matches still get a story, just without the same-hero rankings.
+- **A loading screen that shows real progress.** While your ledger is being built you see your Steam name and avatar, then your match count with the heroes you have played, then a live tally of matches read, kills and crates smashed. It follows what is actually happening instead of a fake timer and says so when it is waiting its turn. Each step stays on screen long enough to read, the counters count up at a readable pace, and the story waits a beat after the last step, but a slow lookup is not made any slower.
+- **The 11-slide story.** Your hours and matches, your main hero and how you rank on it, your roster, your Scavenger stats (Crate Goblin, Gambler, and Urn Mule with the urns you returned), how you kill, your precision and parries, Mid Boss, where you like to die (a heatmap of your deaths), your rank climb, and your signature stat. It plays with placeholder art, and players with only a few matches still get a story, just without the same-hero rankings.
 - **Play it your way.** On a phone, tap the right side of the screen to go forward and the left to go back (press and hold to pause). On desktop, scroll through the story, or use the arrow keys, space or the progress bar.
 - **A summary card to finish.** The last slide gathers your headline numbers. Replay the story, Refresh to fetch your latest matches, or look up another player.
 - **Friendly problem screens.** If your profile can't be found (check that it's public), the service is down (try again in a minute), the connection drops, or you have no Deadlock matches yet (or none since the latest patch), you get a clear full-screen message with what to do next instead of an error code.
