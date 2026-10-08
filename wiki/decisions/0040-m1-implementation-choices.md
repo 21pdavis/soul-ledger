@@ -26,6 +26,8 @@ The user confirmed the choices listed in the [M1 implementation choices](../open
 | Resync | A lookup reuses the cache if the player synced in the last 5 minutes |
 | MVP weights | kills 0.8; deaths, assists 0.9; accuracy, objective damage 1.1; denies, teammate healing, headshot rate 1.2; others 1.0 |
 
+The Tailwind question was settled for M2 by [ADR 0051](0051-m2-visual-motion-styling-stack.md): still no Tailwind.
+
 The tuning values (resync window, sample size, MVP weights) are "keep for now". Revisit them once real stories are visible in M2.
 
 Related: [ADR 0034](0034-tooling.md) (tooling), [ADR 0038](0038-one-trick-threshold-50.md) (one-trick line).

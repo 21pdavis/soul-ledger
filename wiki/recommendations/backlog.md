@@ -13,10 +13,11 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 
 | Priority | Item | Links |
 |---|---|---|
-| P0 | Before the repo goes public at M2, fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public) | [ADR 0032](../decisions/0032-github-private-ci.md) |
-| P0 | Start M2: the 11-slide story in 2D, fed by `/api/lookup` | [ADR 0028](../decisions/0028-milestones.md) |
+| P0 | Before the repo goes public at M2, fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public), including #8 and #9. This is not part of the M2 PRs | [ADR 0032](../decisions/0032-github-private-ci.md) |
+| P0 | Build M2: the 11-slide story in 2D, fed by `/api/lookup` | [M2 plan](m2-plan.md), [ADR 0028](../decisions/0028-milestones.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
-| P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md) |
+| P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
+| P1 | Build the this-patch toggle (accepted in ADR 0004, deferred from M2) | [ADR 0004](../decisions/0004-time-window.md), [M2 plan](m2-plan.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |
 
@@ -35,7 +36,10 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 
 - Steam OpenID login ([ADR 0002](../decisions/0002-steam-id-no-login.md)).
 - Username search like Statlocker's, after the URL-only prototype. The API already has `/v1/players/steam-search` (search by account id or persona name, with a recent-activity weighting) ([API](../research/deadlock-api.md)).
-- The "unlock full history" flow ([ADR 0009](../decisions/0009-preview-then-full-history.md), [mechanism](../open-questions/full-history-unlock.md)).
+- The "unlock full history" flow and its UI; M2 shows only "Based on N matches" plus Refresh ([ADR 0009](../decisions/0009-preview-then-full-history.md), [ADR 0052](../decisions/0052-m2-entry-loading-error-states.md), [mechanism](../open-questions/full-history-unlock.md)).
+- Streaming and auto-play for the story, once the tap/scroll flow is proven ([ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md)).
+- Full-width desktop slide layouts that use more than the 9:16 column ([ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md)).
+- Per-metric MVP one-liners, replacing the single generic template ([ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md)).
 - Video export ([export](../decisions/0011-sharing.md)).
 
 # Standing recommendations
