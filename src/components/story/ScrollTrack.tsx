@@ -32,7 +32,7 @@ interface Props {
 }
 
 /**
- * The desktop controller (ADR 0050, 0061): a vertical scroll track of SLIDE_COUNT viewport-high
+ * The desktop controller (ADR 0050, 0062): a vertical scroll track of SLIDE_COUNT viewport-high
  * snap checkpoints, each holding one slide's card, so the page really moves as the reader scrolls.
  *
  * The two directions never fight: scroll -> index only happens once scrolling is at rest, and
@@ -122,6 +122,10 @@ export function ScrollTrack({ index, smooth, onArrive, renderCard }: Props) {
       ref={track}
       className={styles.track}
       data-testid="scroll-track"
+      // Focusable so keyboard users can always scroll it, even on a card with no controls.
+      role="region"
+      aria-label="Story"
+      tabIndex={0}
       onScroll={onScroll}
       onWheel={takeOver}
       onTouchStart={takeOver}

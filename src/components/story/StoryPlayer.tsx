@@ -22,7 +22,7 @@ interface Props extends SlideProps {
 /**
  * The 11-slide story (ADR 0050). Owns the one slide index; two controllers drive it:
  * - tap (phone, or anything narrower than 1024px / coarse pointer): tap zones, hold to pause;
- * - scroll (desktop): a vertical stack of wide cards over scroll-snap checkpoints (ADR 0061).
+ * - scroll (desktop): a vertical stack of wide cards over scroll-snap checkpoints (ADR 0062).
  * Slides never navigate themselves and are the same components in both modes.
  */
 export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: Props) {

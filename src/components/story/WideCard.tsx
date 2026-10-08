@@ -16,7 +16,7 @@ interface Props extends SlideProps {
 }
 
 /**
- * One slide's card in the desktop vertical layout (ADR 0061). A card shows its slide once the
+ * One slide's card in the desktop vertical layout (ADR 0062). A card shows its slide once the
  * reader has reached it, so the entrance plays on arrival, not while it is offscreen; before that
  * it is an empty frame with only the headline (hidden from assistive tech: the slide is not
  * there yet). Slides the reader has passed are shown finished.
@@ -35,7 +35,13 @@ export function WideCard({
   const isCurrent = index === current;
   const Slide = SLIDE_COMPONENTS[id];
   return (
-    <div className={styles.card} data-testid="story-card" data-slide={id} data-current={isCurrent}>
+    <div
+      className={styles.card}
+      data-testid="story-card"
+      data-slide={id}
+      data-current={isCurrent}
+      inert={!isCurrent}
+    >
       {index <= reached ? (
         <Slide
           story={story}

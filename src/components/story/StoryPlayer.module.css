@@ -130,7 +130,7 @@
 }
 
 /*
- * Desktop scroll controller (ADR 0050, 0061): a vertical stack of wide cards. Each checkpoint is
+ * Desktop scroll controller (ADR 0050, 0062): a vertical stack of wide cards. Each checkpoint is
  * exactly one viewport high (so scroll targets stay index * clientHeight) and holds one card,
  * centred, with breathing room above and below and gutters at the sides (for the progress rail now,
  * and for the 3D hero models later: nothing sits behind the gutters).
@@ -148,6 +148,11 @@
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   overscroll-behavior: contain;
+}
+
+.track:focus-visible {
+  outline: 3px solid var(--bone);
+  outline-offset: -3px;
 }
 
 .trackContent {

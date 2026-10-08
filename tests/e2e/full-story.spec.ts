@@ -11,6 +11,11 @@ import { mockLookup, ndjson, enter, stageSettled, storyEvent } from "./lookup-mo
 // checks (announcer, progress bar, notice, no sideways scroll, stage on screen) on every slide.
 
 const stage = (page: Page) => page.getByTestId("story-stage");
+/** The slide on screen: the current card on desktop, the stage itself on a phone. */
+const slide = (page: Page) =>
+  page.locator(
+    "[data-testid=story-card][data-current=true], [data-testid=story-stage]:not(:has([data-testid=story-card]))",
+  );
 const track = (page: Page) => page.getByTestId("scroll-track");
 const segments = (page: Page) =>
   page.getByRole("list", { name: "Story progress" }).getByRole("listitem");
@@ -138,9 +143,9 @@ test("paste a profile, watch the loading, play all 11 slides to the summary", as
 
   // And it offers the three ways on.
   for (const name of ["Replay", "Look up another player", "Refresh"]) {
-    await expect(page.getByRole("button", { name })).toBeVisible();
+    await expect(slide(page).getByRole("button", { name })).toBeVisible();
   }
-  await page.getByRole("button", { name: "Replay" }).click();
+  await slide(page).getByRole("button", { name: "Replay" }).click();
   await expect(stage(page)).toHaveAttribute("data-slide", "intro");
   await expect(segments(page).nth(0)).toHaveAttribute("data-state", "current");
 });

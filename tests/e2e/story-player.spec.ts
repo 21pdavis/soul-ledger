@@ -172,6 +172,17 @@ test.describe("desktop: scroll controller", () => {
     expect(Math.abs(next.y - before.y)).toBeLessThan(2); // card 2 now sits where card 1 was
   });
 
+  test("only the current card is reachable: the others are inert", async ({ page }) => {
+    await openStory(page);
+    await expect(card(page, 0)).not.toHaveAttribute("inert", "");
+    for (const i of [1, 5, 10]) await expect(card(page, i)).toHaveAttribute("inert", "");
+    await stage(page).hover();
+    await page.mouse.wheel(0, 600);
+    await expect.poll(() => restingCheckpoint(page)).toBe(1);
+    await expect(card(page, 1)).not.toHaveAttribute("inert", "");
+    await expect(card(page, 0)).toHaveAttribute("inert", "");
+  });
+
   test("the progress bar runs down the side", async ({ page }) => {
     await openStory(page);
     const first = (await segments(page).nth(0).boundingBox())!;

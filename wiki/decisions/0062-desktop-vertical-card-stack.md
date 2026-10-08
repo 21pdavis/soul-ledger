@@ -1,6 +1,6 @@
 ---
 type: Decision Record
-title: "0061: Desktop story is a vertical stack of wide cards"
+title: "0062: Desktop story is a vertical stack of wide cards"
 description: "On desktop the story is a vertical page of wide cards, one per slide, that scrolls down card by card with a vertical progress rail, replacing the pinned 9:16 column; phone is unchanged."
 tags: [m2, story, layout, desktop, ux]
 status: stable
@@ -23,6 +23,6 @@ Refines [ADR 0050](0050-m2-story-flow-and-controllers.md) (desktop controller on
 
 # Rules
 
-- A card shows its slide only once the reader has reached it, so the one-shot entrance plays on arrival, not while offscreen ([ADR 0050](0050-m2-story-flow-and-controllers.md)). Until then it is an empty frame with the headline, hidden from assistive tech. Cards the reader has passed stay mounted and show their finished state.
+- A card shows its slide only once the reader has reached it, so the one-shot entrance plays on arrival, not while offscreen ([ADR 0050](0050-m2-story-flow-and-controllers.md)). Until then it is an empty frame with the headline, hidden from assistive tech. Cards the reader has passed stay mounted and show their finished state; revisiting one replays its entrance, as on the phone. Cards other than the current one are `inert`, so they leave the tab order and the accessibility tree.
 - Slides still never navigate themselves and still size to their frame with container queries; wide-card layouts use `@container (min-width: 720px)` (the Scavenger slide goes from three stacked rows to three staggered columns). Other slides use the room as it comes; more multi-column layouts are backlog.
 - Reduced motion: scrolling jumps instantly, and the current-card dimming transition is off ([ADR 0054](0054-m2-testing-and-accessibility.md)). The live region still announces slide changes.
