@@ -4,7 +4,7 @@ title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
 status: draft
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T00:30:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T05:30:00Z }
 ---
 
 # Context
@@ -32,6 +32,10 @@ The orchestrator may deviate from this plan where useful. Every PR follows [ADR 
 | 9 | Hardening | Playwright suites (phone and desktop), a11y pass, `CHANGELOG.md` | all |
 
 PRs 5 to 8 can run in parallel once PRs 1 and 4 are merged.
+
+**Follow-ups for the slide PRs** (the story player is mounted in the app, and the placeholder stage is gone):
+- PR 5 (slides 1-4, #33) owns the window-label e2e: the story shows "All time" or "Since patch <date>" (`WindowLabel`). It was dropped from `entry.spec.ts` because no slide shows it yet; App's side is covered in `tests/component/app-story-props.test.tsx`.
+- PR 8 (slide 11, #31) owns the Refresh, Replay and Look up another player e2e, including Refresh with `refresh=1` and the same window. The summary slide is the first place those buttons exist again. Its card must not repeat the Valve notice: the app's notices strip is below the player and always on screen.
 
 # Cross-cutting acceptance criteria
 
