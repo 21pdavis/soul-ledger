@@ -34,4 +34,5 @@ The owner confirmed this on 2026-10-07. Applies [ADR 0046](0046-strict-red-first
 
 - `tests/e2e/a11y.spec.ts` runs a pinned `@axe-core/playwright` scan over the entry, loading, error and zero-matches screens and all 11 slides (full and sparse story) on phone and desktop. Any violation fails and no rule is disabled.
 - A keyboard-only Playwright test completes the whole story, Reduced motion is covered by component tests (per-slide `reducedMotion: true` cases and the loading screen), not by an e2e suite; the only e2e use of reduced motion is in `summary.spec.ts`, to speed up the layout matrix. An e2e check is on the [backlog](../recommendations/backlog.md).
+- The loader's minimum display times ([ADR 0056](0056-loader-pacing.md)) are switched off for e2e by a `localStorage` override set in `playwright.config.ts`; `tests/e2e/loading-pace.spec.ts` opts out and tests the real pacing.
 - Playwright ports are overridable (`PLAYWRIGHT_PORT`, `PLAYWRIGHT_GATE_PORT`) so several worktrees can run e2e at once.

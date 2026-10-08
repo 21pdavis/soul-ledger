@@ -51,6 +51,7 @@
 * [0052: M2 entry, staged loading, error and completeness states](0052-m2-entry-loading-error-states.md) - A URL entry screen with an All time / This patch window control, three real loading stages from the NDJSON stream, in-voice full-screen error states, and a matches-count line with a Refresh action.
 * [0053: M2 copy rules and data-presentation choices](0053-m2-copy-and-data-presentation.md) - Claude drafts the copy in one module with one fixed headline per slide; heroes, death heatmap, unspent souls, rank and MVP each have a fixed M2 presentation.
 * [0054: M2 testing layers and accessibility rules](0054-m2-testing-and-accessibility.md) - M2 adds component tests per slide, phone and desktop Playwright suites with a mocked NDJSON lookup, and an accessibility baseline checked by tests.
+* [0056: Loader pacing: minimum dwell per stage, real events still gate stages](0056-loader-pacing.md) - The staged loader holds each real stage on screen for a minimum time and holds the story back for the last stage's dwell plus a tail, so a quick lookup can be read; a timer never advances a stage.
 
 # Superseded decisions
 
