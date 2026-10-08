@@ -1,5 +1,8 @@
 # Directory Update Log
 
+## 2026-10-08
+* **Decision**: Audio-unlock on the entry Enter click is deferred out of M2 (no audio layer exists; music is a P2 backlog item). [ADR 0052](decisions/0052-m2-entry-loading-error-states.md), the [M2 plan](recommendations/m2-plan.md) and the [backlog](recommendations/backlog.md) say so.
+
 ## 2026-10-07
 * **Decision**: The ADR 0004 this-patch toggle moves into M2 as an extensible window control, recorded in [ADR 0052](decisions/0052-m2-entry-loading-error-states.md) and the [M2 plan](recommendations/m2-plan.md); more detailed filters go on the backlog.
 * **Decision**: M2 design, confirmed by the owner: [ADR 0050](decisions/0050-m2-story-flow-and-controllers.md) (phone tap-through and desktop snap-scroll over one slide index), [ADR 0051](decisions/0051-m2-visual-motion-styling-stack.md) (deco placeholders, Framer Motion, CSS modules, no Tailwind), [ADR 0052](decisions/0052-m2-entry-loading-error-states.md) (entry, staged loading, errors), [ADR 0053](decisions/0053-m2-copy-and-data-presentation.md) (copy and data presentation), [ADR 0054](decisions/0054-m2-testing-and-accessibility.md) (testing and a11y).
