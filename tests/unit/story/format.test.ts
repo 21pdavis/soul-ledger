@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { formatHours, formatPatchDate, formatPercent } from "@/story/format";
+import { formatHours, formatPatchDate, formatPercent, formatTopPercent } from "@/story/format";
 
 describe("formatHours", () => {
   it("shows one decimal under 10 hours and whole hours from 10", () => {
@@ -10,6 +10,16 @@ describe("formatHours", () => {
 
   it("never reads 0 for a player who played at all", () => {
     expect(formatHours(0.01)).toBe("0.1");
+  });
+});
+
+describe("formatTopPercent", () => {
+  it("keeps one decimal under 10 (dropping a trailing .0) and rounds from 10 up", () => {
+    expect(formatTopPercent(0.5)).toBe("0.5");
+    expect(formatTopPercent(3.4)).toBe("3.4");
+    expect(formatTopPercent(3)).toBe("3");
+    expect(formatTopPercent(9.96)).toBe("10");
+    expect(formatTopPercent(12.4)).toBe("12");
   });
 });
 

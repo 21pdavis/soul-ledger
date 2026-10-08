@@ -1,13 +1,16 @@
 /*
  * Slide 11: a ledger entry. Ruled lines with dotted leaders, figures in the display face, and one
  * rubber stamp, the only memorable thing here. Placeholder-grade: type and rules only.
+ *
+ * The stage clips (overflow: hidden) and is only 480px wide, 9:16 at most, and shorter on small
+ * phones with the app's notice strip under it. So everything here is sized to fit a 320x568 phone,
+ * with the stamp beside the text rather than under it and the two main actions side by side.
  */
 
 .summary {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  height: 100%;
+  gap: 0.9rem;
 }
 
 .ledger {
@@ -23,7 +26,7 @@
   flex-wrap: wrap;
   align-items: baseline;
   column-gap: 0.5rem;
-  padding: 0.7rem 0;
+  padding: 0.5rem 0;
   border-top: 1px solid var(--rule);
 }
 
@@ -33,7 +36,7 @@
 
 .label {
   color: var(--bone-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 /* The dotted run between a ledger label and its figure. */
@@ -47,7 +50,7 @@
 
 .value {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   line-height: 1.1;
   color: var(--bone);
   text-align: right;
@@ -55,9 +58,9 @@
 
 .note {
   flex-basis: 100%;
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
   color: var(--bone-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-align: right;
 }
 
@@ -65,20 +68,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .basis {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.1rem;
 }
 
 .window,
 .based {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .window {
@@ -90,14 +92,13 @@
 }
 
 .refresh {
-  min-height: 2.75rem;
-  margin-top: 0.15rem;
-  padding: 0;
+  min-height: 2.25rem;
+  padding: 0 0.25rem 0 0;
   border: 0;
   background: none;
   color: var(--brass);
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-decoration: underline;
   text-underline-offset: 0.25em;
   cursor: pointer;
@@ -106,14 +107,15 @@
 /* The rubber stamp: a double rule, a tilt, and the words the ledger is known for. */
 .stamp {
   flex: none;
-  width: 6.75rem;
-  padding: 0.6rem 0.5rem;
+  width: 5.75rem;
+  margin-right: 0.35rem;
+  padding: 0.45rem 0.4rem;
   border: 2px solid var(--brass);
   outline: 1px solid var(--brass);
   outline-offset: 3px;
   color: var(--brass);
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.85rem;
   line-height: 1.15;
   text-align: center;
   text-transform: uppercase;
@@ -147,18 +149,19 @@
 }
 
 .actions {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
   gap: 0.6rem;
 }
 
 .primary,
 .secondary {
   min-height: 3rem;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--brass);
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.2;
   cursor: pointer;
 }
 
@@ -179,13 +182,52 @@
   outline-offset: 2px;
 }
 
-/* Pushes the Valve notice to the foot of the card. */
-.notice {
-  margin-top: auto;
+/* Tall screens have room to breathe. */
+@media (min-height: 760px) {
+  .summary {
+    gap: 1.25rem;
+  }
+
+  .line {
+    padding: 0.7rem 0;
+  }
+
+  .value {
+    font-size: 1.5rem;
+  }
+
+  .stamp {
+    width: 6.5rem;
+    font-size: 1rem;
+  }
 }
 
-.notice footer {
-  padding: 0.25rem 0 0;
-  font-size: 0.7rem;
-  line-height: 1.35;
+/* Short screens (small phones, or a stage squeezed by the notice strip): tighter still. */
+@media (max-height: 600px) {
+  .summary {
+    gap: 0.5rem;
+  }
+
+  .line {
+    padding: 0.25rem 0;
+  }
+
+  .primary,
+  .secondary {
+    min-height: 2.75rem;
+  }
+
+  .value {
+    font-size: 1.2rem;
+  }
+
+  .refresh {
+    min-height: 2rem;
+  }
+
+  .stamp {
+    width: 5rem;
+    padding: 0.35rem 0.3rem;
+    font-size: 0.75rem;
+  }
 }

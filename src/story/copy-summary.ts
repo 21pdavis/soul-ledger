@@ -1,4 +1,4 @@
-import { formatHours } from "./format";
+import { formatHours, formatTopPercent } from "./format";
 import { heroName } from "./heroes";
 import { rankLabel } from "./ranks";
 import type { StoryData } from "./types";
@@ -13,17 +13,10 @@ export const SUMMARY_COPY = {
   stamp: "Entered into the ledger",
 } as const;
 
-/** Past this, "Top N%" is no boast: the stat is dropped instead (same line as the MVP slide). */
+/** The MVP slide's "not notable" line (ADR 0053): worse than this and the MVP gives way to the best global stat. */
 const NOTABLE_TOP_PERCENT = 50;
 
-/** "Top 0.5%", "Top 12%": one decimal under 1%, whole percent from there. Never "Top 0%". */
-export function formatTopPercent(topPercent: number): string {
-  const text =
-    topPercent < 1
-      ? String(Math.max(0.1, Math.round(topPercent * 10) / 10))
-      : String(Math.round(topPercent));
-  return `Top ${text}%`;
-}
+const topPercentText = (topPercent: number) => `Top ${formatTopPercent(topPercent)}%`;
 
 export interface TopStat {
   label: string;
@@ -33,31 +26,25 @@ export interface TopStat {
 }
 
 /**
- * The one stat worth printing on the card: the MVP if there is one, else the best global
- * percentile, else nothing. A stat worse than the top half is not shown.
+ * The one stat on the card, following the MVP slide (ADR 0053): the MVP if it is notable (top 50%
+ * or better); otherwise the best global percentile with neutral, all-players phrasing, even when
+ * it is no boast; nothing only when there are no percentiles at all.
  */
 export function topStat(story: StoryData): TopStat | null {
+  const { mvp } = story;
+  if (mvp && mvp.topPercent <= NOTABLE_TOP_PERCENT) {
+    return {
+      label: mvp.label,
+      value: topPercentText(mvp.topPercent),
+      note: mvp.scope === "hero" ? `of ${heroName(mvp.heroId)} players` : "of all players",
+    };
+  }
   const best = story.percentiles.reduce<StoryData["percentiles"][number] | null>(
     (acc, p) => (acc === null || p.topPercent < acc.topPercent ? p : acc),
     null,
   );
-  const mvp = story.mvp && story.mvp.topPercent <= NOTABLE_TOP_PERCENT ? story.mvp : null;
-
-  if (mvp) {
-    return {
-      label: mvp.label,
-      value: formatTopPercent(mvp.topPercent),
-      note: mvp.scope === "hero" ? `of ${heroName(mvp.heroId)} players` : "of all players",
-    };
-  }
-  if (best && best.topPercent <= NOTABLE_TOP_PERCENT) {
-    return {
-      label: best.label,
-      value: formatTopPercent(best.topPercent),
-      note: "of all players",
-    };
-  }
-  return null;
+  if (!best) return null;
+  return { label: best.label, value: topPercentText(best.topPercent), note: "of all players" };
 }
 
 export interface SummaryRow {

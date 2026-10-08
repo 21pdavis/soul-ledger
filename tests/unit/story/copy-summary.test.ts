@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatTopPercent, summaryRows, topStat } from "@/story/copy-summary";
+import { summaryRows, topStat } from "@/story/copy-summary";
 import { fixtureStory } from "../../fixtures/story";
 
 const pct = (label: string, topPercent: number) => ({
@@ -10,15 +10,6 @@ const pct = (label: string, topPercent: number) => ({
   topPercent,
   higherIsBetter: true,
   weight: 1,
-});
-
-describe("formatTopPercent", () => {
-  it("keeps one decimal under 1% and rounds from 1% up", () => {
-    expect(formatTopPercent(0.5)).toBe("Top 0.5%");
-    expect(formatTopPercent(0.04)).toBe("Top 0.1%");
-    expect(formatTopPercent(12.4)).toBe("Top 12%");
-    expect(formatTopPercent(1)).toBe("Top 1%");
-  });
 });
 
 describe("topStat", () => {
@@ -51,8 +42,35 @@ describe("topStat", () => {
     expect(topStat(fixtureStory({ mvp: null, percentiles: [] }))).toBeNull();
   });
 
-  it("is omitted when the best stat is not notable (worse than top 50%)", () => {
-    const story = fixtureStory({ mvp: null, percentiles: [pct("Kills", 62)] });
+  it("uses the shared rounding: one decimal under 10%, whole percent from 10", () => {
+    const story = fixtureStory({ mvp: null, percentiles: [pct("Kills", 3.4)] });
+    expect(topStat(story)?.value).toBe("Top 3.4%");
+    expect(topStat(fixtureStory({ mvp: null, percentiles: [pct("Kills", 12.4)] }))?.value).toBe(
+      "Top 12%",
+    );
+  });
+
+  it("a hero MVP that is not notable (62) gives way to a good global stat, with global phrasing", () => {
+    const story = fixtureStory({
+      mvp: { ...pct("Kills", 62), scope: "hero", heroId: 1 },
+      percentiles: [pct("Assists", 8), pct("Deaths", 40)],
+    });
+    expect(topStat(story)).toEqual({ label: "Assists", value: "Top 8%", note: "of all players" });
+  });
+
+  it("when nothing is notable, still shows the best global stat, neutrally (no hero phrasing)", () => {
+    const story = fixtureStory({
+      mvp: { ...pct("Kills", 62), scope: "hero", heroId: 1 },
+      percentiles: [pct("Assists", 55), pct("Deaths", 70)],
+    });
+    expect(topStat(story)).toEqual({ label: "Assists", value: "Top 55%", note: "of all players" });
+  });
+
+  it("is omitted only when there is nothing to show at all", () => {
+    const story = fixtureStory({
+      mvp: { ...pct("Kills", 62), scope: "hero", heroId: 1 },
+      percentiles: [],
+    });
     expect(topStat(story)).toBeNull();
   });
 });

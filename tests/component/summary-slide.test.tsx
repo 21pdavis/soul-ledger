@@ -138,8 +138,13 @@ describe("SummarySlide", () => {
     expect(card).toHaveTextContent("Infernus");
   });
 
-  it("shows the Valve non-affiliation notice itself, since the app's footer is off screen here (ADR 0016)", () => {
+  it("leaves the Valve notice to the app's strip under the player (ADR 0016), so it is never doubled", () => {
     renderSummary();
-    expect(screen.getByText(ENTRY_COPY.disclaimer)).toBeInTheDocument();
+    expect(screen.queryByText(ENTRY_COPY.disclaimer)).toBeNull();
+  });
+
+  it("keeps list semantics on the ledger even with list-style removed (Safari, VoiceOver)", () => {
+    renderSummary();
+    expect(screen.getByRole("list", { name: "Your ledger entry" })).toHaveAttribute("role", "list");
   });
 });
