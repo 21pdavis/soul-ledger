@@ -6,7 +6,7 @@ tags: [m2, testing, accessibility]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T12:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
 ---
 
 # Decision
@@ -29,3 +29,9 @@ The owner confirmed this on 2026-10-07. Applies [ADR 0046](0046-strict-red-first
 - Keyboard operable, with visible focus rings.
 - WCAG AA contrast checked in a unit test.
 - One Playwright test drives the whole story by keyboard.
+
+# As built
+
+- `tests/e2e/a11y.spec.ts` runs a pinned `@axe-core/playwright` scan over the entry, loading, error and zero-matches screens and all 11 slides (full and sparse story) on phone and desktop. Any violation fails and no rule is disabled.
+- A keyboard-only Playwright test completes the whole story, Reduced motion is covered by component tests (per-slide `reducedMotion: true` cases and the loading screen), not by an e2e suite; the only e2e use of reduced motion is in `summary.spec.ts`, to speed up the layout matrix. An e2e check is on the [backlog](../recommendations/backlog.md).
+- Playwright ports are overridable (`PLAYWRIGHT_PORT`, `PLAYWRIGHT_GATE_PORT`) so several worktrees can run e2e at once.

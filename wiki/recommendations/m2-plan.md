@@ -3,15 +3,46 @@ type: Recommendation
 title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
-status: draft
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T09:00:00Z }
+status: stable
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
 ---
+
+# Outcome
+
+M2 is built and on `staging` (2026-10-08). The criteria below still describe what the tests check.
+
+| PR | Shipped as |
+|---|---|
+| 1 Foundation | #26 |
+| 2 Entry, window control, errors | #28 |
+| 3 Staged loading | #30 |
+| 4 Slide controllers | #27 |
+| Mount the story player, remove `/preview` | #32 (closes #29) |
+| 5 Slides 1-4 | #33 |
+| 6 Slides 5-7 | #34 |
+| 7 Slides 8-10 | #35 |
+| 8 Slide 11 summary | #31 |
+| 9 Hardening | #39 |
+
+**Deviations that matter**
+
+- **Copy:** the per-slide copy files were folded into the single `src/story/copy.ts` in PR 9, as [ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md) says.
+- **Slide contract:** every slide is a `SlideComponent` taking `SlideComponentProps` (`src/components/story/slides/contract.ts`): the slide's data plus `active`, `skipAnimation`, `reducedMotion` and `paused`. The player owns the index and the entrance clock.
+- **Desktop:** a scroll column with snap checkpoints, as in [ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md). The stage mounts only after hydration (`useIsClient`), so server and client markup match.
+- **Valve notice:** owned by App's notices strip below the player, not by any slide.
+- **Unspent souls:** slide 8 ships the neutral sentence, with no unit claimed, pending #36.
+- **Cached-matches note:** it squeezes the stage on tiny phones (#38, make it an overlay).
+- **Audio-unlock:** deferred, there is no audio layer.
+- **a11y:** the axe scan (`tests/e2e/a11y.spec.ts`), and the keyboard-only suite landed in PR 9. Reduced motion is covered by component tests only, with no e2e suite (backlog) ([ADR 0054](../decisions/0054-m2-testing-and-accessibility.md)).
+- **Preview route:** the `/preview` fixture route used during the build is gone (#29).
+
+**Follow-ups:** #36 (unspent souls unit and missing-key bias), #37 (consolidate slide 8-10 helpers into shared primitives and `copy.ts`), #38 (cached-matches overlay), #25 (patch window without a known date). Still open for the owner: [font pairing](../open-questions/m2-font-pairing.md) (Limelight with Space Grotesk shipped as the default), [rank tier names](../open-questions/m2-rank-tier-names.md) (map built from the API fixture), [hero art terms](../open-questions/m2-hero-art-terms.md), [unspent souls unit](../open-questions/m2-unspent-souls-unit.md). The repo going public still waits on #8 and #9.
 
 # Context
 
 M2 is "the 11-slide story in 2D with placeholder art, fully playable on phone and desktop web" ([ADR 0028](../decisions/0028-milestones.md)). Decisions are in ADRs [0050](../decisions/0050-m2-story-flow-and-controllers.md) (flow), [0051](../decisions/0051-m2-visual-motion-styling-stack.md) (look and styling), [0052](../decisions/0052-m2-entry-loading-error-states.md) (entry, loading, errors), [0053](../decisions/0053-m2-copy-and-data-presentation.md) (copy and data) and [0054](../decisions/0054-m2-testing-and-accessibility.md) (testing and a11y). Slides come from [ADR 0015](../decisions/0015-v1-slides.md) and [ADR 0021](../decisions/0021-kill-slides-and-mvp.md); their data is the `Story` type in `src/lib/stats/story.ts`.
 
-The orchestrator may deviate from this plan where useful. Every PR follows [ADR 0046](../decisions/0046-strict-red-first-tdd.md).
+The plan below is kept as written; see Outcome for what changed. The orchestrator may deviate from this plan where useful. Every PR follows [ADR 0046](../decisions/0046-strict-red-first-tdd.md).
 
 # Before the repo goes public
 

@@ -6,7 +6,7 @@ tags: [m2, story, layout, ux]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T12:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
 ---
 
 # Decision
@@ -32,3 +32,9 @@ Refines [ADR 0012](0012-phone-first.md) and [ADR 0028](0028-milestones.md) for M
 - The last slide (summary, a static card in M2; PNG export is M4) offers **Replay** and **Look up another player**.
 - M3's 3D scene later goes **behind the column**, which keeps the intent of ADR 0012 (a 3D backdrop on desktop).
 - Full-width desktop slide layouts are a backlog item, not M2.
+
+# As built
+
+- Slides share one contract, `SlideComponentProps` (`src/components/story/slides/contract.ts`): the slide's data plus `active`, `skipAnimation`, `reducedMotion` and `paused`. The player owns the index and the entrance clock (holding pauses it; it restarts in full on release).
+- The stage mounts only after hydration (`useIsClient`), because the controller choice depends on viewport and pointer, which the server cannot know.
+- Desktop is a scroll column with snap checkpoints. Scroll mode applies at viewport >= 1024px with a fine pointer; anything else uses the tap controller. Taps navigate on the phone controller only, so a slide's own controls must be real `<button>`, `<a>`, `<input>` or `<select>` elements.
