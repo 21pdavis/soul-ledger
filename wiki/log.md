@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-07
+* **Decision**: The ADR 0004 this-patch toggle moves into M2 as an extensible window control, recorded in [ADR 0052](decisions/0052-m2-entry-loading-error-states.md) and the [M2 plan](recommendations/m2-plan.md); more detailed filters go on the backlog.
 * **Decision**: M2 design, confirmed by the owner: [ADR 0050](decisions/0050-m2-story-flow-and-controllers.md) (phone tap-through and desktop snap-scroll over one slide index), [ADR 0051](decisions/0051-m2-visual-motion-styling-stack.md) (deco placeholders, Framer Motion, CSS modules, no Tailwind), [ADR 0052](decisions/0052-m2-entry-loading-error-states.md) (entry, staged loading, errors), [ADR 0053](decisions/0053-m2-copy-and-data-presentation.md) (copy and data presentation), [ADR 0054](decisions/0054-m2-testing-and-accessibility.md) (testing and a11y).
 * **Creation**: [M2 plan](recommendations/m2-plan.md) with the PR breakdown and per-slide acceptance criteria, and four open questions: [hero art terms](open-questions/m2-hero-art-terms.md), [unspent souls unit](open-questions/m2-unspent-souls-unit.md), [rank tier names](open-questions/m2-rank-tier-names.md), [font pairing](open-questions/m2-font-pairing.md).
 * **Decision**: [ADR 0049](decisions/0049-agent-model-assignment.md): qa agent moves to Haiku 5.5; implementer, wiki-keeper and reviewer keep their models.

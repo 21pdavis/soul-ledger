@@ -17,7 +17,6 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P0 | Build M2: the 11-slide story in 2D, fed by `/api/lookup` | [M2 plan](m2-plan.md), [ADR 0028](../decisions/0028-milestones.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | Find out what "Unspent Gold Minutes" counts, and if possible what accolade 11 (breakables) includes, before writing slide copy | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
-| P1 | Build the this-patch toggle (accepted in ADR 0004, deferred from M2) | [ADR 0004](../decisions/0004-time-window.md), [M2 plan](m2-plan.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |
 
@@ -40,6 +39,7 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 - Streaming and auto-play for the story, once the tap/scroll flow is proven ([ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md)).
 - Full-width desktop slide layouts that use more than the 9:16 column ([ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md)).
 - Per-metric MVP one-liners, replacing the single generic template ([ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md)).
+- More detailed filters (beyond all time / this patch), reusing the M2 window control ([ADR 0052](../decisions/0052-m2-entry-loading-error-states.md)).
 - Video export ([export](../decisions/0011-sharing.md)).
 
 # Standing recommendations
