@@ -102,7 +102,7 @@ Rules for agents:
   - **Non-blocking** findings and nits are fixed, or answered in a PR reply explaining why not.
   - Fix **all findings from a review round in one commit and one push**, with one PR reply listing each fix. Every fix commit needs CI to pass again before merging.
   - **Re-review only if the review had a blocking finding or the fixes were substantial.** If only non-blocking findings and nits remained, fix them and merge once CI passes, with no extra review pass (ADR 0047).
-  - **Scale reviewer effort to the change:** `medium` for docs or config only, `high` for code, `xhigh` for auth, data integrity, migrations or security.
+  - **Scale reviewer effort to the change:** `medium` for docs or config only, `high` (Sonnet, the reviewer's default model) for code, `xhigh` on Opus (the orchestrator passes `model: "opus"`) for auth, data integrity, migrations or security (ADR 0057).
 - PRs into `staging` don't need the owner's review. **`staging` → `main` always does**, and only the owner merges it.
 - **Tell the owner about every merge.** Whenever you merge a PR, or notice that one was merged (including the owner's `staging` → `main`), report it in the conversation straight away: PR number and link, a one-line summary, the agent review outcome, and the CI result. During long unattended runs, also send a push notification. Don't batch merges silently into an end-of-run summary.
 - Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
@@ -139,6 +139,19 @@ Running SQL on Neon, other risky Neon changes and triggering Render deploys alwa
 4. Keeps working on tasks that don't depend on the blocker. If nothing can proceed, it stops.
 
 **Blocked means:** the same failure survives about 3 genuinely different attempts; a product or business decision the plan and ADRs don't answer; a needed action is denied by the hard limits above; or an external service (deadlock-api, Steam, Render, Neon, GitHub) is down.
+
+## Token budget for runs (ADR 0057)
+
+Runs are limited by usage, so every agent follows these (reasoning and the rest of the policy in [ADR 0057](wiki/decisions/0057-token-efficient-unattended-runs.md)):
+
+- **Hand-backs are short:** at most about 150 words to the orchestrator. Detail goes in the PR description or review comment, and reports are never pasted into other replies.
+- **Fresh, narrow agents:** don't resume an agent for a small fix. Use a fresh agent given the PR number and review link, or the orchestrator for fixes of about 20 lines or fewer.
+- **Briefs are short** (200 to 300 words): goal, areas, acceptance criteria (link the plan), constraints. Pass references, not pasted contents, and don't restate this file.
+- **Tests are targeted:** run unit and component tests plus only the e2e spec files you touched. CI runs the full e2e suite. Filter long output (`tail`, `grep`) and never read whole logs.
+- **Loops are bounded:** at most 2 fix rounds per PR. A third means the orchestrator re-plans or asks the owner.
+- **Implementers don't wait for CI:** push, open or update the PR, report and stop. The orchestrator watches CI with a background `gh pr checks N --watch`, and triages a failure with a fresh Haiku agent (at most 100 words).
+- **Owner:** run `/clear` between phases and milestones (agents can't), and share `/usage` at each milestone's end.
+- Don't edit CLAUDE.md or agent files mid-run (it breaks the prompt cache), and keep this file under about 200 lines.
 
 ## Agent roster (`.claude/agents/`)
 
