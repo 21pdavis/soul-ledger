@@ -6,6 +6,9 @@ import { fixtureStory } from "../fixtures/story";
 
 const PROFILE = "https://steamcommunity.com/id/gaben";
 
+/** The real story player is up: its segmented progress bar is on screen. */
+const storyUp = (page: Page) => page.getByRole("list", { name: "Story progress" });
+
 const storyEvent = () => ({
   type: "story",
   player: { accountId: 1, personaName: "Gaben", avatarUrl: null },
@@ -94,7 +97,7 @@ test("the loader shows its three stages in order as events arrive, before the st
   const bar = page.getByRole("progressbar", { name: "Match details read" });
   await expect(bar).toHaveAttribute("aria-valuenow", "40");
   await expect(page.getByText("/ 100")).toBeVisible();
-  await expect(page.getByText(/Story ready/)).toHaveCount(0);
+  await expect(storyUp(page)).toHaveCount(0);
 
   await push(page, {
     type: "details",
@@ -111,7 +114,7 @@ test("the loader shows its three stages in order as events arrive, before the st
   await push(page, { type: "done", matchCount: 120 });
   await expect(page.getByRole("progressbar")).toBeVisible();
   await push(page, storyEvent());
-  await expect(page.getByText("Story ready: 120 matches")).toBeVisible();
+  await expect(storyUp(page)).toBeVisible();
   await expect(page.getByRole("progressbar")).toHaveCount(0);
 });
 
@@ -123,7 +126,7 @@ test("a waiting event shows a waiting note and the loader keeps going", async ({
   await expect(page.getByRole("status")).toContainText(/waiting our turn/i);
   await expect(page.getByRole("heading", { name: /couldn't find|lost the thread/ })).toHaveCount(0);
   await push(page, storyEvent());
-  await expect(page.getByText(/Story ready/)).toBeVisible();
+  await expect(storyUp(page)).toBeVisible();
 });
 
 test("the loader fits the screen without horizontal scroll", async ({ page }) => {
@@ -169,5 +172,5 @@ test("a return visit with nothing new (no details event) ends on an up-to-date t
   await expect(page.getByText(/already up to date/i)).toBeVisible();
   await expect(page.getByRole("status")).toHaveText("Almost ready. Sealing the ledger.");
   await push(page, storyEvent());
-  await expect(page.getByText("Story ready: 120 matches")).toBeVisible();
+  await expect(storyUp(page)).toBeVisible();
 });

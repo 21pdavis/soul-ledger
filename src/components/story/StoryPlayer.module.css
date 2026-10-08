@@ -5,9 +5,9 @@
 
 .root {
   /* The stage is as wide as --story-width allows and 9:16 tall, but never taller than the screen. */
-  --stage-h: min(100dvh, calc(min(100vw, var(--story-width)) * 16 / 9));
+  --stage-h: min(var(--player-h, 100dvh), calc(min(100vw, var(--story-width)) * 16 / 9));
   position: relative;
-  min-height: 100dvh;
+  min-height: var(--player-h, 100dvh);
   color: var(--bone);
   background-color: var(--ink);
   /* Art-deco diamond lattice with a faint green glow from the top. */
@@ -21,7 +21,7 @@
 .phone {
   display: grid;
   place-items: center;
-  height: 100dvh;
+  height: var(--player-h, 100dvh);
   overflow: hidden;
 }
 
@@ -131,7 +131,7 @@
 
 /* Desktop scroll controller: one viewport-high snap checkpoint per slide, the stage pinned over them. */
 .track {
-  height: 100dvh;
+  height: var(--player-h, 100dvh);
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   overscroll-behavior: contain;
@@ -139,7 +139,7 @@
 
 .trackContent {
   position: relative;
-  height: calc(var(--count) * 100dvh);
+  height: calc(var(--count) * var(--player-h, 100dvh));
 }
 
 .checkpoints {
@@ -149,7 +149,7 @@
 }
 
 .checkpoint {
-  height: 100dvh;
+  height: var(--player-h, 100dvh);
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -160,7 +160,7 @@
   z-index: 1;
   display: grid;
   place-items: center;
-  height: 100dvh;
+  height: var(--player-h, 100dvh);
 }
 
 @media (prefers-reduced-motion: reduce) {
