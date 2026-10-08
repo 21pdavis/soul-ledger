@@ -1,4 +1,5 @@
-import type { LookupEvent, StoryWindow } from "@/lib/lookup";
+import type { LookupEvent } from "@/lib/lookup";
+import { filtersToQuery, type LookupFilters } from "@/story/filters";
 import type { Jsonify } from "@/story/types";
 
 /**
@@ -12,10 +13,9 @@ export type ClientStoryEvent = Extract<ClientLookupEvent, { type: "story" }>;
 export type ClientErrorEvent = Extract<ClientLookupEvent, { type: "error" }>;
 export type LookupErrorReason = ClientErrorEvent["reason"];
 
-export interface ClientLookupRequest {
+export interface ClientLookupRequest extends LookupFilters {
   /** What the player pasted. */
   input: string;
-  window: StoryWindow;
   /** The Refresh action: fetch even if the player was synced moments ago. */
   refresh: boolean;
 }
@@ -26,8 +26,8 @@ export interface StreamOptions {
 }
 
 /** The request URL for `GET /api/lookup`. */
-export function lookupUrl({ input, window, refresh }: ClientLookupRequest): string {
-  const params = new URLSearchParams({ q: input, window });
+export function lookupUrl({ input, refresh, ...filters }: ClientLookupRequest): string {
+  const params = new URLSearchParams({ q: input, ...filtersToQuery(filters) });
   if (refresh) params.set("refresh", "1");
   return `/api/lookup?${params}`;
 }
