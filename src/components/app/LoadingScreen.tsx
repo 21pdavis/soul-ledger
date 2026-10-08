@@ -14,6 +14,9 @@ interface Props {
   progress: ClientLookupEvent[];
   /** The least time the tally counters take to count up, in ms (ADR 0056). 0 shows values at once. */
   countMs?: number;
+  /** No news from the server for a while: say so and offer a retry. */
+  stalled?: boolean;
+  onRetry?: () => void;
 }
 
 /** Hero tiles shown before the rest are counted ("+8 more"). */
@@ -61,7 +64,12 @@ function Avatar({ url }: { url: string | null }) {
  * tally of match details. It never advances on a timer. Screen readers hear one polite line per
  * stage change; the animated counters stay out of the live region.
  */
-export function LoadingScreen({ progress, countMs = LOADING_PACE.tallyCountMs }: Props) {
+export function LoadingScreen({
+  progress,
+  countMs = LOADING_PACE.tallyCountMs,
+  stalled = false,
+  onRetry,
+}: Props) {
   const view = loadingStage(progress);
   const reduced = usePrefersReducedMotion();
   const { profile, history, details } = view;
@@ -71,14 +79,8 @@ export function LoadingScreen({ progress, countMs = LOADING_PACE.tallyCountMs }:
       ? { initial: false as const }
       : { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, transition: extra };
 
-  // The visible twin of the announcement, for the moments between stages.
-  const note = view.done
-    ? LOADING_COPY.sealing
-    : view.waiting
-      ? LOADING_COPY.waiting
-      : view.stage === 0
-        ? LOADING_COPY.title
-        : null;
+  // What is happening right now: always something, so the page is never blank.
+  const note = view.note;
 
   const tiles = history?.heroes.slice(0, MAX_TILES) ?? [];
   const hiddenHeroes = (history?.heroes.length ?? 0) - tiles.length;
@@ -203,10 +205,19 @@ export function LoadingScreen({ progress, countMs = LOADING_PACE.tallyCountMs }:
             )}
           </li>
         </ol>
-        {note && (
-          <p className={styles.note} aria-hidden="true">
-            {note}
-          </p>
+        <p className={styles.note} aria-hidden="true">
+          {note}
+        </p>
+        {stalled && (
+          <div className={styles.stalled} role="status">
+            <p className={styles.stalledTitle}>{LOADING_COPY.stalled.title}</p>
+            <p>{LOADING_COPY.stalled.body}</p>
+            {onRetry && (
+              <button type="button" className={styles.retry} onClick={onRetry}>
+                {LOADING_COPY.stalled.retry}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

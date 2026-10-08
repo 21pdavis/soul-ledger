@@ -99,7 +99,7 @@ interface Queued {
  * - A stage that goes up stays at least `stageDwellMs` before the next stage is shown. Events that
  *   arrive sooner wait in a queue, in stage order, one per stage (a newer event for a queued stage
  *   replaces it, and details never go backwards).
- * - Updates to a stage already on screen (more details, a repeated profile) and `waiting` are shown
+ * - Updates to a stage already on screen (more details, a repeated profile), `waiting` and `status` are shown
  *   at once. An error is released at once and drops the queue.
  * - The story is released once the queue is empty and the last stage has had its dwell plus
  *   `finalTailMs`. A slow lookup is already past that, so it adds nothing.
@@ -170,7 +170,7 @@ export function createLoadingPacer(config: PaceConfig): LoadingPacer {
         final = event;
       } else if (event.type === "story") {
         pendingStory = event;
-      } else if (event.type === "waiting") {
+      } else if (event.type === "waiting" || event.type === "status") {
         show(event);
       } else {
         const stage = stageOf(event);

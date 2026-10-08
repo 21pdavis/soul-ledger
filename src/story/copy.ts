@@ -64,6 +64,22 @@ export const LOADING_COPY = {
   pageHeading: "Your Soul Ledger is loading",
   waiting: "Another lookup of this ledger is already running. Waiting our turn.",
   sealing: "Almost ready. Sealing the ledger.",
+  /** What the server is doing right now. Always one of these is on screen, never a blank page. */
+  status: {
+    contacting: "Contacting Deadlock's servers...",
+    reading: "Reading your match history...",
+    fetching: "Fetching your match details...",
+    batch: (left: number) =>
+      `Reading your matches. ${count(left)} ${left === 1 ? "match" : "matches"} left.`,
+    rateLimited: (seconds: number) =>
+      `Waiting in line: Deadlock's servers only allow so many requests. About ${seconds} ${seconds === 1 ? "second" : "seconds"}.`,
+    finishing: "Checking your rank history...",
+  },
+  stalled: {
+    title: "This is taking longer than usual.",
+    body: "Deadlock's servers are slow right now. You can keep waiting, or try again.",
+    retry: "Try again",
+  },
   /** Headings of the three ledger entries; the later ones show as blank lines until their stage. */
   entries: { profile: "The soul", history: "The matches", details: "The tally" },
   profileTeaser: (name: string | null) =>

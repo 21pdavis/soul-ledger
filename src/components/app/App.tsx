@@ -44,16 +44,22 @@ interface Props {
   fetchImpl?: typeof fetch;
   /** For tests: replaces the loader pacing (`NO_PACE` skips every wait). Default: `resolvePace()`. */
   pace?: PaceConfig;
+  /** Silence from the server for this long (ms) shows the "taking longer" message. */
+  stallMs?: number;
 }
+
+/** How long a lookup may go without any news before we say it is slow and offer a retry. */
+export const STALL_MS = 20_000;
 
 const subscribeNothing = () => () => {};
 
-export function App({ fetchImpl, pace }: Props) {
+export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
   const [phase, setPhase] = useState<Phase>({ name: "entry" });
   const [request, setRequest] = useState<ClientLookupRequest | null>(null);
   // Bumped by Replay: remounting the story starts it again at slide 1.
   const [replayCount, setReplayCount] = useState(0);
   const [lastEntry, setLastEntry] = useState<Prefs | null>(null);
+  const [stalled, setStalled] = useState(false);
   const running = useRef<AbortController | null>(null);
 
   // Remembered URL and filters. `null` while server rendering, so hydration matches.
@@ -73,9 +79,22 @@ export function App({ fetchImpl, pace }: Props) {
       const pacer = createLoadingPacer(config);
       setPhase({ name: "loading", progress: [], countMs: config.tallyCountMs });
       let timer: ReturnType<typeof setTimeout> | undefined;
-      controller.signal.addEventListener("abort", () => clearTimeout(timer));
+      // The server sends a status before every step, so long silence means something is stuck.
+      let stallTimer: ReturnType<typeof setTimeout> | undefined;
+      const watchStall = () => {
+        clearTimeout(stallTimer);
+        setStalled(false);
+        stallTimer = setTimeout(() => setStalled(true), stallMs);
+      };
+      controller.signal.addEventListener("abort", () => {
+        clearTimeout(timer);
+        clearTimeout(stallTimer);
+      });
+      watchStall();
 
       const finish = (event: FinalEvent) => {
+        clearTimeout(stallTimer);
+        setStalled(false);
         if (event.type === "error") {
           setPhase({
             name: "error",
@@ -122,10 +141,11 @@ export function App({ fetchImpl, pace }: Props) {
         signal: controller.signal,
       })) {
         if (controller.signal.aborted) return;
+        watchStall();
         apply(pacer.push(event, performance.now()));
       }
     },
-    [fetchImpl, pace],
+    [fetchImpl, pace, stallMs],
   );
 
   const submit = useCallback(
@@ -175,7 +195,12 @@ export function App({ fetchImpl, pace }: Props) {
         />
       )}
       {phase.name === "loading" && (
-        <LoadingScreen progress={phase.progress} countMs={phase.countMs} />
+        <LoadingScreen
+          progress={phase.progress}
+          countMs={phase.countMs}
+          stalled={stalled}
+          onRetry={() => request && void run(request)}
+        />
       )}
       {phase.name === "error" && (
         <ErrorScreen

@@ -270,3 +270,27 @@
     opacity: 0.8;
   }
 }
+
+.stalled {
+  margin: 1.25rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.stalledTitle {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+.retry {
+  margin-top: 0.75rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
+  font: inherit;
+  color: var(--brass);
+  background: transparent;
+  border: 1px solid var(--brass);
+  cursor: pointer;
+}
