@@ -1,10 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { fixtureStory } from "../fixtures/story";
+import { push, startLookup, streamLookupByHand } from "./hand-stream";
 
 // The lookup stream is faked in the page so the test decides when each event arrives. That makes
 // "the stages appear in order, driven by events" deterministic, with no real timers involved.
-
-const PROFILE = "https://steamcommunity.com/id/gaben";
 
 /** The real story player is up: its segmented progress bar is on screen. */
 const storyUp = (page: Page) => page.getByRole("list", { name: "Story progress" });
@@ -17,42 +16,6 @@ const storyEvent = () => ({
   stale: false,
   story: fixtureStory(),
 });
-
-declare global {
-  interface Window {
-    __lookup: { push: (event: unknown) => void };
-  }
-}
-
-/** Replaces fetch for /api/lookup with a stream the test feeds by hand. */
-async function streamLookupByHand(page: Page) {
-  await page.addInitScript(() => {
-    const realFetch = window.fetch.bind(window);
-    window.fetch = (input, init) => {
-      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-      if (!url.includes("/api/lookup")) return realFetch(input, init);
-      const encoder = new TextEncoder();
-      let controller!: ReadableStreamDefaultController<Uint8Array>;
-      const body = new ReadableStream<Uint8Array>({ start: (c) => (controller = c) });
-      window.__lookup = {
-        push: (event) => controller.enqueue(encoder.encode(JSON.stringify(event) + "\n")),
-      };
-      return Promise.resolve(
-        new Response(body, { headers: { "content-type": "application/x-ndjson" } }),
-      );
-    };
-  });
-}
-
-const push = (page: Page, event: unknown) => page.evaluate((e) => window.__lookup.push(e), event);
-
-async function startLookup(page: Page) {
-  await page.goto("/");
-  await page.waitForLoadState("networkidle");
-  await page.getByLabel("Paste your Steam profile URL").fill(PROFILE);
-  await page.getByRole("button", { name: "Open the ledger" }).click();
-  await page.waitForFunction(() => Boolean(window.__lookup));
-}
 
 test("the loader shows its three stages in order as events arrive, before the story", async ({
   page,

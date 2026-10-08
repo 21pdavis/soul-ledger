@@ -60,6 +60,8 @@ const count = (n: number) => n.toLocaleString("en-US");
  */
 export const LOADING_COPY = {
   title: "Looking up your ledger...",
+  /** The page's h1 while loading: not shown, it names the page for screen readers. */
+  pageHeading: "Your Soul Ledger is loading",
   waiting: "Another lookup of this ledger is already running. Waiting our turn.",
   sealing: "Almost ready. Sealing the ledger.",
   /** Headings of the three ledger entries; the later ones show as blank lines until their stage. */

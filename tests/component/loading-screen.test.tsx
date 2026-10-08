@@ -44,6 +44,20 @@ beforeEach(() => setReducedMotion(true));
 afterEach(() => vi.unstubAllGlobals());
 
 describe("LoadingScreen", () => {
+  it("has the page's one h1 at every stage, above the stage headings", () => {
+    const stages = [
+      [resolved],
+      [resolved, profile()],
+      [resolved, profile(), history(), details(40)],
+    ];
+    for (const progress of stages) {
+      const { unmount } = render(<LoadingScreen progress={progress} />);
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Your Soul Ledger");
+      unmount();
+    }
+  });
+
   it("before any stage, says it is looking up the ledger", () => {
     render(<LoadingScreen progress={[resolved]} />);
     expect(screen.getByRole("status")).toHaveTextContent("Looking up your ledger...");

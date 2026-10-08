@@ -78,6 +78,7 @@ export function LoadingScreen({ progress }: Props) {
 
   return (
     <div className={styles.page} data-stage={view.stage} data-waiting={view.waiting || undefined}>
+      <h1 className={styles.srOnly}>{LOADING_COPY.pageHeading}</h1>
       <p role="status" aria-live="polite" aria-atomic="true" className={styles.announce}>
         {view.announcement}
       </p>

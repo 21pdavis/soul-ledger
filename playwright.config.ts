@@ -1,7 +1,22 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3100;
-const GATE_PORT = 3101;
+const DEFAULT_PORT = 3100;
+const DEFAULT_GATE_PORT = 3101;
+
+/**
+ * Ports are per worktree: with several checkouts (or agents) running e2e at once, give each its own
+ * `PLAYWRIGHT_PORT` and `PLAYWRIGHT_GATE_PORT`, or one run silently tests another one's server.
+ */
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? DEFAULT_PORT);
+export const GATE_PORT = Number(process.env.PLAYWRIGHT_GATE_PORT ?? DEFAULT_GATE_PORT);
+
+/**
+ * Reuse a server that is already listening only on the default ports, locally, and never when
+ * `PLAYWRIGHT_REUSE_SERVER=0`. On a custom port a listener is not ours to trust: Playwright then
+ * fails fast ("already used") instead of testing someone else's build.
+ */
+const mayReuse = (port: number, defaultPort: number) =>
+  !process.env.CI && process.env.PLAYWRIGHT_REUSE_SERVER !== "0" && port === defaultPort;
 
 /** Local stand-in secrets for the gated server; never used anywhere real. */
 export const TEST_ACCESS_KEY = "e2e-access-key-0123456789abcdef0123456";
@@ -51,13 +66,13 @@ export default defineConfig({
         {
           command: `pnpm exec next start -p ${PORT}`,
           url: `http://localhost:${PORT}/api/health`,
-          reuseExistingServer: !process.env.CI,
+          reuseExistingServer: mayReuse(PORT, DEFAULT_PORT),
           timeout: 60_000,
         },
         {
           command: `pnpm exec next start -p ${GATE_PORT}`,
           url: `http://localhost:${GATE_PORT}/api/health`,
-          reuseExistingServer: !process.env.CI,
+          reuseExistingServer: mayReuse(GATE_PORT, DEFAULT_GATE_PORT),
           timeout: 60_000,
           env: { STAGING_GATE: "on", STAGING_ACCESS_KEY: TEST_ACCESS_KEY },
         },
