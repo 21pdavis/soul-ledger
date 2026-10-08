@@ -27,19 +27,19 @@ interface Props {
   smooth: boolean;
   /** Called with the checkpoint the reader has scrolled to, once the scrolling comes to rest. */
   onArrive: (index: number) => void;
-  /** The pinned stage. */
-  children: ReactNode;
+  /** The card for checkpoint `i`. */
+  renderCard: (index: number) => ReactNode;
 }
 
 /**
- * The desktop controller (ADR 0050): a scroll track of SLIDE_COUNT viewport-high snap checkpoints
- * with the 9:16 stage pinned (sticky) over it.
+ * The desktop controller (ADR 0050, 0061): a vertical scroll track of SLIDE_COUNT viewport-high
+ * snap checkpoints, each holding one slide's card, so the page really moves as the reader scrolls.
  *
  * The two directions never fight: scroll -> index only happens once scrolling is at rest, and
  * index -> scroll only happens when the track is not already on that checkpoint, so an arrival
  * the reader scrolled to produces no further scroll.
  */
-export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
+export function ScrollTrack({ index, smooth, onArrive, renderCard }: Props) {
   const track = useRef<HTMLDivElement>(null);
   const timer = useRef<number>(0);
   const first = useRef(true);
@@ -129,17 +129,11 @@ export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
       style={{ "--count": SLIDE_COUNT } as CSSProperties}
     >
       <div className={styles.trackContent}>
-        <div className={styles.checkpoints} aria-hidden="true">
-          {Array.from({ length: SLIDE_COUNT }, (_, i) => (
-            <div
-              key={i}
-              className={styles.checkpoint}
-              data-testid="checkpoint"
-              data-checkpoint={i}
-            />
-          ))}
-        </div>
-        <div className={styles.pin}>{children}</div>
+        {Array.from({ length: SLIDE_COUNT }, (_, i) => (
+          <div key={i} className={styles.checkpoint} data-testid="checkpoint" data-checkpoint={i}>
+            {renderCard(i)}
+          </div>
+        ))}
       </div>
     </div>
   );
