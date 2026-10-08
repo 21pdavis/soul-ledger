@@ -100,6 +100,55 @@ describe("StoryPlayer, scroll mode (desktop)", () => {
     await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "roster"));
   });
 
+  it("a jump to a checkpoint the track is merely passing still scrolls there", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    // The smooth scroll to 7 is in flight, 40px past checkpoint 3 (nearest checkpoint: 3).
+    track().scrollTop = 3 * VIEWPORT_H + 40;
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 4" }));
+    expect(stage()).toHaveAttribute("data-slide", "scavenger");
+    expect(scrollTo).toHaveBeenCalledTimes(2);
+    expect(scrollTo).toHaveBeenLastCalledWith(expect.objectContaining({ top: 3 * VIEWPORT_H }));
+  });
+
+  it("keys that do not scroll (Tab) do not end a jump in flight", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));
+    scrollToCheckpoint(3); // passing checkpoint 3 on the way
+    await userEvent.keyboard("{Tab}");
+    await new Promise((r) => setTimeout(r, 250));
+    expect(stage()).toHaveAttribute("data-slide", "roast");
+  });
+
+  it("scrolling keys (Page Down) hand control back to the reader", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));
+    await userEvent.keyboard("{PageDown}");
+    scrollToCheckpoint(2);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "roster"));
+  });
+
+  it("scrollend is a definite arrival, even where the reader dragged away mid-jump", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));
+    // A scrollbar drag during the jump, ending on checkpoint 4: no wheel or pointer event fired.
+    track().scrollTop = 4 * VIEWPORT_H;
+    fireEvent(track(), new Event("scrollend"));
+    expect(stage()).toHaveAttribute("data-slide", "kills");
+  });
+
+  it("scrollend at the jump's own target changes nothing", async () => {
+    render(<StoryPlayer {...fixtureSlideProps()} />);
+    await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));
+    track().scrollTop = 7 * VIEWPORT_H;
+    fireEvent(track(), new Event("scrollend"));
+    expect(stage()).toHaveAttribute("data-slide", "roast");
+    // and the jump is over: the reader's next scroll is an ordinary arrival
+    scrollToCheckpoint(2);
+    await waitFor(() => expect(stage()).toHaveAttribute("data-slide", "roster"));
+  });
+
   it("reader input (wheel) during a jump hands control back to the reader", async () => {
     render(<StoryPlayer {...fixtureSlideProps()} />);
     await userEvent.click(screen.getByRole("button", { name: "Go to slide 8" }));

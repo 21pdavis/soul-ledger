@@ -7,6 +7,19 @@ import styles from "./StoryPlayer.module.css";
 /** Scrolling counts as finished once no scroll event has arrived for this long. */
 const SETTLE_MS = 100;
 
+/** Keys that scroll the track natively; pressing one means the reader has taken over. */
+const SCROLLING_KEYS = new Set([
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "PageUp",
+  "PageDown",
+  "Home",
+  "End",
+  " ",
+]);
+
 interface Props {
   /** The slide the player is on. */
   index: number;
@@ -46,8 +59,11 @@ export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
     const el = track.current;
     const firstRun = first.current;
     first.current = false;
-    if (!el || !el.clientHeight || nearest(el) === index) return;
+    if (!el || !el.clientHeight) return;
     const top = index * el.clientHeight;
+    // Already resting on it. (Not merely nearest to it: a jump in flight passing this checkpoint
+    // would otherwise be left to carry on to its old target.) Snap makes rest positions exact.
+    if (Math.abs(el.scrollTop - top) < 1) return;
     // We are scrolling to `index` ourselves: until we get there (or the reader takes over), a
     // pause on some checkpoint along the way is not the reader arriving there.
     pending.current = index;
@@ -58,31 +74,48 @@ export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
     }
   }, [index, smooth]);
 
-  // The reader taking over (wheel, touch, press, key) ends any jump we were waiting on. Our own
-  // key handler dispatches the jump before React re-renders, so it sets a fresh target afterwards.
+  // The reader taking over (wheel, touch, press, a scrolling key) ends any jump we were waiting on.
+  // Our own key handler dispatches the jump before React re-renders, so it sets a fresh target
+  // afterwards. Keys that do not scroll (Tab, Shift) leave a jump in flight alone.
   const takeOver = () => {
     pending.current = null;
   };
   useEffect(() => {
-    window.addEventListener("keydown", takeOver);
-    return () => window.removeEventListener("keydown", takeOver);
+    const onKey = (e: KeyboardEvent) => {
+      if (SCROLLING_KEYS.has(e.key)) pending.current = null;
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   // scroll position -> index, once at rest
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  const arrive = (definite: boolean) => {
+    const el = track.current;
+    if (!el) return;
+    const arrived = nearest(el);
+    if (pending.current !== null && !definite) {
+      if (arrived !== pending.current) return; // still on the way
+    }
+    pending.current = null;
+    onArriveRef.current(arrived);
+  };
   const onScroll = () => {
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => {
-      const el = track.current;
-      if (!el) return;
-      const arrived = nearest(el);
-      if (pending.current !== null) {
-        if (arrived !== pending.current) return; // still on the way
-        pending.current = null;
-      }
-      onArriveRef.current(arrived);
-    }, SETTLE_MS);
+    timer.current = window.setTimeout(() => arrive(false), SETTLE_MS);
   };
+  // Where supported, scrollend says scrolling is truly over (it never fires mid-flight), so
+  // wherever the track came to rest is the arrival, whatever we were heading for.
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    const onEnd = () => {
+      window.clearTimeout(timer.current);
+      arrive(true);
+    };
+    el.addEventListener("scrollend", onEnd);
+    return () => el.removeEventListener("scrollend", onEnd);
+  });
 
   return (
     <div
