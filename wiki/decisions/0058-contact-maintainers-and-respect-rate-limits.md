@@ -20,7 +20,7 @@ Two questions came up on 2026-10-08.
 
 1. **Approach the maintainers** (Discord or GitHub) before launch. This reverses the deferral in [ADR 0017](0017-full-history-via-patreon-for-now.md). Ask:
    - how third-party sites should guide users through the bot-friend flow;
-   - whether an API key, sponsorship or a higher limit is available (the OpenAPI spec lists a separate "Key" rate-limit tier);
+   - whether an API key, sponsorship or a higher limit is available (the OpenAPI spec lists a separate "Key" rate-limit tier, see [deadlock-api](../research/deadlock-api.md); how to get a key is undocumented);
    - whether the data lake at `data.deadlock-api.com` may be used for bulk reads, and how fresh it is.
 2. **Do not circumvent rate limits.** No IP rotation, extra outbound IPs to multiply a quota, or other evasion of per-IP limits. It is bad faith toward a small open-source project, and being blocked would be worse than being slow.
 3. **Do not self-host a clone of the API.** It cannot fix the coverage gap and is too costly for the cheap-site goal of [ADR 0001](0001-public-site-postgres-cache.md).

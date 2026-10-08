@@ -8,7 +8,11 @@ question_status: resolved
 resolved_by: ../decisions/0017-full-history-via-patreon-for-now.md
 recommendation: "Ask the deadlock-api maintainers how third-party sites should use the bot-friend flow; meanwhile link the ingest tool and Patreon tier."
 raised_on: 2026-10-06
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T12:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T16:00:00Z }
+sources:
+  - id: ingest-cache
+    resource: https://deadlock-api.com/ingest-cache
+    title: deadlock-api ingest-cache page, read 2026-10-08
 ---
 
 # Findings (2026-10-06)
@@ -18,7 +22,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T12:00:00Z }
 
 # Findings (2026-10-08): the ingest-cache page
 
-Source: https://deadlock-api.com/ingest-cache ("Get your matches on Deadlock trackers").
+Source: the ingest-cache page ("Get your matches on Deadlock trackers").[^ingest]
 
 - Trackers can only show matches someone has sent in, because a match needs its ID **and a salt** that the game client downloads through Steam when it shows the match.
 - **Two free routes for a player:**
@@ -31,3 +35,5 @@ Source: https://deadlock-api.com/ingest-cache ("Get your matches on Deadlock tra
 # Next step
 
 Ask the deadlock-api maintainers (Discord/GitHub) how a third-party site should guide users through the bot-friend flow, and whether an API key or sponsorship raises our limits.
+
+[^ingest]: deadlock-api ingest-cache page, read 2026-10-08
