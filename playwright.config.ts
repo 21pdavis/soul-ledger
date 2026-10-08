@@ -53,6 +53,9 @@ export default defineConfig({
           url: `http://localhost:${PORT}/api/health`,
           reuseExistingServer: !process.env.CI,
           timeout: 60_000,
+          // Enables the fixture /preview route for the story-player specs. It is a 404 otherwise,
+          // which the gated server below (production-like, no switch) proves in gate.spec.ts.
+          env: { STORY_PREVIEW: "1" },
         },
         {
           command: `pnpm exec next start -p ${GATE_PORT}`,
