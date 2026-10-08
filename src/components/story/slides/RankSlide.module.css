@@ -1,0 +1,113 @@
+/* Rank slide: the current badge is the loud thing; the climb is a quiet brass line under it. */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.summary {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--bone);
+  text-wrap: pretty;
+}
+
+.friendly {
+  margin: 0;
+  padding: 2rem 1.25rem;
+  border: 1px solid var(--rule);
+  outline: 1px solid var(--rule);
+  outline-offset: -6px;
+  color: var(--bone-muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.current {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.25rem 1rem;
+  border: 1px solid var(--brass);
+  outline: 1px solid var(--rule);
+  outline-offset: -6px;
+}
+
+.currentName {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1.1;
+  color: var(--brass);
+  text-align: center;
+}
+
+.currentCaption {
+  font-size: 0.95rem;
+  color: var(--bone-muted);
+}
+
+.plot {
+  width: 100%;
+  height: auto;
+}
+
+.guide {
+  stroke: var(--rule);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.line {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+}
+
+.badge {
+  fill: var(--panel);
+  stroke: var(--brass);
+  stroke-width: 1.5;
+}
+
+.badgeNow {
+  fill: var(--green);
+  stroke: var(--bone);
+  stroke-width: 1.5;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--bone);
+}
+
+.item[aria-current="step"] {
+  color: var(--green);
+}
+
+.name {
+  font-size: 1.05rem;
+}
+
+.date {
+  font-size: 0.9rem;
+  color: var(--bone-muted);
+  font-variant-numeric: tabular-nums;
+}
