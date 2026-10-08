@@ -1,0 +1,39 @@
+.bar {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rule);
+}
+
+.segment[data-state="done"],
+.segment[data-state="current"] {
+  background: var(--brass);
+}
+
+.segment[data-state="current"] {
+  background: var(--bone);
+}
+
+/* A taller invisible hit area so the thin segment is easy to click or tap. */
+.hit {
+  position: absolute;
+  inset: -10px 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
