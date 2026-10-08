@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { fixtureStory } from "../fixtures/story";
 import { mockLookup, ndjson, openEntry, PATCH, PROFILE, storyEvent } from "./lookup-mock";
 
 // Slide 11 on the real flow (entry -> lookup -> story) with the lookup mocked, so these run the
@@ -20,8 +21,16 @@ async function playToSummary(page: Page) {
 }
 
 /** Look up the profile (optionally with the This patch window) and land on the summary slide. */
-async function openSummary(page: Page, over: Record<string, unknown> = {}, patch = false) {
-  const urls = await mockLookup(page, ndjson({ type: "resolved", accountId: 1 }, storyEvent(over)));
+async function openSummary(
+  page: Page,
+  over: Record<string, unknown> = {},
+  patch = false,
+  story = fixtureStory(),
+) {
+  const urls = await mockLookup(
+    page,
+    ndjson({ type: "resolved", accountId: 1 }, storyEvent(over, story)),
+  );
   await openEntry(page);
   await page.getByLabel("Paste your Steam profile URL").fill(PROFILE);
   if (patch) await page.getByRole("radio", { name: "This patch" }).check();
@@ -69,37 +78,74 @@ test("Look up another player returns to the entry screen", async ({ page }) => {
   await expect(page.getByLabel("Paste your Steam profile URL")).toBeVisible();
 });
 
-test.describe("small phones: nothing on the card is clipped by the stage", () => {
-  test.skip(({ isMobile }) => !isMobile, "phone only");
+/** The cases that squeeze the card: the stale note shrinks the stage, "This patch" wraps the window line, long names fill the lines. */
+const CASES: { name: string; over: Record<string, unknown>; patch: boolean; long: boolean }[] = [
+  { name: "all time", over: {}, patch: false, long: false },
+  { name: "stale note", over: { stale: true }, patch: false, long: false },
+  { name: "this patch", over: { window: "patch", patchStart: PATCH }, patch: true, long: false },
+  { name: "long names", over: {}, patch: false, long: true },
+  {
+    name: "stale + this patch + long names",
+    over: { stale: true, window: "patch", patchStart: PATCH },
+    patch: true,
+    long: true,
+  },
+];
 
-  for (const [width, height] of [
-    [320, 568],
-    [360, 640],
-    [375, 667],
-  ]) {
-    test(`${width}x${height}: the three actions are reachable and the card fits the stage`, async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width, height });
-      await openSummary(page);
-      const stageBox = (await stage(page).boundingBox())!;
-      for (const name of ["Replay", "Look up another player", "Refresh"]) {
-        const button = page.getByRole("button", { name });
-        await expect(button).toBeVisible();
-        const box = (await button.boundingBox())!;
-        expect(box.y).toBeGreaterThanOrEqual(stageBox.y);
-        expect(box.y + box.height).toBeLessThanOrEqual(stageBox.y + stageBox.height);
-        expect(box.x).toBeGreaterThanOrEqual(stageBox.x);
-        expect(box.x + box.width).toBeLessThanOrEqual(stageBox.x + stageBox.width);
-      }
-      // The slide's own frame did not overflow (the stage clips whatever overflows).
-      const overflow = await stage(page)
-        .locator("section")
-        .first()
-        .evaluate((el) => el.scrollHeight - el.clientHeight);
-      expect(overflow).toBeLessThanOrEqual(0);
-      // And the Valve notice is still on screen under the stage.
-      await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeInViewport();
-    });
+/** A story whose names are as long as the lines can get ("The Doorman", "Hero damage per minute"). */
+function longNamesStory() {
+  const story = fixtureStory();
+  story.main!.heroId = 69;
+  story.mvp = {
+    ...story.mvp!,
+    label: "Hero damage per minute",
+    scope: "hero",
+    heroId: 69,
+    topPercent: 12,
+  };
+  return story;
+}
+
+const SIZES = [
+  { width: 320, height: 568, phone: true },
+  { width: 360, height: 640, phone: true },
+  { width: 375, height: 667, phone: true },
+  { width: 1280, height: 720, phone: false },
+  { width: 1440, height: 900, phone: false },
+];
+
+test.describe("the card is never clipped by the stage", () => {
+  for (const { width, height, phone } of SIZES) {
+    for (const c of CASES) {
+      test(`${width}x${height}, ${c.name}: the three actions are reachable and the frame is whole`, async ({
+        page,
+        isMobile,
+      }) => {
+        test.skip(phone !== !!isMobile, phone ? "phone only" : "desktop only");
+        await page.setViewportSize({ width, height });
+        await openSummary(page, c.over, c.patch, c.long ? longNamesStory() : fixtureStory());
+        const stageBox = (await stage(page).boundingBox())!;
+        const frame = stage(page).locator("section").first();
+        const frameBox = (await frame.boundingBox())!;
+        // The frame itself sits inside the stage, so its bottom border is not cut off.
+        expect(frameBox.y + frameBox.height).toBeLessThanOrEqual(
+          stageBox.y + stageBox.height + 0.5,
+        );
+        for (const name of ["Replay", "Look up another player", "Refresh"]) {
+          const button = page.getByRole("button", { name });
+          await expect(button).toBeVisible();
+          const box = (await button.boundingBox())!;
+          expect(box.y).toBeGreaterThanOrEqual(stageBox.y);
+          expect(box.y + box.height).toBeLessThanOrEqual(frameBox.y + frameBox.height - 1);
+          expect(box.x).toBeGreaterThanOrEqual(stageBox.x);
+          expect(box.x + box.width).toBeLessThanOrEqual(stageBox.x + stageBox.width);
+        }
+        // Nothing overflows the frame (the stage clips whatever does).
+        const overflow = await frame.evaluate((el) => el.scrollHeight - el.clientHeight);
+        expect(overflow).toBeLessThanOrEqual(0);
+        // And the Valve notice is still on screen under the stage.
+        await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeInViewport();
+      });
+    }
   }
 });

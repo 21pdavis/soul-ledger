@@ -2,15 +2,24 @@
  * Slide 11: a ledger entry. Ruled lines with dotted leaders, figures in the display face, and one
  * rubber stamp, the only memorable thing here. Placeholder-grade: type and rules only.
  *
- * The stage clips (overflow: hidden) and is only 480px wide, 9:16 at most, and shorter on small
- * phones with the app's notice strip under it. So everything here is sized to fit a 320x568 phone,
- * with the stamp beside the text rather than under it and the two main actions side by side.
+ * The stage clips (overflow: hidden) and how tall it is depends on the screen AND on what the app
+ * shows under it (the Valve notice, plus the cached-matches note), so the layout tiers key on the
+ * height the card really has (a size container), not on the viewport. The card degrades instead
+ * of clipping: the stamp and then the scope note go first, and the actions stay pinned to the
+ * foot of the frame so they are never the part that gets cut.
  */
 
+/* The size container: exactly the room the frame leaves for the card. */
 .summary {
+  container-type: size;
+  height: 100%;
+}
+
+.card {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+  height: 100%;
 }
 
 .ledger {
@@ -21,9 +30,10 @@
   border-bottom: 1px solid var(--rule);
 }
 
+/* One ledger line: label, dotted leader, figure; the scope note sits under the figure. */
 .line {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(1rem, 1fr) auto;
   align-items: baseline;
   column-gap: 0.5rem;
   padding: 0.5rem 0;
@@ -35,14 +45,16 @@
 }
 
 .label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--bone-muted);
   font-size: 0.9rem;
 }
 
 /* The dotted run between a ledger label and its figure. */
 .leader {
-  flex: 1;
-  min-width: 1rem;
   align-self: end;
   margin-bottom: 0.3em;
   border-bottom: 2px dotted var(--rule);
@@ -54,10 +66,11 @@
   line-height: 1.1;
   color: var(--bone);
   text-align: right;
+  white-space: nowrap;
 }
 
 .note {
-  flex-basis: 100%;
+  grid-column: 1 / -1;
   margin-top: 0.1rem;
   color: var(--bone-muted);
   font-size: 0.8rem;
@@ -65,16 +78,19 @@
 }
 
 .foot {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "text stamp"
+    "refresh stamp";
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
+  column-gap: 0.75rem;
 }
 
 .basis {
+  grid-area: text;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 }
 
 .window,
@@ -92,6 +108,8 @@
 }
 
 .refresh {
+  grid-area: refresh;
+  justify-self: start;
   min-height: 2.25rem;
   padding: 0 0.25rem 0 0;
   border: 0;
@@ -106,7 +124,7 @@
 
 /* The rubber stamp: a double rule, a tilt, and the words the ledger is known for. */
 .stamp {
-  flex: none;
+  grid-area: stamp;
   width: 5.75rem;
   margin-right: 0.35rem;
   padding: 0.45rem 0.4rem;
@@ -148,10 +166,12 @@
   }
 }
 
+/* Pinned to the foot of the frame; "Look up another player" stays on one line down to 320px wide. */
 .actions {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 0.6rem;
+  margin-top: auto;
 }
 
 .primary,
@@ -160,12 +180,14 @@
   padding: 0.4rem 0.6rem;
   border: 1px solid var(--brass);
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
 }
 
 .primary {
+  padding-inline: 1.25rem;
   background: var(--brass);
   color: var(--ink);
 }
@@ -182,9 +204,9 @@
   outline-offset: 2px;
 }
 
-/* Tall screens have room to breathe. */
-@media (min-height: 760px) {
-  .summary {
+/* Tall stage: room to breathe. */
+@container (min-height: 560px) {
+  .card {
     gap: 1.25rem;
   }
 
@@ -202,9 +224,10 @@
   }
 }
 
-/* Short screens (small phones, or a stage squeezed by the notice strip): tighter still. */
-@media (max-height: 600px) {
-  .summary {
+/* Short stage (small phone, or the stage squeezed by the notice strip and the cached-matches note):
+   no stamp, the foot becomes one row, everything tighter. */
+@container (max-height: 399px) {
+  .card {
     gap: 0.5rem;
   }
 
@@ -212,22 +235,103 @@
     padding: 0.25rem 0;
   }
 
+  .label {
+    font-size: 0.85rem;
+  }
+
+  .value {
+    font-size: 1.15rem;
+  }
+
+  .foot {
+    grid-template-areas: "text refresh";
+  }
+
+  .stamp {
+    display: none;
+  }
+
+  .refresh {
+    justify-self: end;
+    min-height: 2rem;
+    padding: 0 0 0 0.25rem;
+  }
+
   .primary,
   .secondary {
     min-height: 2.75rem;
   }
+}
+
+/* Narrow stage (the cached-matches note shrinks the stage, and with it the width, since the stage
+   is always 9:16): no dotted leaders, smaller type, the two main actions stacked. */
+@container (max-width: 260px) {
+  .line {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 0.15rem 0;
+  }
+
+  .leader {
+    display: none;
+  }
+
+  .label {
+    font-size: 0.75rem;
+  }
 
   .value {
-    font-size: 1.2rem;
+    font-size: 1.05rem;
+  }
+
+  .window,
+  .based {
+    font-size: 0.75rem;
+    line-height: 1.15;
   }
 
   .refresh {
-    min-height: 2rem;
+    font-size: 0.8rem;
   }
 
-  .stamp {
-    width: 5rem;
-    padding: 0.35rem 0.3rem;
-    font-size: 0.75rem;
+  .actions {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+  }
+
+  .primary,
+  .secondary {
+    min-height: 2.25rem;
+    padding-block: 0.2rem;
+  }
+}
+
+/* Very short stage: the scope note goes too. */
+@container (max-height: 279px) {
+  .note {
+    display: none;
+  }
+}
+
+/* Shorter still: the Matches line goes ("Based on N matches" already says it). */
+@container (max-height: 259px) {
+  .line[data-row="matches"] {
+    display: none;
+  }
+}
+
+/* The shortest stages we meet (a 320x568 phone with the cached-matches note): squeeze the rest. */
+@container (max-height: 229px) {
+  .card {
+    gap: 0.3rem;
+  }
+
+  .line {
+    padding: 0.1rem 0;
+  }
+
+  .refresh,
+  .primary,
+  .secondary {
+    min-height: 2rem;
   }
 }

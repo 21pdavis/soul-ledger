@@ -1,5 +1,4 @@
-import { bestPercentile } from "./copy-slides-1-4";
-import { formatHours, formatTopPercent } from "./format";
+import { bestPercentile, formatHours, formatTopPercent } from "./format";
 import { heroName } from "./heroes";
 import { rankLabel } from "./ranks";
 import type { StoryData } from "./types";

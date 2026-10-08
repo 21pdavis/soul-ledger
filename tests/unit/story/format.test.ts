@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { formatHours, formatPatchDate, formatPercent, formatTopPercent } from "@/story/format";
+import {
+  bestPercentile,
+  formatHours,
+  formatPatchDate,
+  formatPercent,
+  formatTopPercent,
+} from "@/story/format";
 
 describe("formatHours", () => {
   it("shows one decimal under 10 hours and whole hours from 10", () => {
@@ -20,6 +26,24 @@ describe("formatTopPercent", () => {
     expect(formatTopPercent(3)).toBe("3");
     expect(formatTopPercent(9.96)).toBe("10");
     expect(formatTopPercent(12.4)).toBe("12");
+    expect(formatTopPercent(3.04)).toBe("3");
+    expect(formatTopPercent(3.46)).toBe("3.5");
+    expect(formatTopPercent(49.6)).toBe("50");
+  });
+});
+
+describe("bestPercentile", () => {
+  const entry = (label: string, topPercent: number) => ({ label, topPercent });
+
+  it("picks the lowest topPercent, the first on a tie", () => {
+    const a = entry("A", 20);
+    const b = entry("B", 5);
+    const c = entry("C", 5);
+    expect(bestPercentile([a, b, c])).toBe(b);
+  });
+
+  it("is null for an empty list", () => {
+    expect(bestPercentile([])).toBeNull();
   });
 });
 

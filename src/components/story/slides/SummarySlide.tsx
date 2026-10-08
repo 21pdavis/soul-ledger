@@ -26,42 +26,46 @@ export const SummarySlide: SlideComponent = ({
   return (
     <SlideFrame headline={headlineFor("summary")}>
       <div className={styles.summary}>
-        <ul className={styles.ledger} role="list" aria-label="Your ledger entry">
-          {rows.map((row) => (
-            <li key={row.key} className={styles.line}>
-              <span className={styles.label}>{row.label}</span>
-              <span className={styles.leader} aria-hidden="true" />
-              <span className={styles.value}>{row.value}</span>
-              {row.note && <span className={styles.note}>{row.note}</span>}
-            </li>
-          ))}
-        </ul>
+        <div className={styles.card}>
+          <ul className={styles.ledger} role="list" aria-label="Your ledger entry">
+            {rows.map((row) => (
+              <li key={row.key} className={styles.line} data-row={row.key}>
+                <span className={styles.label} title={row.label}>
+                  {row.label}
+                </span>
+                <span className={styles.leader} aria-hidden="true" />
+                <span className={styles.value}>{row.value}</span>
+                {row.note && <span className={styles.note}>{row.note}</span>}
+              </li>
+            ))}
+          </ul>
 
-        <div className={styles.foot}>
-          <div className={styles.basis}>
-            <WindowLabel meta={meta} className={styles.window} />
-            <p className={styles.based}>{basedOnMatches(story.matchCount)}</p>
+          <div className={styles.foot}>
+            <div className={styles.basis}>
+              <WindowLabel meta={meta} className={styles.window} />
+              <p className={styles.based}>{basedOnMatches(story.matchCount)}</p>
+            </div>
             <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
               {STORY_ACTIONS_COPY.refresh}
             </button>
+            <div
+              className={styles.stamp}
+              data-testid="summary-stamp"
+              data-motion={motion}
+              aria-hidden="true"
+            >
+              {SUMMARY_COPY.stamp}
+            </div>
           </div>
-          <div
-            className={styles.stamp}
-            data-testid="summary-stamp"
-            data-motion={motion}
-            aria-hidden="true"
-          >
-            {SUMMARY_COPY.stamp}
-          </div>
-        </div>
 
-        <div className={styles.actions}>
-          <button type="button" className={styles.primary} onClick={actions.onReplay}>
-            {STORY_ACTIONS_COPY.replay}
-          </button>
-          <button type="button" className={styles.secondary} onClick={actions.onNewLookup}>
-            {STORY_ACTIONS_COPY.newLookup}
-          </button>
+          <div className={styles.actions}>
+            <button type="button" className={styles.primary} onClick={actions.onReplay}>
+              {STORY_ACTIONS_COPY.replay}
+            </button>
+            <button type="button" className={styles.secondary} onClick={actions.onNewLookup}>
+              {STORY_ACTIONS_COPY.newLookup}
+            </button>
+          </div>
         </div>
       </div>
     </SlideFrame>

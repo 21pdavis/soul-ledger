@@ -20,6 +20,13 @@ export function formatTopPercent(topPercent: number): string {
   return String(Math.round(topPercent * 10) / 10);
 }
 
+/** The percentile entry with the lowest `topPercent` (the first on a tie), or null if there are none. */
+export function bestPercentile<T extends { topPercent: number }>(entries: T[]): T | null {
+  let best: T | null = null;
+  for (const e of entries) if (!best || e.topPercent < best.topPercent) best = e;
+  return best;
+}
+
 /** Patch dates are UTC midnight (ADR 0035); format in UTC so every viewer sees the same day. */
 export function formatPatchDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-US", {
