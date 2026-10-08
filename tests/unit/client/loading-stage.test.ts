@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
-import { loadingStage } from "@/lib/client/loading-stage";
+import { loadingStage, safeAvatarUrl } from "@/lib/client/loading-stage";
 
 const resolved: ClientLookupEvent = { type: "resolved", accountId: 1 };
 const profile = (over: Record<string, unknown> = {}): ClientLookupEvent => ({
   type: "profile",
   accountId: 1,
   personaName: "Gaben",
-  avatarUrl: "https://avatars.example/g.jpg",
+  avatarUrl: "https://avatars.steamstatic.com/g_full.jpg",
   ...over,
 });
 const history = (over: Record<string, unknown> = {}): ClientLookupEvent => ({
@@ -50,7 +50,10 @@ describe("loadingStage", () => {
   it("stage 1: the profile brings the avatar and persona name", () => {
     const view = loadingStage([resolved, profile()]);
     expect(view.stage).toBe(1);
-    expect(view.profile).toEqual({ name: "Gaben", avatarUrl: "https://avatars.example/g.jpg" });
+    expect(view.profile).toEqual({
+      name: "Gaben",
+      avatarUrl: "https://avatars.steamstatic.com/g_full.jpg",
+    });
     expect(view.history).toBeNull();
     expect(view.announcement).toContain("Gaben");
   });
@@ -128,12 +131,40 @@ describe("loadingStage", () => {
     expect(view.details?.fraction).toBe(1);
   });
 
-  it("treats details with a total of 0 as nothing to fetch, not a divide by zero", () => {
-    const view = loadingStage([history({ newMatches: 0 }), details(0, 0)]);
-    expect(view.stage).toBe(3);
-    expect(view.details?.fraction).toBe(1);
-    expect(view.details?.complete).toBe(true);
-    expect(Number.isNaN(view.details?.fraction)).toBe(false);
+  describe("a return visit with nothing new (the real stream has no details event)", () => {
+    // sync-player emits resolved, profile, history, done when every match is already stored.
+    const realSequence = [resolved, profile(), history({ newMatches: 0 }), done];
+
+    it("reaches stage 3 with a complete, empty tally", () => {
+      const view = loadingStage(realSequence);
+      expect(view.stage).toBe(3);
+      expect(view.details).toEqual({
+        fetched: 0,
+        total: 0,
+        fraction: 1,
+        complete: true,
+        kills: 0,
+        breakables: 0,
+        sinnerJackpots: 0,
+      });
+    });
+
+    it("does so as soon as the history says nothing is new, before done", () => {
+      const view = loadingStage([resolved, profile(), history({ newMatches: 0 })]);
+      expect(view.stage).toBe(3);
+      expect(view.details?.complete).toBe(true);
+    });
+
+    it("does not invent a tally when there are new matches still to fetch", () => {
+      const view = loadingStage([resolved, profile(), history({ newMatches: 14 })]);
+      expect(view.stage).toBe(2);
+      expect(view.details).toBeNull();
+    });
+
+    it("prefers real details events when they exist", () => {
+      const view = loadingStage([profile(), history({ newMatches: 0 }), details(5, 10)]);
+      expect(view.details?.fetched).toBe(5);
+    });
   });
 
   it("never lets the fraction pass 1", () => {
@@ -203,6 +234,37 @@ describe("loadingStage", () => {
     const b = loadingStage([profile(), history(), details(60)]).announcement;
     expect(a).toBe(b);
     expect(loadingStage([profile(), history()]).announcement).not.toBe(a);
+  });
+
+  describe("safeAvatarUrl", () => {
+    it("accepts https Steam CDN avatars", () => {
+      const url = "https://avatars.steamstatic.com/aa_full.jpg";
+      expect(safeAvatarUrl(url)).toBe(url);
+      const fastly = "https://avatars.fastly.steamstatic.com/aa_full.jpg";
+      expect(safeAvatarUrl(fastly)).toBe(fastly);
+    });
+
+    it.each([
+      ["http, not https", "http://avatars.steamstatic.com/aa.jpg"],
+      ["a javascript: URL", "javascript:alert(1)"],
+      ["a data: URL", "data:image/png;base64,AAAA"],
+      ["another host", "https://tracker.example/pixel.png"],
+      ["a lookalike host", "https://steamstatic.com.evil.example/a.jpg"],
+      ["a host that merely ends the same", "https://evilsteamstatic.com/a.jpg"],
+      ["not a URL", "not a url"],
+      ["empty", ""],
+    ])("rejects %s", (_label, url) => {
+      expect(safeAvatarUrl(url)).toBeNull();
+    });
+
+    it("passes null through", () => {
+      expect(safeAvatarUrl(null)).toBeNull();
+    });
+
+    it("keeps unsafe avatars out of the view model", () => {
+      const view = loadingStage([profile({ avatarUrl: "https://tracker.example/pixel.png" })]);
+      expect(view.profile).toEqual({ name: "Gaben", avatarUrl: null });
+    });
   });
 
   it("ignores final events defensively", () => {

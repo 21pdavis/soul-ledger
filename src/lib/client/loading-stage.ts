@@ -34,6 +34,21 @@ export interface LoadingView {
   announcement: string;
 }
 
+/**
+ * Steam avatars come from Steam's CDN over https. Anything else (another host, http, a data: or
+ * javascript: URL) is dropped so the page never makes a request the player did not expect.
+ */
+export function safeAvatarUrl(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    const { protocol, hostname } = new URL(url);
+    const steamCdn = hostname === "steamstatic.com" || hostname.endsWith(".steamstatic.com");
+    return protocol === "https:" && steamCdn ? url : null;
+  } catch {
+    return null;
+  }
+}
+
 type Of<T extends ClientLookupEvent["type"]> = Extract<ClientLookupEvent, { type: T }>;
 
 /**
@@ -62,13 +77,21 @@ export function loadingStage(progress: readonly ClientLookupEvent[]): LoadingVie
     waiting = false;
   }
 
+  // When every match is already stored the server sends no details events at all (resolved,
+  // profile, history with newMatches 0, done), so there is nothing to read: a finished, empty tally.
+  if (!details && history && history.newMatches === 0) {
+    details = { type: "details", fetched: 0, total: 0, kills: 0, breakables: 0, sinnerJackpots: 0 };
+  }
+
   const stage: LoadingStageNumber = details ? 3 : history ? 2 : profile ? 1 : 0;
 
   const view: Omit<LoadingView, "announcement"> = {
     stage,
     waiting,
     done,
-    profile: profile ? { name: profile.personaName, avatarUrl: profile.avatarUrl } : null,
+    profile: profile
+      ? { name: profile.personaName, avatarUrl: safeAvatarUrl(profile.avatarUrl) }
+      : null,
     history: history
       ? {
           totalMatches: history.totalMatches,

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LoadingScreen } from "@/components/app/LoadingScreen";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
@@ -8,7 +8,7 @@ const profile = (over: Record<string, unknown> = {}): ClientLookupEvent => ({
   type: "profile",
   accountId: 1,
   personaName: "Gaben",
-  avatarUrl: "https://avatars.example/g.jpg",
+  avatarUrl: "https://avatars.steamstatic.com/g_full.jpg",
   ...over,
 });
 const history = (over: Record<string, unknown> = {}): ClientLookupEvent => ({
@@ -53,7 +53,10 @@ describe("LoadingScreen", () => {
   it("stage 1: shows the avatar and the persona name with a teaser", () => {
     const { container } = render(<LoadingScreen progress={[resolved, profile()]} />);
     expect(screen.getByText("Gaben")).toBeInTheDocument();
-    expect(container.querySelector("img")).toHaveAttribute("src", "https://avatars.example/g.jpg");
+    expect(container.querySelector("img")).toHaveAttribute(
+      "src",
+      "https://avatars.steamstatic.com/g_full.jpg",
+    );
     expect(screen.getByText(/found you, gaben/i)).toBeInTheDocument();
   });
 
@@ -101,10 +104,52 @@ describe("LoadingScreen", () => {
     expect(screen.getByText(/counting every kill/i)).toBeInTheDocument();
   });
 
-  it("stage 3 with nothing new to read says the ledger is up to date", () => {
-    render(<LoadingScreen progress={[profile(), history({ newMatches: 0 }), details(0, 0)]} />);
+  it("a return visit with nothing new (resolved, profile, history, done) says the ledger is up to date", () => {
+    render(
+      <LoadingScreen
+        progress={[
+          resolved,
+          profile(),
+          history({ newMatches: 0 }),
+          { type: "done", matchCount: 120 },
+        ]}
+      />,
+    );
     expect(screen.getByText(/already up to date/i)).toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(screen.getByText("The tally")).toBeInTheDocument();
+  });
+
+  it("the avatar image does not leak a referrer and falls back to the sigil if it fails to load", () => {
+    const { container } = render(<LoadingScreen progress={[profile()]} />);
+    const img = container.querySelector("img")!;
+    expect(img).toHaveAttribute("referrerpolicy", "no-referrer");
+    fireEvent.error(img);
+    expect(container.querySelector("img")).toBeNull();
+    expect(screen.getByText("Gaben")).toBeInTheDocument();
+  });
+
+  it("does not load an avatar from a host that is not Steam's CDN", () => {
+    const { container } = render(
+      <LoadingScreen progress={[profile({ avatarUrl: "https://tracker.example/pixel.png" })]} />,
+    );
+    expect(container.querySelector("img")).toBeNull();
+  });
+
+  it("an empty history shows no tile list and no roster teaser", () => {
+    render(
+      <LoadingScreen
+        progress={[profile(), history({ totalMatches: 0, newMatches: 0, heroIds: [] })]}
+      />,
+    );
+    expect(screen.getByText("No matches on the books yet")).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "Heroes you have played" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/roster/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps its teasers celebratory rather than ominous", () => {
+    render(<LoadingScreen progress={[profile(), history()]} />);
+    expect(document.body.textContent).not.toMatch(/evidence|already open/i);
   });
 
   it("shows later entries as blank lines until their stage arrives", () => {

@@ -1,10 +1,10 @@
 "use client";
 
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { loadingStage } from "@/lib/client/loading-stage";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
-import { usePrefersReducedMotion } from "@/lib/client/use-prefers-reduced-motion";
+import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
 import { LOADING_COPY } from "@/story/copy-entry";
 import styles from "./LoadingScreen.module.css";
 
@@ -31,6 +31,21 @@ function CountingNumber({ value }: { value: number }) {
 /** A number that counts up to its value, or just shows it when motion is reduced. */
 function CountUp({ value, reduced }: { value: number; reduced: boolean }) {
   return reduced ? <span>{format(value)}</span> : <CountingNumber value={value} />;
+}
+
+/** The Steam avatar in its octagon, or a placeholder sigil if there is none or it fails to load. */
+function Avatar({ url }: { url: string | null }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <span className={styles.avatar}>
+      {url && !failed ? (
+        // eslint-disable-next-line @next/next/no-img-element -- a Steam CDN avatar, not ours to optimise
+        <img src={url} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+      ) : (
+        <i aria-hidden />
+      )}
+    </span>
+  );
 }
 
 /**
@@ -73,10 +88,7 @@ export function LoadingScreen({ progress }: Props) {
             <h2 className={styles.heading}>{LOADING_COPY.entries.profile}</h2>
             {profile ? (
               <motion.div className={styles.profile} {...enter({ duration: 0.4 })}>
-                <span className={styles.avatar}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- a Steam CDN avatar, not ours to optimise */}
-                  {profile.avatarUrl ? <img src={profile.avatarUrl} alt="" /> : <i aria-hidden />}
-                </span>
+                <Avatar key={profile.avatarUrl} url={profile.avatarUrl} />
                 <div>
                   {profile.name && <p className={styles.name}>{profile.name}</p>}
                   <p className={styles.teaser}>{LOADING_COPY.profileTeaser(profile.name)}</p>
@@ -92,32 +104,36 @@ export function LoadingScreen({ progress }: Props) {
             {history ? (
               <motion.div {...enter({ duration: 0.4 })}>
                 <p className={styles.figure}>{history.summary}</p>
-                <ul className={styles.tiles} aria-label="Heroes you have played">
-                  {tiles.map((hero, i) => (
-                    <motion.li
-                      key={hero.id}
-                      className={styles.tile}
-                      title={hero.name}
-                      {...(reduced
-                        ? { initial: false as const }
-                        : {
-                            initial: { opacity: 0 },
-                            // A neon sign catching: on, dim, on.
-                            animate: { opacity: [0, 1, 0.35, 1] },
-                            transition: { delay: 0.1 + i * 0.07, duration: 0.45 },
-                          })}
-                    >
-                      <span className={styles.monogram} aria-hidden="true">
-                        {hero.monogram}
-                      </span>
-                      <span className={styles.srOnly}>{hero.name}</span>
-                    </motion.li>
-                  ))}
-                  {hiddenHeroes > 0 && (
-                    <li className={styles.more}>{LOADING_COPY.heroesMore(hiddenHeroes)}</li>
-                  )}
-                </ul>
-                <p className={styles.teaser}>{LOADING_COPY.historyTeaser}</p>
+                {tiles.length > 0 && (
+                  <>
+                    <ul className={styles.tiles} aria-label={LOADING_COPY.heroesLabel}>
+                      {tiles.map((hero, i) => (
+                        <motion.li
+                          key={hero.id}
+                          className={styles.tile}
+                          title={hero.name}
+                          {...(reduced
+                            ? { initial: false as const }
+                            : {
+                                initial: { opacity: 0 },
+                                // A neon sign catching: on, dim, on.
+                                animate: { opacity: [0, 1, 0.35, 1] },
+                                transition: { delay: 0.1 + i * 0.07, duration: 0.45 },
+                              })}
+                        >
+                          <span className={styles.monogram} aria-hidden="true">
+                            {hero.monogram}
+                          </span>
+                          <span className={styles.srOnly}>{hero.name}</span>
+                        </motion.li>
+                      ))}
+                      {hiddenHeroes > 0 && (
+                        <li className={styles.more}>{LOADING_COPY.heroesMore(hiddenHeroes)}</li>
+                      )}
+                    </ul>
+                    <p className={styles.teaser}>{LOADING_COPY.historyTeaser}</p>
+                  </>
+                )}
               </motion.div>
             ) : (
               <span className={styles.blank} aria-hidden />
@@ -140,7 +156,7 @@ export function LoadingScreen({ progress }: Props) {
                     <div
                       className={styles.track}
                       role="progressbar"
-                      aria-label="Match details read"
+                      aria-label={LOADING_COPY.detailsLabel}
                       aria-valuemin={0}
                       aria-valuemax={details.total}
                       aria-valuenow={Math.min(details.fetched, details.total)}

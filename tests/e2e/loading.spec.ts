@@ -156,3 +156,18 @@ test("the loader fits the screen without horizontal scroll", async ({ page }) =>
   expect(overflow).toBeLessThanOrEqual(0);
   await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeVisible();
 });
+
+test("a return visit with nothing new (no details event) ends on an up-to-date tally", async ({
+  page,
+}) => {
+  await streamLookupByHand(page);
+  await startLookup(page);
+  await push(page, { type: "resolved", accountId: 1 });
+  await push(page, { type: "profile", accountId: 1, personaName: "Gaben", avatarUrl: null });
+  await push(page, { type: "history", totalMatches: 120, newMatches: 0, heroIds: [1, 2] });
+  await push(page, { type: "done", matchCount: 120 });
+  await expect(page.getByText(/already up to date/i)).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("Almost ready. Sealing the ledger.");
+  await push(page, storyEvent());
+  await expect(page.getByText("Story ready: 120 matches")).toBeVisible();
+});

@@ -30,9 +30,11 @@ export const LOADING_COPY = {
   entries: { profile: "The soul", history: "The matches", details: "The tally" },
   profileTeaser: (name: string | null) =>
     name
-      ? `Found you, ${name}. Your page was already open.`
-      : "Found you. Your page was already open.",
-  historyTeaser: "Every one of these is evidence.",
+      ? `Found you, ${name}. Let's see what you've been up to.`
+      : "Found you. Let's see what you've been up to.",
+  historyTeaser: "Look at that roster. Somebody has been busy.",
+  heroesLabel: "Heroes you have played",
+  detailsLabel: "Match details read",
   heroesMore: (n: number) => `+${count(n)} more`,
   detailsTeaser: "Counting every kill and crate. The ledger does not round up.",
   nothingToRead: "Nothing new to read. The ledger is already up to date.",
