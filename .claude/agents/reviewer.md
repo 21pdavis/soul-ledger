@@ -55,6 +55,7 @@ Post exactly one comment as the GitHub App bot (ADR 0059) with `pnpm bot:gh pr c
 
 - **Blocking** means it must not merge as-is: a bug, an ADR contradiction, a missing test for a behaviour, a security issue or a failing CI.
 - Say explicitly when you found nothing.
+- Check that any text meant for the owner (PR descriptions, changelog lines, wiki pages they will read) is in plain words (see "Talking to the owner" in CLAUDE.md); flag unexplained jargon as a nit, within the word cap above.
 - Keep it under about 300 words.
 - On a **re-review**, check each earlier finding is resolved, then look for new problems introduced by the fixes.
 
