@@ -59,6 +59,13 @@ describe("PrecisionSlide", () => {
     expect(screen.getByText(new RegExp(`${Math.round(PARRY_KING_RATE * 100)}%`, "i"))).toBeTruthy();
   });
 
+  it("draws the parry meter at the landed rate, with a mark at the king line", () => {
+    renderPrecision({ parryLabel: "king", parrySuccess: 30, parryMiss: 20 });
+    const meter = screen.getByTestId("parry-meter");
+    expect(meter).toHaveAttribute("data-rate", "0.6");
+    expect(meter).toHaveAttribute("data-king-rate", String(PARRY_KING_RATE));
+  });
+
   it("shows distinct clown copy with the counts", () => {
     const { unmount } = renderPrecision({ parryLabel: "king", parrySuccess: 30, parryMiss: 20 });
     const kingLine = within(screen.getByTestId("parry")).getByTestId("parry-line").textContent;

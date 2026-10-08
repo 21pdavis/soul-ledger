@@ -1,0 +1,74 @@
+.dial {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.svg {
+  width: 100%;
+  max-width: 11rem;
+  overflow: visible;
+}
+
+.track,
+.arc,
+.ticks {
+  fill: none;
+  stroke-width: 9;
+}
+
+.track {
+  stroke: var(--rule);
+}
+
+.arc {
+  stroke: var(--brass);
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--fill));
+}
+
+/* Ten ink notches cut across the arc, like the scale on a gauge. */
+.ticks {
+  stroke: var(--panel);
+  stroke-width: 11;
+  stroke-dasharray: 0.7 9.3;
+  stroke-dashoffset: -0.35;
+}
+
+.figure {
+  margin-top: -2.25rem;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone);
+}
+
+.label {
+  margin-top: 0.5rem;
+  max-width: 11ch;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--bone-muted);
+}
+
+.dial[data-animate="true"] .arc {
+  animation: sweep 550ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes sweep {
+  from {
+    stroke-dashoffset: 100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dial .arc {
+    animation: none;
+  }
+}
