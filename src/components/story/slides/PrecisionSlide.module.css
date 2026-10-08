@@ -133,3 +133,41 @@
     animation: none;
   }
 }
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .slide {
+    gap: 0.5rem;
+  }
+
+  .dials {
+    padding-bottom: 0.5rem;
+  }
+
+  .parry {
+    gap: 0.3rem;
+  }
+
+  .parryHeading {
+    font-size: 1rem;
+  }
+
+  .stamp {
+    margin: 0;
+    padding: 0.25rem 0.75rem;
+    font-size: 1.25rem;
+  }
+
+  .line {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  .detail {
+    font-size: 0.8rem;
+  }
+
+  .threshold {
+    font-size: 0.7rem;
+  }
+}

@@ -60,21 +60,28 @@ function worstCaseStory() {
   return story;
 }
 
-const SIZES = [
+const SIZES: { width: number; height: number; phone: boolean; stale?: boolean }[] = [
   { width: 320, height: 568, phone: true },
   { width: 360, height: 640, phone: true },
   { width: 375, height: 667, phone: true },
+  { width: 320, height: 568, phone: true, stale: true },
+  { width: 360, height: 640, phone: true, stale: true },
+  { width: 412, height: 839, phone: true },
   { width: 412, height: 915, phone: true },
   { width: 1280, height: 720, phone: false },
+  { width: 1440, height: 900, phone: false },
 ];
+
+/** The frame has a decorative inner rule 8px inside its edge: content stays clear of it. */
+const RULE_INSET = 8;
 
 test.describe("every slide fits its frame, worst case", () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
   });
 
-  for (const { width, height, phone } of SIZES) {
-    test(`${width}x${height}: nothing on any slide runs past the frame`, async ({
+  for (const { width, height, phone, stale } of SIZES) {
+    test(`${width}x${height}${stale ? " (cached-matches note)" : ""}: nothing on any slide runs past the frame`, async ({
       page,
       isMobile,
     }) => {
@@ -82,7 +89,10 @@ test.describe("every slide fits its frame, worst case", () => {
       await page.setViewportSize({ width, height });
       await mockLookup(
         page,
-        ndjson({ type: "resolved", accountId: 1 }, storyEvent({}, worstCaseStory())),
+        ndjson(
+          { type: "resolved", accountId: 1 },
+          storyEvent({ stale: !!stale }, worstCaseStory()),
+        ),
       );
       await openEntry(page);
       await page.getByLabel("Paste your Steam profile URL").fill(PROFILE);
@@ -94,13 +104,21 @@ test.describe("every slide fits its frame, worst case", () => {
         await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
         await stageSettled(page);
         const frame = stage(page).locator("section").first();
-        const found = await frame.evaluate((el) => {
+        if (slide.id === "intro")
+          console.log("FRAMEBOX", width, height, stale, JSON.stringify(await frame.boundingBox()));
+        const found = await frame.evaluate((el, inset) => {
           const f = el.getBoundingClientRect();
           const out: string[] = [];
           for (const node of el.querySelectorAll("*")) {
+            // The padded wrapper fills the frame by design.
+            if (node === el.firstElementChild) continue;
             const r = node.getBoundingClientRect();
             if (r.width === 0 || r.height === 0) continue;
-            if (r.bottom > f.bottom + 0.5 || r.right > f.right + 0.5 || r.left < f.left - 0.5) {
+            if (
+              r.bottom > f.bottom - inset + 0.5 ||
+              r.right > f.right - inset + 0.5 ||
+              r.left < f.left + inset - 0.5
+            ) {
               const text = (node.textContent ?? "").trim().slice(0, 30);
               out.push(
                 `<${node.tagName.toLowerCase()}> "${text}" bottom ${Math.round(r.bottom - f.bottom)}px right ${Math.round(r.right - f.right)}px`,
@@ -108,10 +126,18 @@ test.describe("every slide fits its frame, worst case", () => {
             }
           }
           if (el.scrollHeight > el.clientHeight) {
-            out.push(`frame scrollHeight ${el.scrollHeight} > clientHeight ${el.clientHeight}`);
+            out.push(
+              `frame ${Math.round(f.width)}x${Math.round(f.height)}: scrollHeight ${el.scrollHeight} > clientHeight ${el.clientHeight}`,
+            );
           }
           return out;
-        });
+        }, RULE_INSET);
+        if (slide.id === "rank") {
+          // The current rank is the point of the slide: its row is whole and in view.
+          const current = frame.locator("li[aria-current=step]");
+          await expect(current).toBeVisible();
+          await expect(current).toContainText("Oracle");
+        }
         for (const f of found.slice(0, 2)) problems.push(`${slide.id}: ${f}`);
         if (slide.id !== SLIDES.at(-1)!.id) await page.keyboard.press("ArrowRight");
       }

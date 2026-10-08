@@ -3,6 +3,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { validateProfileInput } from "@/lib/client/profile-input";
 import type { Prefs } from "@/lib/client/prefs";
+import { useIsClient } from "@/components/story/useIsClient";
 import { ENTRY_COPY } from "@/story/copy";
 import type { LookupFilters } from "@/story/filters";
 import { FilterControls } from "./FilterControls";
@@ -18,6 +19,10 @@ export function EntryScreen({ initial, onSubmit }: Props) {
   const [url, setUrl] = useState(initial.url);
   const [filters, setFilters] = useState(initial.filters);
   const [invalid, setInvalid] = useState(false);
+  // Until React has hydrated, this form is plain HTML and its submit is the browser's own: it would
+  // reload the page and drop what was typed (#42). The field and the button stay disabled until
+  // the handler is attached; a disabled default button also stops Enter inside the form.
+  const ready = useIsClient();
   const inputId = useId();
   const errorId = useId();
 
@@ -60,6 +65,7 @@ export function EntryScreen({ initial, onSubmit }: Props) {
             spellCheck={false}
             placeholder={ENTRY_COPY.inputPlaceholder}
             value={url}
+            disabled={!ready}
             aria-invalid={invalid}
             aria-describedby={invalid ? errorId : undefined}
             onChange={(e) => {
@@ -77,7 +83,7 @@ export function EntryScreen({ initial, onSubmit }: Props) {
 
         <FilterControls value={filters} onChange={setFilters} />
 
-        <button type="submit" className={styles.submit}>
+        <button type="submit" className={styles.submit} disabled={!ready}>
           {ENTRY_COPY.submit}
         </button>
       </form>

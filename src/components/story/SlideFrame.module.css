@@ -1,14 +1,29 @@
+/*
+ * The frame is a size container, so a slide fits the stage it is really in (the stage is always
+ * 9:16, but its size runs from a 320x568 phone to a desktop window) instead of the viewport.
+ * Slides tighten in two tiers on the frame's height, shared by every slide (see the slide modules):
+ *   - mid:   under 640px (360x640 and 375x667 phones, a 720p desktop window);
+ *   - small: under 520px (a 320x568 phone);
+ *   - tiny:  under 420px (a 320x568 phone with the cached-matches note, the smallest stage we meet).
+ * The top padding stays clear of the progress bar. Slides never scroll, so what does not fit has
+ * to get smaller, not longer.
+ */
 .frame {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  container-type: size;
   height: 100%;
-  padding: 2rem 1.5rem;
   border: 1px solid var(--brass);
   outline: 1px solid var(--rule);
   outline-offset: -8px;
   background: var(--panel);
   color: var(--bone);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+  padding: 2rem 1.5rem;
 }
 
 .headline {
@@ -21,7 +36,43 @@
   text-wrap: balance;
 }
 
+/* min-height 0: the body is exactly the room left under the headline, never taller than it, so a
+   slide can tell (and fit itself to) how much room it has. */
 .body {
   flex: 1;
+  min-height: 0;
   font-family: var(--font-body);
+}
+
+@container (max-height: 639px) {
+  .inner {
+    gap: 1rem;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .headline {
+    font-size: 1.5rem;
+  }
+}
+
+@container (max-height: 519px) {
+  .inner {
+    gap: 0.75rem;
+    padding: 1.5rem 1rem 1.25rem;
+  }
+
+  .headline {
+    font-size: 1.35rem;
+  }
+}
+
+@container (max-height: 419px) {
+  .inner {
+    gap: 0.5rem;
+    padding: 1.5rem 0.875rem 1rem;
+  }
+
+  .headline {
+    font-size: 1.2rem;
+  }
 }

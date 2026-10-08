@@ -11,6 +11,9 @@ export interface JourneyPoint {
 /** Most badges the slide draws; a long ranked history is thinned to this many. */
 export const MAX_MILESTONES = 7;
 
+/** Fewest badges worth drawing: the first, the last and the peak. */
+export const MIN_MILESTONES = 3;
+
 /**
  * The points worth drawing: the first match of each run at the same badge (the history has one
  * entry per match), thinned to `max` points keeping the first, the last and the peak.
@@ -20,7 +23,7 @@ export function journeyMilestones(
   max: number = MAX_MILESTONES,
 ): JourneyPoint[] {
   // Room for at least the first, the last and one more (the peak), whatever `max` says.
-  const cap = Math.max(3, max);
+  const cap = Math.max(MIN_MILESTONES, max);
   const changes = journey.filter((p, i) => i === 0 || p.badge !== journey[i - 1].badge);
   const n = changes.length;
   if (n <= cap) return changes;

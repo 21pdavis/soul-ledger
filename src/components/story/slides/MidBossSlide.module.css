@@ -136,3 +136,37 @@
     animation: none;
   }
 }
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .slide {
+    gap: 0.4rem;
+  }
+
+  .gem {
+    width: 3.5rem;
+  }
+
+  .numeral {
+    font-size: 2.75rem;
+  }
+
+  .count {
+    padding: 0.4rem 0 0.3rem;
+  }
+
+  .label,
+  .stolen {
+    font-size: 0.8rem;
+  }
+
+  .line {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .stolen {
+    padding: 0.3rem 0.6rem;
+    line-height: 1.3;
+  }
+}

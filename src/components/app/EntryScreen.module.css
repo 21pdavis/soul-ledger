@@ -110,7 +110,13 @@
   cursor: pointer;
 }
 
-.submit:hover {
+.input:disabled,
+.submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.submit:hover:not(:disabled) {
   background: #d9b55f;
 }
 

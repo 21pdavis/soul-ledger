@@ -15,7 +15,7 @@
 }
 
 .plot {
-  width: min(100%, 17rem);
+  width: min(100%, 17rem, 42cqh);
   height: auto;
   aspect-ratio: 1;
 }
@@ -127,4 +127,93 @@
   line-height: 1.5;
   color: var(--bone);
   text-wrap: pretty;
+}
+
+/* Smaller stages (the frame's tiers, see SlideFrame.module.css): the map shrinks with the stage. */
+@container (max-height: 639px) {
+  .content {
+    gap: 0.75rem;
+  }
+
+  .plotBlock {
+    gap: 0.5rem;
+  }
+
+  .hotspot {
+    font-size: 1.25rem;
+  }
+
+  .totals {
+    padding-top: 0.625rem;
+  }
+
+  .bigNumber {
+    font-size: 2.25rem;
+  }
+
+  .bigLabel,
+  .worst,
+  .unspent {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+}
+
+@container (max-height: 519px) {
+  .content {
+    gap: 0.5rem;
+  }
+
+  .plotBlock {
+    gap: 0.375rem;
+  }
+
+  .hotspot {
+    font-size: 1.05rem;
+  }
+
+  .totals {
+    padding-top: 0.4rem;
+  }
+
+  .bigNumber {
+    font-size: 1.85rem;
+  }
+
+  .bigLabel,
+  .worst,
+  .unspent {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .content {
+    gap: 0.4rem;
+  }
+
+  .plot {
+    width: min(100%, 17rem, 34cqh);
+  }
+
+  .hotspot {
+    font-size: 0.95rem;
+  }
+
+  .totals {
+    padding-top: 0.3rem;
+  }
+
+  .bigNumber {
+    font-size: 1.6rem;
+  }
+
+  .bigLabel,
+  .worst,
+  .unspent {
+    font-size: 0.8rem;
+    line-height: 1.25;
+  }
 }

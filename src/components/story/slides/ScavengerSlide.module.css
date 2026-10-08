@@ -52,7 +52,7 @@
 
 .number {
   font-family: var(--font-display);
-  font-size: clamp(3.25rem, 16vw, 5rem);
+  font-size: clamp(2.25rem, 16cqw, 5rem);
   line-height: 1;
   color: var(--bone);
   font-variant-numeric: tabular-nums;
@@ -61,4 +61,64 @@
 .detail {
   font-size: 1rem;
   color: var(--bone-muted);
+}
+
+/* Smaller stages (the frame's tiers, see SlideFrame.module.css): three stats in less room. */
+@container (max-height: 639px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .stat {
+    gap: 0.25rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .detail {
+    font-size: 0.9rem;
+  }
+}
+
+@container (max-height: 519px) {
+  .card {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .stat {
+    gap: 0.125rem;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .number {
+    font-size: clamp(2rem, 14cqw, 3rem);
+  }
+
+  .detail {
+    font-size: 0.8rem;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .card {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .number {
+    font-size: clamp(1.75rem, 13cqw, 2.5rem);
+  }
+
+  .detail {
+    font-size: 0.75rem;
+  }
 }

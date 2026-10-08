@@ -13,7 +13,7 @@
 .name {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 8vw, 2.5rem);
+  font-size: clamp(1.5rem, 9cqw, 2.5rem);
   line-height: 1.1;
   color: var(--bone);
   text-wrap: balance;
@@ -79,4 +79,94 @@
 .metric {
   margin: 0.375rem 0 0;
   font-size: 0.9375rem;
+}
+
+/* Smaller stages (the frame's tiers, see SlideFrame.module.css): gaps and figures tighten. */
+@container (max-height: 639px) {
+  .slide {
+    gap: 1.25rem;
+  }
+
+  .stat {
+    padding: 0.875rem 0;
+  }
+
+  .stat + .stat {
+    padding-left: 0.875rem;
+  }
+
+  .number {
+    font-size: clamp(2rem, 11cqw, 3.25rem);
+  }
+
+  .stamp {
+    padding: 0.625rem 1rem;
+  }
+}
+
+@container (max-height: 519px) {
+  .slide {
+    gap: 0.875rem;
+  }
+
+  .hero {
+    gap: 0.75rem;
+  }
+
+  .stat {
+    padding: 0.5rem 0;
+  }
+
+  .stat + .stat {
+    padding-left: 0.625rem;
+  }
+
+  .number {
+    font-size: clamp(1.75rem, 10cqw, 2.5rem);
+  }
+
+  .unit,
+  .caption,
+  .metric {
+    font-size: 0.85rem;
+  }
+
+  .stamp {
+    padding: 0.4rem 0.75rem;
+  }
+
+  .rank {
+    font-size: 1.2rem;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .slide {
+    gap: 0.5rem;
+  }
+
+  .name {
+    font-size: 1.25rem;
+  }
+
+  .stat {
+    padding: 0.35rem 0;
+  }
+
+  .number {
+    font-size: 1.75rem;
+  }
+
+  .stamp {
+    padding: 0.3rem 0.6rem;
+  }
+
+  .rank {
+    font-size: 1rem;
+  }
+
+  .metric {
+    margin-top: 0.2rem;
+  }
 }

@@ -21,8 +21,19 @@
 }
 
 .tile[data-size="lg"] {
-  --size: 7.5rem;
+  --size: clamp(4rem, 29cqw, 7.5rem);
   --cut: 24%;
+}
+
+/* The smallest stages (see SlideFrame.module.css): smaller tiles, so names keep their room. */
+@container (max-height: 419px) {
+  .tile {
+    --size: 2rem;
+  }
+
+  .tile[data-size="lg"] {
+    --size: 3.5rem;
+  }
 }
 
 /* The ink face sits 2px inside the brass edge, cut to the same octagon. */

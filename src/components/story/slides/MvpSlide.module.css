@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  min-height: 24rem;
+  min-height: min(24rem, 60cqh);
   padding: 2rem 1rem;
   border: 1px solid var(--brass);
   outline: 1px solid var(--rule);
@@ -83,4 +83,31 @@
   line-height: 1.5;
   text-align: center;
   text-wrap: balance;
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .card {
+    gap: 0.35rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .lead,
+  .scopeLine {
+    font-size: 0.85rem;
+  }
+
+  .label {
+    font-size: 1rem;
+  }
+
+  .big {
+    font-size: 2.5rem;
+  }
+
+  .flavor {
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
 }

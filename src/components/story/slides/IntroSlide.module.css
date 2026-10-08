@@ -96,3 +96,82 @@
   outline: 2px solid var(--green);
   outline-offset: 3px;
 }
+
+/* Smaller stages (the frame's tiers, see SlideFrame.module.css): the figures and gaps tighten. */
+@container (max-height: 639px) {
+  .slide {
+    gap: 1.25rem;
+  }
+
+  .figure {
+    padding-bottom: 0.75rem;
+  }
+
+  .number {
+    font-size: clamp(3rem, 17cqw, 5rem);
+  }
+
+  .unit {
+    font-size: 1rem;
+  }
+}
+
+@container (max-height: 519px) {
+  .slide {
+    gap: 0.75rem;
+  }
+
+  .figure {
+    padding-bottom: 0.5rem;
+  }
+
+  .number {
+    font-size: clamp(2.5rem, 17cqw, 3.25rem);
+  }
+
+  .unit {
+    font-size: 0.9rem;
+  }
+
+  .entry,
+  .basedOn {
+    font-size: 0.85rem;
+  }
+
+  .window {
+    font-size: 0.8rem;
+  }
+
+  .refresh {
+    min-height: 2.5rem;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .slide {
+    gap: 0.5rem;
+  }
+
+  .figure {
+    padding-bottom: 0.35rem;
+  }
+
+  .number {
+    font-size: 2.25rem;
+  }
+
+  .unit {
+    font-size: 0.85rem;
+  }
+
+  .dates {
+    gap: 0.25rem;
+  }
+
+  .footer {
+    padding-bottom: 0;
+  }
+}
