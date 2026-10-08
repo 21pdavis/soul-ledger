@@ -143,8 +143,22 @@ test.describe("the card is never clipped by the stage", () => {
         // Nothing overflows the frame (the stage clips whatever does).
         const overflow = await frame.evaluate((el) => el.scrollHeight - el.clientHeight);
         expect(overflow).toBeLessThanOrEqual(0);
-        // And the Valve notice is still on screen under the stage.
-        await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeInViewport();
+        // Above the narrowest tier (container 260px) a long label wraps rather than being cut off.
+        const ledger = page.getByRole("list", { name: "Your ledger entry" });
+        const narrowest = (await ledger.evaluate((el) => el.clientWidth)) <= 260;
+        if (!narrowest) {
+          const clipped = await ledger.evaluate((el) =>
+            [...el.querySelectorAll("li")]
+              .map((li) => li.firstElementChild as HTMLElement)
+              .filter((l) => l.scrollWidth > l.clientWidth || l.scrollHeight > l.clientHeight)
+              .map((l) => l.textContent),
+          );
+          expect(clipped, "labels cut off above the narrowest tier").toEqual([]);
+        }
+        // And the Valve notice is on screen under the stage, once.
+        const notice = page.getByText(/Not affiliated with or endorsed by Valve/);
+        await expect(notice).toHaveCount(1);
+        await expect(notice).toBeInViewport();
       });
     }
   }
