@@ -7,6 +7,16 @@
   height: 100%;
 }
 
+.content > * {
+  flex: none;
+}
+
+/* The one block that gives way: the map shrinks (never the text) when the stage is short. */
+.content > .plotBlock {
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
 .plotBlock {
   display: flex;
   flex-direction: column;
@@ -15,7 +25,9 @@
 }
 
 .plot {
-  width: min(100%, 17rem, 42cqh);
+  flex: 0 1 auto;
+  min-height: 0;
+  width: min(100%, 17rem);
   height: auto;
   aspect-ratio: 1;
 }
@@ -129,7 +141,7 @@
   text-wrap: pretty;
 }
 
-/* Smaller stages (the frame's tiers, see SlideFrame.module.css): the map shrinks with the stage. */
+/* Smaller stages (the frame's tiers, see SlideFrame.module.css): text tightens, the map shrinks. */
 @container (max-height: 639px) {
   .content {
     gap: 0.75rem;
@@ -194,12 +206,9 @@
     gap: 0.4rem;
   }
 
-  .plot {
-    width: min(100%, 17rem, 34cqh);
-  }
-
   .hotspot {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.15;
   }
 
   .totals {

@@ -72,7 +72,7 @@ const SIZES: { width: number; height: number; phone: boolean; stale?: boolean }[
   { width: 1440, height: 900, phone: false },
 ];
 
-/** The frame has a decorative inner rule 8px inside its edge: content stays clear of it. */
+/** The frame has a decorative inner rule 8px inside its edge: content stays clear of it sideways. */
 const RULE_INSET = 8;
 
 test.describe("every slide fits its frame, worst case", () => {
@@ -104,18 +104,21 @@ test.describe("every slide fits its frame, worst case", () => {
         await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
         await stageSettled(page);
         const frame = stage(page).locator("section").first();
-        if (slide.id === "intro")
-          console.log("FRAMEBOX", width, height, stale, JSON.stringify(await frame.boundingBox()));
         const found = await frame.evaluate((el, inset) => {
           const f = el.getBoundingClientRect();
           const out: string[] = [];
+          // Content ends where the frame's bottom padding starts, not at its edge.
+          const wrapper = el.firstElementChild as HTMLElement;
+          const bottom =
+            wrapper.getBoundingClientRect().bottom -
+            parseFloat(getComputedStyle(wrapper).paddingBottom);
           for (const node of el.querySelectorAll("*")) {
             // The padded wrapper fills the frame by design.
             if (node === el.firstElementChild) continue;
             const r = node.getBoundingClientRect();
             if (r.width === 0 || r.height === 0) continue;
             if (
-              r.bottom > f.bottom - inset + 0.5 ||
+              r.bottom > bottom + 1 ||
               r.right > f.right - inset + 0.5 ||
               r.left < f.left + inset - 0.5
             ) {
