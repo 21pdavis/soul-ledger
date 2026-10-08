@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { fixtureStory } from "../fixtures/story";
 
 // Shared by the e2e specs: the lookup is mocked with NDJSON, so they run the same locally and
@@ -41,4 +41,19 @@ export async function enter(page: Page, url = PROFILE) {
   await openEntry(page);
   await page.getByLabel("Paste your Steam profile URL").fill(url);
   await page.getByRole("button", { name: "Open the ledger" }).click();
+}
+
+/**
+ * Waits for the story's opening entrance to be over, so the next key press or tap really
+ * navigates. The stage's first render has `data-animating="false"` before the entrance has been
+ * started (it starts a frame later), so "false" alone can be read too early, most often on a busy
+ * machine; look again after two frames.
+ */
+export async function stageSettled(page: Page) {
+  const stage = page.getByTestId("story-stage");
+  await expect(stage).toHaveAttribute("data-animating", "false");
+  await page.evaluate(
+    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+  );
+  await expect(stage).toHaveAttribute("data-animating", "false");
 }

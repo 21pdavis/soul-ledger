@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { SLIDES } from "../../src/story/copy";
-import { mockLookup, ndjson, openEntry, PROFILE, storyEvent } from "./lookup-mock";
+import { mockLookup, ndjson, openEntry, PROFILE, stageSettled, storyEvent } from "./lookup-mock";
 
 // ADR 0054: one test drives the whole product with the keyboard alone, entry to summary and
 // Replay, and every stop on the way shows a visible focus ring. Nothing here clicks, taps or
@@ -86,7 +86,7 @@ async function keyboardToStory(page: Page) {
   await tabTo(page, "Open the ledger");
   await page.keyboard.press("Enter");
   await expect(stage(page)).toHaveAttribute("data-slide", "intro");
-  await expect(stage(page)).toHaveAttribute("data-animating", "false");
+  await stageSettled(page);
 }
 
 /** Slide 1 to the summary with arrow keys, one slide at a time. */

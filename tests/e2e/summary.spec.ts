@@ -1,6 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 import { fixtureStory } from "../fixtures/story";
-import { mockLookup, ndjson, openEntry, PATCH, PROFILE, storyEvent } from "./lookup-mock";
+import {
+  mockLookup,
+  ndjson,
+  openEntry,
+  PATCH,
+  PROFILE,
+  stageSettled,
+  storyEvent,
+} from "./lookup-mock";
 
 // Slide 11 on the real flow (entry -> lookup -> story) with the lookup mocked, so these run the
 // same locally and against staging.
@@ -13,7 +21,7 @@ async function playToSummary(page: Page) {
   for (let i = 0; i < 30; i++) {
     if ((await stage(page).getAttribute("data-slide")) === "summary") break;
     // Wait out the entrance so each key press really advances.
-    await expect(stage(page)).toHaveAttribute("data-animating", "false");
+    await stageSettled(page);
     await page.keyboard.press("ArrowRight");
   }
   await expect(stage(page)).toHaveAttribute("data-slide", "summary");

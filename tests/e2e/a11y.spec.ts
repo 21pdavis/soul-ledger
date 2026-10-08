@@ -3,7 +3,15 @@ import { expect, test, type Page } from "@playwright/test";
 import { SLIDES } from "../../src/story/copy";
 import { fixtureStory } from "../fixtures/story";
 import { push, startLookup, streamLookupByHand } from "./hand-stream";
-import { enter, mockLookup, ndjson, openEntry, PATCH, storyEvent } from "./lookup-mock";
+import {
+  enter,
+  mockLookup,
+  ndjson,
+  openEntry,
+  PATCH,
+  stageSettled,
+  storyEvent,
+} from "./lookup-mock";
 
 // Accessibility scans (ADR 0054): axe on every screen, phone and desktop. Stricter than "serious
 // and critical": any violation fails, minor ones included (the page was clean apart from one
@@ -159,7 +167,7 @@ for (const { name, story, over } of STORIES) {
     await enter(page);
     for (let i = 0; i < SLIDES.length; i++) {
       await expect(stage(page)).toHaveAttribute("data-slide", SLIDES[i].id);
-      await expect(stage(page)).toHaveAttribute("data-animating", "false");
+      await stageSettled(page);
       await expectNoViolations(page, `slide ${i + 1} (${SLIDES[i].id}), ${name}`);
       if (i < SLIDES.length - 1) await page.keyboard.press("ArrowRight");
     }

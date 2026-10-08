@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { SLIDES, SLIDE_COUNT } from "../../src/story/copy";
 import { fixtureStory } from "../fixtures/story";
 import { push, startLookup, streamLookupByHand } from "./hand-stream";
-import { mockLookup, ndjson, enter, storyEvent } from "./lookup-mock";
+import { mockLookup, ndjson, enter, stageSettled, storyEvent } from "./lookup-mock";
 
 // The whole product once, on both layouts: paste a profile URL, watch the staged loading, play all
 // 11 slides (tap on phone, scroll on desktop), land on the summary. The lookup is mocked, so this
@@ -14,7 +14,7 @@ const stage = (page: Page) => page.getByTestId("story-stage");
 const track = (page: Page) => page.getByTestId("scroll-track");
 const segments = (page: Page) =>
   page.getByRole("list", { name: "Story progress" }).getByRole("listitem");
-const settled = (page: Page) => expect(stage(page)).toHaveAttribute("data-animating", "false");
+const settled = stageSettled;
 
 /** Something each slide says for the fixture story, besides its headline. */
 const SLIDE_TEXT: Record<(typeof SLIDES)[number]["id"], RegExp> = {

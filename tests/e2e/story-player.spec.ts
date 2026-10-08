@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { SLIDES } from "../../src/story/copy";
-import { enter, mockLookup, ndjson, storyEvent } from "./lookup-mock";
+import { enter, mockLookup, ndjson, stageSettled, storyEvent } from "./lookup-mock";
 
 // The real flow (entry -> lookup -> story) with the lookup mocked, so these run the same locally
 // and against staging.
@@ -8,7 +8,7 @@ import { enter, mockLookup, ndjson, storyEvent } from "./lookup-mock";
 const stage = (page: Page) => page.getByTestId("story-stage");
 const segments = (page: Page) =>
   page.getByRole("list", { name: "Story progress" }).getByRole("listitem");
-const settled = (page: Page) => expect(stage(page)).toHaveAttribute("data-animating", "false");
+const settled = stageSettled;
 
 /** Enter a profile and land on slide 1 of the story. */
 async function openStory(page: Page, over: Record<string, unknown> = {}, waitForSettle = true) {
