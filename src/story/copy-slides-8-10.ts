@@ -3,7 +3,6 @@
  * (ADR 0007). The fixed headlines live in `copy.ts`; this file holds the data-driven variants and
  * the pure functions that choose between them.
  */
-import { headlineFor } from "./copy";
 import { heroName } from "./heroes";
 import { rankLabel } from "./ranks";
 import type { JourneyPoint } from "./rank-journey";
@@ -12,13 +11,6 @@ import type { StoryData } from "./types";
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 // ---------------------------------------------------------------- Roast (slide 8)
-
-export const ROAST_CLEAN_HEADLINE = "A spotless record";
-
-/** The fixed headline, except for a player with no deaths on file, who has nothing to roast. */
-export function roastHeadline({ deaths }: { deaths: number }): string {
-  return deaths > 0 ? headlineFor("roast") : ROAST_CLEAN_HEADLINE;
-}
 
 /** `count` is the hottest cell's count. */
 export function hotspotLine(count: number): string {
@@ -69,7 +61,20 @@ export const UNSPENT_NEUTRAL_LINE =
 export const UNSPENT_SPENDER_LINE =
   "You spend your souls almost as fast as you earn them. Not much hoarding here.";
 
-export function unspentSoulsLine(avgUnspentGoldMinutes: number, avgMinutes: number): string {
+/**
+ * Whether the slide shows the souls figure. Off until #36 is done: the owner has not accepted the
+ * soul-minutes reading of the unit, and matches with no "Unspent Gold Minutes" key are stored as 0,
+ * which understates the average. Until then the slide shows the neutral sentence (no number, no
+ * unit), as the plan requires before the unit is verified.
+ */
+export const SHOW_UNSPENT_SOULS_FIGURE = false;
+
+export function unspentSoulsLine(
+  avgUnspentGoldMinutes: number,
+  avgMinutes: number,
+  showFigure: boolean = SHOW_UNSPENT_SOULS_FIGURE,
+): string {
+  if (!showFigure) return UNSPENT_NEUTRAL_LINE;
   const souls = typicalUnspentSouls(avgUnspentGoldMinutes, avgMinutes);
   if (souls === null) return UNSPENT_NEUTRAL_LINE;
   if (souls <= 100) return UNSPENT_SPENDER_LINE;
@@ -109,10 +114,10 @@ export function rankSummary(
 
 // ------------------------------------------------------------------- MVP (slide 10)
 
-export const MVP_FALLBACK_HEADLINE = "Your best stat so far";
-export const MVP_NONE_HEADLINE = "Still finding your signature";
+// The headline is fixed (`headlineFor("mvp")`); the fallback and empty cases speak in the body.
+export const MVP_FALLBACK_LEAD = "Your best stat so far";
 const MVP_NONE_LINE =
-  "There isn't enough to crown a signature stat yet. Play a few more matches and check back.";
+  "Still finding your signature. There isn't enough to crown a stat yet, so play a few more matches and check back.";
 
 /** "Top 0.5%", never "Top 0%": one decimal below 10, whole numbers from there up. */
 export function formatTopPercent(topPercent: number): string {
@@ -130,7 +135,8 @@ export function mvpFlavor(topPercent: number): string {
 export type MvpCopy =
   | {
       kind: "hero" | "global" | "fallback";
-      headline: string;
+      /** Set for the fallback only: a line above the stat saying it is the best of a quiet bunch. */
+      lead?: string;
       /** The stat, e.g. "Melee kills". */
       label: string;
       /** Already formatted, without the "Top" or the "%". */
@@ -141,9 +147,9 @@ export type MvpCopy =
       /** Set for the hero scope only. */
       heroName?: string;
     }
-  | { kind: "none"; headline: string; line: string };
+  | { kind: "none"; line: string };
 
-const NONE: MvpCopy = { kind: "none", headline: MVP_NONE_HEADLINE, line: MVP_NONE_LINE };
+const NONE: MvpCopy = { kind: "none", line: MVP_NONE_LINE };
 
 /**
  * One template for every case (label, top percent, scope). "Not notable" means the signature
@@ -154,7 +160,6 @@ export function mvpCopy({ mvp, percentiles }: Pick<StoryData, "mvp" | "percentil
   if (!mvp) return NONE;
   if (mvp.topPercent <= 50) {
     const shared = {
-      headline: headlineFor("mvp"),
       label: mvp.label,
       topPercent: formatTopPercent(mvp.topPercent),
       flavor: mvpFlavor(mvp.topPercent),
@@ -172,10 +177,11 @@ export function mvpCopy({ mvp, percentiles }: Pick<StoryData, "mvp" | "percentil
   if (!best) return NONE;
   return {
     kind: "fallback",
-    headline: MVP_FALLBACK_HEADLINE,
+    lead: MVP_FALLBACK_LEAD,
     label: best.label,
     topPercent: formatTopPercent(best.topPercent),
     scopeLine: "of all players",
-    flavor: mvpFlavor(Math.max(best.topPercent, 51)),
+    // The weighted pick can be above 50 while the best global stat is better than that.
+    flavor: mvpFlavor(best.topPercent),
   };
 }

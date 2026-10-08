@@ -70,6 +70,15 @@ describe("RankSlide", () => {
     expect(within(screen.getByTestId("current-rank")).getByText("Tier 99 · 2")).toBeInTheDocument();
   });
 
+  it("marks the last badge as current when the final badge repeats", () => {
+    // One history entry per match, so the current rank is usually a repeat of the one before.
+    const { container } = renderRank(journeyOf([41, 62, 62]), { reducedMotion: true });
+    const items = screen.getAllByRole("listitem");
+    expect(items.filter((li) => li.getAttribute("aria-current") === "step")).toHaveLength(1);
+    expect(items.at(-1)).toHaveAttribute("aria-current", "step");
+    expect(container.querySelectorAll('[data-current="true"]')).toHaveLength(1);
+  });
+
   it("draws the line through two or more badges", () => {
     const { container } = renderRank(undefined, { reducedMotion: true });
     expect(container.querySelector("polyline")).toBeInTheDocument();

@@ -16,16 +16,19 @@ const diamond = (x: number, y: number, r: number) =>
   `M${x} ${y - r} L${x + r} ${y} L${x} ${y + r} L${x - r} ${y} Z`;
 
 interface Props {
-  /** Milestones from `journeyMilestones`, oldest first. At least one. */
+  /**
+   * Milestones from `journeyMilestones`, oldest first. At least one. The last is always the
+   * current rank's run (the history has one entry per match, so the milestone keeps the first
+   * match of that run, not the latest one).
+   */
   points: JourneyPoint[];
-  current: JourneyPoint;
 }
 
 /**
  * The climb as badges on a line: height is rank, left to right is time. One badge draws no line.
  * The plot is decoration (hidden from assistive tech); the list under it says the same in text.
  */
-export function RankJourney({ points, current }: Props) {
+export function RankJourney({ points }: Props) {
   const heights = points.map(ladderHeight);
   const lo = Math.min(...heights);
   const hi = Math.max(...heights);
@@ -43,12 +46,13 @@ export function RankJourney({ points, current }: Props) {
         {pos.length > 1 && (
           <polyline points={pos.map(({ x, y }) => `${x},${y}`).join(" ")} className={styles.line} />
         )}
-        {pos.map(({ p, x, y }) => {
-          const isCurrent = p === current || p.matchId === current.matchId;
+        {pos.map(({ p, x, y }, i) => {
+          const isCurrent = i === pos.length - 1;
           return (
             <path
               key={p.matchId}
               data-badge={p.badge}
+              data-current={isCurrent}
               d={diamond(x, y, isCurrent ? 11 : 7)}
               className={isCurrent ? styles.badgeNow : styles.badge}
             />
@@ -56,8 +60,8 @@ export function RankJourney({ points, current }: Props) {
         })}
       </svg>
       <ol className={styles.list}>
-        {points.map((p) => {
-          const isCurrent = p.matchId === current.matchId;
+        {points.map((p, i) => {
+          const isCurrent = i === points.length - 1;
           return (
             <li
               key={p.matchId}

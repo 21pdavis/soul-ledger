@@ -4,8 +4,9 @@
  */
 
 /**
- * Half-width of the square the grid covers. Real death positions run to about +/-10,300 in both
- * axes (tests/fixtures/api/bulk-metadata.json), so this leaves a little margin.
+ * Half-width of the square the grid covers. In the recorded fixture
+ * (tests/fixtures/api/bulk-metadata.json) x runs from about -8,960 to 9,106 and y from about
+ * -10,169 to 10,285, so this leaves a little margin.
  */
 export const DEATH_BOUND = 10_500;
 export const DEATH_GRID = 10;

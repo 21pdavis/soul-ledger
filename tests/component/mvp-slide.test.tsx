@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { MvpSlide } from "@/components/story/slides/MvpSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
 import { headlineFor } from "@/story/copy";
-import { MVP_FALLBACK_HEADLINE, MVP_NONE_HEADLINE } from "@/story/copy-slides-8-10";
+import { MVP_FALLBACK_LEAD } from "@/story/copy-slides-8-10";
 import type { StoryData } from "@/story/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 
@@ -70,7 +70,8 @@ describe("MvpSlide", () => {
       }),
       { reducedMotion: true },
     );
-    expect(screen.getByRole("heading", { name: MVP_FALLBACK_HEADLINE })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: headlineFor("mvp") })).toBeInTheDocument();
+    expect(screen.getByText(MVP_FALLBACK_LEAD)).toBeInTheDocument();
     expect(screen.getByText("Assists")).toBeInTheDocument();
     expect(screen.getByText("Top 58%")).toBeInTheDocument();
     expect(screen.getByText("of all players")).toBeInTheDocument();
@@ -80,7 +81,7 @@ describe("MvpSlide", () => {
 
   it("has its own friendly copy when mvp is null", () => {
     renderMvp(fixtureStory({ mvp: null, percentiles: [] }), { reducedMotion: true });
-    expect(screen.getByRole("heading", { name: MVP_NONE_HEADLINE })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: headlineFor("mvp") })).toBeInTheDocument();
     expect(screen.getByText(/play a few more matches/i)).toBeInTheDocument();
     expect(screen.queryByText(/^Top /)).not.toBeInTheDocument();
   });
@@ -90,6 +91,7 @@ describe("MvpSlide", () => {
       fixtureStory({ mvp: { ...stat("kills", "Kills", 80), scope: "global" }, percentiles: [] }),
       { reducedMotion: true },
     );
-    expect(screen.getByRole("heading", { name: MVP_NONE_HEADLINE })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: headlineFor("mvp") })).toBeInTheDocument();
+    expect(screen.getByText(/play a few more matches/i)).toBeInTheDocument();
   });
 });

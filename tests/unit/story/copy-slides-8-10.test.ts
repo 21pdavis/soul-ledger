@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { headlineFor } from "@/story/copy";
 import {
-  MVP_FALLBACK_HEADLINE,
-  MVP_NONE_HEADLINE,
+  MVP_FALLBACK_LEAD,
+  SHOW_UNSPENT_SOULS_FIGURE,
+  UNSPENT_NEUTRAL_LINE,
   RANK_EMPTY_LINE,
   avgMatchMinutes,
   deathsLabel,
@@ -12,7 +12,6 @@ import {
   mvpFlavor,
   noDeathMapLine,
   rankSummary,
-  roastHeadline,
   typicalUnspentSouls,
   unspentSoulsLine,
   worstMatchLine,
@@ -21,12 +20,6 @@ import type { JourneyPoint } from "@/story/rank-journey";
 import { fixtureStory } from "../../fixtures/story";
 
 describe("roast copy", () => {
-  it("keeps the fixed headline unless there is nothing to roast", () => {
-    expect(roastHeadline({ deaths: 1100 })).toBe(headlineFor("roast"));
-    expect(roastHeadline({ deaths: 1 })).toBe(headlineFor("roast"));
-    expect(roastHeadline({ deaths: 0 })).not.toBe(headlineFor("roast"));
-  });
-
   it("names the hottest cell's count, in the singular for one", () => {
     expect(hotspotLine(7)).toBe("You died here 7 times");
     expect(hotspotLine(1)).toBe("You died here 1 time");
@@ -49,6 +42,12 @@ describe("roast copy", () => {
 });
 
 describe("unspent souls copy", () => {
+  it("ships the neutral sentence by default, until the unit is accepted (#36)", () => {
+    expect(SHOW_UNSPENT_SOULS_FIGURE).toBe(false);
+    expect(unspentSoulsLine(90_000, 36)).toBe(UNSPENT_NEUTRAL_LINE);
+    expect(UNSPENT_NEUTRAL_LINE).not.toMatch(/\d|minute/i);
+  });
+
   it("is souls x minutes, so a typical stash is the average divided by the average match length", () => {
     // 90,000 soul-minutes over a 36-minute match is 2,500 souls held on average.
     expect(typicalUnspentSouls(90_000, 36)).toBe(2500);
@@ -63,22 +62,22 @@ describe("unspent souls copy", () => {
   });
 
   it("states the stash in souls with a thousands separator", () => {
-    expect(unspentSoulsLine(90_000, 36)).toBe(
+    expect(unspentSoulsLine(90_000, 36, true)).toBe(
       "In a typical match you sat on about 2,500 unspent souls.",
     );
   });
 
   it("praises a player who spends, and shows no number", () => {
-    const line = unspentSoulsLine(2_000, 36);
+    const line = unspentSoulsLine(2_000, 36, true);
     expect(line).not.toMatch(/\d/);
     expect(line).toMatch(/spend/i);
   });
 
   it("falls back to a neutral sentence with no number or unit", () => {
-    const line = unspentSoulsLine(0, 36);
+    const line = unspentSoulsLine(0, 36, true);
     expect(line).not.toMatch(/\d/);
     expect(line).not.toMatch(/minute/i);
-    expect(unspentSoulsLine(90_000, 0)).toBe(line);
+    expect(unspentSoulsLine(90_000, 0, true)).toBe(line);
   });
 
   it("works out the average match length in minutes", () => {
@@ -164,7 +163,6 @@ describe("mvp copy", () => {
     );
     expect(c).toMatchObject({
       kind: "hero",
-      headline: headlineFor("mvp"),
       label: "Melee kills",
       topPercent: "0.5",
       scopeLine: "of Infernus players",
@@ -176,7 +174,6 @@ describe("mvp copy", () => {
     const c = mvpCopy(fixtureStory({ mvp: { ...pct("kills", "Kills", 4), scope: "global" } }));
     expect(c).toMatchObject({
       kind: "global",
-      headline: headlineFor("mvp"),
       label: "Kills",
       topPercent: "4",
       scopeLine: "of all players",
@@ -197,12 +194,24 @@ describe("mvp copy", () => {
     );
     expect(c).toMatchObject({
       kind: "fallback",
-      headline: MVP_FALLBACK_HEADLINE,
+      lead: MVP_FALLBACK_LEAD,
       label: "Assists",
       topPercent: "58",
       scopeLine: "of all players",
     });
     expect(JSON.stringify(c)).not.toMatch(/Infernus|Hero #/);
+  });
+
+  it("uses the flavour for the fallback stat's own rank when it is 50 or better", () => {
+    // The weighted pick can land above 50 while the best global stat is better than that.
+    const c = mvpCopy(
+      fixtureStory({
+        mvp: { ...pct("deaths", "Deaths", 61), scope: "hero", heroId: 1 },
+        percentiles: [pct("kills", "Kills", 72), pct("assists", "Assists", 30)],
+      }),
+    );
+    expect(c).toMatchObject({ kind: "fallback", label: "Assists", flavor: mvpFlavor(30) });
+    expect(JSON.stringify(c)).not.toMatch(/Infernus|Hero #|nothing stands out/i);
   });
 
   it("treats exactly 50 as notable", () => {
@@ -214,7 +223,6 @@ describe("mvp copy", () => {
     const c = mvpCopy(fixtureStory({ mvp: null, percentiles: [] }));
     expect(c).toMatchObject({
       kind: "none",
-      headline: MVP_NONE_HEADLINE,
       line: expect.stringMatching(/matches/i),
     });
   });

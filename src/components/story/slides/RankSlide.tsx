@@ -32,7 +32,7 @@ export const RankSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
               </div>
             </StaggerIn>
             <StaggerIn index={2} {...motion}>
-              <RankJourney points={journeyMilestones(journey)} current={current} />
+              <RankJourney points={journeyMilestones(journey)} />
             </StaggerIn>
           </>
         )}

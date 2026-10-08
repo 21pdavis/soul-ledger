@@ -19,12 +19,14 @@ export function journeyMilestones(
   journey: readonly JourneyPoint[],
   max: number = MAX_MILESTONES,
 ): JourneyPoint[] {
+  // Room for at least the first, the last and one more (the peak), whatever `max` says.
+  const cap = Math.max(3, max);
   const changes = journey.filter((p, i) => i === 0 || p.badge !== journey[i - 1].badge);
   const n = changes.length;
-  if (n <= max) return changes;
+  if (n <= cap) return changes;
 
   const picked = new Set<number>();
-  for (let i = 0; i < max; i++) picked.add(Math.round((i * (n - 1)) / (max - 1)));
+  for (let i = 0; i < cap; i++) picked.add(Math.round((i * (n - 1)) / (cap - 1)));
 
   const peak = changes.reduce((best, p, i) => (p.badge > changes[best].badge ? i : best), 0);
   if (!picked.has(peak)) {

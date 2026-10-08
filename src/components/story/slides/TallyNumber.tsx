@@ -16,7 +16,7 @@ interface Props {
 const withCommas = (n: number) => n.toLocaleString("en-US");
 
 /**
- * A count-up for slides 8 to 10. It shows the final value at once under reduced motion or when
+ * A count-up for slides 8 to 10. Temporary: to be replaced by the shared StoryCountUp (#37). It shows the final value at once under reduced motion or when
  * the player skips (even part-way through), and holds while the reader presses and holds.
  */
 export function TallyNumber({

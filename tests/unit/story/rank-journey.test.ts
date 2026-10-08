@@ -45,6 +45,18 @@ describe("journeyMilestones", () => {
   });
 });
 
+describe("journeyMilestones cap", () => {
+  const j = series([11, 12, 13, 14, 95, 16, 17, 18, 19, 21]);
+
+  it.each([1, 2, 0, -5])("clamps a cap of %i to three, keeping first, last and the peak", (max) => {
+    const out = journeyMilestones(j, max);
+    expect(out).toHaveLength(3);
+    expect(out[0]).toBe(j[0]);
+    expect(out.at(-1)).toBe(j.at(-1));
+    expect(out.map((p) => p.badge)).toContain(95);
+  });
+});
+
 describe("ladderHeight", () => {
   it("rises with the badge number across tiers and subranks", () => {
     expect(ladderHeight(pt(0, 12))).toBeGreaterThan(ladderHeight(pt(0, 11)));

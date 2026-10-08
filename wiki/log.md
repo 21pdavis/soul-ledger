@@ -1,7 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-08
-* **Research**: "Unspent Gold Minutes" fits souls × minutes in the recorded bulk metadata (every value exceeds the match length in minutes; value per minute stays below net worth). The roast slide states a souls figure and never says "minutes"; the [open question](open-questions/m2-unspent-souls-unit.md) stays open until the owner accepts the inference.
+* **Research**: "Unspent Gold Minutes" fits souls × minutes in the recorded bulk metadata (every value exceeds the match length in minutes; value per minute stays below net worth). 26 of 351 Normal records lack the key and are stored as 0, which understates the average. The roast slide ships a neutral sentence for now; the [open question](open-questions/m2-unspent-souls-unit.md) stays open until the owner accepts the inference (#36).
 * **Decision**: Audio-unlock on the entry Enter click is deferred out of M2 (no audio layer exists; music is a P2 backlog item). [ADR 0052](decisions/0052-m2-entry-loading-error-states.md), the [M2 plan](recommendations/m2-plan.md) and the [backlog](recommendations/backlog.md) say so.
 
 ## 2026-10-07

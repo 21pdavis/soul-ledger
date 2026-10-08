@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { RoastSlide } from "@/components/story/slides/RoastSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
 import { headlineFor } from "@/story/copy";
+import { UNSPENT_NEUTRAL_LINE } from "@/story/copy-slides-8-10";
 import type { StoryData } from "@/story/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 
@@ -127,23 +128,29 @@ describe("RoastSlide", () => {
       expect(screen.getByText("Worst night: 14 deaths as Paradox")).toBeInTheDocument();
     });
 
-    it("switches the headline and says so when there are no deaths at all", () => {
+    it("keeps the fixed headline and says so in the body when there are no deaths at all", () => {
       renderRoast({ deaths: 0, deathPositions: [], worstMatch: null }, {}, still);
-      expect(screen.queryByRole("heading", { name: headlineFor("roast") })).not.toBeInTheDocument();
-      expect(screen.getByRole("heading", { name: /spotless/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: headlineFor("roast") })).toBeInTheDocument();
       expect(screen.getByText(/not a single death/i)).toBeInTheDocument();
+    });
+
+    it("leaves out the worst night when it had no deaths (a zero-death player)", () => {
+      renderRoast(
+        { deaths: 0, deathPositions: [], worstMatch: { matchId: 1, heroId: 1, deaths: 0 } },
+        {},
+        still,
+      );
+      expect(screen.queryByText(/Worst night/)).not.toBeInTheDocument();
     });
   });
 
   describe("unspent souls", () => {
     const sentence = () => screen.getByTestId("unspent-souls");
 
-    it("states the average stash in souls, derived from soul-minutes and match length", () => {
-      // 84,800 soul-minutes per match over 84.5h / 120 matches (42.25 min) is about 2,000 souls.
+    it("shows the neutral sentence, with no number and no unit, until the unit is accepted (#36)", () => {
       renderRoast({}, {}, still);
-      expect(sentence()).toHaveTextContent(
-        "In a typical match you sat on about 2,000 unspent souls.",
-      );
+      expect(sentence()).toHaveTextContent(UNSPENT_NEUTRAL_LINE);
+      expect(sentence().textContent).not.toMatch(/\d/);
     });
 
     it("never claims minutes", () => {

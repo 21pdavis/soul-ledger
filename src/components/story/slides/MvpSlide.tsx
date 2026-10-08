@@ -1,3 +1,4 @@
+import { headlineFor } from "@/story/copy";
 import { mvpCopy } from "@/story/copy-slides-8-10";
 import { SlideFrame } from "../SlideFrame";
 import type { SlideComponent } from "./contract";
@@ -10,7 +11,7 @@ export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, 
 
   if (copy.kind === "none") {
     return (
-      <SlideFrame headline={copy.headline}>
+      <SlideFrame headline={headlineFor("mvp")}>
         <StaggerIn {...motion}>
           <p className={styles.friendly}>{copy.line}</p>
         </StaggerIn>
@@ -19,8 +20,13 @@ export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, 
   }
 
   return (
-    <SlideFrame headline={copy.headline}>
+    <SlideFrame headline={headlineFor("mvp")}>
       <div className={styles.card}>
+        {copy.lead && (
+          <StaggerIn index={0} {...motion}>
+            <p className={styles.lead}>{copy.lead}</p>
+          </StaggerIn>
+        )}
         <StaggerIn index={0} {...motion}>
           <p className={styles.label}>{copy.label}</p>
         </StaggerIn>

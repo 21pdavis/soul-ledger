@@ -17,7 +17,7 @@ const STEP_S = 0.1;
 const FADE_S = 0.35;
 
 /**
- * A one-shot fade-and-lift for slides 8 to 10. The text is in the DOM from the first render; only
+ * A one-shot fade-and-lift for slides 8 to 10. Temporary: to be replaced by the shared SlideReveal (#37). The text is in the DOM from the first render; only
  * its opacity changes. Skip or reduced motion shows it at once, and pressing and holding pauses it.
  */
 export function StaggerIn({

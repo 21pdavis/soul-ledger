@@ -3,10 +3,10 @@ import {
   deathsLabel,
   hotspotLine,
   noDeathMapLine,
-  roastHeadline,
   unspentSoulsLine,
   worstMatchLine,
 } from "@/story/copy-slides-8-10";
+import { headlineFor } from "@/story/copy";
 import { binDeaths, hottestCell } from "@/story/death-bins";
 import { heroName } from "@/story/heroes";
 import { SlideFrame } from "../SlideFrame";
@@ -27,7 +27,7 @@ export const RoastSlide: SlideComponent = ({ story, skipAnimation, reducedMotion
   );
 
   return (
-    <SlideFrame headline={roastHeadline(roast)}>
+    <SlideFrame headline={headlineFor("roast")}>
       <div className={styles.content}>
         <StaggerIn index={0} {...motion} className={styles.plotBlock}>
           {hot ? (
@@ -49,7 +49,7 @@ export const RoastSlide: SlideComponent = ({ story, skipAnimation, reducedMotion
           </div>
         </StaggerIn>
 
-        {roast.worstMatch && (
+        {roast.worstMatch && roast.worstMatch.deaths > 0 && (
           <StaggerIn index={2} {...motion}>
             <p className={styles.worst}>
               {worstMatchLine({
