@@ -64,6 +64,22 @@ export const LOADING_COPY = {
   pageHeading: "Your Soul Ledger is loading",
   waiting: "Another lookup of this ledger is already running. Waiting our turn.",
   sealing: "Almost ready. Sealing the ledger.",
+  /** What the server is doing right now. Always one of these is on screen, never a blank page. */
+  status: {
+    contacting: "Contacting Deadlock's servers...",
+    reading: "Reading your match history...",
+    fetching: "Fetching your match details...",
+    batch: (left: number) =>
+      `Reading your matches. ${count(left)} ${left === 1 ? "match" : "matches"} left.`,
+    rateLimited: (seconds: number) =>
+      `Waiting in line: Deadlock's servers only allow so many requests. About ${seconds} ${seconds === 1 ? "second" : "seconds"}.`,
+    finishing: "Checking your rank history...",
+  },
+  stalled: {
+    title: "This is taking longer than usual.",
+    body: "Deadlock's servers are slow right now. You can keep waiting, or try again.",
+    retry: "Try again",
+  },
   /** Headings of the three ledger entries; the later ones show as blank lines until their stage. */
   entries: { profile: "The soul", history: "The matches", details: "The tally" },
   profileTeaser: (name: string | null) =>
@@ -466,6 +482,49 @@ export function mvpCopy({ mvp, percentiles }: Pick<StoryData, "mvp" | "percentil
     // The weighted pick can be above 50 while the best global stat is better than that.
     flavor: mvpFlavor(best.topPercent),
   };
+}
+
+export const MENTIONS_HEADING = "Honorable mentions";
+/** How many runner-up stats sit under the signature stat. */
+export const MAX_MENTIONS = 2;
+
+/** A short hype line for a runner-up stat, by how rare it is (ADR 0007). */
+export function mentionLine(topPercent: number): string {
+  if (topPercent <= 1) return "Rare air.";
+  if (topPercent <= 10) return "Elite company.";
+  if (topPercent <= 25) return "Well ahead of the pack.";
+  return "Quietly good.";
+}
+
+export interface MvpMention {
+  label: string;
+  topPercent: string;
+  note: string;
+  line: string;
+}
+
+/**
+ * Up to two more standout stats for the signature slide: the best global stats other than the one
+ * already on show, each in the top 50% (the same "notable" line as the MVP). None when there is no
+ * signature stat, since that slide then shows its friendly empty copy.
+ */
+export function mvpMentions({
+  mvp,
+  percentiles,
+}: Pick<StoryData, "mvp" | "percentiles">): MvpMention[] {
+  if (!mvp) return [];
+  const best = bestPercentile(percentiles);
+  const shown = mvp.topPercent <= NOT_NOTABLE_ABOVE ? mvp.label : best?.label;
+  return percentiles
+    .filter((p) => p.label !== shown && p.topPercent <= NOT_NOTABLE_ABOVE)
+    .sort((a, b) => a.topPercent - b.topPercent)
+    .slice(0, MAX_MENTIONS)
+    .map((p) => ({
+      label: p.label,
+      topPercent: formatTopPercent(p.topPercent),
+      note: "of all players",
+      line: mentionLine(p.topPercent),
+    }));
 }
 
 // ===================================================================== Slide 11: summary

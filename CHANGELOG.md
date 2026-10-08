@@ -7,6 +7,12 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 ### Changed
 
 - On desktop the story is now a real vertical page: the slides are wide cards stacked down the screen, scrolling down moves to the next card, and there is breathing room above and on both sides. The progress bar runs down the right edge. Phones are unchanged.
+- **You are a parry king from 40%, not 60%.** Landing 40% or more of your parries now earns the king badge; only below that are you a clown.
+- **Your signature stat slide now has honorable mentions.** Under your top stat you also see your next two best stats, each with how rare it is (on very small phones, just the name and the percentage).
+
+### Fixed
+
+- The loading screen no longer sits blank during a slow lookup. It now says what it is doing from the first second (contacting Deadlock, how many matches are left, waiting in line when Deadlock's servers ask us to slow down). If nothing has happened for 20 seconds, it says so and offers a Try again button. Looking up a player is also a little faster, because the profile and match list are asked for together.
 
 ### Removed
 

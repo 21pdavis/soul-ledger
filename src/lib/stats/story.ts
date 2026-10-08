@@ -5,7 +5,7 @@ import type { PlayerMatch } from "./types";
 /** Main-hero share at or above which a player is a one-trick (ADR 0038). */
 export const ONE_TRICK_SHARE = 0.5;
 /** Parry success rate at or above which a player is a parry king rather than a clown (ADR 0040). */
-export const PARRY_KING_RATE = 0.6;
+export const PARRY_KING_RATE = 0.4;
 /** Fewest main-hero matches before we rank against that hero's players. */
 export const MIN_HERO_SAMPLE = 10;
 
