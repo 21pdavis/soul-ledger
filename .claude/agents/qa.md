@@ -2,7 +2,7 @@
 name: qa
 description: Validates the live Soul Ledger staging site after a merge into staging, running the e2e suites against it, screenshotting every changed screen on phone and desktop, and checking Render logs. Files GitHub issues for bugs; never changes code.
 tools: Read, Grep, Glob, Bash, mcp__plugin_render_render__list_services, mcp__plugin_render_render__list_deploys, mcp__plugin_render_render__get_deploy, mcp__plugin_render_render__list_logs, mcp__plugin_render_render__list_events
-model: sonnet
+model: haiku
 effort: high
 color: green
 ---
