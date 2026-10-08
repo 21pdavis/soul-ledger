@@ -1,3 +1,4 @@
+import { bestPercentile } from "./copy-slides-1-4";
 import { formatHours, formatTopPercent } from "./format";
 import { heroName } from "./heroes";
 import { rankLabel } from "./ranks";
@@ -39,10 +40,7 @@ export function topStat(story: StoryData): TopStat | null {
       note: mvp.scope === "hero" ? `of ${heroName(mvp.heroId)} players` : "of all players",
     };
   }
-  const best = story.percentiles.reduce<StoryData["percentiles"][number] | null>(
-    (acc, p) => (acc === null || p.topPercent < acc.topPercent ? p : acc),
-    null,
-  );
+  const best = bestPercentile(story.percentiles);
   if (!best) return null;
   return { label: best.label, value: topPercentText(best.topPercent), note: "of all players" };
 }

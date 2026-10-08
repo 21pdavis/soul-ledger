@@ -38,6 +38,10 @@ test("the summary shows the card, the window and the matches it is based on", as
   await expect(card).toContainText("Oracle 1");
   await expect(page.getByText("All time")).toBeVisible();
   await expect(page.getByText("Based on 120 matches")).toBeVisible();
+  // The Valve notice (ADR 0016) is the app's strip under the player, exactly once.
+  const notice = page.getByText(/Not affiliated with or endorsed by Valve/);
+  await expect(notice).toHaveCount(1);
+  await expect(notice).toBeInViewport();
 });
 
 test("Refresh on the summary reruns the lookup with refresh=1 and the same window", async ({

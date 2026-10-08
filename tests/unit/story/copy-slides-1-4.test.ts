@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   bestPercentile,
   formatLedgerDate,
-  formatTopPercent,
   mainPercentileLine,
   matchesUnit,
   rosterVerdict,
 } from "@/story/copy-slides-1-4";
+import { formatTopPercent } from "@/story/format";
 import { fixtureStory } from "../../fixtures/story";
 
 const base = fixtureStory().percentiles[0];
