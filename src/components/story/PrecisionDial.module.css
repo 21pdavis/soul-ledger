@@ -72,3 +72,20 @@
     animation: none;
   }
 }
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .svg {
+    max-width: 7rem;
+  }
+
+  .figure {
+    margin-top: -1.6rem;
+    font-size: 1.4rem;
+  }
+
+  .label {
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+  }
+}

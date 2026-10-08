@@ -7,17 +7,23 @@ import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
 import type { SlideComponent } from "./contract";
+import { useFitCount } from "./useFitCount";
 import styles from "./RosterSlide.module.css";
+
+/** Fewest top heroes worth listing when the stage is short. */
+const MIN_TOP_HEROES = 3;
 
 /** Slide 3: how many heroes, one-trick or flex (ADR 0038), and the top five played. */
 export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
   const { roster } = story;
   const playing = !reducedMotion && !skipAnimation;
   const verdict = rosterVerdict(roster.label);
+  // The slide never scrolls, so the list of top heroes shows as many as the stage has room for.
+  const { ref, count: shown } = useFitCount(roster.topHeroes.length, MIN_TOP_HEROES);
 
   return (
     <SlideFrame headline={headlineFor("roster")}>
-      <div className={styles.slide}>
+      <div className={styles.slide} ref={ref}>
         <SlideReveal index={0} animate={playing} kind="stamp">
           <p data-testid="roster-heroes" className={styles.count}>
             <StoryCountUp
@@ -42,7 +48,7 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
           <div className={styles.top}>
             <p className={styles.caption}>{ROSTER_COPY.topHeroes}</p>
             <ol className={styles.list}>
-              {roster.topHeroes.map((h, i) => (
+              {roster.topHeroes.slice(0, shown).map((h, i) => (
                 <SlideReveal
                   as="li"
                   key={h.heroId}

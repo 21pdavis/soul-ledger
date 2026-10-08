@@ -14,6 +14,8 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - **A summary card to finish.** The last slide gathers your headline numbers. Replay the story, Refresh to fetch your latest matches, or look up another player.
 - **Friendly problem screens.** If your profile can't be found (check that it's public), the service is down (try again in a minute), the connection drops, or you have no Deadlock matches yet (or none since the latest patch), you get a clear full-screen message with what to do next instead of an error code.
 - **Easier to use for everyone.** The whole site works with the keyboard alone and shows where the keyboard is, text meets contrast guidelines, screen readers announce each slide as you move through the story, and animations are skipped if your device asks for reduced motion.
+- **Every slide now fits small phones.** On a small screen the rank climb no longer runs off the bottom (your current rank is always fully on screen: a long climb shows fewer rows instead), and the other slides tighten up the same way for long hero names and big numbers.
+- **Pressing Enter too early no longer wipes your link.** The profile field and the button wait until the page has finished loading before they can be used, so a fast Enter can't reload the page and lose what you typed.
 - A private **staging** site for reviewing changes before they go live. It is unlocked with a private access link and deploys from the `staging` branch with its own database. Production is unchanged and still needs no login.
 
 ## [0.1.0] - 2026-10-07

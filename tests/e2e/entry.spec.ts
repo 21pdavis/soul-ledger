@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type Route } from "@playwright/test";
 import { fixtureStory } from "../fixtures/story";
 import { PATCH, PROFILE, enter, mockLookup, ndjson, openEntry, storyEvent } from "./lookup-mock";
 
@@ -115,4 +115,65 @@ test("entry has no horizontal scroll and the Valve notice stays visible", async 
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(0);
+});
+
+// #42: before React has hydrated, the form is plain HTML, and Enter used to submit it natively:
+// the page reloaded and the typed URL was gone. The page is held at "HTML only" by keeping its
+// scripts back until the end of the test.
+test("Enter before the page has hydrated never reloads it, and the lookup works once it has", async ({
+  page,
+}) => {
+  const urls = await mockLookup(page, ndjson({ type: "resolved", accountId: 1 }, storyEvent()));
+  const held: Route[] = [];
+  let released = false;
+  await page.route("**/_next/static/**/*.js", (route) => {
+    if (released) return route.continue();
+    held.push(route);
+  });
+  const navigations: string[] = [];
+  page.on("request", (r) => {
+    if (r.isNavigationRequest()) navigations.push(r.url());
+  });
+
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  const field = page.getByLabel("Paste your Steam profile URL");
+  await expect(field).toBeVisible();
+  // A reload would lose this.
+  await page.evaluate(() => {
+    (window as unknown as { beforeEnter: boolean }).beforeEnter = true;
+  });
+  navigations.length = 0;
+
+  // The path from the issue: type the URL, press Enter. (Focus first: a field that is not ready
+  // yet takes no text, and that is fine; what matters is that nothing reloads.)
+  await field.focus();
+  await page.keyboard.type(PROFILE);
+  await page.keyboard.press("Enter");
+  // Enter on another control of the form submits it too, unless the form is held back.
+  // The window choice is held back as well: a pick made now would be reset by hydration.
+  await expect(page.getByRole("radio", { name: "This patch" })).toBeDisabled();
+  await expect(page.getByRole("radio", { name: "All time" })).toBeDisabled();
+  await page.getByRole("radio", { name: "This patch" }).focus();
+  await page.keyboard.press("Enter");
+  await page.getByRole("button", { name: "Open the ledger" }).click({ force: true });
+  // Give a (wrong) native submit time to start its navigation.
+  await page.waitForTimeout(500);
+
+  expect(navigations, "the page navigated").toEqual([]);
+  expect(
+    await page.evaluate(() => (window as unknown as { beforeEnter?: boolean }).beforeEnter),
+    "the page reloaded",
+  ).toBe(true);
+  expect(new URL(page.url()).search).toBe("");
+
+  // Once the scripts arrive the page wakes up and a lookup works as usual.
+  released = true;
+  await Promise.all(held.map((route) => route.continue()));
+  await field.fill(PROFILE);
+  await page.getByRole("radio", { name: "This patch" }).check();
+  await field.press("Enter");
+  await expect(storyUp(page)).toBeVisible();
+  expect(urls).toHaveLength(1);
+  expect(urls[0].searchParams.get("q")).toBe(PROFILE);
+  expect(urls[0].searchParams.get("window")).toBe("patch");
 });

@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { renderToString } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { EntryScreen } from "@/components/app/EntryScreen";
 import { defaultPrefs } from "@/lib/client/prefs";
@@ -14,6 +15,27 @@ function setup(initial = defaultPrefs()) {
 }
 
 describe("EntryScreen", () => {
+  // #42: the server-rendered HTML is what a visitor can use before React has hydrated, and a native
+  // submit there reloads the page and drops the URL. So the field and the button start disabled
+  // (a disabled default button also blocks Enter in the form) and come alive once hydrated.
+  it("renders the field and the submit button disabled in the server HTML, so nothing submits natively", () => {
+    const html = renderToString(<EntryScreen initial={defaultPrefs()} onSubmit={() => {}} />);
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    expect(doc.querySelector("input[type=text]")?.hasAttribute("disabled")).toBe(true);
+    expect(doc.querySelector("button[type=submit]")?.hasAttribute("disabled")).toBe(true);
+    // The window choice too: a pick made before hydration is reset by it (a lost input).
+    const radios = [...doc.querySelectorAll("input[type=radio]")];
+    expect(radios.length).toBeGreaterThan(0);
+    for (const radio of radios) expect(radio.hasAttribute("disabled")).toBe(true);
+  });
+
+  it("has the field and the button enabled once running in the browser", () => {
+    const { input } = setup();
+    expect(input).toBeEnabled();
+    expect(screen.getByRole("button", { name: /open the ledger/i })).toBeEnabled();
+    for (const radio of screen.getAllByRole("radio")) expect(radio).toBeEnabled();
+  });
+
   it("asks for a profile URL and says no login is needed", () => {
     setup();
     expect(screen.getByRole("heading", { level: 1, name: "Soul Ledger" })).toBeInTheDocument();
