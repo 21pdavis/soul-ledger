@@ -35,6 +35,6 @@ Refines [ADR 0012](0012-phone-first.md) and [ADR 0028](0028-milestones.md) for M
 
 # As built
 
-- Slides share one contract, `SlideComponentProps` (`src/components/story/slides/contract.ts`): the slide's data plus `active`, `skipAnimation`, `reducedMotion` and `paused`. The player owns the index and the entrance clock (a held press stops it).
+- Slides share one contract, `SlideComponentProps` (`src/components/story/slides/contract.ts`): the slide's data plus `active`, `skipAnimation`, `reducedMotion` and `paused`. The player owns the index and the entrance clock (holding pauses it; it restarts in full on release).
 - The stage mounts only after hydration (`useIsClient`), because the controller choice depends on viewport and pointer, which the server cannot know.
-- Desktop is a scroll column with snap checkpoints. Taps navigate on the phone controller only, so a slide's own controls must be real `<button>`, `<a>`, `<input>` or `<select>` elements.
+- Desktop is a scroll column with snap checkpoints. Scroll mode applies at viewport >= 1024px with a fine pointer; anything else uses the tap controller. Taps navigate on the phone controller only, so a slide's own controls must be real `<button>`, `<a>`, `<input>` or `<select>` elements.

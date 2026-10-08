@@ -13,11 +13,12 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 
 | Priority | Item | Links |
 |---|---|---|
-| P0 | Before the repo goes public at M2, fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public), including #8 and #9. This is not part of the M2 PRs | [ADR 0032](../decisions/0032-github-private-ci.md) |
-| P0 | Build M3: the 3D scene behind the story column | [ADR 0028](../decisions/0028-milestones.md), [ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md) |
+| P0 | Before the repo goes public (ADR 0032), fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public), including #8 and #9. They gate the M2 staging to main promotion | [ADR 0032](../decisions/0032-github-private-ci.md) |
+| P0 | Build M3: the 3D world behind the story column, then hero models for all playable heroes in batches | [ADR 0028](../decisions/0028-milestones.md), [ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | Confirm what "Unspent Gold Minutes" counts (#36) and, if possible, what accolade 11 (breakables) includes | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
 | P1 | Make the cached-matches note an overlay so it stops squeezing the stage on tiny phones (#38) | [M2 plan](m2-plan.md) |
+| P2 | Add an e2e reduced-motion check (today only component tests cover it) | [ADR 0054](../decisions/0054-m2-testing-and-accessibility.md) |
 | P2 | Fold the slide 8-10 helpers into the shared primitives and `copy.ts` (#37) | [M2 plan](m2-plan.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
 | P2 | Source or commission occult-jazz music, and check licenses | [ADR 0006](../decisions/0006-audio.md) |

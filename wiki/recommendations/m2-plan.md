@@ -33,7 +33,7 @@ M2 is built and on `staging` (2026-10-08). The criteria below still describe wha
 - **Unspent souls:** slide 8 ships the neutral sentence, with no unit claimed, pending #36.
 - **Cached-matches note:** it squeezes the stage on tiny phones (#38, make it an overlay).
 - **Audio-unlock:** deferred, there is no audio layer.
-- **a11y:** the axe scan (`tests/e2e/a11y.spec.ts`), the keyboard-only suite and the reduced-motion matrix landed in PR 9 ([ADR 0054](../decisions/0054-m2-testing-and-accessibility.md)).
+- **a11y:** the axe scan (`tests/e2e/a11y.spec.ts`), and the keyboard-only suite landed in PR 9. Reduced motion is covered by component tests only, with no e2e suite (backlog) ([ADR 0054](../decisions/0054-m2-testing-and-accessibility.md)).
 - **Preview route:** the `/preview` fixture route used during the build is gone (#29).
 
 **Follow-ups:** #36 (unspent souls unit and missing-key bias), #37 (consolidate slide 8-10 helpers into shared primitives and `copy.ts`), #38 (cached-matches overlay), #25 (patch window without a known date). Still open for the owner: [font pairing](../open-questions/m2-font-pairing.md) (Limelight with Space Grotesk shipped as the default), [rank tier names](../open-questions/m2-rank-tier-names.md) (map built from the API fixture), [hero art terms](../open-questions/m2-hero-art-terms.md), [unspent souls unit](../open-questions/m2-unspent-souls-unit.md). The repo going public still waits on #8 and #9.
