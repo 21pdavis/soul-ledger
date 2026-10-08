@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { PACE_OVERRIDE_KEY } from "./src/lib/client/loading-pace";
 
 const DEFAULT_PORT = 3100;
 const DEFAULT_GATE_PORT = 3101;
@@ -30,6 +31,22 @@ export const TEST_ACCESS_KEY = "e2e-access-key-0123456789abcdef0123456";
  */
 const remote = process.env.STAGING_URL;
 
+/**
+ * The loader holds each stage for a minimum time so a player can read it (ADR 0056). Most specs
+ * just need to get through it, so every context starts with the pacing override set to "off",
+ * which only REMOVES delay and so is harmless. loading-pace.spec.ts opts out to test the real
+ * pacing. The origin must match the one the specs open.
+ */
+const paceOff = {
+  cookies: [],
+  origins: [
+    {
+      origin: new URL(remote ?? `http://localhost:${PORT}`).origin,
+      localStorage: [{ name: PACE_OVERRIDE_KEY, value: "off" }],
+    },
+  ],
+};
+
 const devicesProjects = [
   // Phone and desktop are both first-class (ADR 0028).
   { name: "phone", use: { ...devices["Pixel 7"] } },
@@ -47,6 +64,7 @@ export default defineConfig({
   use: {
     baseURL: remote ?? `http://localhost:${PORT}`,
     trace: "on-first-retry",
+    storageState: paceOff,
     extraHTTPHeaders: remote ? { "x-staging-token": process.env.STAGING_ACCESS_KEY ?? "" } : {},
   },
   projects: remote

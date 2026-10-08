@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/components/app/App";
+import { NO_PACE } from "@/lib/client/loading-pace";
 import type { SlideProps } from "@/story/types";
 import { fixtureStory } from "../fixtures/story";
 
@@ -38,7 +39,7 @@ describe("App replay", () => {
         ),
     );
     const user = userEvent.setup();
-    render(<App fetchImpl={fetchMock as unknown as typeof fetch} />);
+    render(<App fetchImpl={fetchMock as unknown as typeof fetch} pace={NO_PACE} />);
     await user.type(
       screen.getByLabelText("Paste your Steam profile URL"),
       "https://steamcommunity.com/id/gaben",
