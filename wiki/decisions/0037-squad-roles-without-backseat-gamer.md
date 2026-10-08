@@ -20,7 +20,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:30:00Z }
 | The Medic | teammate healing |
 | The Sniper | long-distance kills |
 | Parry God | parries landed |
-| The Hoarder | unspent gold minutes |
+| The Hoarder | unspent gold minutes (stat dropped, see [open question](../open-questions/hoarder-role-source.md)) |
 | Mid Boss Thief | Rejuvenators claimed |
 
 - **The Backseat Gamer (pings) is dropped.** Ping counts are not in the bulk match data ([bulk metadata](../research/bulk-match-metadata.md)), and the user judged the role unnecessary.

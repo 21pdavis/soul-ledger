@@ -24,3 +24,5 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T12:00:00Z }
 11. **Summary card:** exportable.
 
 v2 candidates: most-bought item, fastest core item.
+
+> **Superseded in part ([ADR 0060](0060-owner-decisions-m2-open-questions.md)):** slide 8 no longer includes hoarded unspent souls; the stat was dropped on 2026-10-08.

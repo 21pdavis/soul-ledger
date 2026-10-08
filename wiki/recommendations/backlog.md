@@ -23,7 +23,11 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P2 | Once the $1.50 tier is on the test account, compare in-game hero counts with `hero-stats` and our bulk-metadata counts to see what the unlock adds | [API](../research/deadlock-api.md), [test account](../research/test-account.md) |
 | P2 | Pre-warm popular accounts off-peak | [ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
-| P1 | To-do for the owner or the next milestone: confirm what "Unspent Gold Minutes" counts (#36) and, if possible, what accolade 11 (breakables) includes. The owner decided on 2026-10-08 that the roast slide shows no number until then ([ADR 0055](../decisions/0055-owner-confirmations-after-m2.md)) | [bulk metadata](../research/bulk-match-metadata.md), [unit question](../open-questions/m2-unspent-souls-unit.md) |
+| P1 | Check what accolade 11 (breakables) includes. The unspent-souls stat was dropped on 2026-10-08 ([ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md)) | [bulk metadata](../research/bulk-match-metadata.md) |
+| P1 | Add a visible footer disclaimer: "Not affiliated with or endorsed by Valve. Valve and its properties are trademarks of Valve Corporation." Needed before hero art ships; keep art removal quick | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
+| P1 | Replace monogram tiles with deadlock-api hero images | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
+| P2 | Remove the unspent-souls code path (`SHOW_UNSPENT_SOULS_FIGURE`, roast copy); keep the DB column and parsing | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
+| P2 | Big visual style pass (fonts, look) after M3 or later | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P1 | Make the cached-matches note an overlay so it stops squeezing the stage on tiny phones (#38) | [M2 plan](m2-plan.md) |
 | P2 | Add an e2e reduced-motion check (today only component tests cover it) | [ADR 0054](../decisions/0054-m2-testing-and-accessibility.md) |
 | P2 | Fold the slide 8-10 helpers into the shared primitives and `copy.ts` (#37) | [M2 plan](m2-plan.md) |

@@ -34,3 +34,5 @@ The owner confirmed this on 2026-10-07. Applies [ADR 0007](0007-tone-hype-with-r
 - Copy lives in the single `src/story/copy.ts`. Slide PRs briefly kept per-group copy files to avoid merge conflicts; PR 9 (#39) folded them in. Helpers for slides 8-10 still need consolidating (#37).
 - Unspent souls ships as a neutral sentence with no unit claimed, until the [unit](../open-questions/m2-unspent-souls-unit.md) is confirmed (#36). The owner decided on 2026-10-08 that there is no number for now ([ADR 0055](0055-owner-confirmations-after-m2.md)).
 - The rank tier map was built from the API fixture and was [confirmed by the owner](../open-questions/m2-rank-tier-names.md) on 2026-10-08 ([ADR 0055](0055-owner-confirmations-after-m2.md)).
+
+> **Superseded in part ([ADR 0060](0060-owner-decisions-m2-open-questions.md)):** the unspent-souls rows (table and "As built") no longer apply; the stat was dropped on 2026-10-08. The hero-art row is also settled: art may be used, with a disclaimer.

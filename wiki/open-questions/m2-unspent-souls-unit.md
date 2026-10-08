@@ -3,11 +3,12 @@ type: Open Question
 title: "Unit of avgUnspentGoldMinutes for the unspent-souls roast"
 description: "What the Unspent Gold Minutes stat measures (souls times minutes or minutes), which decides how the roast slide can phrase it."
 tags: [m2, data, copy]
-status: draft
-question_status: open
-recommendation: "Check src/lib/stats/normalize.ts and the deadlock-api docs or source, and compare against known matches. Until verified, phrase the roast without a unit, as a plain sentence about hoarding souls."
+status: stable
+question_status: resolved
+resolved_by: ../decisions/0060-owner-decisions-m2-open-questions.md
+recommendation: "Resolved by dropping the stat: the project does not use unspent souls (ADR 0060)."
 raised_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T15:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T20:00:00Z }
 ---
 
 # Context
@@ -40,3 +41,7 @@ What ships: the roast slide shows a **neutral sentence with no number and no uni
 **Owner decision, 2026-10-08 ([ADR 0055](../decisions/0055-owner-confirmations-after-m2.md)):** no number for now. Showing one is a to-do for the owner or the next milestone, tracked in #36. The question stays open because the unit is still unconfirmed.
 
 To close this question: confirm the unit with Valve or the deadlock-api maintainers, fix the missing-key bias in `normalize.ts`, add an ADR, set `question_status: resolved` with `resolved_by`, and flip the switch (all in #36).
+
+# Resolution
+
+Owner decision, 2026-10-08 ([ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md)): drop the stat. The unit stayed unverified, the stat is not in the OpenAPI spec, and web searches found no mention. The DB column and `normalize.ts` parsing stay unused. #36 is closed as not planned. The Hoarder squad role lost its source: see [its open question](hoarder-role-source.md).
