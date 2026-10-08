@@ -27,4 +27,4 @@ The owner answered four of the questions left open at the end of M2 on 2026-10-0
 - The rank map and fonts need no code change. They are now confirmed rather than provisional.
 - The caption change is in `src/story/copy.ts` (`SCAVENGER_COPY.urnMule.detail`), covered by a component test.
 
-> **Superseded in part ([ADR 0060](0060-owner-decisions-m2-open-questions.md)):** the unspent-souls decision (row 1 and the first consequence) is replaced by dropping the stat; #36 is closed as not planned.
+> **Superseded in part ([ADR 0060](0060-owner-decisions-m2-open-questions.md)):** the unspent-souls decision (row 1 and the first consequence) is replaced by dropping the stat (#36 closed as not planned), and the hero-art question is settled: images are allowed with a Valve disclaimer.

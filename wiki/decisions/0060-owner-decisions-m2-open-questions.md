@@ -29,7 +29,7 @@ Four M2 open questions were still on the books. The owner answered all four on 2
 
 # Consequences
 
-- **Supersedes** the unspent-souls parts of [ADR 0015](0015-v1-slides.md) (roast slide), [ADR 0053](0053-m2-copy-and-data-presentation.md) and [ADR 0055](0055-owner-confirmations-after-m2.md). The rest of those ADRs stands.
+- **Supersedes in part** the unspent-souls parts of [ADR 0015](0015-v1-slides.md) (roast slide), [ADR 0053](0053-m2-copy-and-data-presentation.md) and [ADR 0055](0055-owner-confirmations-after-m2.md). The rest of those ADRs stands.
 - The DB column `unspentGoldMinutes` and its parsing in `src/lib/stats/normalize.ts` stay in place, unused, in case of a revisit. The `SHOW_UNSPENT_SOULS_FIGURE` code path and the roast slide's unspent line are to be removed in a code PR.
 - #36 (unit and missing-key bias) is closed as not planned.
 - [ADR 0020](0020-squad-roles.md) and [ADR 0037](0037-squad-roles-without-backseat-gamer.md) define "The Hoarder" from this stat. Squad roles are not built, so this is a new [open question](../open-questions/hoarder-role-source.md).

@@ -23,7 +23,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T14:00:00Z }
 | The Medic | teammate healing |
 | The Sniper | long-distance kills |
 | Parry God | parries landed |
-| The Hoarder | unspent gold minutes |
+| The Hoarder | unspent gold minutes (stat dropped, see [open question](../open-questions/hoarder-role-source.md)) |
 | The Backseat Gamer | pings |
 | Mid Boss Thief | Rejuvenators claimed |
 
