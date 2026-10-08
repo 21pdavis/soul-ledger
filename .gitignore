@@ -51,3 +51,6 @@ Thumbs.db
 
 # local Claude Code settings
 .claude/settings.local.json
+
+# agent worktrees (scratch copies of the repo made by Claude Code subagents)
+.claude/worktrees/
