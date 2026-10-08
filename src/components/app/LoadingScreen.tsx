@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { loadingStage } from "@/lib/client/loading-stage";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
 import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
-import { LOADING_COPY } from "@/story/copy-entry";
+import { LOADING_COPY } from "@/story/copy";
 import styles from "./LoadingScreen.module.css";
 
 interface Props {
@@ -78,6 +78,7 @@ export function LoadingScreen({ progress }: Props) {
 
   return (
     <div className={styles.page} data-stage={view.stage} data-waiting={view.waiting || undefined}>
+      <h1 className={styles.srOnly}>{LOADING_COPY.pageHeading}</h1>
       <p role="status" aria-live="polite" aria-atomic="true" className={styles.announce}>
         {view.announcement}
       </p>

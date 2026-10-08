@@ -1,5 +1,4 @@
-import { headlineFor } from "@/story/copy";
-import { ROSTER_COPY, matchesUnit, rosterVerdict } from "@/story/copy-slides-1-4";
+import { ROSTER_COPY, headlineFor, matchesUnit, rosterVerdict } from "@/story/copy";
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { clampShare } from "@/story/monogram";

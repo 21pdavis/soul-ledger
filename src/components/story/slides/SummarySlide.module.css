@@ -44,11 +44,15 @@
   border-top: 0;
 }
 
+/* A long label wraps to two lines; only the narrowest tier (below) cuts it with an ellipsis. */
 .label {
   min-width: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
   color: var(--bone-muted);
   font-size: 0.9rem;
 }
@@ -276,6 +280,10 @@
   }
 
   .label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 0.75rem;
   }
 

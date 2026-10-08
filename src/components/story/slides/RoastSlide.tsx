@@ -1,12 +1,12 @@
 import {
   avgMatchMinutes,
   deathsLabel,
+  headlineFor,
   hotspotLine,
   noDeathMapLine,
   unspentSoulsLine,
   worstMatchLine,
-} from "@/story/copy-slides-8-10";
-import { headlineFor } from "@/story/copy";
+} from "@/story/copy";
 import { binDeaths, hottestCell } from "@/story/death-bins";
 import { heroName } from "@/story/heroes";
 import { SlideFrame } from "../SlideFrame";

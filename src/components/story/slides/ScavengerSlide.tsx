@@ -1,5 +1,4 @@
-import { headlineFor } from "@/story/copy";
-import { SCAVENGER_COPY } from "@/story/copy-slides-1-4";
+import { SCAVENGER_COPY, headlineFor } from "@/story/copy";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";

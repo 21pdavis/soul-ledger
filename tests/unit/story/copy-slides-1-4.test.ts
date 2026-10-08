@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatLedgerDate,
-  mainPercentileLine,
-  matchesUnit,
-  rosterVerdict,
-} from "@/story/copy-slides-1-4";
+import { formatLedgerDate, mainPercentileLine, matchesUnit, rosterVerdict } from "@/story/copy";
 import { fixtureStory } from "../../fixtures/story";
 
 const base = fixtureStory().percentiles[0];

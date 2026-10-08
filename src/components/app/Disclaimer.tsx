@@ -1,4 +1,4 @@
-import { ENTRY_COPY } from "@/story/copy-entry";
+import { ENTRY_COPY } from "@/story/copy";
 import styles from "./Disclaimer.module.css";
 
 /** The Valve non-affiliation notice (ADR 0016). Shown on every screen, the story included. */

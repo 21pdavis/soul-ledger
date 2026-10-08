@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DISMISS, STALE_NOTE } from "@/story/copy-entry";
+import { DISMISS, STALE_NOTE } from "@/story/copy";
 import styles from "./StaleNote.module.css";
 
 /**

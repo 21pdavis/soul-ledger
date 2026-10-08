@@ -35,6 +35,6 @@ Checks on `tests/fixtures/api/bulk-metadata.json`: one account's 352 matches, of
 
 Conclusion: the value behaves like **soul-minutes** (unspent souls summed over each minute). The mean per match divided by the mean match length (`intro.hoursPlayed * 60 / matchCount`) would be the duration-weighted average souls held unspent, once the missing-key bias is fixed.
 
-What ships: the roast slide shows a **neutral sentence with no number and no unit**. The numeric line ("In a typical match you sat on about 2,500 unspent souls", rounded to the nearest 100) is built and tested but switched off by `SHOW_UNSPENT_SOULS_FIGURE` in `src/story/copy-slides-8-10.ts`.
+What ships: the roast slide shows a **neutral sentence with no number and no unit**. The numeric line ("In a typical match you sat on about 2,500 unspent souls", rounded to the nearest 100) is built and tested but switched off by `SHOW_UNSPENT_SOULS_FIGURE` in `src/story/copy.ts`.
 
 To close this question: confirm the unit with Valve or the deadlock-api maintainers, fix the missing-key bias in `normalize.ts`, add an ADR, set `question_status: resolved` with `resolved_by`, and flip the switch (all in #36).

@@ -265,7 +265,8 @@
 }
 
 @keyframes breathe {
+  /* The note is text: its dimmest point must still meet AA contrast (brass on the panel, tested in a11y.spec.ts). */
   50% {
-    opacity: 0.45;
+    opacity: 0.8;
   }
 }

@@ -4,7 +4,7 @@ title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
 status: draft
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T05:30:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T09:00:00Z }
 ---
 
 # Context
@@ -33,7 +33,7 @@ The orchestrator may deviate from this plan where useful. Every PR follows [ADR 
 
 PRs 5 to 8 can run in parallel once PRs 1 and 4 are merged.
 
-**Follow-up: copy is split per slide group.** To avoid merge conflicts between the parallel slide PRs, each one keeps its own slide copy in a sibling module (`src/story/copy-slides-1-4.ts` for PR 5) instead of the single `copy` module that [ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md) calls for. PR 9 (hardening) folds these files into `src/story/copy.ts` (or re-exports them from it) so copy is edited in one place again.
+**Follow-up: copy is split per slide group.** To avoid merge conflicts between the parallel slide PRs, each one keeps its own slide copy in a sibling module (`src/story/copy-slides-1-4.ts` for PR 5) instead of the single `copy` module that [ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md) calls for. PR 9 (hardening) folded them all into `src/story/copy.ts` (done), so copy is edited in one place again.
 
 **Follow-ups for the slide PRs** (the story player is mounted in the app, and the placeholder stage is gone):
 - PR 5 (slides 1-4, #33) owns the window-label e2e: the story shows "All time" or "Since patch <date>" (`WindowLabel`). It was dropped from `entry.spec.ts` because no slide shows it yet; App's side is covered in `tests/component/app-story-props.test.tsx`.
@@ -158,6 +158,8 @@ The ADR 0004 this-patch toggle is in M2 ([ADR 0052](../decisions/0052-m2-entry-l
 
 - [component] An `aria-live` region announces each slide change.
 - [e2e] One Playwright test completes the whole story, entry to summary, by keyboard only, with visible focus rings.
+- [e2e] `@axe-core/playwright` (pinned) scans the entry screen, every loading stage, the error and zero-matches screens and all 11 slides (a full and a sparse story) on phone and desktop. Any violation fails, not only serious and critical ones, and no rule is disabled (`tests/e2e/a11y.spec.ts`, built in PR 9). Looping animations are scanned at the start and midpoint of the loop. Its findings were a missing h1 on the loading screen and the loading note dimming to 0.45 opacity (contrast 2.5) while it breathed; the floor is now 0.8.
+- Playwright ports are overridable (`PLAYWRIGHT_PORT`, `PLAYWRIGHT_GATE_PORT`) so several worktrees can run e2e at once; a server already listening is only reused on the default ports (`PLAYWRIGHT_REUSE_SERVER=0` turns reuse off there too).
 
 # Related
 

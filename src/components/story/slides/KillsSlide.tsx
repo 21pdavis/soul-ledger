@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
-import { headlineFor } from "@/story/copy";
-import { KILLS_COPY, killsTotalLabel } from "@/story/copy-slides-5-7";
+import { KILLS_COPY, headlineFor, killsTotalLabel } from "@/story/copy";
 import { killRows, rangeShares } from "@/story/kill-shares";
 import { SlideFrame } from "../SlideFrame";
 import { StoryCountUp } from "../StoryCountUp";

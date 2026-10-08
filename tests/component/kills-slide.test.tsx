@@ -1,8 +1,7 @@
 import { render, screen, within, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { KillsSlide } from "@/components/story/slides/KillsSlide";
-import { headlineFor } from "@/story/copy";
-import { KILLS_COPY } from "@/story/copy-slides-5-7";
+import { KILLS_COPY, headlineFor } from "@/story/copy";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 
 const flags = { active: true, skipAnimation: false, reducedMotion: false, paused: false };

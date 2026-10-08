@@ -1,6 +1,10 @@
-import { headlineFor } from "@/story/copy";
-import { STORY_ACTIONS_COPY } from "@/story/copy-entry";
-import { INTRO_COPY, formatLedgerDate, matchesUnit } from "@/story/copy-slides-1-4";
+import {
+  INTRO_COPY,
+  STORY_ACTIONS_COPY,
+  formatLedgerDate,
+  headlineFor,
+  matchesUnit,
+} from "@/story/copy";
 import { formatHours } from "@/story/format";
 import { basedOnMatches } from "@/story/window-label";
 import { SlideFrame } from "../SlideFrame";

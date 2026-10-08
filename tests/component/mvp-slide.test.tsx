@@ -2,8 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { MvpSlide } from "@/components/story/slides/MvpSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
-import { headlineFor } from "@/story/copy";
-import { MVP_FALLBACK_LEAD } from "@/story/copy-slides-8-10";
+import { MVP_FALLBACK_LEAD, headlineFor } from "@/story/copy";
 import type { StoryData } from "@/story/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 

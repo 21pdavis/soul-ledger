@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { PARRY_KING_RATE } from "@/lib/stats/story";
-import { killsTotalLabel, midBossCopy, parryCopy, parryKingLine } from "@/story/copy-slides-5-7";
+import { killsTotalLabel, midBossCopy, parryCopy, parryKingLine } from "@/story/copy";
 
 describe("killsTotalLabel", () => {
   it("pluralises, so one kill never reads '1 kills'", () => {

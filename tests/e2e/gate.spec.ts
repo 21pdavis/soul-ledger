@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { TEST_ACCESS_KEY } from "../../playwright.config";
+import { GATE_PORT, TEST_ACCESS_KEY } from "../../playwright.config";
 
 // Runs against a local server started with the staging gate on (see playwright.config.ts).
 
@@ -32,7 +32,11 @@ test("a wrong key in the link does not log in", async ({ page }) => {
 
 test("a forged cookie is refused", async ({ page, context }) => {
   await context.addCookies([
-    { name: "staging_session", value: "9999999999999.forged", url: "http://localhost:3101" },
+    {
+      name: "staging_session",
+      value: "9999999999999.forged",
+      url: `http://localhost:${GATE_PORT}`,
+    },
   ]);
   expect((await page.goto("/"))?.status()).toBe(401);
 });
