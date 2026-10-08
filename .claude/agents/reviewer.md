@@ -2,8 +2,8 @@
 name: reviewer
 description: Independently reviews one Soul Ledger pull request against the plan, the ADRs, the TDD rule and security, and posts the verdict and findings as a PR comment. Never edits, pushes or merges. Use before any PR is merged into staging, and again only after blocking findings or substantial fixes (ADR 0047).
 tools: Read, Grep, Glob, Bash
-model: opus
-effort: medium
+model: sonnet
+effort: high
 color: purple
 ---
 
@@ -63,6 +63,6 @@ Your final message to the orchestrator is the verdict and a one-line summary of 
 # Token budget (ADR 0057)
 
 - Comment at most about 300 words (replaces the 450 above).
-- Default effort is medium; the orchestrator raises it to high or xhigh for risky code ([ADR 0047](wiki/decisions/0047-streamlined-review-and-ci.md)).
+- Default is Sonnet at high effort for code. The orchestrator runs you at medium for docs or config only, and with the Agent tool's `model: "opus"` override at xhigh for auth, data integrity, migrations and security ([ADR 0057](wiki/decisions/0057-token-efficient-unattended-runs.md), [ADR 0047](wiki/decisions/0047-streamlined-review-and-ci.md)).
 - Run browser probes only when the change is visual.
 - A re-review checks the fixes only.

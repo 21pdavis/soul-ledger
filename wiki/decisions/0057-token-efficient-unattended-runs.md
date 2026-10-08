@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: "0057: Token-efficient unattended runs"
-description: "Ten policies that cut token use in agent runs: orchestrator context hygiene, fresh narrow subagents, short briefs and reports, cheaper models and effort, foundation-first and fewer PRs, targeted tests, bounded fix loops, per-milestone measurement, and small always-loaded context."
+description: "Eleven policies that cut token use in agent runs: orchestrator context hygiene, fresh narrow subagents, short briefs and reports, cheaper models and effort (reviewer on Sonnet, Opus for security work), foundation-first and fewer PRs, targeted tests, bounded fix loops, per-milestone measurement, small always-loaded context, and CI watched by the orchestrator."
 tags: [process, agents, tokens, cost]
 status: stable
 decision: accepted
@@ -47,7 +47,7 @@ M2 used about two 5-hour usage windows. `/usage` attributed the spend as: implem
 | Agent | Model and effort |
 |---|---|
 | `implementer` | Sonnet by default, effort `medium`. **Trial** Haiku 5.5 on one well-specified task in M3, record cost and quality in the milestone log, then decide. |
-| `reviewer` | Effort `medium` by default, `high` only for risky code, `xhigh` only for auth, data, migrations and security ([ADR 0047](0047-streamlined-review-and-ci.md)). Re-reviews check only the fixes. Its **model** is unchanged here; see the [open question](../open-questions/reviewer-model.md). |
+| `reviewer` | **Sonnet** (was Opus; the owner decided on 2026-10-08: "sonnet high reviewer with opus for security is perfectly reasonable"). Effort `high` for code, `medium` for docs or config only. `xhigh` on **Opus** only for auth, data integrity, migrations and security: the orchestrator passes the Agent tool's `model: "opus"` override ([ADR 0047](0047-streamlined-review-and-ci.md)). Re-reviews check only the fixes. This amends the reviewer row of [ADR 0049](0049-agent-model-assignment.md). |
 | `qa` | Haiku ([ADR 0049](0049-agent-model-assignment.md)). |
 | `wiki-keeper` | Sonnet, effort `medium`. |
 
@@ -81,6 +81,13 @@ At the end of each milestone the owner shares `/usage` attribution by subagent, 
 - Keep the cache prefix stable mid-run: avoid editing CLAUDE.md or agent files during a run.
 - The prompt cache expires after about an hour idle, so a long pause makes the next turn expensive.[^costs]
 
+## k. CI watching
+
+- Implementers do **not** wait for CI. After pushing they open or update the PR and stop with their short report.
+- The orchestrator watches CI with a background shell command (`gh pr checks N --watch` run in the background). It costs no model tokens while waiting and notifies on exit.
+- If CI fails, a small fresh Haiku agent reads the failing job log and reports at most 100 words: failing test names, the error line and the likely cause. The fix then goes to a fresh narrowly scoped agent or the orchestrator (policy b).
+- Why: a blocked implementer keeps its whole context alive and re-reads it on resume. Waiting is a job for a plain command, and triage is a job for Haiku.
+
 # Alternatives considered
 
 | Option | Why not |
@@ -94,7 +101,7 @@ At the end of each milestone the owner shares `/usage` attribution by subagent, 
 - Runs get cheaper and longer-lived, at the cost of more process discipline from the orchestrator and the owner (`/clear` between phases, sharing `/usage`).
 - Agent briefs and reports get shorter, so reviewers and the owner read PR text for detail.
 - Fewer, bigger PRs raise per-PR review size; the foundation-first rule keeps them coherent.
-- The Haiku trial and the reviewer model are open to evidence from M3 rather than assumed.
+- The Haiku trial is open to evidence from M3 rather than assumed. Reviews on Sonnet are cheaper; if review quality drops, raise effort or use Opus for that PR.
 - Follow-ups are in the [backlog](../recommendations/backlog.md).
 
 [^costs]: Manage costs effectively (Claude Code docs)

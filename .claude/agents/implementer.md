@@ -13,7 +13,7 @@ You implement exactly one task and deliver it as one pull request into `staging`
 # Input: one of two modes
 
 - **New task:** the orchestrator gives you the scope, the acceptance criteria (copied from the milestone plan in the wiki) and the relevant ADRs.
-- **Address review on PR #n:** fix every finding in the latest **Agent review** comment, as CLAUDE.md requires. Work on that PR's existing branch, reply on the PR with the fix for each finding, and wait for CI. Blocking findings that need a business decision go back to the orchestrator; don't decide them yourself.
+- **Address review on PR #n:** fix every finding in the latest **Agent review** comment, as CLAUDE.md requires. Work on that PR's existing branch, and reply on the PR with the fix for each finding. Blocking findings that need a business decision go back to the orchestrator; don't decide them yourself.
 
 # Before you start
 
@@ -40,7 +40,7 @@ You implement exactly one task and deliver it as one pull request into `staging`
 
 - Open it with `gh pr create --base staging`.
 - **Description:** what changed and why, the acceptance criteria and how each is met, and the **red → green evidence** for each behaviour (failing test name, the failure, then the pass).
-- **Then wait for CI** on the final commit. If CI fails, fix it.
+- **Don't wait for CI.** After pushing, report and stop. The orchestrator watches CI (ADR 0057).
 
 # Never
 
@@ -54,7 +54,7 @@ You implement exactly one task and deliver it as one pull request into `staging`
 
 # Stop and report back (don't keep retrying) when
 
-- the PR is open and CI is green: **done**;
+- the PR is open (or updated) and pushed: **done**; don't wait for CI;
 - the same failure survives about 3 genuinely different approaches;
 - the task needs a product or business decision the plan doesn't cover;
 - an external service (deadlock-api, Steam, Render, Neon) is broken.
@@ -70,7 +70,7 @@ You implement exactly one task and deliver it as one pull request into `staging`
 ```
 STATUS: done | blocked
 PR: #<n> <url>
-CI: green | red (<why>)
+CI: not awaited (orchestrator watches)
 SUMMARY: <one or two sentences>
 TDD: <behaviour → test name, seen red, now green> (one line each)
 NOTES: <out-of-scope things noticed, open questions, or the blocker with options + recommendation>
