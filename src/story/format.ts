@@ -12,12 +12,12 @@ export function formatPercent(rate: number): string {
 
 /**
  * The number in "Top N%": one decimal under 10 (a trailing .0 dropped), whole percent from 10 up.
- * `topPercent` is already in [0.5, 99.5], so it never reads "Top 0%". The one formatter for every
+ * Values below 0.1 show as 0.1, so it never reads "Top 0%". The one formatter for every
  * slide, so the same stat reads the same everywhere.
  */
 export function formatTopPercent(topPercent: number): string {
-  if (topPercent >= 10) return String(Math.round(topPercent));
-  return String(Math.round(topPercent * 10) / 10);
+  const v = Math.max(0.1, topPercent);
+  return v < 10 ? String(Math.round(v * 10) / 10) : String(Math.round(v));
 }
 
 /** The percentile entry with the lowest `topPercent` (the first on a tie), or null if there are none. */

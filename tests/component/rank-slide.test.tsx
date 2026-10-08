@@ -2,8 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { RankSlide } from "@/components/story/slides/RankSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
-import { headlineFor } from "@/story/copy";
-import { RANK_EMPTY_LINE } from "@/story/copy-slides-8-10";
+import { RANK_EMPTY_LINE, headlineFor } from "@/story/copy";
 import type { StoryData } from "@/story/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 

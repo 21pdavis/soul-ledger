@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { summaryRows, topStat } from "@/story/copy-summary";
+import { summaryRows, topStat } from "@/story/copy";
 import { fixtureStory } from "../../fixtures/story";
 
 const pct = (label: string, topPercent: number) => ({

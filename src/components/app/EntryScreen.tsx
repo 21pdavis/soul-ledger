@@ -3,7 +3,7 @@
 import { useId, useState, type FormEvent } from "react";
 import { validateProfileInput } from "@/lib/client/profile-input";
 import type { Prefs } from "@/lib/client/prefs";
-import { ENTRY_COPY } from "@/story/copy-entry";
+import { ENTRY_COPY } from "@/story/copy";
 import type { LookupFilters } from "@/story/filters";
 import { FilterControls } from "./FilterControls";
 import styles from "./EntryScreen.module.css";

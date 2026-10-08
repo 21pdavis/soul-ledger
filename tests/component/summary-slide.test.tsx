@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { SummarySlide } from "@/components/story/slides/SummarySlide";
-import { ENTRY_COPY } from "@/story/copy-entry";
+import { ENTRY_COPY } from "@/story/copy";
 import type { StoryData } from "@/story/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 

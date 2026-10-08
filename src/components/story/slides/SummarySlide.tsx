@@ -1,6 +1,4 @@
-import { headlineFor } from "@/story/copy";
-import { STORY_ACTIONS_COPY } from "@/story/copy-entry";
-import { SUMMARY_COPY, summaryRows } from "@/story/copy-summary";
+import { STORY_ACTIONS_COPY, SUMMARY_COPY, headlineFor, summaryRows } from "@/story/copy";
 import { basedOnMatches } from "@/story/window-label";
 import { SlideFrame } from "../SlideFrame";
 import { WindowLabel } from "../WindowLabel";

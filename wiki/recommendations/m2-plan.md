@@ -33,7 +33,7 @@ The orchestrator may deviate from this plan where useful. Every PR follows [ADR 
 
 PRs 5 to 8 can run in parallel once PRs 1 and 4 are merged.
 
-**Follow-up: copy is split per slide group.** To avoid merge conflicts between the parallel slide PRs, each one keeps its own slide copy in a sibling module (`src/story/copy-slides-1-4.ts` for PR 5) instead of the single `copy` module that [ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md) calls for. PR 9 (hardening) folds these files into `src/story/copy.ts` (or re-exports them from it) so copy is edited in one place again.
+**Follow-up: copy is split per slide group.** To avoid merge conflicts between the parallel slide PRs, each one keeps its own slide copy in a sibling module (`src/story/copy-slides-1-4.ts` for PR 5) instead of the single `copy` module that [ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md) calls for. PR 9 (hardening) folded them all into `src/story/copy.ts` (done), so copy is edited in one place again.
 
 **Follow-ups for the slide PRs** (the story player is mounted in the app, and the placeholder stage is gone):
 - PR 5 (slides 1-4, #33) owns the window-label e2e: the story shows "All time" or "Since patch <date>" (`WindowLabel`). It was dropped from `entry.spec.ts` because no slide shows it yet; App's side is covered in `tests/component/app-story-props.test.tsx`.

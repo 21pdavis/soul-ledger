@@ -8,7 +8,7 @@ import {
 } from "@/lib/client/lookup-stream";
 import { defaultPrefs, readPrefsSnapshot, savePrefs, type Prefs } from "@/lib/client/prefs";
 import type { StoryWindow } from "@/lib/lookup";
-import type { ErrorKind } from "@/story/copy-entry";
+import type { ErrorKind } from "@/story/copy";
 import type { LookupFilters } from "@/story/filters";
 import type { SlideProps, StoryActions, StoryData, StoryMeta } from "@/story/types";
 import { EntryScreen } from "./EntryScreen";

@@ -6,7 +6,6 @@ import {
   RANK_EMPTY_LINE,
   avgMatchMinutes,
   deathsLabel,
-  formatTopPercent,
   hotspotLine,
   mvpCopy,
   mvpFlavor,
@@ -15,8 +14,9 @@ import {
   typicalUnspentSouls,
   unspentSoulsLine,
   worstMatchLine,
-} from "@/story/copy-slides-8-10";
+} from "@/story/copy";
 import type { JourneyPoint } from "@/story/rank-journey";
+import { formatTopPercent } from "@/story/format";
 import { fixtureStory } from "../../fixtures/story";
 
 describe("roast copy", () => {

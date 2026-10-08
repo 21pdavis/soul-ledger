@@ -1,5 +1,5 @@
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
-import { LOADING_COPY } from "@/story/copy-entry";
+import { LOADING_COPY } from "@/story/copy";
 import { heroMonogram, heroName } from "@/story/heroes";
 
 /** The three stages of ADR 0014. Stage 0 is the moment before the profile arrives. */

@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import { PARRY_KING_RATE } from "@/lib/stats/story";
-import { headlineFor } from "@/story/copy";
-import { PRECISION_COPY, parryCopy, parryKingLine } from "@/story/copy-slides-5-7";
+import { PRECISION_COPY, headlineFor, parryCopy, parryKingLine } from "@/story/copy";
 import { parryRate } from "@/story/kill-shares";
 import { PrecisionDial } from "../PrecisionDial";
 import { SlideFrame } from "../SlideFrame";

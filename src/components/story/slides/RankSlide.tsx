@@ -1,5 +1,4 @@
-import { headlineFor } from "@/story/copy";
-import { rankSummary } from "@/story/copy-slides-8-10";
+import { headlineFor, rankSummary } from "@/story/copy";
 import { journeyMilestones } from "@/story/rank-journey";
 import { rankLabel } from "@/story/ranks";
 import { SlideFrame } from "../SlideFrame";

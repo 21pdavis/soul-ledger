@@ -1,5 +1,4 @@
-import { headlineFor } from "@/story/copy";
-import { mvpCopy } from "@/story/copy-slides-8-10";
+import { headlineFor, mvpCopy } from "@/story/copy";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import type { SlideComponent } from "./contract";

@@ -1,11 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { StoryWindow } from "@/lib/lookup";
-import {
-  ERROR_COPY,
-  noMatchesDetails,
-  STORY_ACTIONS_COPY,
-  type ErrorKind,
-} from "@/story/copy-entry";
+import { ERROR_COPY, noMatchesDetails, STORY_ACTIONS_COPY, type ErrorKind } from "@/story/copy";
 import styles from "./ErrorScreen.module.css";
 
 export type { ErrorKind };

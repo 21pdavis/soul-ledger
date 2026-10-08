@@ -1,5 +1,4 @@
-import { headlineFor } from "@/story/copy";
-import { MAIN_COPY, mainPercentileLine, matchesUnit } from "@/story/copy-slides-1-4";
+import { MAIN_COPY, headlineFor, mainPercentileLine, matchesUnit } from "@/story/copy";
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { MonogramTile } from "../MonogramTile";

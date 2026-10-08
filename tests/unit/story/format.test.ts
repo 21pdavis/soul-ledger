@@ -30,6 +30,11 @@ describe("formatTopPercent", () => {
     expect(formatTopPercent(3.46)).toBe("3.5");
     expect(formatTopPercent(49.6)).toBe("50");
   });
+
+  it('never reads "Top 0%": values below 0.1 show as 0.1', () => {
+    expect(formatTopPercent(0)).toBe("0.1");
+    expect(formatTopPercent(0.04)).toBe("0.1");
+  });
 });
 
 describe("bestPercentile", () => {

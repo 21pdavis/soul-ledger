@@ -2,8 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { RoastSlide } from "@/components/story/slides/RoastSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
-import { headlineFor } from "@/story/copy";
-import { UNSPENT_NEUTRAL_LINE } from "@/story/copy-slides-8-10";
+import { UNSPENT_NEUTRAL_LINE, headlineFor } from "@/story/copy";
 import type { StoryData } from "@/story/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 

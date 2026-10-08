@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { loadingStage } from "@/lib/client/loading-stage";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
 import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
-import { LOADING_COPY } from "@/story/copy-entry";
+import { LOADING_COPY } from "@/story/copy";
 import styles from "./LoadingScreen.module.css";
 
 interface Props {
