@@ -11,9 +11,9 @@ describe("killsTotalLabel", () => {
 });
 
 describe("parryKingLine", () => {
-  it("is pinned to PARRY_KING_RATE (60% today, ADR 0040)", () => {
+  it("is pinned to PARRY_KING_RATE (40% today, ADR 0061)", () => {
     expect(parryKingLine()).toContain(`${Math.round(PARRY_KING_RATE * 100)}%`);
-    expect(parryKingLine()).toContain("60%");
+    expect(parryKingLine()).toContain("40%");
   });
 });
 
