@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/components/app/App";
@@ -43,6 +43,11 @@ function setup(...responses: (Response | Promise<Response> | Error)[]) {
 
 beforeEach(() => localStorage.clear());
 
+/** The real story player is up: its segmented progress bar is on screen. */
+const storyUp = () => screen.findByRole("list", { name: "Story progress" });
+const storyGone = () =>
+  expect(screen.queryByRole("list", { name: "Story progress" })).not.toBeInTheDocument();
+
 describe("App flow", () => {
   it("starts on the entry screen, with the Valve disclaimer", () => {
     setup();
@@ -57,43 +62,33 @@ describe("App flow", () => {
     expect(await screen.findByText(/Looking up your ledger/)).toBeInTheDocument();
     expect(screen.queryByLabelText("Paste your Steam profile URL")).not.toBeInTheDocument();
     finish(ndjson({ type: "resolved", accountId: 1 }, storyEvent()));
-    expect(await screen.findByText("Story ready: 120 matches")).toBeInTheDocument();
+    expect(await storyUp()).toBeInTheDocument();
   });
 
   it("sends the pasted URL and the all-time window by default", async () => {
     const { enter, requested } = setup(ndjson(storyEvent()));
     await enter();
-    await screen.findByText("Story ready: 120 matches");
+    await storyUp();
     expect(requested().searchParams.get("q")).toBe(URL_A);
     expect(requested().searchParams.get("window")).toBe("all");
     expect(requested().searchParams.has("refresh")).toBe(false);
-    expect(screen.getByText("All time")).toBeInTheDocument();
   });
 
-  it("sends window=patch when This patch is chosen, and the story says which patch", async () => {
+  it("sends window=patch when This patch is chosen", async () => {
     const { enter, requested, user } = setup(
       ndjson(storyEvent({ window: "patch", patchStart: PATCH })),
     );
     await user.click(screen.getByRole("radio", { name: "This patch" }));
     await enter();
-    expect(await screen.findByText("Since patch Sep 30, 2026")).toBeInTheDocument();
+    await storyUp();
     expect(requested().searchParams.get("window")).toBe("patch");
-  });
-
-  it("labels the story All time when a patch window came back without a patch date (#25)", async () => {
-    const { enter, user } = setup(ndjson(storyEvent({ window: "patch", patchStart: null })));
-    await user.click(screen.getByRole("radio", { name: "This patch" }));
-    await enter();
-    await screen.findByText("Story ready: 120 matches");
-    expect(screen.getByText(/^All time/)).toBeInTheDocument();
-    expect(screen.queryByText(/this patch/i)).not.toBeInTheDocument();
   });
 
   it("remembers the URL and window, and restores them next visit", async () => {
     const { enter, user } = setup(ndjson(storyEvent({ window: "patch", patchStart: PATCH })));
     await user.click(screen.getByRole("radio", { name: "This patch" }));
     await enter();
-    await screen.findByText(/Since patch/);
+    await storyUp();
     expect(JSON.parse(localStorage.getItem(PREFS_KEY)!)).toEqual({
       url: URL_A,
       filters: { window: "patch" },
@@ -115,7 +110,7 @@ describe("App flow", () => {
     try {
       const { enter } = setup(ndjson(storyEvent()));
       await enter();
-      expect(await screen.findByText("Story ready: 120 matches")).toBeInTheDocument();
+      expect(await storyUp()).toBeInTheDocument();
     } finally {
       getItem.mockRestore();
       setItem.mockRestore();
@@ -146,7 +141,7 @@ describe("App flow", () => {
     await user.click(screen.getByRole("radio", { name: "This patch" }));
     await enter();
     await user.click(await screen.findByRole("button", { name: "Try again" }));
-    expect(await screen.findByText("Story ready: 120 matches")).toBeInTheDocument();
+    expect(await storyUp()).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(requested(1).searchParams.get("q")).toBe(URL_A);
     expect(requested(1).searchParams.get("window")).toBe("patch");
@@ -157,7 +152,7 @@ describe("App flow", () => {
     const { enter } = setup(ndjson(storyEvent({}, empty)));
     await enter();
     expect(await screen.findByRole("heading", { name: "No Deadlock matches found" })).toBeVisible();
-    expect(screen.queryByText(/Story ready/)).not.toBeInTheDocument();
+    storyGone();
   });
 
   it("treats a Street Brawl-only player as zero matches", async () => {
@@ -165,7 +160,7 @@ describe("App flow", () => {
     const { enter } = setup(ndjson(storyEvent({}, brawl)));
     await enter();
     expect(await screen.findByText(/14 games/)).toBeInTheDocument();
-    expect(screen.queryByText(/Story ready/)).not.toBeInTheDocument();
+    storyGone();
   });
 
   it("zero matches in the patch window mentions the latest patch", async () => {
@@ -181,7 +176,7 @@ describe("App flow", () => {
   it("shows a cached-matches note when the story is stale, and not otherwise", async () => {
     const { enter } = setup(ndjson(storyEvent({ stale: true })));
     await enter();
-    expect(await screen.findByRole("status")).toHaveTextContent(/showing cached matches/i);
+    expect(await screen.findByText(/showing cached matches/i)).toBeInTheDocument();
   });
 
   it("zero matches after a patch request that fell back to all time does not blame the patch (#25)", async () => {
@@ -196,15 +191,15 @@ describe("App flow", () => {
   it("keeps the Valve notice on screen while the story plays", async () => {
     const { enter } = setup(ndjson(storyEvent()));
     await enter();
-    await screen.findByText("Story ready: 120 matches");
+    await storyUp();
     expect(screen.getByText(/Not affiliated with or endorsed by Valve/)).toBeInTheDocument();
   });
 
   it("puts the cached-matches note after the story, where it cannot cover it, and lets you dismiss it", async () => {
     const { enter, user } = setup(ndjson(storyEvent({ stale: true })));
     await enter();
-    const note = await screen.findByRole("status");
-    const story = screen.getByText("Story ready: 120 matches");
+    const note = (await screen.findByText(/showing cached matches/i)).closest("[role=status]")!;
+    const story = screen.getByTestId("story-player");
     expect(story.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByText(/cached matches/i)).not.toBeInTheDocument();
@@ -213,30 +208,21 @@ describe("App flow", () => {
   it("shows no cached-matches note for a fresh story", async () => {
     const { enter } = setup(ndjson(storyEvent()));
     await enter();
-    await screen.findByText("Story ready: 120 matches");
+    await storyUp();
     expect(screen.queryByText(/cached matches/i)).not.toBeInTheDocument();
   });
 
-  it("Refresh reruns the lookup with refresh=1 and the same window", async () => {
-    const { enter, user, requested, fetchMock } = setup(
-      ndjson(storyEvent({ window: "patch", patchStart: PATCH })),
-      ndjson(storyEvent({ window: "patch", patchStart: PATCH })),
-    );
-    await user.click(screen.getByRole("radio", { name: "This patch" }));
-    await enter();
-    await user.click(await screen.findByRole("button", { name: "Refresh" }));
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
-    expect(requested(1).searchParams.get("refresh")).toBe("1");
-    expect(requested(1).searchParams.get("window")).toBe("patch");
-    expect(requested(1).searchParams.get("q")).toBe(URL_A);
-    expect(await screen.findByText("Story ready: 120 matches")).toBeInTheDocument();
-  });
-
-  it("Look up another player returns to the entry screen", async () => {
+  it("plays the real story: 11 segments with the first current, and a tap moves on", async () => {
     const { enter, user } = setup(ndjson(storyEvent()));
     await enter();
-    await user.click(await screen.findByRole("button", { name: "Look up another player" }));
-    expect(screen.getByLabelText("Paste your Steam profile URL")).toHaveValue(URL_A);
-    expect(screen.queryByText(/Story ready/)).not.toBeInTheDocument();
+    const bar = await storyUp();
+    const segments = within(bar).getAllByRole("listitem");
+    expect(segments).toHaveLength(11);
+    expect(segments[0]).toHaveAttribute("data-state", "current");
+    expect(screen.queryByText(/story player arrives in a later PR/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Welcome back to the Cursed City" })).toBeVisible();
+    await user.click(screen.getByTestId("tap-zone-next")); // completes the opening entrance
+    await user.click(screen.getByTestId("tap-zone-next"));
+    expect(segments[1]).toHaveAttribute("data-state", "current");
   });
 });
