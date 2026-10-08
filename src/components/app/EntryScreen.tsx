@@ -1,0 +1,85 @@
+"use client";
+
+import { useId, useState, type FormEvent } from "react";
+import { validateProfileInput } from "@/lib/client/profile-input";
+import type { Prefs } from "@/lib/client/prefs";
+import { ENTRY_COPY } from "@/story/copy-entry";
+import type { LookupFilters } from "@/story/filters";
+import { FilterControls } from "./FilterControls";
+import styles from "./EntryScreen.module.css";
+
+interface Props {
+  /** The remembered URL and filters to start from. */
+  initial: Prefs;
+  onSubmit: (input: string, filters: LookupFilters) => void;
+}
+
+export function EntryScreen({ initial, onSubmit }: Props) {
+  const [url, setUrl] = useState(initial.url);
+  const [filters, setFilters] = useState(initial.filters);
+  const [invalid, setInvalid] = useState(false);
+  const inputId = useId();
+  const errorId = useId();
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const result = validateProfileInput(url);
+    if (!result.ok) {
+      setInvalid(true);
+      return;
+    }
+    // This click is the user gesture browsers require before audio may play. When the audio
+    // layer lands (ADR 0006, PR 3), unlock it here, before the lookup starts.
+    onSubmit(result.value, filters);
+  }
+
+  return (
+    <div className={styles.entry}>
+      <header className={styles.masthead}>
+        <svg className={styles.ornament} viewBox="0 0 120 40" aria-hidden="true">
+          <path d="M60 4 L60 36 M44 8 L60 4 L76 8 M30 14 L60 4 L90 14 M18 22 L60 4 L102 22" />
+          <path d="M6 36 H114" />
+        </svg>
+        <h1 className={styles.title}>{ENTRY_COPY.title}</h1>
+        <p className={styles.tagline}>{ENTRY_COPY.tagline}</p>
+      </header>
+
+      <form className={styles.panel} onSubmit={handleSubmit} noValidate>
+        <div className={styles.field}>
+          <label htmlFor={inputId} className={styles.label}>
+            {ENTRY_COPY.inputLabel}
+          </label>
+          <input
+            id={inputId}
+            className={styles.input}
+            type="text"
+            inputMode="url"
+            autoComplete="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            placeholder={ENTRY_COPY.inputPlaceholder}
+            value={url}
+            aria-invalid={invalid}
+            aria-describedby={invalid ? errorId : undefined}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              setInvalid(false);
+            }}
+          />
+          {invalid && (
+            <p id={errorId} role="alert" className={styles.error}>
+              {ENTRY_COPY.invalidInput}
+            </p>
+          )}
+          <p className={styles.hint}>{ENTRY_COPY.noLogin}</p>
+        </div>
+
+        <FilterControls value={filters} onChange={setFilters} />
+
+        <button type="submit" className={styles.submit}>
+          {ENTRY_COPY.submit}
+        </button>
+      </form>
+    </div>
+  );
+}

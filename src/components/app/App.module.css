@@ -1,0 +1,7 @@
+/* The strip after the story: notices that must not sit on top of the player. */
+.notices {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--ink);
+}
