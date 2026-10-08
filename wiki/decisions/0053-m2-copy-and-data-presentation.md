@@ -1,0 +1,30 @@
+---
+type: Decision Record
+title: "0053: M2 copy rules and data-presentation choices"
+description: "Claude drafts the copy in one module with one fixed headline per slide; heroes, death heatmap, unspent souls, rank and MVP each have a fixed M2 presentation."
+tags: [m2, copy, data]
+status: stable
+decision: accepted
+decided_on: 2026-10-07
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-07T12:00:00Z }
+---
+
+# Decision
+
+The owner confirmed this on 2026-10-07. Applies [ADR 0007](0007-tone-hype-with-roasts.md), [ADR 0015](0015-v1-slides.md) and [ADR 0021](0021-kill-slides-and-mvp.md).
+
+## Copy
+
+- Claude drafts all copy, in a single `copy` module.
+- One fixed headline per slide. Data-driven variants only for the roast slide and the MVP slide.
+- Playful PG-13, no swearing in v1.
+
+## Data presentation
+
+| Item | M2 choice |
+|---|---|
+| Hero names | Static `heroId` to name map. No Valve art until the [asset terms](../open-questions/m2-hero-art-terms.md) are checked. |
+| Death heatmap | Bin raw `[x, y]` death positions into a grid, draw an SVG density plot on an abstract deco frame (no map). The binning is pure and unit tested. Copy names the hottest cell ("You died here N times"). |
+| Unspent souls | Verify the [unit](../open-questions/m2-unspent-souls-unit.md) first, then show it as a plain sentence. |
+| Rank | Static tier-name map from research, fallback "Tier 4 · 2". Names need [confirmation](../open-questions/m2-rank-tier-names.md). |
+| MVP | One generic template: label + `topPercent` + scope. If nothing is notable, fall back to the best global percentile without same-hero phrasing. Per-metric one-liners are a backlog item. |
