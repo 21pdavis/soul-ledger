@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-08
+* **Decision**: [ADR 0059](decisions/0059-claude-posts-as-github-app-bot.md): reviewer and QA agents post comments and issues as the "Soul Ledger Claude" GitHub App via `pnpm bot:gh` (read-only contents, one-hour tokens, key outside the repo). Open: whether a bot Approve counts for required reviews (test once #10 exists); a deny rule on reading the `.pem` needs owner approval.
 * **Decision**: [ADR 0055](decisions/0055-owner-confirmations-after-m2.md), owner confirmations after M2: rank tier names and the Limelight and Space Grotesk fonts confirmed (their open questions are resolved), the Scavenger caption becomes "urns returned", and no unspent-souls number for now (#36 and its open question stay open). The hero art question stays open, rewritten in plain language.
 * **Decision**: [ADR 0058](decisions/0058-contact-maintainers-and-respect-rate-limits.md): contact the deadlock-api maintainers before launch (reverses the deferral in ADR 0017), never evade their per-IP rate limits, and don't self-host a clone of the API (it can't fix the coverage gap).
 * **Research**: [deadlock-api](research/deadlock-api.md) now lists `/v1/players/hero-stats` (public, 100 req/s, computed from stored matches, so same partial history) and clarifies that `account-stats` is Valve's own in-game data but Patreon-only. Cold-lookup capacity from one IP is about 200 to 250 an hour.

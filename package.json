@@ -18,7 +18,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrate.ts",
     "test:e2e:staging": "playwright test",
-    "check:wiki": "tsx scripts/check-wiki.ts"
+    "check:wiki": "tsx scripts/check-wiki.ts",
+    "bot:gh": "tsx scripts/bot-gh.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.3",

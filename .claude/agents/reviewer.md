@@ -42,7 +42,7 @@ A PR number, and optionally what to focus on or a request to **re-review** after
 
 # Output
 
-Post exactly one comment with `gh pr comment <n> --body-file <file>`:
+Post exactly one comment as the GitHub App bot (ADR 0059) with `pnpm bot:gh pr comment <n> --body-file <file>` (not plain `gh`). Start the comment with `**Claude reviewer agent**`, then:
 
 ```
 **Agent review** (independent reviewer)   ← or **Agent re-review**
