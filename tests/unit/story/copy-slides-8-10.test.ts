@@ -237,6 +237,11 @@ describe("mvp honorable mentions", () => {
     expect(m.map((x) => x.label)).toEqual(["Kills", "Denies"]);
   });
 
+  it("with a hero-scoped signature, does not repeat the same metric's global entry", () => {
+    const m = mvpMentions(story({ mvp: { ...pct("Melee kills", 0.5), scope: "hero", heroId: 1 } }));
+    expect(m.map((x) => x.label)).toEqual(["Assists", "Kills"]);
+  });
+
   it("is empty with no percentiles", () => {
     expect(mvpMentions(story({ mvp: null, percentiles: [] }))).toEqual([]);
   });
