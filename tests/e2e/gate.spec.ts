@@ -25,6 +25,14 @@ test("the access link logs the browser in and hides the key", async ({ page, con
   expect(api.status()).toBe(400); // reached the real handler, which rejects the empty query
 });
 
+test("the fixture preview route is a 404 without the explicit STORY_PREVIEW switch", async ({
+  request,
+}) => {
+  // This server is a production build like staging and production, and does not set the switch.
+  const res = await request.get("/preview", { headers: { "x-staging-token": TEST_ACCESS_KEY } });
+  expect(res.status()).toBe(404);
+});
+
 test("a wrong key in the link does not log in", async ({ page }) => {
   const res = await page.goto(`/?key=${TEST_ACCESS_KEY}x`);
   expect(res?.status()).toBe(401);
