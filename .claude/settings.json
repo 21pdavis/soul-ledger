@@ -71,6 +71,7 @@
       "Read(**/.env.local)",
       "Read(**/.env)",
       "Read(~/.claude/*.pem)",
+      "Read(//**/*.pem)",
       "Bash(*soul-ledger-bot.pem*)",
       "Bash(*CLAUDE_BOT_KEY_PATH*)",
       "PowerShell(*soul-ledger-bot.pem*)",
