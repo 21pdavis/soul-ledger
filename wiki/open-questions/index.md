@@ -4,10 +4,10 @@
 * [Unit of avgUnspentGoldMinutes for the unspent-souls roast](m2-unspent-souls-unit.md) - What the Unspent Gold Minutes stat measures (souls times minutes or minutes), which decides how the roast slide can phrase it.
 * [Rank tier names for the rank journey slide](m2-rank-tier-names.md) - Whether the static tier-name map (badge tier 1 to 11 to names such as Oracle) matches the game, so the rank slide shows real names rather than the fallback.
 * [Font pairing for the M2 story](m2-font-pairing.md) - Which open-licence deco display face and grotesk to pair via next/font for the art-deco occult look.
-* [Which model should the reviewer agent use?](reviewer-model.md) - Whether the reviewer should move from Opus to Sonnet at high effort for normal code, keeping Opus only for xhigh work.
 
 # Resolved (kept for reference)
 
+* [Which model should the reviewer agent use?](reviewer-model.md) - Resolved by ADR 0057: the reviewer runs on Sonnet at high effort, with Opus only for xhigh work (auth, data integrity, migrations, security).
 * [M1 implementation choices](m1-implementation-choices.md) - The libraries, schema and tuning values chosen while building M1; confirmed by ADR 0040.
 * [Source of the current patch date for the this-patch toggle](patch-date-source.md) - Findings on /v1/patches title dates versus pub_date; resolved by ADR 0035.
 * [Monetization and open source](monetization.md) - Research on how peer sites fund themselves; resolved by ADR 0016, kept as reference.
