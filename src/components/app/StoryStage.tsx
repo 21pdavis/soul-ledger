@@ -12,6 +12,8 @@ import styles from "./StoryStage.module.css";
 export function StoryStage(props: SlideProps) {
   return (
     <main className={styles.stage}>
+      {/* The page's one h1; the slide headlines are h2s below it. */}
+      <h1 className={styles.visuallyHidden}>Your Soul Ledger story</h1>
       <StoryPlayer {...props} />
     </main>
   );

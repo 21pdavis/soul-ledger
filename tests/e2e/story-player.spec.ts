@@ -57,10 +57,12 @@ test.describe("both layouts", () => {
 test.describe("phone: tap controller", () => {
   test.skip(({ isMobile }) => !isMobile, "phone only");
 
+  // Taps land 6px in from the stage edge, inside the slide frame's padding, where no slide control
+  // (Refresh, Replay, Look up another player...) can ever be. The tap is always a navigation tap.
   async function tapSide(page: Page, side: "left" | "right") {
     const box = (await stage(page).boundingBox())!;
     await stage(page).tap({
-      position: { x: box.width * (side === "right" ? 0.85 : 0.15), y: box.height * 0.5 },
+      position: { x: side === "right" ? box.width - 6 : 6, y: box.height * 0.5 },
     });
   }
 
@@ -193,7 +195,26 @@ test.describe("desktop: scroll controller", () => {
     await page.getByRole("button", { name: "Go to slide 11" }).click();
     await expect(stage(page)).toHaveAttribute("data-slide", "summary");
     await expect.poll(() => restingCheckpoint(page)).toBe(10);
+    // exactly on the snap point, not a few pixels off it
+    const [top, height] = await track(page).evaluate((el) => [el.scrollTop, el.clientHeight]);
+    expect(top).toBe(10 * height);
     await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeInViewport();
+  });
+
+  test("checkpoints are a whole number of pixels tall, so scroll targets sit on snap points", async ({
+    page,
+  }) => {
+    for (const over of [{}, { stale: true }]) {
+      await openStory(page, over);
+      const heights = await track(page).evaluate((el) => [
+        el.getBoundingClientRect().height,
+        ...[...el.querySelectorAll("[data-testid=checkpoint]")].map(
+          (c) => c.getBoundingClientRect().height,
+        ),
+      ]);
+      for (const h of heights) expect(Number.isInteger(h)).toBe(true);
+      await page.goto("/");
+    }
   });
 
   test("the progress bar shows a focus ring when reached by keyboard", async ({ page }) => {

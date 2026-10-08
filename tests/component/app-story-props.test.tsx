@@ -1,10 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { App } from "@/components/app/App";
 import type { SlideProps } from "@/story/types";
 import { basedOnMatches, windowLabel } from "@/story/window-label";
-import { fixtureStory } from "../fixtures/story";
+import { PATCH, URL_A, ndjson, setup, storyEvent } from "./app-harness";
 
 // What App hands the story player (window, matches, actions), seen through a stand-in player that
 // shows those props. The real slides own the window label and the Refresh / new-lookup buttons
@@ -19,40 +17,6 @@ vi.mock("@/components/story/StoryPlayer", () => ({
     </div>
   ),
 }));
-
-const URL_A = "https://steamcommunity.com/id/gaben";
-const PATCH = "2026-09-30T00:00:00.000Z";
-
-const ndjson = (...events: unknown[]) =>
-  new Response(events.map((e) => JSON.stringify(e) + "\n").join(""), {
-    headers: { "content-type": "application/x-ndjson" },
-  });
-
-const storyEvent = (over: Record<string, unknown> = {}) => ({
-  type: "story",
-  player: { accountId: 1, personaName: "Gaben", avatarUrl: null },
-  window: "all",
-  patchStart: null,
-  stale: false,
-  story: fixtureStory(),
-  ...over,
-});
-
-function setup(...responses: Response[]) {
-  const queue = [...responses];
-  const fetchMock = vi.fn(async (url: RequestInfo | URL) => {
-    void url;
-    return queue.shift() ?? ndjson({ type: "error", reason: "unavailable" });
-  });
-  const user = userEvent.setup();
-  render(<App fetchImpl={fetchMock as unknown as typeof fetch} />);
-  const requested = (n = 0) => new URL(String(fetchMock.mock.calls[n][0]), "http://x");
-  const enter = async () => {
-    await user.type(screen.getByLabelText("Paste your Steam profile URL"), URL_A);
-    await user.click(screen.getByRole("button", { name: /open the ledger/i }));
-  };
-  return { user, fetchMock, requested, enter };
-}
 
 beforeEach(() => localStorage.clear());
 

@@ -1,52 +1,11 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@/components/app/App";
 import { PREFS_KEY } from "@/lib/client/prefs";
 import { fixtureStory } from "../fixtures/story";
-
-const URL_A = "https://steamcommunity.com/id/gaben";
-const PATCH = "2026-09-30T00:00:00.000Z";
-
-const ndjson = (...events: unknown[]) =>
-  new Response(events.map((e) => JSON.stringify(e) + "\n").join(""), {
-    headers: { "content-type": "application/x-ndjson" },
-  });
-
-const storyEvent = (over: Record<string, unknown> = {}, story = fixtureStory()) => ({
-  type: "story",
-  player: { accountId: 1, personaName: "Gaben", avatarUrl: null },
-  window: "all",
-  patchStart: null,
-  stale: false,
-  story,
-  ...over,
-});
-
-function setup(...responses: (Response | Promise<Response> | Error)[]) {
-  const queue = [...responses];
-  const fetchMock = vi.fn(async (url: RequestInfo | URL) => {
-    void url; // typed so that mock.calls[n][0] is the requested URL
-    const next = queue.shift();
-    if (next instanceof Error) throw next;
-    return next ?? ndjson({ type: "error", reason: "unavailable" });
-  });
-  const user = userEvent.setup();
-  render(<App fetchImpl={fetchMock as unknown as typeof fetch} />);
-  const requested = (n = 0) => new URL(String(fetchMock.mock.calls[n][0]), "http://x");
-  const enter = async (url = URL_A) => {
-    await user.type(screen.getByLabelText("Paste your Steam profile URL"), url);
-    await user.click(screen.getByRole("button", { name: /open the ledger/i }));
-  };
-  return { user, fetchMock, requested, enter };
-}
+import { PATCH, URL_A, ndjson, setup, storyEvent, storyGone, storyUp } from "./app-harness";
 
 beforeEach(() => localStorage.clear());
-
-/** The real story player is up: its segmented progress bar is on screen. */
-const storyUp = () => screen.findByRole("list", { name: "Story progress" });
-const storyGone = () =>
-  expect(screen.queryByRole("list", { name: "Story progress" })).not.toBeInTheDocument();
 
 describe("App flow", () => {
   it("starts on the entry screen, with the Valve disclaimer", () => {
@@ -243,6 +202,16 @@ describe("App flow", () => {
     await enter();
     await storyUp();
     expect(screen.queryByText(/cached matches/i)).not.toBeInTheDocument();
+  });
+
+  it("gives the story page one h1 inside main, above the slide headlines", async () => {
+    const { enter } = setup(ndjson(storyEvent()));
+    await enter();
+    await storyUp();
+    const h1s = screen.getAllByRole("heading", { level: 1 });
+    expect(h1s).toHaveLength(1);
+    expect(h1s[0]).toHaveTextContent("Your Soul Ledger story");
+    expect(screen.getByRole("main")).toContainElement(h1s[0]);
   });
 
   it("plays the real story: 11 segments with the first current, and a tap moves on", async () => {

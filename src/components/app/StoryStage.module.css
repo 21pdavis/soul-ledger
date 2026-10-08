@@ -10,3 +10,23 @@
   container-type: size;
   --player-h: 100cqh;
 }
+
+/*
+ * 100cqh is usually fractional, but a scroller's clientHeight is whole pixels, so scroll targets
+ * computed from it would sit a few pixels off the snap points. Round down to whole pixels; the
+ * line above stays as the fallback for browsers without round().
+ */
+@supports (height: round(down, 1px, 1px)) {
+  .stage {
+    --player-h: round(down, 100cqh, 1px);
+  }
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
