@@ -124,13 +124,13 @@ export function App({ fetchImpl }: Props) {
   if (phase.name === "story") {
     const props: SlideProps = { story: phase.story, meta: phase.meta, actions };
     return (
-      <>
+      <div className={styles.storyPage}>
         <StoryStage key={replayCount} {...props} />
         <div className={styles.notices}>
           {phase.meta.stale && <StaleNote />}
           <Disclaimer />
         </div>
-      </>
+      </div>
     );
   }
 

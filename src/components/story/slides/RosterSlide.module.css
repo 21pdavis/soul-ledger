@@ -1,0 +1,118 @@
+.slide {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 18vw, 5.5rem);
+  line-height: 1;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: 1.125rem;
+  color: var(--bone-muted);
+}
+
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-block: 1rem;
+  border-block: 3px double var(--brass);
+}
+
+.stamp {
+  flex: none;
+  margin: 0;
+  padding: 0.5rem 0.875rem;
+  border: 3px double var(--green);
+  color: var(--green);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  transform: rotate(-3deg);
+}
+
+.stamp[data-label="flex"] {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.blurb {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--bone);
+}
+
+.caption {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--bone-muted);
+}
+
+/* A ranked list, most played first, so the order is the point. */
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.875rem;
+  padding-block: 0.625rem;
+  border-top: 1px solid var(--rule);
+}
+
+.row:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.who,
+.rate {
+  min-width: 0;
+}
+
+.heroName {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  color: var(--bone);
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--bone-muted);
+}
+
+.rate {
+  width: 7rem;
+}
+
+.track {
+  display: block;
+  height: 4px;
+  margin-top: 0.375rem;
+  background: var(--rule);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--green);
+}

@@ -6,8 +6,9 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Added
 
-- **A real front door.** The home page now asks you to paste your Steam profile URL (no login needed), remembers it for next time, and lets you choose **All time** or **This patch** before you look yourself up. If something goes wrong, you get a clear full-screen message instead of an error code: profile not found (check that it's public), the service is down (try again in a minute), or no Deadlock matches found. The story itself is still a placeholder.
+- **A real front door.** The home page now asks you to paste your Steam profile URL (no login needed), remembers it for next time, and lets you choose **All time** or **This patch** before you look yourself up. If something goes wrong, you get a clear full-screen message instead of an error code: profile not found (check that it's public), the service is down (try again in a minute), or no Deadlock matches found.
 - **A loading screen that shows real progress.** While your ledger is being built, you now see your Steam name and avatar, then your match count with the heroes you have played, then a live tally of matches read, kills and crates smashed. It follows what is actually happening instead of a fake timer, says so when it is waiting its turn, and skips the animation if your device asks for reduced motion.
+- **The story is now playable.** On a phone, tap the right side of the screen to go forward and the left side to go back (press and hold to pause). On desktop, scroll down through the story, or use the arrow keys, space or the progress bar. There are 11 slides, with placeholder content until the real slides land.
 - A private **staging** site for reviewing changes before they go live. It is unlocked with a private access link and deploys from the `staging` branch with its own database. Production is unchanged and still needs no login.
 
 ## [0.1.0] - 2026-10-07
