@@ -108,34 +108,26 @@ describe("rankSummary", () => {
     expect(s.text).toContain("Oracle 1");
   });
 
-  it("describes a climb from the first to the current rank", () => {
-    const j = [pt(0, 31), pt(1, 62), pt(2, 81)];
-    const s = rankSummary(j, j[2]);
-    expect(s.kind).toBe("climbed");
-    expect(s.text).toContain("Acolyte 1");
-    expect(s.text).toContain("Oracle 1");
+  it("uses one line for every journey, from the first rank to the current one", () => {
+    const up = [pt(0, 31), pt(1, 62), pt(2, 81)];
+    const down = [pt(0, 81), pt(1, 62)];
+    const flat = [pt(0, 62), pt(1, 62)];
+    const lines = [up, down, flat].map((j) => rankSummary(j, j.at(-1)!));
+    for (const s of lines) expect(s.kind).toBe("journey");
+    expect(lines[0].text).toBe("You started at Acolyte 1 and now sit at Oracle 1.");
+    expect(lines[1].text).toBe(
+      "You started at Oracle 1 and now sit at Ritualist 2. Your peak was Oracle 1.",
+    );
+    expect(lines[2].text).toBe("You started at Ritualist 2 and now sit at Ritualist 2.");
   });
 
-  it("mentions a higher peak when the player has slipped back from it", () => {
+  it("mentions a higher peak only when the player is below it", () => {
     const j = [pt(0, 41), pt(1, 91), pt(2, 62)];
-    const s = rankSummary(j, j[2]);
-    expect(s.kind).toBe("climbed");
-    expect(s.text).toContain("Phantom 1");
-    expect(s.text).toContain("Ritualist 2");
-  });
-
-  it("describes ending below where the journey started", () => {
-    const j = [pt(0, 81), pt(1, 91), pt(2, 62)];
-    const s = rankSummary(j, j[2]);
-    expect(s.kind).toBe("fell");
-    expect(s.text).toContain("Oracle 1");
-    expect(s.text).toContain("Ritualist 2");
-    expect(s.text).toContain("Phantom 1");
-  });
-
-  it("describes holding steady", () => {
-    const j = [pt(0, 62), pt(1, 62)];
-    expect(rankSummary(j, j[1]).kind).toBe("held");
+    expect(rankSummary(j, j[2]).text).toBe(
+      "You started at Sentinel 1 and now sit at Ritualist 2. Your peak was Phantom 1.",
+    );
+    const up = [pt(0, 41), pt(1, 91)];
+    expect(rankSummary(up, up[1]).text).not.toMatch(/peak/);
   });
 
   it("uses the fallback name for an unknown tier", () => {

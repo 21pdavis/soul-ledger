@@ -64,7 +64,7 @@ export function RankJourney({ points, current }: Props) {
               className={styles.item}
               aria-current={isCurrent ? "step" : undefined}
             >
-              <span className={styles.name}>{rankLabel(p)}</span>
+              <span className={styles.name}>{rankLabel(p)}</span>{" "}
               <time className={styles.date} dateTime={p.at}>
                 {monthYear(p.at)}
               </time>

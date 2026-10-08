@@ -81,7 +81,11 @@ export function unspentSoulsLine(avgUnspentGoldMinutes: number, avgMinutes: numb
 export const RANK_EMPTY_LINE =
   "No ranked history on file yet. Play some ranked matches and your climb will show up here.";
 
-export type RankSummaryKind = "empty" | "single" | "climbed" | "held" | "fell";
+/**
+ * One fixed line for any journey (ADR 0053 allows data-driven variants only on the roast and MVP
+ * slides). A single badge and no history are the two states that need their own words.
+ */
+export type RankSummaryKind = "empty" | "single" | "journey";
 
 export function rankSummary(
   journey: readonly JourneyPoint[],
@@ -95,22 +99,12 @@ export function rankSummary(
       text: `You're at ${now} so far. One badge isn't a climb yet, so play on and the line will draw itself.`,
     };
   }
-  const first = journey[0];
   const peak = journey.reduce((best, p) => (p.badge > best.badge ? p : best), journey[0]);
   const peakNote = peak.badge > current.badge ? ` Your peak was ${rankLabel(peak)}.` : "";
-  if (current.badge > first.badge) {
-    return {
-      kind: "climbed",
-      text: `You started at ${rankLabel(first)} and climbed to ${now}.${peakNote}`,
-    };
-  }
-  if (current.badge < first.badge) {
-    return {
-      kind: "fell",
-      text: `You started at ${rankLabel(first)} and sit at ${now} now.${peakNote}`,
-    };
-  }
-  return { kind: "held", text: `You've held steady at ${now}.${peakNote}` };
+  return {
+    kind: "journey",
+    text: `You started at ${rankLabel(journey[0])} and now sit at ${now}.${peakNote}`,
+  };
 }
 
 // ------------------------------------------------------------------- MVP (slide 10)

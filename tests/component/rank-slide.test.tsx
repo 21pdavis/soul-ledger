@@ -40,7 +40,7 @@ describe("RankSlide", () => {
   ])("renders the headline, summary and every badge name as DOM text (%s)", (_n, flags) => {
     renderRank(undefined, flags);
     expect(screen.getByRole("heading", { name: headlineFor("rank") })).toBeInTheDocument();
-    expect(screen.getByText(/climbed to Oracle 1/)).toBeInTheDocument();
+    expect(screen.getByText(/now sit at Oracle 1/)).toBeInTheDocument();
     const items = screen.getAllByRole("listitem");
     expect(items.map((li) => li.textContent)).toEqual([
       expect.stringContaining("Sentinel 1"),
@@ -58,6 +58,8 @@ describe("RankSlide", () => {
     renderRank(journeyOf([41, 62]), { reducedMotion: true });
     const items = screen.getAllByRole("listitem");
     expect(items[0]).toHaveTextContent("Jan 2026");
+    // A space between the parts, so the text reads right when flattened.
+    expect(items[0].textContent).toBe("Sentinel 1 Jan 2026");
   });
 
   it("falls back to the plain format for an unknown tier", () => {
