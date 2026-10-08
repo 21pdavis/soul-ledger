@@ -1,20 +1,20 @@
 import { headlineFor } from "@/story/copy";
 import { mvpCopy } from "@/story/copy-slides-8-10";
 import { SlideFrame } from "../SlideFrame";
+import { SlideReveal } from "../SlideReveal";
 import type { SlideComponent } from "./contract";
 import styles from "./MvpSlide.module.css";
-import { StaggerIn } from "./StaggerIn";
 
-export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
+export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion }) => {
   const copy = mvpCopy(story);
-  const motion = { skipAnimation, reducedMotion, paused };
+  const animate = !(reducedMotion || skipAnimation);
 
   if (copy.kind === "none") {
     return (
       <SlideFrame headline={headlineFor("mvp")}>
-        <StaggerIn {...motion}>
+        <SlideReveal index={0} animate={animate}>
           <p className={styles.friendly}>{copy.line}</p>
-        </StaggerIn>
+        </SlideReveal>
       </SlideFrame>
     );
   }
@@ -23,17 +23,17 @@ export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, 
     <SlideFrame headline={headlineFor("mvp")}>
       <div className={styles.card}>
         {copy.lead && (
-          <StaggerIn index={0} {...motion}>
+          <SlideReveal index={0} animate={animate}>
             <p className={styles.lead}>{copy.lead}</p>
-          </StaggerIn>
+          </SlideReveal>
         )}
-        <StaggerIn index={0} {...motion}>
+        <SlideReveal index={0} animate={animate}>
           <p className={styles.label}>{copy.label}</p>
-        </StaggerIn>
-        <StaggerIn index={1} {...motion}>
+        </SlideReveal>
+        <SlideReveal index={1} animate={animate}>
           <p className={styles.big}>Top {copy.topPercent}%</p>
-        </StaggerIn>
-        <StaggerIn index={2} {...motion}>
+        </SlideReveal>
+        <SlideReveal index={2} animate={animate}>
           <div className={styles.scope}>
             {copy.heroName && (
               <span className={styles.monogram} data-testid="hero-monogram" aria-hidden="true">
@@ -42,10 +42,10 @@ export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, 
             )}
             <p className={styles.scopeLine}>{copy.scopeLine}</p>
           </div>
-        </StaggerIn>
-        <StaggerIn index={3} {...motion}>
+        </SlideReveal>
+        <SlideReveal index={3} animate={animate}>
           <p className={styles.flavor}>{copy.flavor}</p>
-        </StaggerIn>
+        </SlideReveal>
       </div>
     </SlideFrame>
   );

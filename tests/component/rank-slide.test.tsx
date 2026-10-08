@@ -33,6 +33,20 @@ const journeyOf = (badges: number[]): StoryData["rank"] => {
 
 describe("RankSlide", () => {
   it.each([
+    ["active", {}, "rise"],
+    ["skipAnimation", { skipAnimation: true }, "none"],
+    ["reducedMotion", { reducedMotion: true }, "none"],
+  ])(
+    "the rank slide reveals with entrance motion only when it should (%s)",
+    (_n, flags, expected) => {
+      const { container } = renderRank(undefined, flags);
+      const steps = [...container.querySelectorAll("[data-motion]")];
+      expect(steps.length).toBeGreaterThan(0);
+      for (const el of steps) expect(el).toHaveAttribute("data-motion", expected);
+    },
+  );
+
+  it.each([
     ["active", {}],
     ["skipAnimation", { skipAnimation: true }],
     ["reducedMotion", { reducedMotion: true }],

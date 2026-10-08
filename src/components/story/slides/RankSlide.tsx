@@ -3,37 +3,37 @@ import { rankSummary } from "@/story/copy-slides-8-10";
 import { journeyMilestones } from "@/story/rank-journey";
 import { rankLabel } from "@/story/ranks";
 import { SlideFrame } from "../SlideFrame";
+import { SlideReveal } from "../SlideReveal";
 import type { SlideComponent } from "./contract";
 import { RankJourney } from "./RankJourney";
 import styles from "./RankSlide.module.css";
-import { StaggerIn } from "./StaggerIn";
 
-export const RankSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
+export const RankSlide: SlideComponent = ({ story, skipAnimation, reducedMotion }) => {
   const { journey, current } = story.rank;
-  const motion = { skipAnimation, reducedMotion, paused };
+  const animate = !(reducedMotion || skipAnimation);
   const summary = rankSummary(journey, current);
 
   return (
     <SlideFrame headline={headlineFor("rank")}>
       <div className={styles.content}>
         {summary.kind === "empty" || !current ? (
-          <StaggerIn {...motion}>
+          <SlideReveal index={0} animate={animate}>
             <p className={styles.friendly}>{summary.text}</p>
-          </StaggerIn>
+          </SlideReveal>
         ) : (
           <>
-            <StaggerIn index={0} {...motion}>
+            <SlideReveal index={0} animate={animate}>
               <p className={styles.summary}>{summary.text}</p>
-            </StaggerIn>
-            <StaggerIn index={1} {...motion}>
+            </SlideReveal>
+            <SlideReveal index={1} animate={animate}>
               <div className={styles.current} data-testid="current-rank">
                 <span className={styles.currentName}>{rankLabel(current)}</span>
                 <span className={styles.currentCaption}>Current rank</span>
               </div>
-            </StaggerIn>
-            <StaggerIn index={2} {...motion}>
+            </SlideReveal>
+            <SlideReveal index={2} animate={animate}>
               <RankJourney points={journeyMilestones(journey)} />
-            </StaggerIn>
+            </SlideReveal>
           </>
         )}
       </div>

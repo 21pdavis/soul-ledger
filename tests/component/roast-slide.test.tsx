@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { RoastSlide } from "@/components/story/slides/RoastSlide";
 import type { SlideComponentProps } from "@/components/story/slides";
@@ -24,6 +24,20 @@ function renderRoast(
 const still = { reducedMotion: true };
 
 describe("RoastSlide", () => {
+  it.each([
+    ["active", {}, "rise"],
+    ["skipAnimation", { skipAnimation: true }, "none"],
+    ["reducedMotion", { reducedMotion: true }, "none"],
+  ])(
+    "the roast slide reveals with entrance motion only when it should (%s)",
+    (_n, flags, expected) => {
+      const { container } = renderRoast({}, {}, flags);
+      const steps = [...container.querySelectorAll("[data-motion]")];
+      expect(steps.length).toBeGreaterThan(0);
+      for (const el of steps) expect(el).toHaveAttribute("data-motion", expected);
+    },
+  );
+
   it.each([
     ["active", {}],
     ["skipAnimation", { skipAnimation: true }],
@@ -116,6 +130,26 @@ describe("RoastSlide", () => {
       unmount();
       renderRoast();
       expect(await screen.findByText("1,100", {}, { timeout: 1500 })).toBeInTheDocument();
+    });
+
+    it("holds the death count while paused and finishes once released", async () => {
+      const base = fixtureStory();
+      const props = fixtureSlideProps({ story: base });
+      const { rerender } = render(<RoastSlide {...props} {...motion} paused />);
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 900));
+      });
+      expect(screen.queryByText("1,100")).not.toBeInTheDocument();
+      rerender(<RoastSlide {...props} {...motion} />);
+      expect(await screen.findByText("1,100", {}, { timeout: 1500 })).toBeInTheDocument();
+    });
+
+    it("jumps to the final death count when skip arrives mid-count", async () => {
+      const props = fixtureSlideProps({ story: fixtureStory() });
+      const { rerender } = render(<RoastSlide {...props} {...motion} />);
+      expect(screen.queryByText("1,100")).not.toBeInTheDocument();
+      rerender(<RoastSlide {...props} {...motion} skipAnimation />);
+      await waitFor(() => expect(screen.getByText("1,100")).toBeInTheDocument(), { timeout: 100 });
     });
 
     it("omits the worst match when it is null", () => {

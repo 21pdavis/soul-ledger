@@ -10,15 +10,16 @@ import { headlineFor } from "@/story/copy";
 import { binDeaths, hottestCell } from "@/story/death-bins";
 import { heroName } from "@/story/heroes";
 import { SlideFrame } from "../SlideFrame";
+import { SlideReveal } from "../SlideReveal";
+import { StoryCountUp } from "../StoryCountUp";
 import type { SlideComponent } from "./contract";
 import { DeathHeatmap } from "./DeathHeatmap";
 import styles from "./RoastSlide.module.css";
-import { StaggerIn } from "./StaggerIn";
-import { TallyNumber } from "./TallyNumber";
 
 export const RoastSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
   const { roast, intro, matchCount } = story;
-  const motion = { skipAnimation, reducedMotion, paused };
+  const animate = !(reducedMotion || skipAnimation);
+  const count = { reducedMotion, skipAnimation, paused };
   const bins = binDeaths(roast.deathPositions);
   const hot = hottestCell(bins);
   const stash = unspentSoulsLine(
@@ -29,7 +30,7 @@ export const RoastSlide: SlideComponent = ({ story, skipAnimation, reducedMotion
   return (
     <SlideFrame headline={headlineFor("roast")}>
       <div className={styles.content}>
-        <StaggerIn index={0} {...motion} className={styles.plotBlock}>
+        <SlideReveal index={0} animate={animate} className={styles.plotBlock}>
           {hot ? (
             <>
               <DeathHeatmap bins={bins} hot={hot} still={reducedMotion || skipAnimation} />
@@ -38,33 +39,33 @@ export const RoastSlide: SlideComponent = ({ story, skipAnimation, reducedMotion
           ) : (
             <p className={styles.friendly}>{noDeathMapLine(roast.deaths)}</p>
           )}
-        </StaggerIn>
+        </SlideReveal>
 
-        <StaggerIn index={1} {...motion}>
+        <SlideReveal index={1} animate={animate}>
           <div className={styles.totals}>
             <span className={styles.bigNumber}>
-              <TallyNumber value={roast.deaths} {...motion} />
+              <StoryCountUp value={roast.deaths} {...count} />
             </span>
             <p className={styles.bigLabel}>{deathsLabel(roast.deaths)}</p>
           </div>
-        </StaggerIn>
+        </SlideReveal>
 
         {roast.worstMatch && roast.worstMatch.deaths > 0 && (
-          <StaggerIn index={2} {...motion}>
+          <SlideReveal index={2} animate={animate}>
             <p className={styles.worst}>
               {worstMatchLine({
                 deaths: roast.worstMatch.deaths,
                 heroName: heroName(roast.worstMatch.heroId),
               })}
             </p>
-          </StaggerIn>
+          </SlideReveal>
         )}
 
-        <StaggerIn index={3} {...motion}>
+        <SlideReveal index={3} animate={animate}>
           <p className={styles.unspent} data-testid="unspent-souls">
             {stash}
           </p>
-        </StaggerIn>
+        </SlideReveal>
       </div>
     </SlideFrame>
   );
