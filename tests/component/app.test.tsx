@@ -54,9 +54,42 @@ describe("App flow", () => {
     let finish!: (r: Response) => void;
     const { enter } = setup(new Promise<Response>((resolve) => (finish = resolve)));
     await enter();
-    expect(await screen.findByText(/Looking up your ledger/)).toBeInTheDocument();
+    expect(await screen.findByRole("status")).toHaveTextContent(/Looking up your ledger/);
     expect(screen.queryByLabelText("Paste your Steam profile URL")).not.toBeInTheDocument();
     finish(ndjson({ type: "resolved", accountId: 1 }, storyEvent()));
+    expect(await screen.findByText("Story ready: 120 matches")).toBeInTheDocument();
+  });
+
+  it("moves through the loading stages as the lookup streams events, then shows the story", async () => {
+    const encoder = new TextEncoder();
+    let push!: (event: unknown) => void;
+    let close!: () => void;
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        push = (event) => controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
+        close = () => controller.close();
+      },
+    });
+    const { enter } = setup(new Response(body));
+    await enter();
+    push({ type: "resolved", accountId: 1 });
+    expect(await screen.findByRole("status")).toHaveTextContent(/Looking up your ledger/);
+    push({ type: "profile", accountId: 1, personaName: "Gaben", avatarUrl: null });
+    expect(await screen.findByText(/Found you, Gaben/)).toBeInTheDocument();
+    push({ type: "history", totalMatches: 120, newMatches: 120, heroIds: [1, 2] });
+    expect(await screen.findByText("120 matches on the books")).toBeInTheDocument();
+    push({
+      type: "details",
+      fetched: 50,
+      total: 100,
+      kills: 400,
+      breakables: 150,
+      sinnerJackpots: 0,
+    });
+    expect(await screen.findByRole("progressbar")).toHaveAttribute("aria-valuenow", "50");
+    expect(screen.queryByText(/Story ready/)).not.toBeInTheDocument();
+    push(storyEvent());
+    close();
     expect(await screen.findByText("Story ready: 120 matches")).toBeInTheDocument();
   });
 

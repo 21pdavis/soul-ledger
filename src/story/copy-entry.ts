@@ -29,7 +29,9 @@ export const LOADING_COPY = {
   /** Headings of the three ledger entries; the later ones show as blank lines until their stage. */
   entries: { profile: "The soul", history: "The matches", details: "The tally" },
   profileTeaser: (name: string | null) =>
-    name ? `Found you, ${name}. Your page was already open.` : "Found you. Your page was already open.",
+    name
+      ? `Found you, ${name}. Your page was already open.`
+      : "Found you. Your page was already open.",
   historyTeaser: "Every one of these is evidence.",
   heroesMore: (n: number) => `+${count(n)} more`,
   detailsTeaser: "Counting every kill and crate. The ledger does not round up.",
