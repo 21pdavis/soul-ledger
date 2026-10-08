@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LoadingScreen } from "@/components/app/LoadingScreen";
+import { LOADING_PACE } from "@/lib/client/loading-pace";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
 
 const resolved: ClientLookupEvent = { type: "resolved", accountId: 1 };
@@ -227,6 +228,22 @@ describe("LoadingScreen", () => {
       render(<LoadingScreen progress={[profile(), history(), details(100)]} />);
       expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "100");
       await waitFor(() => expect(screen.getByText("800")).toBeInTheDocument(), { timeout: 3000 });
+    });
+
+    it("takes the tally minimum to count up, even when all the data arrives in one burst", async () => {
+      setReducedMotion(false);
+      const started = performance.now();
+      render(<LoadingScreen progress={[profile(), history(), details(100)]} />);
+      await new Promise((resolve) => setTimeout(resolve, LOADING_PACE.tallyCountMs / 2));
+      expect(screen.queryByText("800")).not.toBeInTheDocument(); // halfway, not there yet
+      await waitFor(() => expect(screen.getByText("800")).toBeInTheDocument(), { timeout: 3000 });
+      expect(performance.now() - started).toBeGreaterThanOrEqual(LOADING_PACE.tallyCountMs * 0.9);
+    });
+
+    it("shows the final value at once when the count-up time is zero (pacing off)", () => {
+      setReducedMotion(false);
+      render(<LoadingScreen progress={[profile(), history(), details(100)]} countMs={0} />);
+      expect(screen.getByText("800")).toBeInTheDocument();
     });
   });
 });
