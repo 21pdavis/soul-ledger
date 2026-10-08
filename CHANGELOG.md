@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-08
+
+**Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with placeholder art. The 3D world arrives in M3.
+
 ### Added
 
 - **Paste your Steam profile link and get your story.** The home page asks for your Steam profile URL (no login needed) and remembers it for next time.
@@ -50,5 +54,6 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - The Render build no longer installs pnpm globally, because Render's global modules folder is read-only.
 - Failed Steam vanity-URL lookups are now logged with the reason. They had failed intermittently in production right after the first deploy.
 
-[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/21pdavis/soul-ledger/releases/tag/v0.1.0
