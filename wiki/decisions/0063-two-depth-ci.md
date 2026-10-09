@@ -20,7 +20,7 @@ The owner asked for this after the full browser suite took 11 to 12 minutes per 
 | Docs-only PR | Unchanged from ADR 0047: format, lint and the wiki check |
 | Pushes to `staging` | Smoke, like a PR into `staging` |
 
-**Smoke set** (`pnpm test:e2e:smoke`): the entry, full-story, gate, home, keyboard, loading, story-player and window-label specs, plus the slide-fit check at the tightest phone size (360x640), the size that caught a real regression on 2026-10-09. The accessibility (axe) spec, the summary-card size matrix and the other slide-fit sizes run only in the full suite. Locally the smoke set takes about 50 seconds against 72 for the full suite.
+**Smoke set** (`pnpm test:e2e:smoke`): the entry, full-story, gate, home, keyboard, loading, story-player and window-label specs, plus the slide-fit check at the tightest phone size (360x640, with and without the cached-matches note), the size that caught a real regression on 2026-10-09. The accessibility (axe) spec, the summary-card size matrix and the other slide-fit sizes run only in the full suite. Locally the smoke set takes about 50 seconds against 72 for the full suite.
 
 # Why
 
