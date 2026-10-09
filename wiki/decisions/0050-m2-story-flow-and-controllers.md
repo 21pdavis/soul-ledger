@@ -9,6 +9,8 @@ decided_on: 2026-10-07
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T12:00:00Z }
 ---
 
+> The desktop controller is refined by [ADR 0062](0062-desktop-vertical-card-stack.md): a vertical stack of wide cards replaces the pinned 9:16 column.
+
 # Decision
 
 Refines [ADR 0012](0012-phone-first.md) and [ADR 0028](0028-milestones.md) for M2. The owner confirmed this on 2026-10-07.

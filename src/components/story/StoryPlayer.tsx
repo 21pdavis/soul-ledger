@@ -6,6 +6,7 @@ import { ENTRANCE_MS, initialPlayerState, reducePlayer } from "@/story/slide-ind
 import type { SlideProps } from "@/story/types";
 import { ProgressBar } from "./ProgressBar";
 import { ScrollTrack } from "./ScrollTrack";
+import { WideCard } from "./WideCard";
 import { SlideStage } from "./SlideStage";
 import { TapZone } from "./TapZone";
 import { useIsClient } from "./useIsClient";
@@ -21,7 +22,7 @@ interface Props extends SlideProps {
 /**
  * The 11-slide story (ADR 0050). Owns the one slide index; two controllers drive it:
  * - tap (phone, or anything narrower than 1024px / coarse pointer): tap zones, hold to pause;
- * - scroll (desktop): a pinned stage over scroll-snap checkpoints.
+ * - scroll (desktop): a vertical stack of wide cards over scroll-snap checkpoints (ADR 0062).
  * Slides never navigate themselves and are the same components in both modes.
  */
 export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: Props) {
@@ -94,6 +95,10 @@ export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: 
   const headline = SLIDES[state.index].headline;
   const tap = mode === "tap";
 
+  // The furthest slide reached: on desktop, cards up to it show their slide.
+  const [reached, setReached] = useState(0);
+  if (state.index > reached) setReached(state.index);
+
   const stage = (
     <div
       className={styles.stage}
@@ -148,9 +153,38 @@ export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: 
       {tap ? (
         <div className={styles.phone}>{stage}</div>
       ) : (
-        <ScrollTrack index={state.index} smooth={motion} onArrive={goTo}>
-          {stage}
-        </ScrollTrack>
+        <div
+          className={styles.wide}
+          data-testid="story-stage"
+          data-slide={SLIDES[state.index].id}
+          data-animating={state.animating}
+        >
+          <ScrollTrack
+            index={state.index}
+            smooth={motion}
+            onArrive={goTo}
+            renderCard={(i) => (
+              <WideCard
+                index={i}
+                current={state.index}
+                reached={reached}
+                skipAnimation={state.skip}
+                reducedMotion={reduced}
+                story={story}
+                meta={meta}
+                actions={slideActions}
+              />
+            )}
+          />
+          <div className={styles.rail}>
+            <ProgressBar
+              count={SLIDE_COUNT}
+              current={state.index}
+              onSelect={goTo}
+              orientation="vertical"
+            />
+          </div>
+        </div>
       )}
       <div role="status" aria-live="polite" className={styles.visuallyHidden}>
         {`Slide ${state.index + 1} of ${SLIDE_COUNT}: ${headline}`}

@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -103,7 +103,9 @@ describe("Replay", () => {
     await userEvent.click(within(summary).getByRole("button", { name: "Replay" }));
     expect(stage()).toHaveAttribute("data-slide", "intro");
     expect(onReplay).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(screen.getAllByRole("heading")).toHaveLength(1));
+    // desktop keeps the earlier cards in the stack, so the intro is the one marked current
+    expect(screen.getByTestId("probe-intro")).toHaveAttribute("data-active", "true");
+    expect(screen.getByTestId("probe-summary")).toHaveAttribute("data-active", "false");
   });
 });
 

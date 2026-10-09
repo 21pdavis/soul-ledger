@@ -4,3 +4,13 @@
   color: var(--bone-muted);
   font-size: 0.8rem;
 }
+
+/* Phones: the longer notice (ADR 0060) takes a line more than it did, which cost the tightest
+   stage (360x640) a rank row. A little smaller and tighter keeps it to the same height. */
+@media (max-width: 480px) {
+  .disclaimer {
+    padding: 1rem 0.75rem 0.75rem;
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+}

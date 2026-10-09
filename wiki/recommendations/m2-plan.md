@@ -122,7 +122,7 @@ Each is testable at the layer in brackets.
 
 - Shows `precision.heroAccuracy` and `headshotRate` as percentages.
 - Parry badge follows `parryLabel`: "king" and "clown" show distinct copy with `parrySuccess` and `parryMiss`; "none" shows neutral copy or hides the parry block.
-- A unit test pins the 60% king line to the value of `PARRY_KING_RATE` ([ADR 0040](../decisions/0040-m1-implementation-choices.md)).
+- A unit test pins the king line to the value of `PARRY_KING_RATE` (40%, [ADR 0061](../decisions/0061-parry-king-at-40-percent.md)).
 
 ## 7. Mid Boss
 

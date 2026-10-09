@@ -1,10 +1,8 @@
 import {
-  avgMatchMinutes,
   deathsLabel,
   headlineFor,
   hotspotLine,
   noDeathMapLine,
-  unspentSoulsLine,
   worstMatchLine,
 } from "@/story/copy";
 import { binDeaths, hottestCell } from "@/story/death-bins";
@@ -17,15 +15,11 @@ import { DeathHeatmap } from "./DeathHeatmap";
 import styles from "./RoastSlide.module.css";
 
 export const RoastSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
-  const { roast, intro, matchCount } = story;
+  const { roast } = story;
   const animate = !(reducedMotion || skipAnimation);
   const count = { reducedMotion, skipAnimation, paused };
   const bins = binDeaths(roast.deathPositions);
   const hot = hottestCell(bins);
-  const stash = unspentSoulsLine(
-    roast.avgUnspentGoldMinutes,
-    avgMatchMinutes(intro.hoursPlayed, matchCount),
-  );
 
   return (
     <SlideFrame headline={headlineFor("roast")}>
@@ -60,12 +54,6 @@ export const RoastSlide: SlideComponent = ({ story, skipAnimation, reducedMotion
             </p>
           </SlideReveal>
         )}
-
-        <SlideReveal index={3} animate={animate}>
-          <p className={styles.unspent} data-testid="unspent-souls">
-            {stash}
-          </p>
-        </SlideReveal>
       </div>
     </SlideFrame>
   );

@@ -4,6 +4,24 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Added
+
+- **Real hero art.** Your main hero and your roster now show the hero’s own artwork instead of initials (heroes without art still show initials). The footer also says that Valve and its properties are trademarks of Valve Corporation, and that this is a non-commercial fan project not affiliated with Valve.
+
+### Changed
+
+- On desktop the story is now a real vertical page: the slides are wide cards stacked down the screen, scrolling down moves to the next card, and there is breathing room above and on both sides. The progress bar runs down the right edge. Phones are unchanged.
+- **You are a parry king from 40%, not 60%.** Landing 40% or more of your parries now earns the king badge; only below that are you a clown.
+- **Your signature stat slide now has honorable mentions.** Under your top stat you also see your next two best stats, each with how rare it is (on very small phones, just the name and the percentage).
+
+### Fixed
+
+- The loading screen no longer sits blank during a slow lookup. It now says what it is doing from the first second (contacting Deadlock, how many matches are left, waiting in line when Deadlock's servers ask us to slow down). If nothing has happened for 20 seconds, it says so and offers a Try again button. Looking up a player is also a little faster, because the profile and match list are asked for together.
+
+### Removed
+
+- The death slide no longer ends with the "souls that never made it to the shop" line. The stat behind it was unclear, so it is dropped.
+
 ## [0.2.0] - 2026-10-08
 
 **Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with placeholder art. The 3D world arrives in M3.

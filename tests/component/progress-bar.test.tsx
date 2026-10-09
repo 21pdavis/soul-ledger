@@ -14,6 +14,19 @@ describe("ProgressBar", () => {
     expect(items[4].dataset.state).toBe("todo");
   });
 
+  it("is horizontal by default and vertical on request", () => {
+    const { rerender } = render(<ProgressBar count={11} current={3} />);
+    expect(screen.getByRole("list", { name: "Story progress" })).toHaveAttribute(
+      "data-orientation",
+      "horizontal",
+    );
+    rerender(<ProgressBar count={11} current={3} orientation="vertical" />);
+    expect(screen.getByRole("list", { name: "Story progress" })).toHaveAttribute(
+      "data-orientation",
+      "vertical",
+    );
+  });
+
   it("names each read-only segment for screen readers", () => {
     render(<ProgressBar count={11} current={3} />);
     expect(screen.getByText("Slide 1 of 11")).toBeInTheDocument();

@@ -49,7 +49,7 @@ export const ENTRY_COPY = {
   submit: "Open the ledger",
   invalidInput: "That doesn't look like a Steam profile URL.",
   disclaimer:
-    "Non-commercial fan project. Not affiliated with or endorsed by Valve. Deadlock is a trademark of Valve Corporation.",
+    "Non-commercial fan project. Not affiliated with or endorsed by Valve. Valve and its properties are trademarks of Valve Corporation.",
 } as const;
 
 const count = (n: number) => n.toLocaleString("en-US");
@@ -64,6 +64,22 @@ export const LOADING_COPY = {
   pageHeading: "Your Soul Ledger is loading",
   waiting: "Another lookup of this ledger is already running. Waiting our turn.",
   sealing: "Almost ready. Sealing the ledger.",
+  /** What the server is doing right now. Always one of these is on screen, never a blank page. */
+  status: {
+    contacting: "Contacting Deadlock's servers...",
+    reading: "Reading your match history...",
+    fetching: "Fetching your match details...",
+    batch: (left: number) =>
+      `Reading your matches. ${count(left)} ${left === 1 ? "match" : "matches"} left.`,
+    rateLimited: (seconds: number) =>
+      `Waiting in line: Deadlock's servers only allow so many requests. About ${seconds} ${seconds === 1 ? "second" : "seconds"}.`,
+    finishing: "Checking your rank history...",
+  },
+  stalled: {
+    title: "This is taking longer than usual.",
+    body: "Deadlock's servers are slow right now. You can keep waiting, or try again.",
+    retry: "Try again",
+  },
   /** Headings of the three ledger entries; the later ones show as blank lines until their stage. */
   entries: { profile: "The soul", history: "The matches", details: "The tally" },
   profileTeaser: (name: string | null) =>
@@ -369,56 +385,6 @@ export function worstMatchLine({ deaths, heroName: hero }: { deaths: number; her
   return `Worst night: ${deaths} ${plural(deaths, "death", "deaths")} as ${hero}`;
 }
 
-// -------------------------------------------------------- Unspent souls (slide 8)
-//
-// `avgUnspentGoldMinutes` is the mean per match of "Unspent Gold Minutes". Checked against the
-// recorded bulk metadata (see wiki/open-questions/m2-unspent-souls-unit.md): it is souls x
-// minutes, not minutes, so dividing by the match length gives the souls held on average. The
-// mean of the sums over the mean match length is the duration-weighted average exactly.
-
-/** Mean match length in minutes, or 0 when there are no matches. */
-export function avgMatchMinutes(hoursPlayed: number, matchCount: number): number {
-  return matchCount > 0 ? (hoursPlayed * 60) / matchCount : 0;
-}
-
-/** Souls held unspent on average during a match, rounded to the nearest 100, or null if unknown. */
-export function typicalUnspentSouls(avgUnspentGoldMinutes: number, avgMinutes: number) {
-  if (
-    !Number.isFinite(avgUnspentGoldMinutes) ||
-    !Number.isFinite(avgMinutes) ||
-    avgUnspentGoldMinutes <= 0 ||
-    avgMinutes <= 0
-  ) {
-    return null;
-  }
-  return Math.round(avgUnspentGoldMinutes / avgMinutes / 100) * 100;
-}
-
-export const UNSPENT_NEUTRAL_LINE =
-  "Somewhere in your matches there are souls that never made it to the shop.";
-export const UNSPENT_SPENDER_LINE =
-  "You spend your souls almost as fast as you earn them. Not much hoarding here.";
-
-/**
- * Whether the slide shows the souls figure. Off until #36 is done: the owner has not accepted the
- * soul-minutes reading of the unit, and matches with no "Unspent Gold Minutes" key are stored as 0,
- * which understates the average. Until then the slide shows the neutral sentence (no number, no
- * unit), as the plan requires before the unit is verified.
- */
-export const SHOW_UNSPENT_SOULS_FIGURE = false;
-
-export function unspentSoulsLine(
-  avgUnspentGoldMinutes: number,
-  avgMinutes: number,
-  showFigure: boolean = SHOW_UNSPENT_SOULS_FIGURE,
-): string {
-  if (!showFigure) return UNSPENT_NEUTRAL_LINE;
-  const souls = typicalUnspentSouls(avgUnspentGoldMinutes, avgMinutes);
-  if (souls === null) return UNSPENT_NEUTRAL_LINE;
-  if (souls <= 100) return UNSPENT_SPENDER_LINE;
-  return `In a typical match you sat on about ${souls.toLocaleString("en-US")} unspent souls.`;
-}
-
 // ------------------------------------------------------------ Rank journey (slide 9)
 
 export const RANK_EMPTY_LINE =
@@ -516,6 +482,49 @@ export function mvpCopy({ mvp, percentiles }: Pick<StoryData, "mvp" | "percentil
     // The weighted pick can be above 50 while the best global stat is better than that.
     flavor: mvpFlavor(best.topPercent),
   };
+}
+
+export const MENTIONS_HEADING = "Honorable mentions";
+/** How many runner-up stats sit under the signature stat. */
+export const MAX_MENTIONS = 2;
+
+/** A short hype line for a runner-up stat, by how rare it is (ADR 0007). */
+export function mentionLine(topPercent: number): string {
+  if (topPercent <= 1) return "Rare air.";
+  if (topPercent <= 10) return "Elite company.";
+  if (topPercent <= 25) return "Well ahead of the pack.";
+  return "Quietly good.";
+}
+
+export interface MvpMention {
+  label: string;
+  topPercent: string;
+  note: string;
+  line: string;
+}
+
+/**
+ * Up to two more standout stats for the signature slide: the best global stats other than the one
+ * already on show, each in the top 50% (the same "notable" line as the MVP). None when there is no
+ * signature stat, since that slide then shows its friendly empty copy.
+ */
+export function mvpMentions({
+  mvp,
+  percentiles,
+}: Pick<StoryData, "mvp" | "percentiles">): MvpMention[] {
+  if (!mvp) return [];
+  const best = bestPercentile(percentiles);
+  const shown = mvp.topPercent <= NOT_NOTABLE_ABOVE ? mvp.label : best?.label;
+  return percentiles
+    .filter((p) => p.label !== shown && p.topPercent <= NOT_NOTABLE_ABOVE)
+    .sort((a, b) => a.topPercent - b.topPercent)
+    .slice(0, MAX_MENTIONS)
+    .map((p) => ({
+      label: p.label,
+      topPercent: formatTopPercent(p.topPercent),
+      note: "of all players",
+      line: mentionLine(p.topPercent),
+    }));
 }
 
 // ===================================================================== Slide 11: summary

@@ -137,17 +137,60 @@ test.describe("desktop: scroll controller", () => {
       return Math.abs(i - Math.round(i)) < 0.01 ? Math.round(i) : null;
     });
 
-  test("has 11 snap checkpoints, a clickable 11-segment progress bar and a stage of at most 480px", async ({
-    page,
-  }) => {
+  const card = (page: Page, i: number) => page.getByTestId("story-card").nth(i);
+
+  test("has 11 snap checkpoints and a clickable 11-segment progress bar", async ({ page }) => {
     await openStory(page);
     await expect(page.getByTestId("story-player")).toHaveAttribute("data-mode", "scroll");
     await expect(page.getByTestId("checkpoint")).toHaveCount(11);
     await expect(segments(page)).toHaveCount(11);
     await expect(segments(page).nth(0)).toHaveAttribute("data-state", "current");
-    const box = (await stage(page).boundingBox())!;
-    expect(box.width).toBeLessThanOrEqual(480);
-    expect(box.width / box.height).toBeCloseTo(9 / 16, 1);
+  });
+
+  test("the slides are wide cards with room above and gutters left and right", async ({ page }) => {
+    await openStory(page);
+    const viewport = page.viewportSize()!;
+    const box = (await card(page, 0).boundingBox())!;
+    expect(box.width).toBeGreaterThan(640); // not the 480px phone column
+    expect(box.width).toBeGreaterThan(box.height * 0.9); // landscape-ish, not 9:16
+    expect(box.y).toBeGreaterThanOrEqual(24); // breathing room above the story
+    expect(box.x).toBeGreaterThanOrEqual(64); // gutters either side
+    expect(viewport.width - (box.x + box.width)).toBeGreaterThanOrEqual(64);
+  });
+
+  test("scrolling down moves the page: the first card leaves the top and the next arrives", async ({
+    page,
+  }) => {
+    await openStory(page);
+    const before = (await card(page, 0).boundingBox())!;
+    await stage(page).hover();
+    await page.mouse.wheel(0, 600);
+    await expect.poll(() => restingCheckpoint(page)).toBe(1);
+    const after = (await card(page, 0).boundingBox())!;
+    expect(after.y).toBeLessThan(before.y - 100); // it really moved up and away
+    const next = (await card(page, 1).boundingBox())!;
+    expect(Math.abs(next.y - before.y)).toBeLessThan(2); // card 2 now sits where card 1 was
+  });
+
+  test("only the current card is reachable: the others are inert", async ({ page }) => {
+    await openStory(page);
+    await expect(card(page, 0)).not.toHaveAttribute("inert", "");
+    for (const i of [1, 5, 10]) await expect(card(page, i)).toHaveAttribute("inert", "");
+    await stage(page).hover();
+    await page.mouse.wheel(0, 600);
+    await expect.poll(() => restingCheckpoint(page)).toBe(1);
+    await expect(card(page, 1)).not.toHaveAttribute("inert", "");
+    await expect(card(page, 0)).toHaveAttribute("inert", "");
+  });
+
+  test("the progress bar runs down the side", async ({ page }) => {
+    await openStory(page);
+    const first = (await segments(page).nth(0).boundingBox())!;
+    const last = (await segments(page).nth(10).boundingBox())!;
+    expect(last.y).toBeGreaterThan(first.y + 100);
+    expect(Math.abs(last.x - first.x)).toBeLessThan(2);
+    const cardBox = (await card(page, 0).boundingBox())!;
+    expect(first.x).toBeGreaterThan(cardBox.x + cardBox.width); // in the right gutter
   });
 
   test("scrolling lands on a snap checkpoint and plays that slide", async ({ page }) => {

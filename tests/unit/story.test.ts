@@ -96,10 +96,10 @@ describe("computeStory on the test account", () => {
     });
   });
 
-  it("roast: every death position, hoarded souls and the worst match", () => {
+  it("roast: every death position and the worst match", () => {
     expect(story.roast.deaths).toBe(total((r) => r.deaths));
     expect(story.roast.deathPositions).toHaveLength(total((r) => r.deathPositions.length));
-    expect(story.roast.avgUnspentGoldMinutes).toBeCloseTo(total((r) => r.unspentGoldMinutes) / 351);
+    expect(story.roast).not.toHaveProperty("avgUnspentGoldMinutes");
     const worst = Math.max(...normal.map((r) => r.deaths));
     expect(story.roast.worstMatch).toMatchObject({ deaths: worst });
   });
@@ -175,10 +175,10 @@ describe("computeStory edge cases", () => {
   });
 
   it.each([
-    [6, "king"],
-    [5, "clown"],
+    [4, "king"],
+    [3, "clown"],
   ] as const)(
-    "parry king line is 60 percent: %i of 10 parries landed is %s (ADR 0040)",
+    "parry king line is 40 percent: %i of 10 parries landed is %s (ADR 0061)",
     (n, label) => {
       const s = computeStory({
         matches: [row({ parrySuccess: n, parryMiss: 10 - n })],

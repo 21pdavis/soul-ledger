@@ -5,12 +5,14 @@ interface Props {
   current: number;
   /** When given, each segment is a button (desktop progress-bar clicks, keyboard). */
   onSelect?: (index: number) => void;
+  /** Across the top (phone, the default) or down the side (the desktop vertical layout). */
+  orientation?: "horizontal" | "vertical";
 }
 
 /** Segmented story progress: one segment per slide, filled up to the current one. */
-export function ProgressBar({ count, current, onSelect }: Props) {
+export function ProgressBar({ count, current, onSelect, orientation = "horizontal" }: Props) {
   return (
-    <ol className={styles.bar} aria-label="Story progress">
+    <ol className={styles.bar} aria-label="Story progress" data-orientation={orientation}>
       {Array.from({ length: count }, (_, i) => {
         const state = i < current ? "done" : i === current ? "current" : "todo";
         return (

@@ -27,28 +27,32 @@ interface Props {
   smooth: boolean;
   /** Called with the checkpoint the reader has scrolled to, once the scrolling comes to rest. */
   onArrive: (index: number) => void;
-  /** The pinned stage. */
-  children: ReactNode;
+  /** The card for checkpoint `i`. */
+  renderCard: (index: number) => ReactNode;
 }
 
 /**
- * The desktop controller (ADR 0050): a scroll track of SLIDE_COUNT viewport-high snap checkpoints
- * with the 9:16 stage pinned (sticky) over it.
+ * The desktop controller (ADR 0050, 0062): a vertical scroll track of SLIDE_COUNT viewport-high
+ * snap checkpoints, each holding one slide's card, so the page really moves as the reader scrolls.
  *
  * The two directions never fight: scroll -> index only happens once scrolling is at rest, and
  * index -> scroll only happens when the track is not already on that checkpoint, so an arrival
  * the reader scrolled to produces no further scroll.
  */
-export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
+export function ScrollTrack({ index, smooth, onArrive, renderCard }: Props) {
   const track = useRef<HTMLDivElement>(null);
   const timer = useRef<number>(0);
   const first = useRef(true);
   /** The checkpoint a programmatic scroll is heading to, or null when none is in flight. */
   const pending = useRef<number | null>(null);
   const onArriveRef = useRef(onArrive);
+  const indexRef = useRef(index);
+  /** The checkpoint the reader last scrolled to, until the index effect has seen it. */
+  const arrivedAt = useRef<number | null>(null);
 
   useEffect(() => {
     onArriveRef.current = onArrive;
+    indexRef.current = index;
   });
 
   const nearest = (el: HTMLElement) =>
@@ -60,6 +64,13 @@ export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
     const firstRun = first.current;
     first.current = false;
     if (!el || !el.clientHeight) return;
+    // The reader scrolled here: the index is following the track. The track may have moved on
+    // again before this effect ran, and must not be pulled back.
+    if (arrivedAt.current === index) {
+      arrivedAt.current = null;
+      return;
+    }
+    arrivedAt.current = null;
     const top = index * el.clientHeight;
     // Already resting on it. (Not merely nearest to it: a jump in flight passing this checkpoint
     // would otherwise be left to carry on to its old target.) Snap makes rest positions exact.
@@ -98,6 +109,8 @@ export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
       if (arrived !== pending.current) return; // still on the way
     }
     pending.current = null;
+    // Only a real change of slide leads to an index effect run, so only then mark the arrival.
+    if (arrived !== indexRef.current) arrivedAt.current = arrived;
     onArriveRef.current(arrived);
   };
   const onScroll = () => {
@@ -122,6 +135,10 @@ export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
       ref={track}
       className={styles.track}
       data-testid="scroll-track"
+      // Focusable so keyboard users can always scroll it, even on a card with no controls.
+      role="region"
+      aria-label="Story"
+      tabIndex={0}
       onScroll={onScroll}
       onWheel={takeOver}
       onTouchStart={takeOver}
@@ -129,17 +146,11 @@ export function ScrollTrack({ index, smooth, onArrive, children }: Props) {
       style={{ "--count": SLIDE_COUNT } as CSSProperties}
     >
       <div className={styles.trackContent}>
-        <div className={styles.checkpoints} aria-hidden="true">
-          {Array.from({ length: SLIDE_COUNT }, (_, i) => (
-            <div
-              key={i}
-              className={styles.checkpoint}
-              data-testid="checkpoint"
-              data-checkpoint={i}
-            />
-          ))}
-        </div>
-        <div className={styles.pin}>{children}</div>
+        {Array.from({ length: SLIDE_COUNT }, (_, i) => (
+          <div key={i} className={styles.checkpoint} data-testid="checkpoint" data-checkpoint={i}>
+            {renderCard(i)}
+          </div>
+        ))}
       </div>
     </div>
   );

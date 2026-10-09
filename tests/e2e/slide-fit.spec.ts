@@ -9,6 +9,11 @@ import { mockLookup, ndjson, openEntry, PROFILE, stageSettled, storyEvent } from
 // numbers, the longest rank journey), and checks that every element sits inside the slide frame.
 
 const stage = (page: Page) => page.getByTestId("story-stage");
+/** The slide on screen: the current card on desktop, the stage itself on a phone. */
+const current = (page: Page) =>
+  page.locator(
+    "[data-testid=story-card][data-current=true], [data-testid=story-stage]:not(:has([data-testid=story-card]))",
+  );
 
 /** The longest names, the biggest numbers, and a rank journey that is capped at the most rows. */
 function worstCaseStory() {
@@ -47,7 +52,6 @@ function worstCaseStory() {
   story.roast = {
     ...story.roast,
     deaths: 98765,
-    avgUnspentGoldMinutes: 987654,
     worstMatch: { matchId: 99, heroId: 87, deaths: 99 },
   };
   story.mvp = {
@@ -57,6 +61,21 @@ function worstCaseStory() {
     heroId: 69,
     topPercent: 12,
   };
+  // Three notable stats besides the signature one, so two honorable mentions render (the most rows).
+  const pct = (metric: string, label: string, topPercent: number) => ({
+    metric,
+    label,
+    value: 10,
+    percentile: 100 - topPercent,
+    topPercent,
+    higherIsBetter: true,
+    weight: 1,
+  });
+  story.percentiles = [
+    pct("soulsPerMin", "Souls per minute", 0.5),
+    pct("objectiveDamage", "Objective damage", 8),
+    pct("teammateHealing", "Teammate healing", 20),
+  ];
   return story;
 }
 
@@ -74,6 +93,9 @@ const SIZES: { width: number; height: number; phone: boolean; stale?: boolean }[
 
 /** The frame has a decorative inner rule 8px inside its edge: content stays clear of it sideways. */
 const RULE_INSET = 8;
+
+/** Spare pixels the worst-case honorable mentions must leave, so font differences cannot clip them. */
+const MENTIONS_SLACK = 48;
 
 test.describe("every slide fits its frame, worst case", () => {
   test.beforeEach(async ({ page }) => {
@@ -103,7 +125,7 @@ test.describe("every slide fits its frame, worst case", () => {
       for (const slide of SLIDES) {
         await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
         await stageSettled(page);
-        const frame = stage(page).locator("section").first();
+        const frame = current(page).locator("section").first();
         const found = await frame.evaluate((el, inset) => {
           const f = el.getBoundingClientRect();
           const out: string[] = [];
@@ -143,6 +165,22 @@ test.describe("every slide fits its frame, worst case", () => {
           // A bigger stage never shows fewer rows than a smaller one: the climb has 14 distinct
           // badges, so every stage with the stage's usual room shows the full 7.
           if (!stale) await expect(frame.locator("ol li")).toHaveCount(7);
+        }
+        if (slide.id === "mvp") {
+          // Spare room under the mentions: a wider fallback font on another machine (CI, a real
+          // phone) must not push the second one past the frame, where the stage would clip it.
+          const spare = await frame.evaluate((el) => {
+            const w = el.firstElementChild as HTMLElement;
+            const limit =
+              w.getBoundingClientRect().bottom - parseFloat(getComputedStyle(w).paddingBottom);
+            return limit - el.querySelector("ul")!.getBoundingClientRect().bottom;
+          });
+          expect(spare, "room left under the honorable mentions").toBeGreaterThanOrEqual(
+            MENTIONS_SLACK,
+          );
+          // The worst case is two honorable mentions, so the fit check above really covers them.
+          await expect(frame.getByRole("heading", { name: "Honorable mentions" })).toBeVisible();
+          await expect(frame.locator("ul li")).toHaveCount(2);
         }
         for (const f of found.slice(0, 2)) problems.push(`${slide.id}: ${f}`);
         if (slide.id !== SLIDES.at(-1)!.id) await page.keyboard.press("ArrowRight");

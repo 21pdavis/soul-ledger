@@ -27,4 +27,4 @@ Next.js (TypeScript), React Three Fiber + drei, Framer Motion, Neon Postgres, de
 
 ## Disclaimer
 
-Non-commercial fan project. Not affiliated with or endorsed by Valve. Deadlock is a trademark of Valve Corporation.
+Non-commercial fan project. Not affiliated with or endorsed by Valve. Valve and its properties are trademarks of Valve Corporation.

@@ -129,42 +129,87 @@
   outline-offset: 2px;
 }
 
-/* Desktop scroll controller: one viewport-high snap checkpoint per slide, the stage pinned over them. */
-.track {
+/*
+ * Desktop scroll controller (ADR 0050, 0062): a vertical stack of wide cards. Each checkpoint is
+ * exactly one viewport high (so scroll targets stay index * clientHeight) and holds one card,
+ * centred, with breathing room above and below and gutters at the sides (for the progress rail now,
+ * and for the 3D hero models later: nothing sits behind the gutters).
+ */
+.wide {
+  position: relative;
   height: var(--player-h, 100dvh);
+  --card-top: clamp(1.5rem, 5dvh, 3.5rem);
+  --card-bottom: clamp(1rem, 3dvh, 2rem);
+  --gutter: clamp(4.5rem, 12vw, 12rem);
+}
+
+.track {
+  height: 100%;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   overscroll-behavior: contain;
 }
 
-.trackContent {
-  position: relative;
-  height: calc(var(--count) * var(--player-h, 100dvh));
+.track:focus-visible {
+  outline: 3px solid var(--bone);
+  outline-offset: -3px;
 }
 
-.checkpoints {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.trackContent {
+  position: relative;
 }
 
 .checkpoint {
+  display: flex;
+  justify-content: center;
   height: var(--player-h, 100dvh);
+  padding: var(--card-top) var(--gutter) var(--card-bottom);
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
-.pin {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  height: var(--player-h, 100dvh);
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 64rem;
+  height: 100%;
+  overflow: hidden;
+  background: var(--panel);
+  box-shadow:
+    0 0 0 1px var(--brass),
+    0 0 0 7px var(--ink),
+    0 0 0 8px var(--rule),
+    0 24px 80px rgb(0 0 0 / 0.7);
+}
+
+.card[data-current="false"] {
+  opacity: 0.55;
+  transition: opacity 0.25s ease-out;
+}
+
+.card[data-current="true"] {
+  transition: opacity 0.25s ease-out;
+}
+
+.cardPlaceholder {
+  height: 100%;
+}
+
+/* The vertical progress rail sits in the right gutter, centred on the screen. */
+.rail {
+  position: absolute;
+  top: 50%;
+  right: clamp(1rem, 3vw, 2.5rem);
+  z-index: 2;
+  transform: translateY(-50%);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .track {
     scroll-behavior: auto;
+  }
+
+  .card[data-current] {
+    transition: none;
   }
 }

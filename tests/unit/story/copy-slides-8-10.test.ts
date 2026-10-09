@@ -1,18 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
   MVP_FALLBACK_LEAD,
-  SHOW_UNSPENT_SOULS_FIGURE,
-  UNSPENT_NEUTRAL_LINE,
   RANK_EMPTY_LINE,
-  avgMatchMinutes,
   deathsLabel,
   hotspotLine,
+  mentionLine,
   mvpCopy,
   mvpFlavor,
+  mvpMentions,
   noDeathMapLine,
   rankSummary,
-  typicalUnspentSouls,
-  unspentSoulsLine,
   worstMatchLine,
 } from "@/story/copy";
 import type { JourneyPoint } from "@/story/rank-journey";
@@ -38,51 +35,6 @@ describe("roast copy", () => {
       "Worst night: 21 deaths as Infernus",
     );
     expect(worstMatchLine({ deaths: 1, heroName: "Seven" })).toBe("Worst night: 1 death as Seven");
-  });
-});
-
-describe("unspent souls copy", () => {
-  it("ships the neutral sentence by default, until the unit is accepted (#36)", () => {
-    expect(SHOW_UNSPENT_SOULS_FIGURE).toBe(false);
-    expect(unspentSoulsLine(90_000, 36)).toBe(UNSPENT_NEUTRAL_LINE);
-    expect(UNSPENT_NEUTRAL_LINE).not.toMatch(/\d|minute/i);
-  });
-
-  it("is souls x minutes, so a typical stash is the average divided by the average match length", () => {
-    // 90,000 soul-minutes over a 36-minute match is 2,500 souls held on average.
-    expect(typicalUnspentSouls(90_000, 36)).toBe(2500);
-    // Rounded to the nearest 100.
-    expect(typicalUnspentSouls(84_800, 35)).toBe(2400);
-  });
-
-  it("gives no figure when it cannot be worked out", () => {
-    expect(typicalUnspentSouls(0, 30)).toBeNull();
-    expect(typicalUnspentSouls(90_000, 0)).toBeNull();
-    expect(typicalUnspentSouls(Number.NaN, 30)).toBeNull();
-  });
-
-  it("states the stash in souls with a thousands separator", () => {
-    expect(unspentSoulsLine(90_000, 36, true)).toBe(
-      "In a typical match you sat on about 2,500 unspent souls.",
-    );
-  });
-
-  it("praises a player who spends, and shows no number", () => {
-    const line = unspentSoulsLine(2_000, 36, true);
-    expect(line).not.toMatch(/\d/);
-    expect(line).toMatch(/spend/i);
-  });
-
-  it("falls back to a neutral sentence with no number or unit", () => {
-    const line = unspentSoulsLine(0, 36, true);
-    expect(line).not.toMatch(/\d/);
-    expect(line).not.toMatch(/minute/i);
-    expect(unspentSoulsLine(90_000, 0, true)).toBe(line);
-  });
-
-  it("works out the average match length in minutes", () => {
-    expect(avgMatchMinutes(3, 5)).toBe(36);
-    expect(avgMatchMinutes(3, 0)).toBe(0);
   });
 });
 
@@ -238,5 +190,64 @@ describe("mvp copy", () => {
     expect(mvpFlavor(0.5)).not.toBe(mvpFlavor(5));
     expect(mvpFlavor(5)).not.toBe(mvpFlavor(30));
     expect(mvpFlavor(30)).not.toBe(mvpFlavor(70));
+  });
+});
+
+describe("mvp honorable mentions", () => {
+  const pct = (label: string, topPercent: number) => ({
+    metric: label.toLowerCase(),
+    label,
+    value: 10,
+    percentile: 100 - topPercent,
+    topPercent,
+    higherIsBetter: true,
+    weight: 1,
+  });
+  const story = (over: Parameters<typeof fixtureStory>[0] = {}) =>
+    fixtureStory({
+      mvp: { ...pct("Melee kills", 0.5), scope: "global" },
+      percentiles: [
+        pct("Melee kills", 0.5),
+        pct("Assists", 8),
+        pct("Kills", 20),
+        pct("Denies", 35),
+      ],
+      ...over,
+    });
+
+  it("lists the next two best stats, never the signature stat itself", () => {
+    const m = mvpMentions(story());
+    expect(m.map((x) => x.label)).toEqual(["Assists", "Kills"]);
+    expect(m[0]).toMatchObject({ topPercent: "8", note: "of all players" });
+    expect(m[0].line).toBe(mentionLine(8));
+  });
+
+  it("skips stats that are not notable (above the top 50%)", () => {
+    const m = mvpMentions(story({ percentiles: [pct("Melee kills", 0.5), pct("Deaths", 61)] }));
+    expect(m).toEqual([]);
+  });
+
+  it("when the signature is the fallback, leaves out the best stat it already shows", () => {
+    const m = mvpMentions(
+      story({
+        mvp: { ...pct("Deaths", 61), scope: "global" },
+        percentiles: [pct("Assists", 30), pct("Kills", 40), pct("Denies", 45)],
+      }),
+    );
+    expect(m.map((x) => x.label)).toEqual(["Kills", "Denies"]);
+  });
+
+  it("with a hero-scoped signature, does not repeat the same metric's global entry", () => {
+    const m = mvpMentions(story({ mvp: { ...pct("Melee kills", 0.5), scope: "hero", heroId: 1 } }));
+    expect(m.map((x) => x.label)).toEqual(["Assists", "Kills"]);
+  });
+
+  it("is empty with no percentiles", () => {
+    expect(mvpMentions(story({ mvp: null, percentiles: [] }))).toEqual([]);
+  });
+
+  it("has a distinct short line per tier", () => {
+    expect(mentionLine(1)).not.toBe(mentionLine(8));
+    expect(mentionLine(8)).not.toBe(mentionLine(30));
   });
 });

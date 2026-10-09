@@ -1,4 +1,4 @@
-import { headlineFor, mvpCopy } from "@/story/copy";
+import { MENTIONS_HEADING, headlineFor, mvpCopy, mvpMentions } from "@/story/copy";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import type { SlideComponent } from "./contract";
@@ -6,6 +6,7 @@ import styles from "./MvpSlide.module.css";
 
 export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion }) => {
   const copy = mvpCopy(story);
+  const mentions = mvpMentions(story);
   const animate = !(reducedMotion || skipAnimation);
 
   if (copy.kind === "none") {
@@ -20,7 +21,7 @@ export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion }
 
   return (
     <SlideFrame headline={headlineFor("mvp")}>
-      <div className={styles.card}>
+      <div className={`${styles.card} ${mentions.length > 0 ? styles.compact : ""}`}>
         {copy.lead && (
           <SlideReveal index={0} animate={animate}>
             <p className={styles.lead}>{copy.lead}</p>
@@ -46,6 +47,24 @@ export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion }
           <p className={styles.flavor}>{copy.flavor}</p>
         </SlideReveal>
       </div>
+      {mentions.length > 0 && (
+        <SlideReveal index={4} animate={animate}>
+          <section className={styles.mentions}>
+            <h3 className={styles.mentionsHeading} id="mvp-mentions">
+              {MENTIONS_HEADING}
+            </h3>
+            <ul className={styles.mentionList} aria-labelledby="mvp-mentions">
+              {mentions.map((m) => (
+                <li key={m.label} className={styles.mention}>
+                  <span className={styles.mentionLabel}>{m.label}</span>
+                  <span className={styles.mentionValue}>Top {m.topPercent}%</span>
+                  <span className={styles.mentionLine}>{m.line}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </SlideReveal>
+      )}
     </SlideFrame>
   );
 };

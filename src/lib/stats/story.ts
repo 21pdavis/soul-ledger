@@ -5,7 +5,7 @@ import type { PlayerMatch } from "./types";
 /** Main-hero share at or above which a player is a one-trick (ADR 0038). */
 export const ONE_TRICK_SHARE = 0.5;
 /** Parry success rate at or above which a player is a parry king rather than a clown (ADR 0040). */
-export const PARRY_KING_RATE = 0.6;
+export const PARRY_KING_RATE = 0.4;
 /** Fewest main-hero matches before we rank against that hero's players. */
 export const MIN_HERO_SAMPLE = 10;
 
@@ -69,7 +69,6 @@ export interface Story {
   roast: {
     deaths: number;
     deathPositions: [number, number][];
-    avgUnspentGoldMinutes: number;
     worstMatch: { matchId: number; heroId: number; deaths: number } | null;
   };
   rank: { journey: RankPoint[]; current: RankPoint | null };
@@ -206,10 +205,6 @@ export function computeStory(input: StoryInput): Story {
     roast: {
       deaths: total((r) => r.deaths),
       deathPositions: rows.flatMap((r) => r.deathPositions),
-      avgUnspentGoldMinutes: rate(
-        total((r) => r.unspentGoldMinutes),
-        rows.length,
-      ),
       worstMatch: worst
         ? { matchId: worst.matchId, heroId: worst.heroId, deaths: worst.deaths }
         : null,
