@@ -5,7 +5,7 @@ description: "Whether the hero images served by deadlock-api assets may be shown
 tags: [m2, legal, assets]
 status: stable
 question_status: resolved
-resolved_by: ../decisions/0060-owner-decisions-m2-open-questions.md
+resolved_by: ../decisions/0064-hero-art-on-staging.md
 recommendation: "Resolved: deadlock-api hero images may be used, with a visible not-affiliated-with-Valve disclaimer and quick removal if Valve asks (ADR 0060)."
 raised_on: 2026-10-07
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T20:00:00Z }

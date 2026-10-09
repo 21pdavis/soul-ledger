@@ -8,6 +8,22 @@ export const ONE_TRICK_SHARE = 0.5;
 export const PARRY_KING_RATE = 0.4;
 /** Fewest main-hero matches before we rank against that hero's players. */
 export const MIN_HERO_SAMPLE = 10;
+/** "Recent" overall = the player's latest 300 matches (ADR 0063). */
+export const RECENT_MATCHES = 300;
+/** "Recent" per hero = that hero's latest 50 matches (ADR 0063). */
+export const RECENT_HERO_MATCHES = 50;
+
+/** Win rate over the latest `window` rows; null unless the player has more than that many. */
+export interface RecentRate {
+  matches: number;
+  winRate: number;
+}
+export function recentRate(rows: PlayerMatch[], window: number): RecentRate | null {
+  if (rows.length <= window) return null;
+  const latest = [...rows].sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
+  const slice = latest.slice(0, window);
+  return { matches: window, winRate: slice.filter((r) => r.won).length / window };
+}
 
 export interface RankPoint {
   at: Date;
@@ -40,13 +56,22 @@ export interface Story {
     wins: number;
     winRate: number;
     share: number;
+    /** Latest 50 matches on this hero; null at 50 or fewer. */
+    recent: RecentRate | null;
     /** Ranked against players of the same hero; empty below MIN_HERO_SAMPLE matches. */
     percentiles: PercentileResult[];
   } | null;
   roster: {
     heroesPlayed: number;
     label: "one-trick" | "flex";
-    topHeroes: { heroId: number; matches: number; winRate: number }[];
+    /** Latest 300 matches overall; null at 300 or fewer. */
+    recent: RecentRate | null;
+    topHeroes: {
+      heroId: number;
+      matches: number;
+      winRate: number;
+      recent: RecentRate | null;
+    }[];
   };
   scavenger: { breakables: number; sinnerJackpots: number; idolsReturned: number };
   kills: {
@@ -123,6 +148,7 @@ export function computeStory(input: StoryInput): Story {
         wins: top.wins,
         winRate: rate(top.wins, top.matches),
         share: rate(top.matches, rows.length),
+        recent: recentRate(top.rows, RECENT_HERO_MATCHES),
         percentiles:
           top.matches >= MIN_HERO_SAMPLE ? comparePlayer(top.rows, input.mainHeroMetrics) : [],
       }
@@ -163,10 +189,12 @@ export function computeStory(input: StoryInput): Story {
     roster: {
       heroesPlayed: heroesByPlay.length,
       label: main && main.share >= ONE_TRICK_SHARE ? "one-trick" : "flex",
+      recent: recentRate(rows, RECENT_MATCHES),
       topHeroes: heroesByPlay.slice(0, 5).map((h) => ({
         heroId: h.heroId,
         matches: h.matches,
         winRate: rate(h.wins, h.matches),
+        recent: recentRate(h.rows, RECENT_HERO_MATCHES),
       })),
     },
     scavenger: {

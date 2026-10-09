@@ -48,6 +48,15 @@ describe.each(VARIANTS)("SummarySlide (%s)", (_name, variant) => {
     expect(card).toHaveTextContent("Oracle 1");
   });
 
+  it("shows the hero pool as real text", () => {
+    renderSummary(fixtureStory(), variant);
+    const pool = screen.getByRole("list", { name: "Your hero pool" });
+    expect(within(pool).getAllByRole("listitem")).toHaveLength(5);
+    expect(pool).toHaveTextContent("Infernus");
+    expect(pool).toHaveTextContent("60% wins");
+    expect(screen.getByText("Hero pool: 9 heroes")).toBeInTheDocument();
+  });
+
   it("shows the window and how many matches the card is based on", () => {
     renderSummary(fixtureStory(), variant);
     expect(screen.getByText("All time")).toBeInTheDocument();

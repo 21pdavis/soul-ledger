@@ -14,7 +14,7 @@ import { WindowLabel } from "../WindowLabel";
 import type { SlideComponent } from "./contract";
 import styles from "./IntroSlide.module.css";
 
-/** Slide 1: matches and hours in the Cursed City, as two stamped ledger figures. */
+/** Slide 1: matches and hours in the Cursed Apple, as two stamped ledger figures. */
 export const IntroSlide: SlideComponent = ({
   story,
   meta,

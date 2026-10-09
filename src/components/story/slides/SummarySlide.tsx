@@ -1,5 +1,12 @@
-import { STORY_ACTIONS_COPY, SUMMARY_COPY, headlineFor, summaryRows } from "@/story/copy";
+import {
+  STORY_ACTIONS_COPY,
+  SUMMARY_COPY,
+  headlineFor,
+  summaryHeroPool,
+  summaryRows,
+} from "@/story/copy";
 import { basedOnMatches } from "@/story/window-label";
+import { MonogramTile } from "../MonogramTile";
 import { SlideFrame } from "../SlideFrame";
 import { WindowLabel } from "../WindowLabel";
 import type { SlideComponent } from "./contract";
@@ -19,6 +26,7 @@ export const SummarySlide: SlideComponent = ({
   reducedMotion,
 }) => {
   const rows = summaryRows(story);
+  const pool = summaryHeroPool(story);
   const motion = skipAnimation || reducedMotion ? "still" : "play";
 
   return (
@@ -37,6 +45,21 @@ export const SummarySlide: SlideComponent = ({
               </li>
             ))}
           </ul>
+
+          {pool && (
+            <div className={styles.pool}>
+              <p className={styles.poolCaption}>{pool.caption}</p>
+              <ul className={styles.heroes} role="list" aria-label={SUMMARY_COPY.heroPoolLabel}>
+                {pool.heroes.map((h) => (
+                  <li key={h.heroId} className={styles.hero} title={`${h.name}: ${h.matches}`}>
+                    <MonogramTile heroId={h.heroId} />
+                    <span className={styles.heroName}>{h.name}</span>
+                    <span className={styles.heroRate}>{h.winRate}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className={styles.foot}>
             <div className={styles.basis}>

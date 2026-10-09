@@ -110,6 +110,25 @@
   width: 7rem;
 }
 
+.overall {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.overall[data-trend="up"],
+.recent[data-trend="up"] {
+  color: var(--green);
+}
+
+.recent {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--bone);
+}
+
 .track {
   display: block;
   height: 4px;

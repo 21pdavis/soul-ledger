@@ -9,7 +9,7 @@
  * -10,169 to 10,285, so this leaves a little margin.
  */
 export const DEATH_BOUND = 10_500;
-export const DEATH_GRID = 10;
+export const DEATH_GRID = 20;
 
 export interface DeathBins {
   cols: number;

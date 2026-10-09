@@ -58,6 +58,26 @@
   color: var(--bone-muted);
 }
 
+/* Recent win rate under the all-time one; the arrow shows when it moved 3+ points. */
+.recent {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.recent[data-trend="up"] {
+  color: var(--green);
+}
+
+.recent[data-trend="down"] {
+  color: var(--bone-muted);
+}
+
+.window {
+  font-weight: 400;
+  color: var(--bone-muted);
+}
+
 /* The percentile, inked on like a ledger stamp. */
 .stamp {
   display: inline-block;

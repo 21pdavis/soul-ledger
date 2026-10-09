@@ -250,6 +250,20 @@ describe("slide 2: Your main", () => {
     expect(screen.getByTestId("main-winrate")).toHaveTextContent("0%");
   });
 
+  it("shows the recent win rate next to all time, with an arrow when it moved", () => {
+    show(MainSlide, {
+      story: { main: { ...fixtureStory().main!, recent: { matches: 50, winRate: 0.7 } } },
+    });
+    const el = screen.getByTestId("main-recent");
+    expect(el).toHaveTextContent("recent 70%");
+    expect(el).toHaveAttribute("data-trend", "up");
+  });
+
+  it("hides the recent win rate when there is none", () => {
+    show(MainSlide);
+    expect(screen.queryByTestId("main-recent")).not.toBeInTheDocument();
+  });
+
   it("has no controls", () => {
     show(MainSlide);
     expect(screen.queryAllByRole("button")).toHaveLength(0);
@@ -308,14 +322,37 @@ describe("slide 3: Roster", () => {
     });
   });
 
+  it("shows the overall recent win rate and each hero's recent figure", () => {
+    const base = fixtureStory().roster;
+    show(RosterSlide, {
+      story: {
+        roster: {
+          ...base,
+          recent: { matches: 300, winRate: 0.65 },
+          topHeroes: [
+            { ...base.topHeroes[0], winRate: 0.5, recent: { matches: 50, winRate: 0.6 } },
+          ],
+        },
+      },
+    });
+    expect(screen.getByTestId("roster-recent")).toHaveTextContent("recent 65%");
+    expect(screen.getByRole("listitem")).toHaveTextContent("recent 60%");
+  });
+
+  it("hides recent figures when there are none", () => {
+    show(RosterSlide);
+    expect(screen.queryByTestId("roster-recent")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")[0]).not.toHaveTextContent("recent");
+  });
+
   it("keeps the given order even when it is not sorted by name or rate", () => {
     show(RosterSlide, {
       story: {
         roster: {
           ...fixtureStory().roster,
           topHeroes: [
-            { heroId: 6, matches: 9, winRate: 0.1 },
-            { heroId: 1, matches: 4, winRate: 0.9 },
+            { heroId: 6, matches: 9, winRate: 0.1, recent: null },
+            { heroId: 1, matches: 4, winRate: 0.9, recent: null },
           ],
         },
       },
@@ -331,7 +368,7 @@ describe("slide 3: Roster", () => {
       story: {
         roster: {
           ...fixtureStory().roster,
-          topHeroes: [{ heroId: 1, matches: 3, winRate: 0 }],
+          topHeroes: [{ heroId: 1, matches: 3, winRate: 0, recent: null }],
         },
       },
     });
@@ -343,7 +380,7 @@ describe("slide 3: Roster", () => {
       story: {
         roster: {
           ...fixtureStory().roster,
-          topHeroes: [{ heroId: 1, matches: 1, winRate: 1 }],
+          topHeroes: [{ heroId: 1, matches: 1, winRate: 1, recent: null }],
         },
       },
     });

@@ -11,7 +11,7 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T12:00:00Z }
 
 # Decision
 
-1. **Intro:** total matches and hours in the Cursed City.
+1. **Intro:** total matches and hours in the Cursed Apple.
 2. **Your main:** most-played hero, its win rate, and a global percentile.
 3. **Roster:** number of heroes played, with a one-trick or flex label.
 4. **Scavenger card:** three stats on one card. **Crate Goblin** (breakables) top-left, **Gambler** (Sinner's Sacrifice) middle-right, **Urn Mule** (idols returned) bottom-left.

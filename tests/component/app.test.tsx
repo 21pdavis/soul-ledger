@@ -222,7 +222,7 @@ describe("App flow", () => {
     expect(segments).toHaveLength(11);
     expect(segments[0]).toHaveAttribute("data-state", "current");
     expect(screen.queryByText(/story player arrives in a later PR/i)).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Welcome back to the Cursed City" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Welcome back to the Cursed Apple" })).toBeVisible();
     await user.click(screen.getByTestId("tap-zone-next")); // completes the opening entrance
     await user.click(screen.getByTestId("tap-zone-next"));
     expect(segments[1]).toHaveAttribute("data-state", "current");

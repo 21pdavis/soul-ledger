@@ -30,12 +30,20 @@ function worstCaseStory() {
   story.rank = { journey, current: journey.at(-1)! };
   story.matchCount = 9999;
   story.intro = { ...story.intro, matches: 9999, hoursPlayed: 9876.5, wins: 6543 };
-  story.main = { ...story.main!, heroId: 78, matches: 9999, wins: 6543 };
+  story.main = {
+    ...story.main!,
+    heroId: 78,
+    matches: 9999,
+    wins: 6543,
+    recent: { matches: 50, winRate: 0.72 },
+  };
   story.roster.heroesPlayed = 38;
+  story.roster.recent = { matches: 300, winRate: 0.65 };
   story.roster.topHeroes = [78, 87, 69, 57, 2].map((heroId, i) => ({
     heroId,
     matches: 9000 - i,
     winRate: 0.5,
+    recent: { matches: 50, winRate: 0.72 },
   }));
   story.scavenger = { breakables: 987654, sinnerJackpots: 98765, idolsReturned: 54321 };
   story.kills = {
