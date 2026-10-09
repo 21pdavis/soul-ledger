@@ -201,6 +201,7 @@ export const RECENT_COPY = {
   /** Points of difference at which an arrow shows. */
   arrowPoints: 3,
   arrow: { up: "▲", down: "▼", flat: "" },
+  arrowLabel: { up: "trending up", down: "trending down", flat: "" },
   windowHint: (matches: number) => `last ${matches}`,
 } as const;
 
@@ -209,6 +210,8 @@ export interface RecentTrend {
   allTime: string;
   recent: string;
   arrow: string;
+  /** The arrow in words, for screen readers. */
+  arrowLabel: string;
   window: string;
 }
 
@@ -217,7 +220,8 @@ export function recentTrend(
   recent: { matches: number; winRate: number } | null,
 ): RecentTrend | null {
   if (!recent) return null;
-  const diff = Math.round((recent.winRate - allTimeRate) * 100);
+  // Compare the percentages as printed, so an arrow never sits beside two numbers under 3 apart.
+  const diff = Math.round(recent.winRate * 100) - Math.round(allTimeRate * 100);
   const direction =
     diff >= RECENT_COPY.arrowPoints ? "up" : diff <= -RECENT_COPY.arrowPoints ? "down" : "flat";
   return {
@@ -225,6 +229,7 @@ export function recentTrend(
     allTime: formatPercent(allTimeRate),
     recent: formatPercent(recent.winRate),
     arrow: RECENT_COPY.arrow[direction],
+    arrowLabel: RECENT_COPY.arrowLabel[direction],
     window: RECENT_COPY.windowHint(recent.matches),
   };
 }

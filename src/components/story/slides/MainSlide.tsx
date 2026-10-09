@@ -9,6 +9,7 @@ import {
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { HeroTile } from "../HeroTile";
+import { TrendArrow } from "../TrendArrow";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
@@ -55,7 +56,7 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
                   data-testid="main-recent"
                   data-trend={trend.direction}
                 >
-                  {RECENT_COPY.label} {trend.recent} {trend.arrow}
+                  {RECENT_COPY.label} {trend.recent} <TrendArrow trend={trend} />
                   <span className={styles.window}> ({trend.window})</span>
                 </span>
               )}

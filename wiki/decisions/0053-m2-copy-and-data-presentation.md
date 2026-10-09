@@ -24,7 +24,7 @@ The owner confirmed this on 2026-10-07. Applies [ADR 0007](0007-tone-hype-with-r
 | Item | M2 choice |
 |---|---|
 | Hero names | Static `heroId` to name map. No Valve art until the [asset terms](../open-questions/m2-hero-art-terms.md) are checked. |
-| Death heatmap | Bin raw `[x, y]` death positions into a grid, draw an SVG density plot on an abstract deco frame (no map). The binning is pure and unit tested. Copy names the hottest cell ("You died here N times"). |
+| Death heatmap | Bin raw `[x, y]` death positions into a grid, draw an SVG density plot on an abstract deco frame (no map; superseded in part by [ADR 0066](0066-death-map-on-roast-slide.md), which draws a stylised map). The binning is pure and unit tested. Copy names the hottest cell ("You died here N times"). |
 | Unspent souls | Verify the [unit](../open-questions/m2-unspent-souls-unit.md) first, then show it as a plain sentence. |
 | Rank | Static tier-name map from research, fallback "Tier 4 · 2". Names need [confirmation](../open-questions/m2-rank-tier-names.md). |
 | MVP | One generic template: label + `topPercent` + scope. "Not notable" means the best `topPercent` is above 50; then show the best global stat with neutral copy, no same-hero phrasing. A null `mvp` gets its own friendly copy. Per-metric one-liners are a backlog item. |

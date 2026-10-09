@@ -56,7 +56,7 @@ export interface Story {
     wins: number;
     winRate: number;
     share: number;
-    /** Latest 50 matches on this hero; null at 50 or fewer. */
+    /** Latest 20 matches on this hero; null at 20 or fewer. */
     recent: RecentRate | null;
     /** Ranked against players of the same hero; empty below MIN_HERO_SAMPLE matches. */
     percentiles: PercentileResult[];

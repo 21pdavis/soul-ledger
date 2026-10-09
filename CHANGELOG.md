@@ -10,6 +10,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Changed
 
+- **The death heatmap now sits on a map of the lanes.** Your deaths are drawn on a stylised Deadlock map on a finer grid, so you can see which lane you die in.
 - **Your recent form now shows next to your all-time win rate.** The main hero and roster slides show your win rate over your last 300 matches (last 20 per hero) beside the all-time number, with an arrow when you have moved 3 points or more, so early games no longer hide how good you are now.
 - The final shareable card now shows your hero pool: your five most-played heroes with their win rates, plus how many heroes you have played.
 - On desktop the story is now a real vertical page: the slides are wide cards stacked down the screen, scrolling down moves to the next card, and there is breathing room above and on both sides. The progress bar runs down the right edge. Phones are unchanged.

@@ -116,7 +116,7 @@ describe("RosterSlide fits the stage it is in", () => {
       heroId,
       matches: 100,
       winRate: 0.5,
-      recent: { matches: 50, winRate: 0.6 },
+      recent: { matches: 20, winRate: 0.6 },
     }));
     return s;
   };

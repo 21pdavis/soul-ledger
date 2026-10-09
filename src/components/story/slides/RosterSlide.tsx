@@ -10,6 +10,7 @@ import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { clampShare } from "@/story/monogram";
 import { HeroTile } from "../HeroTile";
+import { TrendArrow } from "../TrendArrow";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
@@ -61,7 +62,7 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
               data-trend={overall.direction}
             >
               {ROSTER_COPY.allTime} {overall.allTime} {ROSTER_COPY.winRate} · {RECENT_COPY.label}{" "}
-              {overall.recent} {overall.arrow}{" "}
+              {overall.recent} <TrendArrow trend={overall} />{" "}
               <span className={styles.meta}>({overall.window})</span>
             </p>
           </SlideReveal>
@@ -87,7 +88,8 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
                     </p>
                     {heroTrends[i] && (
                       <p className={styles.recent} data-trend={heroTrends[i].direction}>
-                        {RECENT_COPY.label} {heroTrends[i].recent} {heroTrends[i].arrow}
+                        {RECENT_COPY.label} {heroTrends[i].recent}{" "}
+                        <TrendArrow trend={heroTrends[i]} />
                       </p>
                     )}
                   </div>
