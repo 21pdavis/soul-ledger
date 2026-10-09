@@ -6,6 +6,7 @@ import { LOADING_PACE } from "@/lib/client/loading-pace";
 import { loadingStage } from "@/lib/client/loading-stage";
 import type { ClientLookupEvent } from "@/lib/client/lookup-stream";
 import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
+import { HeroArt } from "@/components/story/HeroTile";
 import { LOADING_COPY } from "@/story/copy";
 import styles from "./LoadingScreen.module.css";
 
@@ -132,7 +133,11 @@ export function LoadingScreen({
                               })}
                         >
                           <span className={styles.monogram} aria-hidden="true">
-                            {hero.monogram}
+                            <HeroArt
+                              heroId={hero.id}
+                              className={styles.art}
+                              fallback={hero.monogram}
+                            />
                           </span>
                           <span className={styles.srOnly}>{hero.name}</span>
                         </motion.li>
