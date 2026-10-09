@@ -43,7 +43,7 @@ export interface Story {
     wins: number;
     winRate: number;
     /** Win rate over the newest RECENT_MATCHES on this hero; null when the hero has no more than that, since it would repeat winRate. */
-    recent: { matches: number; wins: number; winRate: number } | null;
+    recent: RecentForm | null;
     share: number;
     /** Ranked against players of the same hero; empty below MIN_HERO_SAMPLE matches. */
     percentiles: PercentileResult[];
@@ -51,7 +51,7 @@ export interface Story {
   roster: {
     heroesPlayed: number;
     label: "one-trick" | "flex";
-    topHeroes: { heroId: number; matches: number; winRate: number }[];
+    topHeroes: { heroId: number; matches: number; winRate: number; recent: RecentForm | null }[];
   };
   scavenger: { breakables: number; sinnerJackpots: number; idolsReturned: number };
   kills: {
@@ -110,8 +110,10 @@ export function rankHeroes(rows: PlayerMatch[]) {
     .sort((a, b) => b.matches - a.matches || b.wins - a.wins);
 }
 
+export type RecentForm = { matches: number; wins: number; winRate: number };
+
 /** The newest RECENT_MATCHES of a hero’s rows, or null when there are no more than that. */
-function recentForm(heroRows: PlayerMatch[]) {
+function recentForm(heroRows: PlayerMatch[]): RecentForm | null {
   if (heroRows.length <= RECENT_MATCHES) return null;
   const newest = [...heroRows]
     .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
@@ -183,6 +185,7 @@ export function computeStory(input: StoryInput): Story {
         heroId: h.heroId,
         matches: h.matches,
         winRate: rate(h.wins, h.matches),
+        recent: recentForm(h.rows),
       })),
     },
     scavenger: {

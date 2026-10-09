@@ -111,7 +111,12 @@ describe("RankSlide fits the stage it is in", () => {
 describe("RosterSlide fits the stage it is in", () => {
   const story = () => {
     const s = fixtureStory();
-    s.roster.topHeroes = [1, 2, 3, 4, 6].map((heroId) => ({ heroId, matches: 10, winRate: 0.5 }));
+    s.roster.topHeroes = [1, 2, 3, 4, 6].map((heroId) => ({
+      heroId,
+      matches: 30,
+      winRate: 0.5,
+      recent: { matches: 20, wins: 10, winRate: 0.5 },
+    }));
     return s;
   };
   const renderRoster = () =>

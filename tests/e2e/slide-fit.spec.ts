@@ -36,6 +36,7 @@ function worstCaseStory() {
     heroId,
     matches: 9000 - i,
     winRate: 0.5,
+    recent: { matches: 20, wins: 10, winRate: 0.5 },
   }));
   story.scavenger = { breakables: 987654, sinnerJackpots: 98765, idolsReturned: 54321 };
   story.kills = {

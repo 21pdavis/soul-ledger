@@ -192,6 +192,8 @@ export const MAIN_COPY = {
 } as const;
 
 export const ROSTER_COPY = {
+  /** The win rate over the newest n matches on the hero (ADR 0064). */
+  recentWinRate: (n: number) => `last ${n}`,
   heroesPlayedUnit: (n: number) => (n === 1 ? "hero played" : "heroes played"),
   topHeroes: "Most played",
   winRate: "win rate",

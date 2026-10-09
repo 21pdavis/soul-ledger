@@ -164,6 +164,18 @@ describe("computeStory edge cases", () => {
     expect(story20([...hero1, ...other]).main!.recent).toMatchObject({ matches: 20, winRate: 1 });
   });
 
+  it("roster.topHeroes carry their own recent win rate, null for a hero with 20 or fewer matches", () => {
+    const hero1 = Array.from({ length: 22 }, (_, i) =>
+      row({ matchId: i, heroId: 1, startTime: day(i), won: i % 2 === 0 }),
+    );
+    const hero2 = Array.from({ length: 5 }, (_, i) =>
+      row({ matchId: 100 + i, heroId: 2, startTime: day(100 + i), won: true }),
+    );
+    const [a, b] = story20([...hero1, ...hero2]).roster.topHeroes;
+    expect(a).toMatchObject({ heroId: 1, recent: { matches: 20, wins: 10, winRate: 0.5 } });
+    expect(b).toMatchObject({ heroId: 2, recent: null });
+  });
+
   it("main.recent is null when the hero has 20 or fewer matches (it would repeat the overall rate)", () => {
     const rows = Array.from({ length: 20 }, (_, i) =>
       row({ matchId: i, heroId: 1, startTime: day(i) }),

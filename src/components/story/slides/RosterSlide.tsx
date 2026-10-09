@@ -67,6 +67,12 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
                     <p className={styles.meta}>
                       {formatPercent(h.winRate)} {ROSTER_COPY.winRate}
                     </p>
+                    {h.recent && (
+                      <p data-testid="roster-recent-winrate" className={styles.recent}>
+                        {formatPercent(h.recent.winRate)}{" "}
+                        {ROSTER_COPY.recentWinRate(h.recent.matches)}
+                      </p>
+                    )}
                     <span className={styles.track} aria-hidden="true">
                       <span
                         className={styles.fill}

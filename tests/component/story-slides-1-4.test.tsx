@@ -277,6 +277,29 @@ describe("slide 2: Your main", () => {
 });
 
 describe("slide 3: Roster", () => {
+  it("shows each top hero’s win rate over their last 20 matches, only where there is one", () => {
+    show(RosterSlide, {
+      story: {
+        roster: {
+          ...fixtureStory().roster,
+          topHeroes: [
+            {
+              heroId: 1,
+              matches: 50,
+              winRate: 0.6,
+              recent: { matches: 20, wins: 14, winRate: 0.7 },
+            },
+            { heroId: 2, matches: 8, winRate: 0.5, recent: null },
+          ],
+        },
+      },
+    });
+    const recent = screen.getAllByTestId("roster-recent-winrate");
+    expect(recent).toHaveLength(1);
+    expect(recent[0]).toHaveTextContent("70%");
+    expect(recent[0]).toHaveTextContent("last 20");
+  });
+
   it("shows roster.heroesPlayed", () => {
     show(RosterSlide);
     expect(screen.getByRole("heading", { name: headlineFor("roster") })).toBeInTheDocument();
@@ -326,8 +349,8 @@ describe("slide 3: Roster", () => {
         roster: {
           ...fixtureStory().roster,
           topHeroes: [
-            { heroId: 6, matches: 9, winRate: 0.1 },
-            { heroId: 1, matches: 4, winRate: 0.9 },
+            { heroId: 6, matches: 9, winRate: 0.1, recent: null },
+            { heroId: 1, matches: 4, winRate: 0.9, recent: null },
           ],
         },
       },
@@ -343,7 +366,7 @@ describe("slide 3: Roster", () => {
       story: {
         roster: {
           ...fixtureStory().roster,
-          topHeroes: [{ heroId: 1, matches: 3, winRate: 0 }],
+          topHeroes: [{ heroId: 1, matches: 3, winRate: 0, recent: null }],
         },
       },
     });
@@ -355,7 +378,7 @@ describe("slide 3: Roster", () => {
       story: {
         roster: {
           ...fixtureStory().roster,
-          topHeroes: [{ heroId: 1, matches: 1, winRate: 1 }],
+          topHeroes: [{ heroId: 1, matches: 1, winRate: 1, recent: null }],
         },
       },
     });

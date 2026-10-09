@@ -1,7 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-09
-* **Decision**: [ADR 0064](decisions/0064-recent-win-rate-on-main.md): the Main slide shows the win rate over the last 20 matches on the main hero next to the overall one (hidden at 20 matches or fewer).
+* **Decision**: [ADR 0064](decisions/0064-recent-win-rate.md): the Main slide and each top hero on the Roster slide show the win rate over the last 20 matches on that hero next to the overall one (hidden at 20 matches or fewer).
 * **Decision**: [ADR 0063](decisions/0063-two-depth-ci.md): CI runs a smoke browser set on PRs into `staging` and the full suite with coverage only on the `staging` to `main` PR and pushes to `main`. Prompted by 11 to 12 minute CI runs.
 
 ## 2026-10-08

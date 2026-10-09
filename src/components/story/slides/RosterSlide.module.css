@@ -106,6 +106,13 @@
   color: var(--bone-muted);
 }
 
+.recent {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--bone-muted);
+  opacity: 0.85;
+}
+
 .rate {
   width: 7rem;
 }
