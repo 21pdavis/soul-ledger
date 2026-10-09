@@ -394,7 +394,7 @@
 }
 
 /* The pool is the first thing to go on short stages (the ledger lines are the card). */
-@container (max-height: 479px) {
+@container (max-height: 559px) {
   .hero:nth-child(n + 4) {
     display: none;
   }
@@ -404,7 +404,7 @@
   }
 }
 
-@container (max-height: 399px) {
+@container (max-height: 519px) {
   .pool {
     display: none;
   }

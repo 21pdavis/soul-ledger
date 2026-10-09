@@ -9,7 +9,7 @@ import {
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { clampShare } from "@/story/monogram";
-import { MonogramTile } from "../MonogramTile";
+import { HeroTile } from "../HeroTile";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
@@ -79,7 +79,7 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
                   animate={playing}
                   className={styles.row}
                 >
-                  <MonogramTile heroId={h.heroId} />
+                  <HeroTile heroId={h.heroId} />
                   <div className={styles.who}>
                     <p className={styles.heroName}>{heroName(h.heroId)}</p>
                     <p className={styles.meta}>

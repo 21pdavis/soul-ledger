@@ -4,10 +4,13 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Added
+
+- **Real hero art.** Your main hero and your roster now show the hero’s own artwork instead of initials (heroes without art still show initials). The footer also says that Valve and its properties are trademarks of Valve Corporation, and that this is a non-commercial fan project not affiliated with Valve.
+
 ### Changed
 
-- **Heroes now show their real artwork** in the roster, main hero and summary card instead of letter badges. If a picture can't load, the letter badge appears instead.
-- **Your recent form now shows next to your all-time win rate.** The main hero and roster slides show your win rate over your last 300 matches (last 50 per hero) beside the all-time number, with an arrow when you have moved 3 points or more, so early games no longer hide how good you are now.
+- **Your recent form now shows next to your all-time win rate.** The main hero and roster slides show your win rate over your last 300 matches (last 20 per hero) beside the all-time number, with an arrow when you have moved 3 points or more, so early games no longer hide how good you are now.
 - The final shareable card now shows your hero pool: your five most-played heroes with their win rates, plus how many heroes you have played.
 - On desktop the story is now a real vertical page: the slides are wide cards stacked down the screen, scrolling down moves to the next card, and there is breathing room above and on both sides. The progress bar runs down the right edge. Phones are unchanged.
 - **You are a parry king from 40%, not 60%.** Landing 40% or more of your parries now earns the king badge; only below that are you a clown.

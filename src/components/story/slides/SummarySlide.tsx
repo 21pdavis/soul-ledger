@@ -6,7 +6,7 @@ import {
   summaryRows,
 } from "@/story/copy";
 import { basedOnMatches } from "@/story/window-label";
-import { MonogramTile } from "../MonogramTile";
+import { HeroTile } from "../HeroTile";
 import { SlideFrame } from "../SlideFrame";
 import { WindowLabel } from "../WindowLabel";
 import type { SlideComponent } from "./contract";
@@ -52,7 +52,7 @@ export const SummarySlide: SlideComponent = ({
               <ul className={styles.heroes} role="list" aria-label={SUMMARY_COPY.heroPoolLabel}>
                 {pool.heroes.map((h) => (
                   <li key={h.heroId} className={styles.hero} title={`${h.name}: ${h.matches}`}>
-                    <MonogramTile heroId={h.heroId} />
+                    <HeroTile heroId={h.heroId} />
                     <span className={styles.heroName}>{h.name}</span>
                     <span className={styles.heroRate}>{h.winRate}</span>
                   </li>

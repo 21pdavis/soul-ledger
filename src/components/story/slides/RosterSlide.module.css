@@ -277,3 +277,12 @@
     width: 4.75rem;
   }
 }
+
+/* The shortest stages (a 320x568 phone with the cached-matches note): the recent-form lines go, the
+   all-time numbers stay (ADR 0064). */
+@container (max-height: 419px) {
+  .overall,
+  .recent {
+    display: none;
+  }
+}

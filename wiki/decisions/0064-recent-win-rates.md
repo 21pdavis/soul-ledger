@@ -1,22 +1,24 @@
 ---
 type: Decision Record
-title: "0063: Show recent win rates next to all-time"
-description: "The main and roster slides show the all-time win rate beside a recent one (latest 300 matches overall, latest 50 per hero), with an arrow when they differ by 3 points or more."
+title: "0064: Show recent win rates next to all-time"
+description: "The main and roster slides show the all-time win rate beside a recent one (latest 300 matches overall, latest 20 per hero), with an arrow when they differ by 3 points or more."
 tags: [m2, story, stats, win-rate]
 status: stable
 decision: accepted
-decided_on: 2026-10-08
+decided_on: 2026-10-09
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T19:30:00Z }
 ---
 
 # Decision
+
+The per-hero window was 50 when first built (2026-10-08). On 2026-10-09 the owner said "last 20 matches on the hero is fine", so it is 20; the overall window stays 300.
 
 The owner improves over time, so early games drag the all-time win rate down. Every match is stored (`player_matches`), so no API change is needed.
 
 | | Rule |
 |---|---|
 | Overall recent | The player's latest 300 counted matches (by start time) |
-| Per hero recent (main, top heroes) | That hero's latest 50 matches |
+| Per hero recent (main, top heroes) | That hero's latest 20 matches |
 | Shown only when | The player (or hero) has more matches than the window, so the recent figure is a real subset |
 | Arrow | Up or down when recent differs from all-time by 3 points or more, none otherwise |
 | Where | `RECENT_MATCHES` and `RECENT_HERO_MATCHES` in `src/lib/stats/story.ts`; copy in `src/story/copy.ts` (`recentTrend`) |

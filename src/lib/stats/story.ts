@@ -8,10 +8,10 @@ export const ONE_TRICK_SHARE = 0.5;
 export const PARRY_KING_RATE = 0.4;
 /** Fewest main-hero matches before we rank against that hero's players. */
 export const MIN_HERO_SAMPLE = 10;
-/** "Recent" overall = the player's latest 300 matches (ADR 0063). */
+/** "Recent" overall = the player's latest 300 matches (ADR 0064). */
 export const RECENT_MATCHES = 300;
-/** "Recent" per hero = that hero's latest 50 matches (ADR 0063). */
-export const RECENT_HERO_MATCHES = 50;
+/** "Recent" per hero = that hero's latest 20 matches (ADR 0064). */
+export const RECENT_HERO_MATCHES = 20;
 
 /** Win rate over the latest `window` rows; null unless the player has more than that many. */
 export interface RecentRate {

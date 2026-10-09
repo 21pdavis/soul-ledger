@@ -1,6 +1,8 @@
 name: CI
 
 # One run per change (ADR 0047): PRs, plus pushes to the long-lived branches.
+# Two depths (ADR 0063): a PR into staging runs the smoke end-to-end set; anything aimed at main
+# (the staging -> main PR, and pushes to main) runs the full suite with coverage.
 on:
   pull_request:
   push:
@@ -22,6 +24,11 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
         run: |
+          if [ "${{ github.base_ref }}" = "main" ] || [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "full=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "full=false" >> "$GITHUB_OUTPUT"
+          fi
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
@@ -58,15 +65,25 @@ jobs:
 
       # Integration tests use in-process PGlite, so no database service is needed.
       - name: Unit and integration tests
-        if: steps.changes.outputs.code == 'true'
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full != 'true'
         run: pnpm test
+
+      - name: Unit and integration tests with coverage (full)
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full == 'true'
+        run: pnpm test:coverage
 
       - name: Install Playwright browser
         if: steps.changes.outputs.code == 'true'
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: End-to-end tests (phone and desktop)
-        if: steps.changes.outputs.code == 'true'
+      # Smoke: every spec except the worst-case slide-fit matrix, which keeps its tightest phone size
+      # (360x640). The rest of that matrix runs in the full suite.
+      - name: End-to-end tests, smoke (phone and desktop)
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full != 'true'
+        run: pnpm test:e2e:smoke
+
+      - name: End-to-end tests, full (phone and desktop)
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full == 'true'
         run: pnpm test:e2e
 
       - uses: actions/upload-artifact@v4

@@ -1,8 +1,12 @@
 # Directory Update Log
 
+## 2026-10-09
+* **Decision**: [ADR 0063](decisions/0063-two-depth-ci.md): CI runs a smoke browser set on PRs into `staging` and the full suite with coverage only on the `staging` to `main` PR and pushes to `main`. Prompted by 11 to 12 minute CI runs.
+
 ## 2026-10-08
-* **Decision**: [ADR 0064](decisions/0064-hero-art-on-staging.md): the owner approved hotlinked deadlock-api hero images on hero tiles, staging included (supersedes the no-Valve-art parts of ADRs 0051 and 0053 for hero images only); the monogram stays as fallback. Closes the [hero art question](open-questions/m2-hero-art-terms.md).
-* **Decision**: [ADR 0063](decisions/0063-recent-win-rates.md): main and roster slides show a recent win rate (latest 300 matches overall, latest 50 per hero) beside all-time, with an arrow at a 3-point gap.
+* **Decision**: [ADR 0065](decisions/0065-hero-art-served-locally.md): the owner approved hotlinked deadlock-api hero images on hero tiles, staging included (supersedes the no-Valve-art parts of ADRs 0051 and 0053 for hero images only); the monogram stays as fallback. Closes the [hero art question](open-questions/m2-hero-art-terms.md).
+* **Decision**: [ADR 0064](decisions/0064-recent-win-rates.md): main and roster slides show a recent win rate (latest 300 matches overall, latest 50 per hero) beside all-time, with an arrow at a 3-point gap.
+* **Research**: [Valve match files and the Steam cache](research/valve-match-files-and-steam-cache.md): a local experiment showed match files can be downloaded from Valve with a match ID and salt from Steam's cache, but the cache holds only recent matches (5 in the owner's), so it can't give full history. The owner scrapped the feature; terms of use unknown.
 * **Decision**: [ADR 0062](decisions/0062-desktop-vertical-card-stack.md): the desktop story becomes a vertical stack of wide cards with a vertical progress rail, replacing the pinned 9:16 column (refines ADR 0050; phone unchanged).
 * **Decision**: [ADR 0061](decisions/0061-parry-king-at-40-percent.md): the owner lowered the parry-king line to 40% (a 40%-or-better parrier is not a clown), superseding the parry row of ADR 0040.
 * **Decision**: [ADR 0014](decisions/0014-staged-loading.md) amended: the loader also gets `status` events (contacting, batch left, rate-limit wait, finishing), a note that is never empty, and a 20 s stall message with a retry. A lookup that sat on a blank screen for over a minute was silent between the history event and the first details batch, with no sign of rate-limit waits.

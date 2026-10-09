@@ -268,7 +268,7 @@ describe("computeStory edge cases", () => {
   });
 });
 
-describe("recent win rates (ADR 0063)", () => {
+describe("recent win rates (ADR 0064)", () => {
   /** n matches of one hero, oldest first; the first `lost` are losses, the rest wins. */
   const synth = (heroId: number, n: number, lost: number, startAt = 0): PlayerMatch[] =>
     Array.from({ length: n }, (_, i) => ({
@@ -291,14 +291,14 @@ describe("recent win rates (ADR 0063)", () => {
     expect(run(synth(1, 300, 100)).roster.recent).toBeNull();
   });
 
-  it("main recent = the hero's latest 50 matches, null at 50 or fewer", () => {
-    expect(run(synth(1, 80, 30)).main?.recent).toEqual({ matches: 50, winRate: 1 });
-    expect(run(synth(1, 50, 30)).main?.recent).toBeNull();
+  it("main recent = the hero's latest 20 matches, null at 20 or fewer", () => {
+    expect(run(synth(1, 80, 30)).main?.recent).toEqual({ matches: 20, winRate: 1 });
+    expect(run(synth(1, 20, 10)).main?.recent).toBeNull();
   });
 
-  it("top heroes carry their own recent 50", () => {
+  it("top heroes carry their own recent 20", () => {
     const s = run([...synth(1, 80, 30), ...synth(2, 60, 60, 100)]);
-    expect(s.roster.topHeroes[0].recent).toEqual({ matches: 50, winRate: 1 });
-    expect(s.roster.topHeroes[1].recent).toEqual({ matches: 50, winRate: 0 });
+    expect(s.roster.topHeroes[0].recent).toEqual({ matches: 20, winRate: 1 });
+    expect(s.roster.topHeroes[1].recent).toEqual({ matches: 20, winRate: 0 });
   });
 });

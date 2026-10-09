@@ -1,35 +1,34 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { MonogramTile } from "@/components/story/MonogramTile";
-import { heroImageUrl } from "@/story/hero-images";
+import { HeroTile } from "@/components/story/HeroTile";
 
-describe("hero art on tiles (ADR 0064)", () => {
-  it("maps a known hero id to a deadlock-api image and an unknown one to null", () => {
-    expect(heroImageUrl(1)).toBe(
-      "https://assets-bucket.deadlock-api.com/assets-api-res/images/heroes/inferno_sm.webp",
-    );
-    expect(heroImageUrl(99999)).toBeNull();
+describe("HeroTile", () => {
+  it("shows the hero card art at the large size", () => {
+    const { container } = render(<HeroTile heroId={1} size="lg" />);
+    expect(container.querySelector("img")).toHaveAttribute("src", "/heroes/1-card.webp");
   });
 
-  it("shows the hero image as decorative art (the name sits beside it) over the monogram", () => {
-    const { container } = render(<MonogramTile heroId={1} />);
-    const img = container.querySelector("img");
-    expect(img).not.toBeNull();
-    expect(img?.getAttribute("src")).toBe(heroImageUrl(1));
-    expect(img?.getAttribute("alt")).toBe("");
-    expect(container.textContent).toContain("IN");
+  it("shows the small icon at the small size", () => {
+    const { container } = render(<HeroTile heroId={1} />);
+    expect(container.querySelector("img")).toHaveAttribute("src", "/heroes/1-sm.webp");
   });
 
-  it("drops the image and keeps the monogram when the image fails", () => {
-    const { container } = render(<MonogramTile heroId={1} />);
+  it("is decorative: the hero name always sits next to it as text", () => {
+    const { container } = render(<HeroTile heroId={1} />);
+    expect(container.querySelector("img")).toHaveAttribute("alt", "");
+  });
+
+  it("falls back to the monogram tile when the image fails to load", () => {
+    const { container } = render(<HeroTile heroId={1} />);
     fireEvent.error(container.querySelector("img")!);
     expect(container.querySelector("img")).toBeNull();
-    expect(container.textContent).toContain("IN");
+    expect(container.textContent).toBe("IN");
   });
 
-  it("uses only the monogram for a hero with no image", () => {
-    const { container } = render(<MonogramTile heroId={99999} />);
-    expect(container.querySelector("img")).toBeNull();
-    expect(container.textContent).toBe("?");
+  it("tries the art again when it is shown for a different hero", () => {
+    const { container, rerender } = render(<HeroTile heroId={1} />);
+    fireEvent.error(container.querySelector("img")!);
+    rerender(<HeroTile heroId={2} />);
+    expect(container.querySelector("img")).toHaveAttribute("src", "/heroes/2-sm.webp");
   });
 });

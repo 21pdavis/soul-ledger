@@ -51,13 +51,11 @@
   letter-spacing: 0.02em;
 }
 
-/* Hero art covers the monogram inside the same octagon; the monogram shows through until it loads. */
+/* Hero art fills the octagon, cropped to its centre. */
 .art {
   position: absolute;
-  inset: 2px;
-  width: calc(100% - 4px);
-  height: calc(100% - 4px);
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  clip-path: var(--octagon);
-  background: var(--ink);
 }

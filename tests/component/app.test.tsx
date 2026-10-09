@@ -11,6 +11,9 @@ describe("App flow", () => {
   it("starts on the entry screen, with the Valve disclaimer", () => {
     setup();
     expect(screen.getByLabelText("Paste your Steam profile URL")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Valve and its properties are trademarks of Valve Corporation/),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Not affiliated with or endorsed by Valve/)).toBeInTheDocument();
   });
 
