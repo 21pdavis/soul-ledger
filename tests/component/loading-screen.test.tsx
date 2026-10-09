@@ -96,6 +96,12 @@ describe("LoadingScreen", () => {
     expect(screen.getByText("Gaben")).toBeInTheDocument();
   });
 
+  it("stage 2 falls back to the initials when a hero’s art fails to load", () => {
+    render(<LoadingScreen progress={[resolved, profile(), history()]} />);
+    fireEvent.error(document.querySelector("ul img")!);
+    expect(screen.getByText("I")).toBeInTheDocument();
+  });
+
   it("stage 2 says how many matches are new on a return visit", () => {
     render(<LoadingScreen progress={[profile(), history({ newMatches: 14 })]} />);
     expect(screen.getByText("120 matches, 14 new to the ledger")).toBeInTheDocument();
