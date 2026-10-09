@@ -1,4 +1,5 @@
 import { MENTIONS_HEADING, headlineFor, mvpCopy, mvpMentions } from "@/story/copy";
+import { HeroArt } from "../HeroTile";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import type { SlideComponent } from "./contract";
@@ -35,9 +36,13 @@ export const MvpSlide: SlideComponent = ({ story, skipAnimation, reducedMotion }
         </SlideReveal>
         <SlideReveal index={2} animate={animate}>
           <div className={styles.scope}>
-            {copy.heroName && (
-              <span className={styles.monogram} data-testid="hero-monogram" aria-hidden="true">
-                {copy.heroName.charAt(0)}
+            {copy.heroName && copy.heroId !== undefined && (
+              <span className={styles.monogram} aria-hidden="true">
+                <HeroArt
+                  heroId={copy.heroId}
+                  className={styles.art}
+                  fallback={copy.heroName.charAt(0)}
+                />
               </span>
             )}
             <p className={styles.scopeLine}>{copy.scopeLine}</p>

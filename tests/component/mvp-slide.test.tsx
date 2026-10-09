@@ -53,13 +53,13 @@ describe("MvpSlide", () => {
     expect(screen.getByText("of Infernus players")).toBeInTheDocument();
   });
 
-  it("uses the hero name for the hero scope and shows a monogram tile for it", () => {
+  it("uses the hero name for the hero scope and shows that hero’s art", () => {
     renderMvp(
       fixtureStory({ mvp: { ...stat("melee", "Melee kills", 3), scope: "hero", heroId: 10 } }),
       { reducedMotion: true },
     );
     expect(screen.getByText("of Paradox players")).toBeInTheDocument();
-    expect(screen.getByTestId("hero-monogram")).toHaveTextContent("P");
+    expect(document.querySelector('img[src="/heroes/10-sm.webp"]')).not.toBeNull();
   });
 
   it("for the global scope, never mentions a hero", () => {
@@ -72,7 +72,7 @@ describe("MvpSlide", () => {
     expect(screen.getByText("Top 4%")).toBeInTheDocument();
     expect(screen.getByText("of all players")).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/Infernus|Hero #/);
-    expect(screen.queryByTestId("hero-monogram")).not.toBeInTheDocument();
+    expect(document.querySelector("img")).toBeNull();
   });
 
   it("shows the best global stat with neutral copy when the signature stat is above 50", () => {
@@ -89,7 +89,7 @@ describe("MvpSlide", () => {
     expect(screen.getByText("Top 58%")).toBeInTheDocument();
     expect(screen.getByText("of all players")).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/Infernus|Hero #|Deaths/);
-    expect(screen.queryByTestId("hero-monogram")).not.toBeInTheDocument();
+    expect(document.querySelector("img")).toBeNull();
   });
 
   it("shows honorable mentions under the signature stat, as DOM text", () => {

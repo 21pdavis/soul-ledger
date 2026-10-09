@@ -1,6 +1,6 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { HeroTile } from "@/components/story/HeroTile";
+import { HeroArt, HeroTile } from "@/components/story/HeroTile";
 
 describe("HeroTile", () => {
   it("shows the hero card art at the large size", () => {
@@ -30,5 +30,11 @@ describe("HeroTile", () => {
     fireEvent.error(container.querySelector("img")!);
     rerender(<HeroTile heroId={2} />);
     expect(container.querySelector("img")).toHaveAttribute("src", "/heroes/2-sm.webp");
+  });
+
+  it("HeroArt shows its own fallback when the image fails", () => {
+    const { container } = render(<HeroArt heroId={1} size="sm" fallback={<b>fallback</b>} />);
+    fireEvent.error(container.querySelector("img")!);
+    expect(container.textContent).toBe("fallback");
   });
 });

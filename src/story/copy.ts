@@ -444,6 +444,7 @@ export type MvpCopy =
       flavor: string;
       /** Set for the hero scope only. */
       heroName?: string;
+      heroId?: number;
     }
   | { kind: "none"; line: string };
 
@@ -464,7 +465,13 @@ export function mvpCopy({ mvp, percentiles }: Pick<StoryData, "mvp" | "percentil
     };
     if (mvp.scope === "hero") {
       const hero = heroName(mvp.heroId);
-      return { kind: "hero", ...shared, scopeLine: `of ${hero} players`, heroName: hero };
+      return {
+        kind: "hero",
+        ...shared,
+        scopeLine: `of ${hero} players`,
+        heroName: hero,
+        heroId: mvp.heroId,
+      };
     }
     return { kind: "global", ...shared, scopeLine: "of all players" };
   }

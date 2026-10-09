@@ -81,13 +81,17 @@ describe("LoadingScreen", () => {
     expect(document.querySelector("img")).toBeNull();
   });
 
-  it("stage 2: shows the match count and a monogram tile per hero", () => {
+  it("stage 2: shows the match count and the art of each hero", () => {
     render(<LoadingScreen progress={[resolved, profile(), history()]} />);
     expect(screen.getByText("120 matches on the books")).toBeInTheDocument();
     const heroes = within(screen.getByRole("list", { name: "Heroes you have played" }));
     expect(heroes.getAllByRole("listitem")).toHaveLength(3);
     expect(heroes.getByText("Infernus")).toBeInTheDocument();
-    expect(heroes.getByText("MK")).toBeInTheDocument();
+    expect([...document.querySelectorAll("ul img")].map((i) => i.getAttribute("src"))).toEqual([
+      "/heroes/1-sm.webp",
+      "/heroes/2-sm.webp",
+      "/heroes/18-sm.webp",
+    ]);
     // The earlier stage stays on the page.
     expect(screen.getByText("Gaben")).toBeInTheDocument();
   });

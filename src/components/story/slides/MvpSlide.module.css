@@ -49,7 +49,7 @@
   color: var(--bone);
 }
 
-/* A placeholder for hero art (ADR 0051): a diamond tile with the hero's initial. */
+/* A diamond tile with the hero's art, or their initial if the art is missing (ADR 0060). */
 .monogram {
   display: grid;
   place-items: center;
@@ -61,6 +61,13 @@
   font-family: var(--font-display);
   font-size: 0.95rem;
   color: var(--brass);
+  overflow: hidden;
+}
+
+.art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .flavor {
