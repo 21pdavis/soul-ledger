@@ -6,6 +6,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Added
 
+- **Recent win rate.** Under your main hero’s win rate you now also see your win rate over your last 20 matches on that hero (shown once you have played the hero more than 20 times).
 - **Hero art everywhere.** The hero art now also appears next to your signature stat and on the loading screen, not just on your main hero and roster.
 - **Real hero art.** Your main hero and your roster now show the hero’s own artwork instead of initials (heroes without art still show initials). The footer also says that Valve and its properties are trademarks of Valve Corporation, and that this is a non-commercial fan project not affiliated with Valve.
 

@@ -41,6 +41,12 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
                 {...count}
               />{" "}
               <span className={styles.unit}>{MAIN_COPY.winRate}</span>
+              {main.recent && (
+                <span data-testid="main-recent-winrate" className={styles.recent}>
+                  {formatPercent(main.recent.winRate)}{" "}
+                  {MAIN_COPY.recentWinRate(main.recent.matches)}
+                </span>
+              )}
             </p>
           </SlideReveal>
 

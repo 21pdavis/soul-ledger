@@ -187,6 +187,8 @@ export const INTRO_COPY = {
 export const MAIN_COPY = {
   mostPlayed: "Your most-played hero",
   winRate: "win rate",
+  /** The win rate over the newest n matches on the hero (ADR 0064). */
+  recentWinRate: (n: number) => `in the last ${n} matches`,
 } as const;
 
 export const ROSTER_COPY = {

@@ -58,6 +58,12 @@
   color: var(--bone-muted);
 }
 
+/* The recent win rate: a quieter second line under the overall one. */
+.recent {
+  font-size: 0.9rem;
+  color: var(--bone-muted);
+}
+
 /* The percentile, inked on like a ledger stamp. */
 .stamp {
   display: inline-block;

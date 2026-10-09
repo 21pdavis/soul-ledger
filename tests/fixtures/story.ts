@@ -34,6 +34,7 @@ export function fixtureStory(overrides: Partial<StoryData> = {}): StoryData {
       matches: 50,
       wins: 30,
       winRate: 0.6,
+      recent: { matches: 20, wins: 14, winRate: 0.7 },
       share: 0.42,
       percentiles: [pct("kills", "Kills per match", 12)],
     },

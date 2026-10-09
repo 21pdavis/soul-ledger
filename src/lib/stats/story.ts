@@ -9,6 +9,9 @@ export const PARRY_KING_RATE = 0.4;
 /** Fewest main-hero matches before we rank against that hero's players. */
 export const MIN_HERO_SAMPLE = 10;
 
+/** How many of the newest matches on the main hero the "recent" win rate covers (ADR 0064). */
+export const RECENT_MATCHES = 20;
+
 export interface RankPoint {
   at: Date;
   matchId: number;
@@ -39,6 +42,8 @@ export interface Story {
     matches: number;
     wins: number;
     winRate: number;
+    /** Win rate over the newest RECENT_MATCHES on this hero; null when the hero has no more than that, since it would repeat winRate. */
+    recent: { matches: number; wins: number; winRate: number } | null;
     share: number;
     /** Ranked against players of the same hero; empty below MIN_HERO_SAMPLE matches. */
     percentiles: PercentileResult[];
@@ -105,6 +110,16 @@ export function rankHeroes(rows: PlayerMatch[]) {
     .sort((a, b) => b.matches - a.matches || b.wins - a.wins);
 }
 
+/** The newest RECENT_MATCHES of a hero’s rows, or null when there are no more than that. */
+function recentForm(heroRows: PlayerMatch[]) {
+  if (heroRows.length <= RECENT_MATCHES) return null;
+  const newest = [...heroRows]
+    .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+    .slice(0, RECENT_MATCHES);
+  const wins = newest.filter((r) => r.won).length;
+  return { matches: newest.length, wins, winRate: wins / newest.length };
+}
+
 export function computeStory(input: StoryInput): Story {
   const rows = countedMatches(input.matches);
   const total = (f: (r: PlayerMatch) => number) => rows.reduce((s, r) => s + f(r), 0);
@@ -122,6 +137,7 @@ export function computeStory(input: StoryInput): Story {
         matches: top.matches,
         wins: top.wins,
         winRate: rate(top.wins, top.matches),
+        recent: recentForm(top.rows),
         share: rate(top.matches, rows.length),
         percentiles:
           top.matches >= MIN_HERO_SAMPLE ? comparePlayer(top.rows, input.mainHeroMetrics) : [],

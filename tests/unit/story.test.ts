@@ -141,6 +141,35 @@ function row(overrides: Partial<PlayerMatch>): PlayerMatch {
 }
 
 describe("computeStory edge cases", () => {
+  const day = (i: number) => new Date(Date.UTC(2026, 0, 1 + i));
+  const story20 = (rows: PlayerMatch[]) =>
+    computeStory({ matches: rows, rankHistory: [], globalMetrics: {}, mainHeroMetrics: {} });
+
+  it("main.recent: win rate over the newest 20 matches on the main hero, whatever order they arrive in", () => {
+    // 25 matches on hero 1: the oldest 5 are losses, of the newest 20 the last 5 are losses.
+    const rows = Array.from({ length: 25 }, (_, i) =>
+      row({ matchId: i, heroId: 1, startTime: day(i), won: i >= 5 && i < 20 }),
+    );
+    const s = story20([...rows].reverse());
+    expect(s.main!.recent).toEqual({ matches: 20, wins: 15, winRate: 0.75 });
+  });
+
+  it("main.recent ignores matches on other heroes", () => {
+    const hero1 = Array.from({ length: 21 }, (_, i) =>
+      row({ matchId: i, heroId: 1, startTime: day(i), won: true }),
+    );
+    const other = Array.from({ length: 5 }, (_, i) =>
+      row({ matchId: 100 + i, heroId: 2, startTime: day(100 + i), won: false }),
+    );
+    expect(story20([...hero1, ...other]).main!.recent).toMatchObject({ matches: 20, winRate: 1 });
+  });
+
+  it("main.recent is null when the hero has 20 or fewer matches (it would repeat the overall rate)", () => {
+    const rows = Array.from({ length: 20 }, (_, i) =>
+      row({ matchId: i, heroId: 1, startTime: day(i) }),
+    );
+    expect(story20(rows).main!.recent).toBeNull();
+  });
   it.each([
     [5, "one-trick"],
     [4, "flex"],

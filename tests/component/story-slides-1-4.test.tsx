@@ -142,6 +142,18 @@ describe("slide 2: Your main", () => {
     expect(screen.getByTestId("main-winrate")).toHaveTextContent("60%");
   });
 
+  it("shows the win rate over the last 20 matches on the hero, next to the overall one", () => {
+    show(MainSlide);
+    expect(screen.getByTestId("main-recent-winrate")).toHaveTextContent("70%");
+    expect(screen.getByTestId("main-recent-winrate")).toHaveTextContent("last 20 matches");
+  });
+
+  it("leaves the recent win rate out when the hero has no more than 20 matches", () => {
+    show(MainSlide, { story: { main: { ...fixtureStory().main!, recent: null } } });
+    expect(screen.queryByTestId("main-recent-winrate")).not.toBeInTheDocument();
+    expect(screen.getByTestId("main-winrate")).toHaveTextContent("60%");
+  });
+
   it("falls back to 'Hero #id' for an unknown hero", () => {
     show(MainSlide, { story: { main: { ...fixtureStory().main!, heroId: 999 } } });
     expect(screen.getByText("Hero #999")).toBeInTheDocument();
