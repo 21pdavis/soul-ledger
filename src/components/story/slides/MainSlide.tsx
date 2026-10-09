@@ -1,7 +1,7 @@
 import { MAIN_COPY, headlineFor, mainPercentileLine, matchesUnit } from "@/story/copy";
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
-import { MonogramTile } from "../MonogramTile";
+import { HeroTile } from "../HeroTile";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
@@ -21,7 +21,7 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
       {main && (
         <div className={styles.slide}>
           <SlideReveal index={0} animate={playing} kind="stamp" className={styles.hero}>
-            <MonogramTile heroId={main.heroId} size="lg" />
+            <HeroTile heroId={main.heroId} size="lg" />
             <div>
               <p className={styles.name}>{heroName(main.heroId)}</p>
               <p className={styles.caption}>{MAIN_COPY.mostPlayed}</p>
