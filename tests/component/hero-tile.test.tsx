@@ -24,4 +24,11 @@ describe("HeroTile", () => {
     expect(container.querySelector("img")).toBeNull();
     expect(container.textContent).toBe("IN");
   });
+
+  it("tries the art again when it is shown for a different hero", () => {
+    const { container, rerender } = render(<HeroTile heroId={1} />);
+    fireEvent.error(container.querySelector("img")!);
+    rerender(<HeroTile heroId={2} />);
+    expect(container.querySelector("img")).toHaveAttribute("src", "/heroes/2-sm.webp");
+  });
 });

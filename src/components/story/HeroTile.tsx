@@ -16,17 +16,13 @@ interface Props {
  * get the monogram tile instead.
  */
 export function HeroTile({ heroId, size = "sm" }: Props) {
-  const [failed, setFailed] = useState(false);
-  if (failed) return <MonogramTile heroId={heroId} size={size} />;
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const src = `/heroes/${heroId}-${size === "lg" ? "card" : "sm"}.webp`;
+  if (failedSrc === src) return <MonogramTile heroId={heroId} size={size} />;
   return (
     <span className={styles.tile} data-size={size} aria-hidden="true">
       {/* eslint-disable-next-line @next/next/no-img-element -- fixed-size local webp files */}
-      <img
-        className={styles.art}
-        src={`/heroes/${heroId}-${size === "lg" ? "card" : "sm"}.webp`}
-        alt=""
-        onError={() => setFailed(true)}
-      />
+      <img className={styles.art} src={src} alt="" onError={() => setFailedSrc(src)} />
     </span>
   );
 }

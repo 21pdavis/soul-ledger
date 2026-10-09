@@ -8,10 +8,6 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 - **Real hero art.** Your main hero and your roster now show the hero’s own artwork instead of initials (heroes without art still show initials). The footer also says that Valve and its properties are trademarks of Valve Corporation, and that this is a non-commercial fan project not affiliated with Valve.
 
-### Added
-
-- **Real hero art.** Your main hero and your roster now show the hero’s own artwork instead of initials (heroes without art still show initials). The footer also says that Valve and its properties are trademarks of Valve Corporation, and that this is a non-commercial fan project not affiliated with Valve.
-
 ### Changed
 
 - On desktop the story is now a real vertical page: the slides are wide cards stacked down the screen, scrolling down moves to the next card, and there is breathing room above and on both sides. The progress bar runs down the right edge. Phones are unchanged.
