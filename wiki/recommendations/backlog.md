@@ -24,7 +24,6 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P2 | Pre-warm popular accounts off-peak | [ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md) |
 | P2 | In-app What's new page (`/changelog`) rendering `CHANGELOG.md` | [ADR 0041](../decisions/0041-changelog-and-releases.md) |
 | P1 | Check what accolade 11 (breakables) includes. The unspent-souls stat was dropped on 2026-10-08 ([ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md)) | [bulk metadata](../research/bulk-match-metadata.md) |
-| P1 | Add a visible footer disclaimer: "Not affiliated with or endorsed by Valve. Valve and its properties are trademarks of Valve Corporation." Needed before hero art ships; keep art removal quick | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P1 | Replace monogram tiles with deadlock-api hero images | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P2 | Remove the unspent-souls code path (`SHOW_UNSPENT_SOULS_FIGURE`, roast copy); keep the DB column and parsing | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P2 | Big visual style pass (fonts, look) after M3 or later | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |

@@ -49,7 +49,7 @@ export const ENTRY_COPY = {
   submit: "Open the ledger",
   invalidInput: "That doesn't look like a Steam profile URL.",
   disclaimer:
-    "Non-commercial fan project. Not affiliated with or endorsed by Valve. Deadlock is a trademark of Valve Corporation.",
+    "Non-commercial fan project. Not affiliated with or endorsed by Valve. Valve and its properties are trademarks of Valve Corporation.",
 } as const;
 
 const count = (n: number) => n.toLocaleString("en-US");
