@@ -110,6 +110,25 @@
   width: 7rem;
 }
 
+.overall {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--bone);
+}
+
+.overall[data-trend="up"],
+.recent[data-trend="up"] {
+  color: var(--green);
+}
+
+.recent {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--bone);
+}
+
 .track {
   display: block;
   height: 4px;
@@ -256,5 +275,14 @@
 
   .rate {
     width: 4.75rem;
+  }
+}
+
+/* The shortest stages (a 320x568 phone with the cached-matches note): the recent-form lines go, the
+   all-time numbers stay (ADR 0064). */
+@container (max-height: 419px) {
+  .overall,
+  .recent {
+    display: none;
   }
 }

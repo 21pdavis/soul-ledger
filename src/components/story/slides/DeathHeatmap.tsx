@@ -1,5 +1,6 @@
 import { useId } from "react";
 import type { DeathBins, HotCell } from "@/story/death-bins";
+import { DeadlockMap } from "./DeadlockMap";
 import styles from "./RoastSlide.module.css";
 
 const VIEW = 240;
@@ -13,9 +14,9 @@ interface Props {
 }
 
 /**
- * An SVG density plot of where the player died, on an abstract deco frame (no map, ADR 0053).
- * Brighter brass means more deaths; the hottest cell gets a green ring. Row 0 of the bins is the
- * lowest y, so rows are drawn bottom-up.
+ * An SVG density plot of where the player died, glowing over a stylised Deadlock map (ADR 0053
+ * said no map; the owner asked for one after M2). Brighter brass means more deaths; the hottest
+ * cell gets a green ring. Row 0 of the bins is the lowest y, so rows are drawn bottom-up.
  */
 export function DeathHeatmap({ bins, hot, still }: Props) {
   const id = useId();
@@ -36,6 +37,11 @@ export function DeathHeatmap({ bins, hot, still }: Props) {
       aria-labelledby={`${id}-title`}
       aria-describedby={`${id}-desc`}
     >
+      <defs>
+        <filter id={`${id}-glow`} x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="0.9" />
+        </filter>
+      </defs>
       <title id={`${id}-title`}>Where you died</title>
       <desc id={`${id}-desc`}>
         {`${bins.total} ${bins.total === 1 ? "death" : "deaths"} plotted on a ${bins.cols} by ${bins.rows} grid. Hottest spot: ${hot.count} ${hot.count === 1 ? "death" : "deaths"} in one cell.`}
@@ -57,15 +63,7 @@ export function DeathHeatmap({ bins, hot, still }: Props) {
         />
       ))}
 
-      {/* The faint lattice every cell sits on. */}
-      <g className={styles.lattice} aria-hidden="true">
-        {Array.from({ length: bins.cols + 1 }, (_, c) => (
-          <line key={`v${c}`} x1={PAD + c * cell} y1={PAD} x2={PAD + c * cell} y2={VIEW - PAD} />
-        ))}
-        {Array.from({ length: bins.rows + 1 }, (_, r) => (
-          <line key={`h${r}`} x1={PAD} y1={PAD + r * rowH} x2={VIEW - PAD} y2={PAD + r * rowH} />
-        ))}
-      </g>
+      <DeadlockMap />
 
       <g aria-hidden="true">
         {cells.map(({ col, row, count }) => (
@@ -77,6 +75,7 @@ export function DeathHeatmap({ bins, hot, still }: Props) {
             width={cell - 2}
             height={rowH - 2}
             className={styles.heat}
+            filter={`url(#${id}-glow)`}
             fillOpacity={0.18 + 0.72 * Math.sqrt(count / hot.count)}
           />
         ))}

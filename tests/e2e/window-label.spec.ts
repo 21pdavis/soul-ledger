@@ -10,7 +10,8 @@ async function openStory(page: Page, over: Record<string, unknown>) {
   await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "intro");
 }
 
-const intro = (page: Page) => page.getByRole("region", { name: "Welcome back to the Cursed City" });
+const intro = (page: Page) =>
+  page.getByRole("region", { name: "Welcome back to the Cursed Apple" });
 
 test("an all-time story says 'All time' on slide 1, with the matches line", async ({ page }) => {
   await openStory(page, { window: "all", patchStart: null });

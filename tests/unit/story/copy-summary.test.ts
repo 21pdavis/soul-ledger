@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { summaryRows, topStat } from "@/story/copy";
+import { summaryHeroPool, summaryRows, topStat } from "@/story/copy";
 import { fixtureStory } from "../../fixtures/story";
 
 const pct = (label: string, topPercent: number) => ({
@@ -102,5 +102,24 @@ describe("summaryRows", () => {
   it("omits the main hero if there is none", () => {
     const rows = summaryRows(fixtureStory({ main: null }));
     expect(rows.map((r) => r.key)).not.toContain("main");
+  });
+});
+
+describe("summaryHeroPool", () => {
+  it("lists the top heroes with matches and win rate, plus the hero count", () => {
+    const pool = summaryHeroPool(fixtureStory());
+    expect(pool?.caption).toBe("Hero pool: 9 heroes");
+    expect(pool?.heroes).toHaveLength(5);
+    expect(pool?.heroes[0]).toMatchObject({
+      heroId: 1,
+      matches: "50 matches",
+      winRate: "60% wins",
+    });
+  });
+
+  it("is null when there are no heroes", () => {
+    const story = fixtureStory();
+    story.roster.topHeroes = [];
+    expect(summaryHeroPool(story)).toBeNull();
   });
 });

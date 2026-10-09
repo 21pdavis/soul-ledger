@@ -1,7 +1,15 @@
-import { MAIN_COPY, headlineFor, mainPercentileLine, matchesUnit } from "@/story/copy";
+import {
+  MAIN_COPY,
+  RECENT_COPY,
+  headlineFor,
+  mainPercentileLine,
+  matchesUnit,
+  recentTrend,
+} from "@/story/copy";
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { HeroTile } from "../HeroTile";
+import { TrendArrow } from "../TrendArrow";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
@@ -15,6 +23,7 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
   const count = { reducedMotion, skipAnimation, paused };
   // `main` is only null with zero matches, when the story never mounts; render the frame anyway.
   const line = main ? mainPercentileLine(main, story.percentiles) : null;
+  const trend = main ? recentTrend(main.winRate, main.recent) : null;
 
   return (
     <SlideFrame headline={headlineFor("main")}>
@@ -41,6 +50,16 @@ export const MainSlide: SlideComponent = ({ story, skipAnimation, reducedMotion,
                 {...count}
               />{" "}
               <span className={styles.unit}>{MAIN_COPY.winRate}</span>
+              {trend && (
+                <span
+                  className={styles.recent}
+                  data-testid="main-recent"
+                  data-trend={trend.direction}
+                >
+                  {RECENT_COPY.label} {trend.recent} <TrendArrow trend={trend} />
+                  <span className={styles.window}> ({trend.window})</span>
+                </span>
+              )}
             </p>
           </SlideReveal>
 

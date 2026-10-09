@@ -1,6 +1,12 @@
 import type { StoryWindow } from "@/lib/lookup";
 import { PARRY_KING_RATE } from "@/lib/stats/story";
-import { bestPercentile, formatHours, formatPatchDate, formatTopPercent } from "./format";
+import {
+  bestPercentile,
+  formatHours,
+  formatPatchDate,
+  formatPercent,
+  formatTopPercent,
+} from "./format";
 import { heroName } from "./heroes";
 import type { KillType } from "./kill-shares";
 import type { JourneyPoint } from "./rank-journey";
@@ -17,7 +23,7 @@ import type { StoryData } from "./types";
 
 // ==================================================================== Slide headlines
 export const SLIDES = [
-  { id: "intro", headline: "Welcome back to the Cursed City" },
+  { id: "intro", headline: "Welcome back to the Cursed Apple" },
   { id: "main", headline: "Your main" },
   { id: "roster", headline: "Your roster" },
   { id: "scavenger", headline: "Scavenger of the year" },
@@ -179,7 +185,7 @@ export function noMatchesDetails(window: StoryWindow, excludedMatches: number): 
 type PercentileEntry = StoryData["percentiles"][number];
 
 export const INTRO_COPY = {
-  hoursUnit: "hours in the Cursed City",
+  hoursUnit: "hours in the Cursed Apple",
   firstEntry: "First entry",
   latestEntry: "Latest entry",
 } as const;
@@ -189,10 +195,50 @@ export const MAIN_COPY = {
   winRate: "win rate",
 } as const;
 
+/** Win rate over all matches vs the recent ones (ADR 0064). */
+export const RECENT_COPY = {
+  label: "recent",
+  /** Points of difference at which an arrow shows. */
+  arrowPoints: 3,
+  arrow: { up: "▲", down: "▼", flat: "" },
+  arrowLabel: { up: "trending up", down: "trending down", flat: "" },
+  windowHint: (matches: number) => `last ${matches}`,
+} as const;
+
+export interface RecentTrend {
+  direction: "up" | "down" | "flat";
+  allTime: string;
+  recent: string;
+  arrow: string;
+  /** The arrow in words, for screen readers. */
+  arrowLabel: string;
+  window: string;
+}
+
+export function recentTrend(
+  allTimeRate: number,
+  recent: { matches: number; winRate: number } | null,
+): RecentTrend | null {
+  if (!recent) return null;
+  // Compare the percentages as printed, so an arrow never sits beside two numbers under 3 apart.
+  const diff = Math.round(recent.winRate * 100) - Math.round(allTimeRate * 100);
+  const direction =
+    diff >= RECENT_COPY.arrowPoints ? "up" : diff <= -RECENT_COPY.arrowPoints ? "down" : "flat";
+  return {
+    direction,
+    allTime: formatPercent(allTimeRate),
+    recent: formatPercent(recent.winRate),
+    arrow: RECENT_COPY.arrow[direction],
+    arrowLabel: RECENT_COPY.arrowLabel[direction],
+    window: RECENT_COPY.windowHint(recent.matches),
+  };
+}
+
 export const ROSTER_COPY = {
   heroesPlayedUnit: (n: number) => (n === 1 ? "hero played" : "heroes played"),
   topHeroes: "Most played",
   winRate: "win rate",
+  allTime: "All time",
 } as const;
 
 export const SCAVENGER_COPY = {
@@ -542,6 +588,7 @@ export const SUMMARY_COPY = {
   hours: "Hours played",
   main: "Main hero",
   rank: "Current rank",
+  heroPoolLabel: "Your hero pool",
   /** The stamp's text: decorative, so it is hidden from screen readers (the headline says it). */
   stamp: "Entered into the ledger",
 } as const;
@@ -600,4 +647,32 @@ export function summaryRows(story: StoryData): SummaryRow[] {
     rows.push({ key: "rank", label: SUMMARY_COPY.rank, value: rankLabel(story.rank.current) });
   }
   return rows;
+}
+
+export interface SummaryHero {
+  heroId: number;
+  name: string;
+  matches: string;
+  winRate: string;
+}
+
+export interface SummaryHeroPool {
+  caption: string;
+  heroes: SummaryHero[];
+}
+
+/** The most-played heroes for the share card (compact tiles), or null if there are none. */
+export function summaryHeroPool(story: StoryData): SummaryHeroPool | null {
+  const { heroesPlayed, topHeroes } = story.roster;
+  if (topHeroes.length === 0) return null;
+  const count = `${heroesPlayed.toLocaleString("en-US")} ${heroesPlayed === 1 ? "hero" : "heroes"}`;
+  return {
+    caption: `Hero pool: ${count}`,
+    heroes: topHeroes.slice(0, 5).map((h) => ({
+      heroId: h.heroId,
+      name: heroName(h.heroId),
+      matches: `${h.matches.toLocaleString("en-US")} ${matchesUnit(h.matches)}`,
+      winRate: `${formatPercent(h.winRate)} wins`,
+    })),
+  };
 }

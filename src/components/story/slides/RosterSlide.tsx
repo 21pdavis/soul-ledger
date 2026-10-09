@@ -1,8 +1,16 @@
-import { ROSTER_COPY, headlineFor, matchesUnit, rosterVerdict } from "@/story/copy";
+import {
+  RECENT_COPY,
+  ROSTER_COPY,
+  headlineFor,
+  matchesUnit,
+  recentTrend,
+  rosterVerdict,
+} from "@/story/copy";
 import { formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
 import { clampShare } from "@/story/monogram";
 import { HeroTile } from "../HeroTile";
+import { TrendArrow } from "../TrendArrow";
 import { SlideFrame } from "../SlideFrame";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
@@ -18,6 +26,8 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
   const { roster } = story;
   const playing = !reducedMotion && !skipAnimation;
   const verdict = rosterVerdict(roster.label);
+  const heroTrends = roster.topHeroes.map((h) => recentTrend(h.winRate, h.recent));
+  const overall = recentTrend(story.intro.winRate, roster.recent);
   // The slide never scrolls, so the list of top heroes shows as many as the stage has room for.
   const { ref, count: shown } = useFitCount(roster.topHeroes.length, MIN_TOP_HEROES);
 
@@ -44,6 +54,20 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
           <p className={styles.blurb}>{verdict.blurb}</p>
         </SlideReveal>
 
+        {overall && (
+          <SlideReveal index={1} animate={playing}>
+            <p
+              className={styles.overall}
+              data-testid="roster-recent"
+              data-trend={overall.direction}
+            >
+              {ROSTER_COPY.allTime} {overall.allTime} {ROSTER_COPY.winRate} · {RECENT_COPY.label}{" "}
+              {overall.recent} <TrendArrow trend={overall} />{" "}
+              <span className={styles.meta}>({overall.window})</span>
+            </p>
+          </SlideReveal>
+        )}
+
         {roster.topHeroes.length > 0 && (
           <div className={styles.top}>
             <p className={styles.caption}>{ROSTER_COPY.topHeroes}</p>
@@ -62,6 +86,12 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
                     <p className={styles.meta}>
                       {h.matches.toLocaleString("en-US")} {matchesUnit(h.matches)}
                     </p>
+                    {heroTrends[i] && (
+                      <p className={styles.recent} data-trend={heroTrends[i].direction}>
+                        {RECENT_COPY.label} {heroTrends[i].recent}{" "}
+                        <TrendArrow trend={heroTrends[i]} />
+                      </p>
+                    )}
                   </div>
                   <div className={styles.rate}>
                     <p className={styles.meta}>
