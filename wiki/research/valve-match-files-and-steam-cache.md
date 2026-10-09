@@ -15,7 +15,7 @@ sources:
     title: deadlock-api-ingest (scan_cache.rs), read by a research agent 2026-10-08
 ---
 
-A short local experiment (code deleted, never pushed) tested whether the player's own Steam cache could replace deadlock-api. **The owner scrapped it**: the cache only covers recent matches. This page keeps what was learned.
+**Provenance:** the file sizes, hosting, CORS result, decoded match and cache counts below (196 KB, Google Cloud Storage, no CORS, 5 of 1,399 files) come from the owner’s local experiment, which is not reproducible because the code was deleted. Only the cache layout and URL pattern are backed by the deadlock-api-ingest repo. A short local experiment (code deleted, never pushed) tested whether the player's own Steam cache could replace deadlock-api. **The owner scrapped it**: the cache only covers recent matches. This page keeps what was learned.
 
 # Findings
 
@@ -24,11 +24,11 @@ A short local experiment (code deleted, never pushed) tested whether the player'
 - **Format.** bz2-compressed protobuf (`CMsgMatchMetaData`, definitions in SteamDatabase/GameTracking-Deadlock). The experiment decoded one real match (duration, 12 players, winner, kills/deaths/assists).
 - **No CORS headers**, so a browser can't fetch it; it needs a server.
 - **Coverage is the limit.** The owner's cache held 1,399 files and only **5 Deadlock matches**, all `.meta.bz2` and no `.dem.bz2`. The game saves a salt only when it shows that match, so the cache is recent matches only, the same limit the ingest-cache page states.[^ingest]
-- **Terms are unknown.** No Valve statement on third-party use of these files was found. The Steam Web API terms cover the Web API, not these files. deadlock-api says it is not endorsed by Valve. The URL is unsupported and could change.
+- **Terms are unknown.** No Valve statement on third-party use of these files was found. We did not check whether the Steam Web API terms reach these files. deadlock-api says it is not endorsed by Valve. The URL is unsupported and could change.
 
 # Decision
 
-Not pursued ([open question](../open-questions/full-history-unlock.md) stays as is): full history still needs the bot-friend flow or the Patreon tier ([ADR 0017](../decisions/0017-full-history-via-patreon-for-now.md)), and deadlock-api stays the data source.
+Not pursued ([open question](../open-questions/full-history-unlock.md) stays as is): full history still needs the bot-friend flow, the Patreon tier ([ADR 0017](../decisions/0017-full-history-via-patreon-for-now.md)) or the free ingest tool’s slow backfill of a few missing matches a day, and deadlock-api stays the data source. The next step is to ask the maintainers about this route as part of the outreach in [ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md).
 
 [^ingest]: deadlock-api ingest-cache page, read 2026-10-08
 [^repo]: deadlock-api-ingest `src/scan_cache.rs`, read by a research agent 2026-10-08; the download was checked once with a ranged request against the repo's own test URL
