@@ -1,5 +1,8 @@
 # Directory Update Log
 
+## 2026-10-09
+* **Decision**: [ADR 0063](decisions/0063-two-depth-ci.md): CI runs a smoke browser set on PRs into `staging` and the full suite with coverage only on the `staging` to `main` PR and pushes to `main`. Prompted by 11 to 12 minute CI runs.
+
 ## 2026-10-08
 * **Decision**: [ADR 0062](decisions/0062-desktop-vertical-card-stack.md): the desktop story becomes a vertical stack of wide cards with a vertical progress rail, replacing the pinned 9:16 column (refines ADR 0050; phone unchanged).
 * **Decision**: [ADR 0061](decisions/0061-parry-king-at-40-percent.md): the owner lowered the parry-king line to 40% (a 40%-or-better parrier is not a clown), superseding the parry row of ADR 0040.
