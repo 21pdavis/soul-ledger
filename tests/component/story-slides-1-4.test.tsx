@@ -133,11 +133,11 @@ describe("slide 1: Intro", () => {
 });
 
 describe("slide 2: Your main", () => {
-  it("shows the hero name, a monogram tile, matches and win rate", () => {
+  it("shows the hero name, its art, matches and win rate", () => {
     show(MainSlide);
     expect(screen.getByRole("heading", { name: headlineFor("main") })).toBeInTheDocument();
     expect(screen.getByText("Infernus")).toBeInTheDocument();
-    expect(screen.getByText("IN")).toBeInTheDocument();
+    expect(document.querySelector('img[src="/heroes/1-card.webp"]')).not.toBeNull();
     expect(screen.getByTestId("main-matches")).toHaveTextContent("50");
     expect(screen.getByTestId("main-winrate")).toHaveTextContent("60%");
   });
