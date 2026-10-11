@@ -9,7 +9,7 @@ import styles from "./WorldPreview.module.css";
 
 const POSES: { pose: PoseName; label: string }[] = [
   { pose: "idle", label: "Idle" },
-  { pose: "attack", label: "Attack: Radiant Daggers" },
+  { pose: "attack", label: "Attack: Light Eater" },
   { pose: "zipline", label: "Zip line" },
 ];
 
@@ -42,22 +42,23 @@ export default function ModelViewer({
         <img src={`/heroes/${heroId}-card.webp`} alt={`${name} art`} />
         <div className={styles.viewerStage}>
           <Canvas camera={{ position: [0, 1.6, 5.2], fov: 38 }} dpr={[1, 2]}>
-            <color attach="background" args={["#1c1820"]} />
-            <hemisphereLight args={["#d8d0f0", "#3a3034", 1.6]} />
-            <directionalLight position={[3, 5, 4]} intensity={2.2} color="#fff0e0" />
-            <directionalLight position={[-4, 3, -3]} intensity={0.9} color="#8aa0ff" />
+            <color attach="background" args={["#262426"]} />
+            {/* Neutral studio light, so her colours read as they are. */}
+            <hemisphereLight args={["#ffffff", "#4a4446", 1.3]} />
+            <directionalLight position={[3, 5, 4]} intensity={2.4} color="#fffaf2" />
+            <directionalLight position={[-4, 3, -3]} intensity={0.8} color="#e8eeff" />
             <Suspense fallback={null}>
               {POSES.map(({ pose }, i) => (
                 <group key={pose} position={[(i - 1) * 1.7, 0, 0]}>
                   <mesh position={[0, -0.04, 0]}>
                     <cylinderGeometry args={[0.5, 0.56, 0.08, 16]} />
-                    <meshStandardMaterial color="#2a2428" />
+                    <meshStandardMaterial color="#3a3638" />
                   </mesh>
                   <HeroModel
                     heroId={heroId}
                     pose={pose}
                     pos={[0, pose === "zipline" ? 0.2 : 0, 0]}
-                    facing={0}
+                    facing={pose === "attack" ? -0.9 : 0}
                     scale={1}
                   />
                 </group>

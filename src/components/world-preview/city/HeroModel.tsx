@@ -100,57 +100,158 @@ function Star({
   );
 }
 
+/** Orientation and length of a segment, for placing cones and rods along it. */
+function segment(from: V3, to: V3) {
+  const a = new THREE.Vector3(...from);
+  const b = new THREE.Vector3(...to);
+  const dir = b.clone().sub(a);
+  return {
+    position: a.clone().add(b).multiplyScalar(0.5),
+    quaternion: new THREE.Quaternion().setFromUnitVectors(up, dir.clone().normalize()),
+    length: dir.length(),
+  };
+}
+
+/** The unicorn horn: a long pale cone with a spiral ridge winding up it, glowing faintly. */
+function Horn({ base, tip }: { base: V3; tip: V3 }) {
+  const seg = useMemo(() => segment(base, tip), [base, tip]);
+  const spiral = useMemo(() => {
+    const turns = 6;
+    const pts: THREE.Vector3[] = [];
+    for (let i = 0; i <= 120; i++) {
+      const t = i / 120;
+      const r = 0.026 * (1 - t) + 0.002;
+      const a = t * turns * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * r, (t - 0.5) * seg.length, Math.sin(a) * r));
+    }
+    return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 120, 0.0045, 4);
+  }, [seg.length]);
+  return (
+    <group position={seg.position} quaternion={seg.quaternion}>
+      <mesh>
+        <coneGeometry args={[0.024, seg.length, 8]} />
+        <meshStandardMaterial
+          color="#ead8ff"
+          emissive="#c8a0ff"
+          emissiveIntensity={0.18}
+          roughness={0.4}
+        />
+      </mesh>
+      <mesh geometry={spiral}>
+        <meshStandardMaterial color="#f8eeff" emissive="#e0c0ff" emissiveIntensity={0.3} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Her visible eye: white, a violet iris with a highlight, a dark lash line, a thin brow. */
+function Eye({ at, brow }: { at: V3; brow: V3 }) {
+  return (
+    <>
+      <group position={at}>
+        <mesh scale={[1.5, 1, 0.45]}>
+          <sphereGeometry args={[0.011, 10, 8]} />
+          <meshStandardMaterial color="#f4f0f4" roughness={0.3} />
+        </mesh>
+        <mesh position={[0, -0.001, 0.004]} scale={[1, 1, 0.4]}>
+          <sphereGeometry args={[0.0075, 10, 8]} />
+          <meshStandardMaterial color="#7a5ad0" roughness={0.3} />
+        </mesh>
+        <mesh position={[0.002, 0.002, 0.0075]}>
+          <sphereGeometry args={[0.0022, 6, 4]} />
+          <Glow color="#ffffff" />
+        </mesh>
+        <mesh position={[0, 0.0085, 0.002]} rotation={[0, 0, -0.12]}>
+          <boxGeometry args={[0.036, 0.003, 0.006]} />
+          <meshStandardMaterial color="#2a1a2a" />
+        </mesh>
+      </group>
+      <mesh position={brow} rotation={[0, 0, -0.2]}>
+        <boxGeometry args={[0.03, 0.0035, 0.005]} />
+        <meshStandardMaterial color="#5a4ab0" />
+      </mesh>
+    </>
+  );
+}
+
+/**
+ * Light Eater: the purple cone she breathes through her baton, with sparkles and streaks
+ * scattered through it (static, like the rest of the scene).
+ */
+function LightEater({ from, dir }: { from: V3; dir: V3 }) {
+  const length = 1.6;
+  const seg = useMemo(() => {
+    const d = new THREE.Vector3(...dir).normalize();
+    const to: V3 = [from[0] + d.x * length, from[1] + d.y * length, from[2] + d.z * length];
+    return segment(from, to);
+  }, [from, dir]);
+  const sparks = useMemo(() => {
+    const out: { p: V3; s: number; streak: boolean }[] = [];
+    let seed = 7;
+    const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 46; i++) {
+      const t = r();
+      const spread = 0.04 + t * 0.3;
+      const a = r() * Math.PI * 2;
+      out.push({
+        p: [Math.cos(a) * spread * r(), (t - 0.5) * length, Math.sin(a) * spread * r()],
+        s: 0.006 + r() * 0.014,
+        streak: r() > 0.7,
+      });
+    }
+    return out;
+  }, []);
+  return (
+    <group position={seg.position} quaternion={seg.quaternion}>
+      {/* The cone opens away from the baton (cones point +y, so flip it). */}
+      <mesh rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.32, length, 20, 1, true]} />
+        <meshBasicMaterial
+          color="#b46aff"
+          transparent
+          opacity={0.1}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          toneMapped={false}
+        />
+      </mesh>
+      {sparks.map((k, i) =>
+        k.streak ? (
+          <mesh key={i} position={k.p}>
+            <boxGeometry args={[0.006, k.s * 9, 0.006]} />
+            <Glow color="#f0e0ff" />
+          </mesh>
+        ) : (
+          <mesh key={i} position={k.p} rotation={[i, i * 2, 0]}>
+            <octahedronGeometry args={[k.s]} />
+            <Glow color={i % 3 ? "#d8a8ff" : "#ffffff"} />
+          </mesh>
+        ),
+      )}
+      <pointLight position={[0, -length * 0.3, 0]} color="#b46aff" intensity={14} distance={5} />
+    </group>
+  );
+}
+
 function Parts({ parts }: { parts: CelesteParts }) {
-  const horn = useMemo(() => {
-    const a = new THREE.Vector3(...parts.horn.base);
-    const b = new THREE.Vector3(...parts.horn.tip);
-    const dir = b.clone().sub(a);
-    return {
-      position: a.clone().add(b).multiplyScalar(0.5),
-      quaternion: new THREE.Quaternion().setFromUnitVectors(up, dir.clone().normalize()),
-      length: dir.length(),
-    };
-  }, [parts.horn]);
   const { baton } = parts;
   return (
     <>
-      {/* The unicorn horn, glowing pale violet. */}
-      <mesh position={horn.position} quaternion={horn.quaternion}>
-        <coneGeometry args={[0.022, horn.length, 6]} />
-        <Glow color="#f2d4ff" />
+      <Horn base={parts.horn.base} tip={parts.horn.tip} />
+      <Eye at={parts.eye.at} brow={parts.eye.brow} />
+      <mesh position={parts.lips} scale={[1.7, 0.55, 0.6]}>
+        <sphereGeometry args={[0.009, 8, 6]} />
+        <meshStandardMaterial color="#c24c66" roughness={0.4} />
       </mesh>
-      {parts.eyes.map((e, i) => (
-        <group key={i} position={e}>
-          <mesh scale={[1.25, 1, 0.5]}>
-            <sphereGeometry args={[0.013, 8, 6]} />
-            <meshStandardMaterial color="#3a2a6a" />
-          </mesh>
-          <mesh position={[0.004, 0.004, 0.006]}>
-            <sphereGeometry args={[0.004, 6, 4]} />
-            <Glow color="#ffffff" />
-          </mesh>
-        </group>
-      ))}
-      <mesh position={parts.lips} scale={[1.6, 0.6, 0.6]}>
-        <sphereGeometry args={[0.011, 8, 6]} />
-        <meshStandardMaterial color="#c4526a" />
-      </mesh>
-      <Star at={parts.pendant} size={0.045} color="#e8eef8" />
+      <Star at={parts.pendant} size={0.035} color="#e8eef8" />
       {/* The twisted baton, its crystal tip glowing blue (bright while she attacks). */}
-      <Rod from={baton.from} to={baton.to} r={0.009} color="#3a4a6a" />
+      <Rod from={baton.from} to={baton.to} r={0.008} color="#3a4a6a" />
       <mesh position={baton.to}>
-        <octahedronGeometry args={[baton.bright ? 0.05 : 0.03]} />
+        <octahedronGeometry args={[baton.bright ? 0.04 : 0.026]} />
         <Glow color="#6ae0ff" />
       </mesh>
-      {baton.bright && (
-        <pointLight position={baton.to} color="#6ae0ff" intensity={6} distance={3} />
-      )}
-      {parts.dagger && (
-        <>
-          <Star at={parts.dagger.at} size={0.2} color="#9ae8ff" dir={parts.dagger.dir} />
-          <pointLight position={parts.dagger.at} color="#9ae8ff" intensity={5} distance={3} />
-        </>
-      )}
+      {parts.lightEater && <LightEater from={parts.lightEater.from} dir={parts.lightEater.dir} />}
     </>
   );
 }
