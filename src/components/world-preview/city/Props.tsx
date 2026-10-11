@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { DeathBins } from "@/story/death-bins";
+import { HeroModel, MODELLED_HEROES, gripHeight } from "./HeroModel";
 import { PALETTE, type Vec3 } from "./layout";
 import { MIDBOSS_PARTS, buildMidBossGeometry, frontAt } from "./midboss";
 import type { CastMember, Duel } from "./tour";
@@ -30,6 +31,29 @@ export function Glow({ color, opacity = 1 }: { color: string; opacity?: number }
       toneMapped={false}
       transparent={opacity < 1}
       opacity={opacity}
+    />
+  );
+}
+
+/** The zip lines hang this high over the street. */
+export const ZIP_HEIGHT = 10.5;
+
+/**
+ * A hero in the city: their sculpted model in the scene's pose if they have one, otherwise the
+ * art-card standee (which also shows while a model builds).
+ */
+export function Figure({ member }: { member: CastMember }) {
+  if (!MODELLED_HEROES.has(member.heroId)) return <Standee member={member} />;
+  const pose = member.pose ?? "idle";
+  const [x, y, z] = member.pos;
+  const at: Vec3 = pose === "zipline" ? [x, ZIP_HEIGHT - gripHeight(pose), z] : [x, y, z];
+  return (
+    <HeroModel
+      heroId={member.heroId}
+      pose={pose}
+      pos={at}
+      facing={member.facing}
+      fallback={<Standee member={member} />}
     />
   );
 }
@@ -163,8 +187,8 @@ export function DuelStage({ duel }: { duel: Duel }) {
   const [cx, cy, cz] = duel.clash;
   return (
     <>
-      <Standee member={duel.a} />
-      <Standee member={duel.b} />
+      <Figure member={duel.a} />
+      <Figure member={duel.b} />
       {/* One side's fire, the other's spirit, meeting in the middle. */}
       <Line points={[[ax, 2, az], duel.clash]} color="#ff8a3d" lineWidth={5} toneMapped={false} />
       <Line points={[[bx, 2, bz], duel.clash]} color="#9ad4ff" lineWidth={5} toneMapped={false} />

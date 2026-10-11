@@ -100,6 +100,35 @@ export function carve(base: Field, cut: Field, k: number, tint: string): Field {
   };
 }
 
+/**
+ * Repaints a shape: `fn` gets the point and the shape's own colour and writes the colour to use
+ * into `out`. For stripes, patterns and tattoos.
+ */
+export function paint(
+  f: Field,
+  fn: (p: THREE.Vector3, base: THREE.Color, out: THREE.Color) => void,
+): Field {
+  const out = new THREE.Color();
+  return (p) => {
+    const s = f(p);
+    fn(p, s.c, out);
+    return { d: s.d, c: out };
+  };
+}
+
+/**
+ * Wraps a field so points farther than `margin` from a bounding sphere skip it: blends of many small
+ * shapes (a whole figure) then cost only the shapes near each sample.
+ */
+export function bounded(f: Field, center: V3, radius: number): Field {
+  const c = new THREE.Vector3(...center);
+  const far = new THREE.Color();
+  return (p) => {
+    const out = p.distanceTo(c) - radius;
+    return out > 0.25 ? { d: out, c: far } : f(p);
+  };
+}
+
 /** Mirrors a field across x = 0, for symmetric creatures. */
 export function mirrorX(f: Field): Field {
   const q = new THREE.Vector3();
@@ -118,9 +147,31 @@ export function meshField(field: Field, min: V3, max: V3, cell: number): THREE.B
   const at = (i: number, j: number, k: number) => i + nx * (j + ny * k);
   const values = new Float32Array(nx * ny * nz);
   const p = new THREE.Vector3();
+  // Coarse pass first (every 4th sample). Fine samples far from the surface take the nearest
+  // coarse value: only the sign matters there, and a distance field cannot cross zero sooner than
+  // its own value, so this skips most of the work without changing the mesh.
+  const S = 4;
+  const cx = Math.ceil((nx - 1) / S) + 1;
+  const cy = Math.ceil((ny - 1) / S) + 1;
+  const cz = Math.ceil((nz - 1) / S) + 1;
+  const coarse = new Float32Array(cx * cy * cz);
+  for (let k = 0; k < cz; k++) {
+    for (let j = 0; j < cy; j++) {
+      for (let i = 0; i < cx; i++) {
+        p.set(min[0] + i * S * cell, min[1] + j * S * cell, min[2] + k * S * cell);
+        coarse[i + cx * (j + cy * k)] = field(p).d;
+      }
+    }
+  }
+  const safe = S * cell * 0.9;
   for (let k = 0; k < nz; k++) {
     for (let j = 0; j < ny; j++) {
       for (let i = 0; i < nx; i++) {
+        const near = coarse[Math.round(i / S) + cx * (Math.round(j / S) + cy * Math.round(k / S))];
+        if (Math.abs(near) > safe) {
+          values[at(i, j, k)] = near;
+          continue;
+        }
         p.set(min[0] + i * cell, min[1] + j * cell, min[2] + k * cell);
         values[at(i, j, k)] = field(p).d;
       }

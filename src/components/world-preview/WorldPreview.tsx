@@ -11,8 +11,40 @@ import styles from "./WorldPreview.module.css";
 
 // The 3D never renders on the server and loads after the story is up (ADR 0068).
 const WorldCanvas = dynamic(() => import("./WorldCanvas"), { ssr: false });
+const ModelViewer = dynamic(() => import("./ModelViewer"), { ssr: false });
 
-const BASE_PROPS = fixtureSlideProps();
+/**
+ * The owner's heroes stand in for the sample story's: Celeste as the main (she has a model),
+ * then Paradox, Ivy, Paige and The Doorman.
+ */
+const OWNER_HEROES = [81, 10, 20, 67, 69];
+const BASE_PROPS = (() => {
+  const props = fixtureSlideProps();
+  const story = props.story;
+  return {
+    ...props,
+    story: {
+      ...story,
+      main: story.main && { ...story.main, heroId: OWNER_HEROES[0] },
+      roster: story.roster && {
+        ...story.roster,
+        topHeroes: story.roster.topHeroes.map((h, i) => ({
+          ...h,
+          heroId: OWNER_HEROES[i] ?? h.heroId,
+        })),
+      },
+      mvp:
+        story.mvp && "heroId" in story.mvp ? { ...story.mvp, heroId: OWNER_HEROES[0] } : story.mvp,
+      roast: story.roast && {
+        ...story.roast,
+        worstMatch: story.roast.worstMatch && {
+          ...story.roast.worstMatch,
+          heroId: OWNER_HEROES[0],
+        },
+      },
+    },
+  };
+})();
 
 /**
  * Sample stats, with one override for trying the death map: `?deaths=x,y` (game units, about
@@ -73,12 +105,14 @@ export function WorldPreview() {
   const props = usePreviewProps();
   const [boardOpen, setBoardOpen] = useState(false);
   const [storyOn, setStoryOn] = useState(true);
+  const [viewer, setViewer] = useState(false);
   const board = MOOD_BOARD;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "m") setBoardOpen((o) => !o);
       if (e.key === "h") setStoryOn((o) => !o);
+      if (e.key === "v") setViewer((o) => !o);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -102,7 +136,12 @@ export function WorldPreview() {
         <button type="button" aria-pressed={!storyOn} onClick={() => setStoryOn((o) => !o)}>
           {storyOn ? "Hide story (H)" : "Show story (H)"}
         </button>
+        <button type="button" aria-pressed={viewer} onClick={() => setViewer((o) => !o)}>
+          Celeste model (V)
+        </button>
       </div>
+
+      {viewer && <ModelViewer heroId={81} name="Celeste" onClose={() => setViewer(false)} />}
 
       {boardOpen && (
         <aside className={styles.board} aria-label="Mood board">

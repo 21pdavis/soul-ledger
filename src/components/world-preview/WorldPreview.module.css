@@ -166,3 +166,77 @@
   color: var(--bone-muted);
   font-size: 11px;
 }
+
+/* The model checkpoint viewer: art card and the sculpted poses side by side. */
+.viewer {
+  position: fixed;
+  inset: 44px 8px 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  background: rgb(13 11 16 / 0.96);
+  border: 1px solid var(--brass);
+}
+
+.viewer header {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.viewer h2 {
+  margin: 0;
+  font: 22px var(--font-display);
+  color: var(--brass);
+}
+
+.viewer header span {
+  flex: 1;
+  color: var(--bone-muted);
+  font-size: 13px;
+}
+
+.viewer header button {
+  font-size: 22px;
+  color: var(--bone);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.viewerBody {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  min-height: 0;
+  margin-top: 10px;
+}
+
+.viewerBody img {
+  width: min(28%, 320px);
+  height: auto;
+  align-self: center;
+  border: 1px solid var(--brass);
+}
+
+.viewerStage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.viewerLabels {
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+  left: 0;
+  display: flex;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--bone-muted);
+  font-size: 13px;
+  pointer-events: none;
+}
