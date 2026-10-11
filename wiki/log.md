@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-11
+* **Decision**: [ADR 0063](decisions/0063-two-depth-ci.md) amended: CI runs as three parallel jobs (checks, e2e phone, e2e desktop) with build and browser caches, same tests as before. Required checks under #10 must name all three.
 * **Decision**: [ADR 0067](decisions/0067-database-logins-per-environment.md): production and staging now connect as a limited `soul_ledger_app` login (rows only), and the production owner password was reset and lives only in the owner's password manager. Closes #8 and #9.
 
 ## 2026-10-09
