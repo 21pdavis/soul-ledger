@@ -347,7 +347,7 @@ export function buildOuterRing(seed = 5): Building[] {
   const r = rng(seed);
   const out: Building[] = [];
   const stones = ["#3a3842", "#4c3f3c", "#463a30", "#2f3a33", "#3e3a4a"];
-  for (let ring = 0; ring < 4; ring++) {
+  for (let ring = 0; ring < 13; ring++) {
     const dist = MAP_RADIUS + 6 + ring * 11;
     const count = Math.floor((2 * Math.PI * dist) / 10);
     for (let i = 0; i < count; i++) {
@@ -358,7 +358,7 @@ export function buildOuterRing(seed = 5): Building[] {
         z: Math.cos(a) * dist,
         w,
         d: 7 + r() * 2.5,
-        h: (16 + r() * 22) * (1 - ring * 0.15),
+        h: (16 + r() * 22) * Math.max(0.45, 1 - ring * 0.045),
         rot: a,
         color: stones[Math.floor(r() * stones.length)],
         windows: PALETTE.windowWarm,

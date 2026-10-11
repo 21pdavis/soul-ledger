@@ -58,10 +58,6 @@
   max-width: min(30rem, 42vw);
 }
 
-.story :global([data-testid="story-stage"]) {
-  backdrop-filter: blur(1.5px);
-}
-
 .toolbar {
   position: fixed;
   top: 8px;

@@ -1,6 +1,7 @@
 "use client";
 
 import { Line } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { StoryData } from "@/story/types";
@@ -33,11 +34,16 @@ import { planTour, routeConnectors } from "./tour";
 
 /** A dusk sky: dark blue-grey overhead, mauve, then a warm band at the horizon. */
 function Sky() {
+  const dome = useRef<THREE.Mesh>(null);
+  useFrame(({ camera }) => {
+    dome.current?.position.copy(camera.position);
+  });
   const material = useMemo(
     () =>
       new THREE.ShaderMaterial({
         side: THREE.BackSide,
         depthWrite: false,
+        depthTest: false,
         fog: false,
         uniforms: {
           top: { value: new THREE.Color(PALETTE.skyTop) },
@@ -58,7 +64,9 @@ function Sky() {
     [],
   );
   return (
-    <mesh material={material}>
+    // Centred on the camera and drawn first with no depth test, so it is always behind everything
+    // and never cuts off the ground at its rim.
+    <mesh ref={dome} material={material} renderOrder={-1} frustumCulled={false}>
       <sphereGeometry args={[480, 24, 12]} />
     </mesh>
   );
@@ -370,7 +378,7 @@ export default function CityWorld({ slide, story }: { slide: number; story: Stor
       <directionalLight position={[80, 60, -100]} intensity={0.8} color="#8a9cff" />
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-        <circleGeometry args={[MAP_RADIUS + 500, 48]} />
+        <circleGeometry args={[MAP_RADIUS + 1400, 64]} />
         <meshStandardMaterial color={PALETTE.ground} roughness={1} />
       </mesh>
 
@@ -382,7 +390,7 @@ export default function CityWorld({ slide, story }: { slide: number; story: Stor
       ))}
       <DuelStage duel={tour.duel} />
       <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
-      <SewerPit at={tour.pit} />
+      <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
       <DeathProjector bins={tour.deaths} on={slide === 7} />
       <TourRig shots={tour.shots} slide={slide} />
     </>

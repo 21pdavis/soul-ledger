@@ -46,7 +46,7 @@ export function Standee({ member }: { member: CastMember }) {
   return (
     <>
       <group position={member.pos} rotation={[0, member.facing, 0]}>
-        {!member.airborne && (
+        {!member.zipline && (
           <mesh position={[0, 0.15, 0]}>
             <cylinderGeometry args={[0.85 * s, 0.95 * s, 0.3, 8]} />
             <Mat color="#2a2428" metal={0.4} />
@@ -61,16 +61,24 @@ export function Standee({ member }: { member: CastMember }) {
           <meshBasicMaterial map={texture} toneMapped={false} />
         </mesh>
       </group>
-      {member.airborne && (
-        // The jump: a dust ring on the street and streaks trailing down from the hero.
-        <group position={[x, 0, z]}>
-          <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[1.2, 2.2, 14]} />
-            <Glow color="#d8cfc0" opacity={0.5} />
+      {member.zipline && (
+        // Riding the zip line: a glowing hook where the card meets the line, speed streaks behind.
+        <group position={[x, y + 0.3 + h, z]} rotation={[0, member.facing, 0]}>
+          <mesh position={[0, 0.25, 0]} rotation={[0, Math.PI / 2, 0]}>
+            <torusGeometry args={[0.3, 0.07, 4, 10]} />
+            <Glow color="#cfe6ff" />
           </mesh>
-          {[-0.9, 0, 0.9].map((dx) => (
-            <mesh key={dx} position={[dx, y * 0.45, 0]}>
-              <boxGeometry args={[0.06, y * 0.7, 0.06]} />
+          <mesh position={[0, 0.06, 0]}>
+            <boxGeometry args={[0.08, 0.4, 0.08]} />
+            <Mat color="#2a2428" />
+          </mesh>
+          {[0.2, -0.6, -1.4].map((dy, i) => (
+            <mesh
+              key={dy}
+              position={[0, dy - h * 0.25, -0.6 - i * 0.4]}
+              rotation={[Math.PI / 2, 0, 0]}
+            >
+              <boxGeometry args={[0.05, 2.4 - i * 0.5, 0.05]} />
               <Glow color="#f4f0e6" opacity={0.45} />
             </mesh>
           ))}
@@ -236,7 +244,7 @@ export function PrecisionShot({ from, target }: { from: Vec3; target: Vec3 }) {
  * hunched, sack-bodied ghoul holding up its glowing teal eye. The chamber is closed, so nothing
  * of the city above shows while the camera is inside.
  */
-export function SewerPit({ at }: { at: Vec3 }) {
+export function SewerPit({ at, beamTo }: { at: Vec3; beamTo: Vec3 }) {
   return (
     <group position={at}>
       {/* The chamber: brick walls, floor and ceiling, seen from inside. */}
@@ -275,65 +283,154 @@ export function SewerPit({ at }: { at: Vec3 }) {
         <octahedronGeometry args={[0.8]} />
         <Glow color="#ffd24a" />
       </mesh>
-      <MidBoss />
-      <pointLight position={[0, 9, 2]} color="#6dfff0" intensity={160} distance={30} />
+      <MidBoss beamTo={beamTo} />
+      <pointLight position={[4, 10, 8]} color="#9ab0a0" intensity={90} distance={34} />
       <pointLight position={[6, 4, 6]} color="#c46aff" intensity={50} distance={20} />
       <hemisphereLight args={["#3a4a44", "#1a1414", 0.6]} />
     </group>
   );
 }
 
-/** The mid boss: a hunched ghoul, a tied sack for a body, long arms, one huge glowing eye. */
-function MidBoss() {
-  const skin = "#3c4440";
-  const sack = "#4a4a3e";
+/**
+ * The mid boss, after the in-game model: a tall olive worm on a skirt of tentacles, a ribbed trunk,
+ * a heavy upper body split at the top into a hood that cradles a glass dome with a purple eye, a
+ * vertical toothed mouth with a long tongue, and two pairs of thin clawed arms. It fires its purple
+ * beam at your main. Faces local +z; `beamTo` is in the pit's frame.
+ */
+function MidBoss({ beamTo }: { beamTo: Vec3 }) {
+  const olive = "#6a7a2e";
+  const dark = "#4a5620";
+  const lime = "#b4c43c";
+  const eye: Vec3 = [0, 12.4, 0.2];
+  const origin: Vec3 = [-1, 0, -1];
+  // Turned to face the camera's corner of the pit; the beam target is taken into the turned frame.
+  const turn = Math.PI / 4;
+  const dx = beamTo[0] - origin[0];
+  const dz = beamTo[2] - origin[2];
+  const target: Vec3 = [
+    dx * Math.cos(turn) - dz * Math.sin(turn),
+    beamTo[1],
+    dx * Math.sin(turn) + dz * Math.cos(turn),
+  ];
   return (
-    <group position={[-1, 0, -1]} rotation={[0, 0.5, 0]}>
-      {[-1, 1].map((sd) => (
-        <group key={sd}>
-          <mesh position={[sd * 1.6, 1.6, 0]} rotation={[0, 0, sd * 0.2]}>
-            <cylinderGeometry args={[0.3, 0.45, 3.4, 5]} />
-            <Mat color={skin} />
-          </mesh>
-          {/* Long arms reaching down to the floor. */}
-          <mesh position={[sd * 3.6, 4.2, 0.6]} rotation={[0.2, 0, sd * 0.5]}>
-            <cylinderGeometry args={[0.28, 0.4, 5.4, 5]} />
-            <Mat color={skin} />
-          </mesh>
-          <mesh position={[sd * 4.6, 1.2, 1.2]}>
-            <dodecahedronGeometry args={[0.6]} />
-            <Mat color={skin} />
-          </mesh>
-        </group>
-      ))}
-      <mesh position={[0, 6, 0]} scale={[1.5, 1.35, 1.25]}>
-        <icosahedronGeometry args={[3]} />
-        <Mat color={sack} />
-      </mesh>
-      {/* The tied top, with a green band. */}
-      <mesh position={[0.3, 10.1, -0.3]} rotation={[0.2, 0, -0.3]}>
-        <coneGeometry args={[1.4, 2.2, 6]} />
-        <Mat color={sack} />
-      </mesh>
-      <mesh position={[0.15, 9.4, -0.2]} rotation={[Math.PI / 2 + 0.2, 0, 0]}>
-        <torusGeometry args={[1.05, 0.18, 4, 10]} />
-        <Glow color={PALETTE.occult} />
-      </mesh>
-      {/* The eye, held up by a clawed hand. */}
-      <mesh position={[0, 8, 3.4]}>
-        <icosahedronGeometry args={[1.5, 1]} />
-        <Glow color="#6dfff0" />
-      </mesh>
-      <mesh position={[0.4, 8.2, 3.6]}>
-        <icosahedronGeometry args={[0.55]} />
-        <Glow color="#ffffff" />
-      </mesh>
-      {[-0.9, 0, 0.9].map((x) => (
-        <mesh key={x} position={[x * 1.1, 9.4, 3.2]} rotation={[0.6, 0, x * 0.4]}>
-          <coneGeometry args={[0.18, 1.4, 4]} />
-          <Mat color={skin} />
+    <group position={origin} rotation={[0, turn, 0]}>
+      {/* The skirt of tentacles, curling out across the floor. */}
+      {Array.from({ length: 9 }, (_, i) => {
+        const ang = (i / 9) * Math.PI * 2;
+        return (
+          <group key={i} rotation={[0, ang, 0]}>
+            <mesh position={[0, 0.5, 1.9]} rotation={[1.25, 0, 0]}>
+              <cylinderGeometry args={[0.18, 0.42, 3.2, 5]} />
+              <Mat color={lime} />
+            </mesh>
+            <mesh position={[0, 0.25, 3.6]} rotation={[1.5, 0, 0.4]}>
+              <cylinderGeometry args={[0.08, 0.2, 1.6, 4]} />
+              <Mat color={lime} />
+            </mesh>
+          </group>
+        );
+      })}
+      {/* The ribbed trunk, widening as it rises. */}
+      {[0, 1, 2, 3, 4].map((i) => (
+        <mesh key={i} position={[0, 0.9 + i * 1.15, 0]}>
+          <cylinderGeometry args={[1.05 + i * 0.12, 1.15 + i * 0.12, 1.05, 9]} />
+          <Mat color={i % 2 ? dark : olive} />
         </mesh>
       ))}
+      {/* The heavy upper body. */}
+      <mesh position={[0, 8.6, 0]} scale={[1.45, 1.35, 1.05]}>
+        <icosahedronGeometry args={[2.4, 1]} />
+        <Mat color={olive} />
+      </mesh>
+      {/* The hood: two thick lips parting around the dome. */}
+      {[-1, 1].map((sd) => (
+        <mesh
+          key={sd}
+          position={[sd * 1.55, 11.4, 0]}
+          rotation={[0, 0, sd * -0.35]}
+          scale={[0.75, 1.5, 1]}
+        >
+          <dodecahedronGeometry args={[1.4]} />
+          <Mat color={dark} />
+        </mesh>
+      ))}
+      {/* The glass dome and the purple eye inside it. */}
+      <mesh position={eye}>
+        <sphereGeometry args={[1.65, 14, 10]} />
+        <meshStandardMaterial
+          color="#b8d0ff"
+          transparent
+          opacity={0.28}
+          roughness={0.1}
+          metalness={0.2}
+        />
+      </mesh>
+      <mesh position={eye}>
+        <icosahedronGeometry args={[1, 1]} />
+        <Glow color="#d26aff" />
+      </mesh>
+      <mesh position={[eye[0], eye[1], eye[2] + 0.85]}>
+        <icosahedronGeometry args={[0.36, 0]} />
+        <Glow color="#ffe8ff" />
+      </mesh>
+      {/* The mouth: a vertical slit with teeth, and a long tongue hanging down the trunk. */}
+      <mesh position={[0, 8.6, 2.45]}>
+        <boxGeometry args={[0.7, 2.2, 0.3]} />
+        <Mat color="#2a1418" />
+      </mesh>
+      {[-1, 1].map((sd) =>
+        [0, 1, 2, 3].map((j) => (
+          <mesh
+            key={`${sd}${j}`}
+            position={[sd * 0.32, 9.4 - j * 0.5, 2.62]}
+            rotation={[0, 0, (sd * Math.PI) / 2]}
+          >
+            <coneGeometry args={[0.09, 0.32, 4]} />
+            <Mat color="#e8e0c8" />
+          </mesh>
+        )),
+      )}
+      <mesh position={[0.05, 5.7, 2.5]} rotation={[0.08, 0, 0]}>
+        <boxGeometry args={[0.32, 4.6, 0.12]} />
+        <Mat color="#7a2a3a" />
+      </mesh>
+      {/* Two pairs of thin arms ending in hooked claws. */}
+      {[-1, 1].map((sd) =>
+        [
+          { y: 9.2, out: 2.9, drop: 2.6, tilt: 0.7 },
+          { y: 6.6, out: 2.3, drop: 2.2, tilt: 0.9 },
+        ].map((arm, j) => (
+          <group key={`${sd}${j}`} position={[sd * arm.out, arm.y, 0.5]}>
+            <mesh rotation={[0, 0, sd * arm.tilt]} position={[sd * 0.7, -0.4, 0]}>
+              <cylinderGeometry args={[0.13, 0.2, 2, 5]} />
+              <Mat color={olive} />
+            </mesh>
+            <mesh position={[sd * 1.3, -arm.drop * 0.6, 0.3]}>
+              <cylinderGeometry args={[0.1, 0.14, arm.drop, 5]} />
+              <Mat color={olive} />
+            </mesh>
+            {[-0.2, 0, 0.2].map((c) => (
+              <mesh
+                key={c}
+                position={[sd * 1.3 + c, -arm.drop * 1.15, 0.45]}
+                rotation={[0.5, 0, c * 2]}
+              >
+                <coneGeometry args={[0.06, 0.6, 4]} />
+                <Mat color={lime} />
+              </mesh>
+            ))}
+          </group>
+        )),
+      )}
+      {/* Its beam, locked on your main. */}
+      <Line points={[eye, target]} color="#c46aff" lineWidth={7} toneMapped={false} />
+      <Line points={[eye, target]} color="#ffe8ff" lineWidth={2} toneMapped={false} />
+      <pointLight
+        position={[eye[0], eye[1], eye[2] + 2]}
+        color="#c46aff"
+        intensity={120}
+        distance={26}
+      />
     </group>
   );
 }

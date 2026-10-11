@@ -83,6 +83,15 @@ function routeNear(p: THREE.Vector3): number {
   return (at / (ROUTE_SAMPLES.length - 1)) * ROUTE_LENGTH;
 }
 
+/**
+ * Where the route leaves one lane for the next (Yellow to Blue at the north base, Blue to Green at
+ * the south). Flights across one swoop over the rooftops instead of crawling round the base.
+ */
+export const LANE_CHANGES = [
+  routeNear(lanePoint("yellow", 0.93).p),
+  routeNear(lanePoint("blue", 0.07).p),
+];
+
 /** Points along the straight hops the route takes between lanes; the city keeps them clear. */
 export function routeConnectors(): [number, number][] {
   const out: [number, number][] = [];
@@ -112,8 +121,8 @@ export interface CastMember {
   /** Which way the standee faces. */
   facing: number;
   scale?: number;
-  /** Mid-jump: a dust ring is drawn on the ground below. */
-  airborne?: boolean;
+  /** Hanging from the lane's zip line by a hook (pos is the card's bottom). */
+  zipline?: boolean;
 }
 
 export interface Duel {
@@ -250,10 +259,14 @@ export function planTour(story: StoryData): TourPlan {
   // 8 roast: straight overhead, your deaths projected onto the city.
   shots.push({ kind: "free", pos: [0, 250, 0.01], look: [0, 0, 0] });
 
-  // 9 rank: your main mid-jump between the Downtown towers, the camera looking up.
-  const dt = routeShot("downtown", 9, 12, 2);
+  // 9 rank: your main riding the Blue zip line between the Downtown towers, camera looking up.
+  // The card hangs so its top meets the line (10.5 up; the card is 0.3 + 2.9 * scale tall).
+  const dt = routeShot("downtown", 17, 8.5, 2);
   shots.push(dt);
-  stand(main, atStop("downtown", 2, 0, 9), dt, { scale: 1.2, airborne: true });
+  stand(main, atStop("downtown", 2, 0, 10.5 - 0.3 - 2.9 * 1.2 - 0.35), dt, {
+    scale: 1.2,
+    zipline: true,
+  });
 
   // 10 mvp: under the Hangman's Elm in Central Park.
   const cp = routeShot("centralPark", 15, 4);
