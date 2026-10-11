@@ -1,0 +1,170 @@
+/* One card, three stats staggered down it: left, right, left. */
+.card {
+  position: relative;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  height: 100%;
+  padding: 1.5rem 1.25rem;
+  border: 1px solid var(--brass);
+  background: var(--ink);
+}
+
+/* An inner rule, like the frame it sits in. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--rule);
+  pointer-events: none;
+}
+
+.stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  gap: 0.375rem;
+  max-width: 78%;
+}
+
+.stat[data-place="top-left"],
+.stat[data-place="bottom-left"] {
+  justify-self: start;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.stat[data-place="middle-right"] {
+  justify-self: end;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--brass);
+}
+
+.stat[data-place="middle-right"] .title {
+  color: var(--green);
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 16cqw, 5rem);
+  line-height: 1;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.detail {
+  font-size: 1rem;
+  color: var(--bone-muted);
+}
+
+/* Smaller stages (the frame's tiers, see SlideFrame.module.css): three stats in less room. */
+@container (max-height: 639px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .stat {
+    gap: 0.25rem;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .detail {
+    font-size: 0.9rem;
+  }
+}
+
+@container (max-height: 519px) {
+  .card {
+    padding: 0.75rem 0.875rem;
+  }
+
+  .stat {
+    gap: 0.125rem;
+  }
+
+  .title {
+    font-size: 1.1rem;
+  }
+
+  .number {
+    font-size: clamp(2rem, 14cqw, 3rem);
+  }
+
+  .detail {
+    font-size: 0.8rem;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .card {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .title {
+    font-size: 1rem;
+  }
+
+  .number {
+    font-size: clamp(1.75rem, 13cqw, 2.5rem);
+  }
+
+  .detail {
+    font-size: 0.75rem;
+  }
+}
+
+/*
+ * Wide cards (the desktop vertical layout, ADR 0062): the three stats sit side by side, still
+ * staggered (centre, low, high), instead of stacked in rows.
+ */
+@container (min-width: 720px) {
+  .card {
+    grid-template-rows: none;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 2rem 2.5rem;
+  }
+
+  .stat,
+  .stat[data-place="middle-right"] {
+    max-width: none;
+    justify-self: stretch;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .stat[data-place="top-left"] {
+    align-self: start;
+    margin-top: 12%;
+  }
+
+  .stat[data-place="middle-right"] {
+    align-self: center;
+  }
+
+  .stat[data-place="bottom-left"] {
+    align-self: end;
+    margin-bottom: 12%;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .number {
+    font-size: clamp(3rem, 8cqw, 6rem);
+  }
+
+  .detail {
+    font-size: 1.125rem;
+  }
+}

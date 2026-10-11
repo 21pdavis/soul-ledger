@@ -4,9 +4,22 @@ Guidance for agents (Claude Code and others) working in this repo.
 
 ## Project state
 
-**M1 (data layer) is built; M2 is next** ([milestones](wiki/decisions/0028-milestones.md)). The knowledge base under `wiki/` is the source of truth for what has been decided. Next.js-specific agent rules are in [`AGENTS.md`](AGENTS.md).
+**M1 (data layer) and M2 (the playable 2D story) are built; M3 is next** ([milestones](wiki/decisions/0028-milestones.md)). The knowledge base under `wiki/` is the source of truth for what has been decided. Next.js-specific agent rules are in [`AGENTS.md`](AGENTS.md).
 
 Commands: `pnpm test` (unit + integration), `pnpm test:e2e`, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm db:generate` / `pnpm db:migrate`. Integration tests run on in-process PGlite. `.env.local` holds the Neon `dev` branch `DATABASE_URL` and is never committed.
+
+## Talking to the owner
+
+The owner doesn't read code day to day, so messages to them are in plain words:
+
+- **Lead with what happened and why it matters.** Put any decision they need to make in its own short, labelled section.
+- **Explain a technical term in a few words the first time** (and again if it hasn't come up for a while). Say "the settings file that blocks agents", not "hard-limit file".
+- **Say it in words, then link the number.** PR and ADR numbers go after the plain description, never instead of it.
+- **Keep test and build jargon out of the owner's messages** (red-green, hydration, e2e, container queries). It belongs in PR descriptions and agent reports.
+- **Keep it short.** Give the conclusion and offer the detail.
+- **When asked "what's X?", answer simply and fix the habit**, don't just define the word.
+
+Exceptions: the owner asks for technical detail, and agents' own reports to the orchestrator.
 
 ## The knowledge base: `wiki/` (Open Knowledge Format v0.2)
 
@@ -96,18 +109,62 @@ Rules for agents:
 - **PRs gate every change.** Never push directly to `staging` or `main`, never force-push either, and never push to a branch after its PR has merged. Every change, including one-line doc fixes, goes through a PR with green CI.
 - Cut feature branches from `staging` and open PRs **into `staging`**. You may merge your own PR into `staging` only when **both** of these hold:
   1. **CI passes** on the PR's final commit.
-  2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts its findings as a PR comment (`gh pr comment`), even when it finds nothing.
+  2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts its findings as a PR comment (`pnpm bot:gh pr comment`, ADR 0059), even when it finds nothing.
 - **Act on agent review feedback without being asked**, as if the owner had said "go fix the feedback on this PR".
   - **Blocking** findings must be fixed. The only exception is a finding that turns on a business decision only the owner can make: ask the owner and don't merge until they answer. Never dismiss a blocking finding on your own.
   - **Non-blocking** findings and nits are fixed, or answered in a PR reply explaining why not.
   - Fix **all findings from a review round in one commit and one push**, with one PR reply listing each fix. Every fix commit needs CI to pass again before merging.
   - **Re-review only if the review had a blocking finding or the fixes were substantial.** If only non-blocking findings and nits remained, fix them and merge once CI passes, with no extra review pass (ADR 0047).
-  - **Scale reviewer effort to the change:** `medium` for docs or config only, `high` for code, `xhigh` for auth, data integrity, migrations or security.
+  - **Scale reviewer effort to the change:** `medium` for docs or config only, `high` (Sonnet, the reviewer's default model) for code, `xhigh` on Opus (the orchestrator passes `model: "opus"`) for auth, data integrity, migrations or security (ADR 0057).
 - PRs into `staging` don't need the owner's review. **`staging` → `main` always does**, and only the owner merges it.
 - **Tell the owner about every merge.** Whenever you merge a PR, or notice that one was merged (including the owner's `staging` → `main`), report it in the conversation straight away: PR number and link, a one-line summary, the agent review outcome, and the CI result. During long unattended runs, also send a push notification. Don't batch merges silently into an end-of-run summary.
 - Validate on live staging after it deploys: `pnpm test:e2e:staging` with `STAGING_URL` and `STAGING_ACCESS_KEY` from `.env.local`. API calls need the `x-staging-token` header.
 - Run migrations against Neon `staging` (`STAGING_DATABASE_URL` in `.env.local`) or `dev`. **Never** against `main`.
 - **Never merge or push to `main`, and never change production settings or secrets.** Promote by opening a `staging` → `main` PR for the owner.
+
+## Unattended runs: hard limits and escalation (ADR 0048)
+
+**Hard limits** live in `.claude/settings.json`. Deny rules beat allow rules and apply to every session and subagent:
+
+| Denied | Examples |
+|---|---|
+| Pushing to `main` or `staging` (common forms, including `HEAD:`, `refs/heads/` and `--all`/`--mirror`); force-push; deleting remote branches | `git push origin staging`, `git push -f`, `git push origin :x` |
+| Admin merges and repo settings changes | `gh pr merge --admin`, `gh repo edit` |
+| Reading `.env.local` with the Read tool, `cat`, `head`, `tail`, `less` or PowerShell `Get-Content` | Use the exact `grep ... \| cut` exports in the agent briefs |
+| Destructive Neon actions | Delete or reset branches, projects, databases, roles or snapshots; rotate credentials; apply migrations to the main branch |
+| Render changes | Updating environment variables, creating services |
+
+Routine work is pre-allowed so runs don't stall on prompts:
+- `pnpm`;
+- `git` on feature branches;
+- `gh pr` / `run` / `issue` / `label`;
+- read-only Render tools.
+
+Running SQL on Neon, other risky Neon changes and triggering Render deploys always ask. **Always name the branch when pushing** (`git push -u origin <feature-branch>`): a bare `git push` is denied. These are pattern rules: a strong guardrail, not a guarantee. GitHub branch protection (#10) is the backstop.
+
+**When blocked**, don't keep retrying. The orchestrator:
+1. Commits work in progress to the feature branch (never to `staging` or `main`) and pushes it, so nothing is lost.
+2. Writes the blocker up in the conversation:
+   - what was attempted;
+   - the error or the decision needed;
+   - 2–3 options with a recommendation.
+3. Sends a **push notification** so the owner doesn't have to watch the terminal.
+4. Keeps working on tasks that don't depend on the blocker. If nothing can proceed, it stops.
+
+**Blocked means:** the same failure survives about 3 genuinely different attempts; a product or business decision the plan and ADRs don't answer; a needed action is denied by the hard limits above; or an external service (deadlock-api, Steam, Render, Neon, GitHub) is down.
+
+## Token budget for runs (ADR 0057)
+
+Runs are limited by usage, so every agent follows these (reasoning and the rest of the policy in [ADR 0057](wiki/decisions/0057-token-efficient-unattended-runs.md)):
+
+- **Hand-backs are short:** at most about 150 words to the orchestrator. Detail goes in the PR description or review comment, and reports are never pasted into other replies.
+- **Fresh, narrow agents:** don't resume an agent for a small fix. Use a fresh agent given the PR number and review link, or the orchestrator for fixes of about 20 lines or fewer.
+- **Briefs are short** (200 to 300 words): goal, areas, acceptance criteria (link the plan), constraints. Pass references, not pasted contents, and don't restate this file.
+- **Tests are targeted:** run unit and component tests plus only the e2e spec files you touched. CI runs the full e2e suite. Filter long output (`tail`, `grep`) and never read whole logs.
+- **Loops are bounded:** at most 2 fix rounds per PR. A third means the orchestrator re-plans or asks the owner.
+- **Implementers don't wait for CI:** push, open or update the PR, report and stop. The orchestrator watches CI with a background `gh pr checks N --watch`, and triages a failure with a fresh Haiku agent (at most 100 words).
+- **Owner:** run `/clear` between phases and milestones (agents can't), and share `/usage` at each milestone's end.
+- Don't edit CLAUDE.md or agent files mid-run (it breaks the prompt cache), and keep this file under about 200 lines.
 
 ## Agent roster (`.claude/agents/`)
 
@@ -119,6 +176,8 @@ For autonomous runs, the **main session is the orchestrator**. It splits the mil
 | `reviewer` | Independent review of one PR, posted as a comment with a verdict and findings | Edit, push or merge |
 | `qa` | After a merge, checks live staging: e2e suites, phone and desktop screenshots, Render logs; files bug issues | Change code or settings |
 | `wiki-keeper` | Brings the wiki in line with what a run built or decided, via its own PR | Edit code, or invent decisions |
+
+**Bot identity ([ADR 0059](wiki/decisions/0059-claude-posts-as-github-app-bot.md)):** only `reviewer` and `qa` post as the "Soul Ledger Claude" GitHub App, with `pnpm bot:gh <gh args>` (they never fall back to the owner's name). Everything else is under the owner's name with plain `gh`/`git`: PRs, implementer replies, orchestrator comments, merges and pushed commits (the bot cannot push or merge). Never read or print the bot's `.pem` key (deny rules in `.claude/settings.json`).
 
 **Separate writers from checkers:** an implementer never reviews its own PR, and the reviewer and QA never edit. Each agent ends with a fixed-format report, so the orchestrator can act on it.
 

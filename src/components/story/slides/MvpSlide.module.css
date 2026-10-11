@@ -1,0 +1,220 @@
+/* MVP slide: one very large percentage inside a double deco frame; nothing else competes. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  min-height: min(24rem, 60cqh);
+  padding: 2rem 1rem;
+  border: 1px solid var(--brass);
+  outline: 1px solid var(--rule);
+  outline-offset: -8px;
+  background: radial-gradient(ellipse 80% 50% at 50% 45%, rgb(79 179 124 / 0.1), transparent 70%);
+  text-align: center;
+}
+
+.lead {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--bone-muted);
+}
+
+.label {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--bone);
+}
+
+.big {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 17vw, 4.75rem);
+  line-height: 1;
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
+}
+
+.scope {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.scopeLine {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--bone);
+}
+
+/* A diamond tile with the hero's art, or their initial if the art is missing (ADR 0060). */
+.monogram {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--brass);
+  background: var(--ink);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--brass);
+  overflow: hidden;
+}
+
+.art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flavor {
+  margin: 0.5rem 0 0;
+  max-width: 20rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--bone-muted);
+  text-wrap: balance;
+}
+
+.friendly {
+  margin: 0;
+  padding: 2rem 1.25rem;
+  border: 1px solid var(--rule);
+  outline: 1px solid var(--rule);
+  outline-offset: -6px;
+  color: var(--bone-muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .card {
+    gap: 0.35rem;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .lead,
+  .scopeLine {
+    font-size: 0.85rem;
+  }
+
+  .label {
+    font-size: 1rem;
+  }
+
+  .big {
+    font-size: 2.5rem;
+  }
+
+  .flavor {
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+}
+
+/* Honorable mentions: two compact runner-up rows under the card. */
+.mentions {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.mentionsHeading {
+  margin: 0 0 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bone-muted);
+}
+
+.mentionList {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mention {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.15rem 0.6rem;
+  font-size: 0.95rem;
+  color: var(--bone);
+}
+
+.mentionValue {
+  font-variant-numeric: tabular-nums;
+  color: var(--brass);
+}
+
+.mentionLine {
+  color: var(--bone-muted);
+}
+
+/* With mentions below, the card gives up its fixed height so everything fits small phones. */
+.compact {
+  min-height: 0;
+  padding: 1rem 0.75rem;
+  gap: 0.4rem;
+}
+
+.compact .big {
+  font-size: clamp(2.75rem, 14vw, 3.75rem);
+}
+
+@container (max-height: 639px) {
+  .mentions {
+    margin-top: 0.3rem;
+  }
+
+  .mentionsHeading {
+    margin-bottom: 0.2rem;
+    font-size: 0.75rem;
+  }
+
+  .mention {
+    font-size: 0.85rem;
+  }
+
+  .mentionLine {
+    display: none;
+  }
+
+  .compact {
+    padding: 0.4rem 0.5rem;
+    gap: 0.1rem;
+  }
+
+  .compact .label {
+    font-size: 1rem;
+  }
+
+  .compact .big {
+    font-size: clamp(2rem, 11vw, 2.5rem);
+    line-height: 1.05;
+  }
+
+  .compact .scopeLine,
+  .compact .flavor {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .compact .flavor {
+    margin-top: 0;
+  }
+
+  .mentionList {
+    gap: 0.2rem;
+  }
+}

@@ -1,0 +1,248 @@
+/* Rank slide: the current badge is the loud thing; the climb is a quiet brass line under it. */
+
+/* Fills the slide body exactly: RankSlide measures it to drop rows that do not fit. */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+}
+
+.content > * {
+  flex: none;
+}
+
+.summary {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--bone);
+  text-wrap: pretty;
+}
+
+.friendly {
+  margin: 0;
+  padding: 2rem 1.25rem;
+  border: 1px solid var(--rule);
+  outline: 1px solid var(--rule);
+  outline-offset: -6px;
+  color: var(--bone-muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.current {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.25rem 1rem;
+  border: 1px solid var(--brass);
+  outline: 1px solid var(--rule);
+  outline-offset: -6px;
+}
+
+.currentName {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1.1;
+  color: var(--brass);
+  text-align: center;
+}
+
+.currentCaption {
+  font-size: 0.95rem;
+  color: var(--bone-muted);
+}
+
+.plot {
+  width: 100%;
+  height: auto;
+  /* A roomy stage must not spend its room here: it would then list fewer rows than a small one. */
+  max-height: 7.5rem;
+}
+
+.guide {
+  stroke: var(--rule);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.line {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+}
+
+.badge {
+  fill: var(--panel);
+  stroke: var(--brass);
+  stroke-width: 1.5;
+}
+
+.badgeNow {
+  fill: var(--green);
+  stroke: var(--bone);
+  stroke-width: 1.5;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--bone);
+}
+
+.item[aria-current="step"] {
+  color: var(--green);
+}
+
+.name {
+  font-size: 1.05rem;
+}
+
+.date {
+  font-size: 0.9rem;
+  color: var(--bone-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Smaller stages (the frame's tiers, see SlideFrame.module.css; the first one starts at 700px here,
+ * not 640px, so a 720p desktop window still lists every row): everything tightens so the current
+ * rank is always whole and in view. RankSlide drops the middle rows when this is still not enough.
+ */
+@container (max-height: 699px) {
+  .content {
+    gap: 0.75rem;
+  }
+
+  .summary {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .current {
+    padding: 0.6rem 1rem;
+  }
+
+  .currentName {
+    font-size: 2rem;
+  }
+
+  .currentCaption {
+    font-size: 0.85rem;
+  }
+
+  .plot {
+    max-height: 6.5rem;
+  }
+
+  .list {
+    gap: 0;
+  }
+
+  .item {
+    padding: 0.25rem 0;
+  }
+
+  .name {
+    font-size: 0.95rem;
+  }
+
+  .date {
+    font-size: 0.8rem;
+  }
+}
+
+@container (max-height: 519px) {
+  .content {
+    gap: 0.5rem;
+  }
+
+  .summary {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  .current {
+    padding: 0.4rem 0.75rem;
+  }
+
+  .currentName {
+    font-size: 1.6rem;
+  }
+
+  .currentCaption {
+    font-size: 0.8rem;
+  }
+
+  .plot {
+    max-height: 4.5rem;
+  }
+
+  .item {
+    padding: 0.15rem 0;
+  }
+
+  .name {
+    font-size: 0.85rem;
+  }
+
+  .date {
+    font-size: 0.75rem;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .content {
+    gap: 0.4rem;
+  }
+
+  .summary {
+    font-size: 0.8rem;
+    line-height: 1.25;
+  }
+
+  .current {
+    padding: 0.3rem 0.5rem;
+  }
+
+  .currentName {
+    font-size: 1.35rem;
+  }
+
+  .currentCaption {
+    font-size: 0.75rem;
+  }
+
+  .plot {
+    max-height: 3.25rem;
+  }
+
+  .item {
+    padding: 0.1rem 0;
+  }
+
+  .name {
+    font-size: 0.8rem;
+  }
+
+  .date {
+    font-size: 0.7rem;
+  }
+}

@@ -21,10 +21,12 @@ The user confirmed the choices listed in the [M1 implementation choices](../open
 | Styling | **No Tailwind** for now; revisit for M2 if wanted |
 | `/api/lookup` | **NDJSON stream** of progress events, then the story |
 | Schema | `player_matches` keeps **flattened stat columns**, not raw API JSON |
-| Parry label | **King at a 60% or higher success rate**, otherwise clown; "none" with no parries landed. *Changed from 50%.* |
+| Parry label | ~~King at a 60% or higher success rate~~ **Superseded by [ADR 0061](0061-parry-king-at-40-percent.md): king at 40% or higher**, otherwise clown; "none" with no parries landed. |
 | Same-hero percentiles | Need 10 or more main-hero matches |
 | Resync | A lookup reuses the cache if the player synced in the last 5 minutes |
 | MVP weights | kills 0.8; deaths, assists 0.9; accuracy, objective damage 1.1; denies, teammate healing, headshot rate 1.2; others 1.0 |
+
+The Tailwind question was settled for M2 by [ADR 0051](0051-m2-visual-motion-styling-stack.md): still no Tailwind.
 
 The tuning values (resync window, sample size, MVP weights) are "keep for now". Revisit them once real stories are visible in M2.
 

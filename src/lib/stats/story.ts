@@ -5,9 +5,25 @@ import type { PlayerMatch } from "./types";
 /** Main-hero share at or above which a player is a one-trick (ADR 0038). */
 export const ONE_TRICK_SHARE = 0.5;
 /** Parry success rate at or above which a player is a parry king rather than a clown (ADR 0040). */
-export const PARRY_KING_RATE = 0.6;
+export const PARRY_KING_RATE = 0.4;
 /** Fewest main-hero matches before we rank against that hero's players. */
 export const MIN_HERO_SAMPLE = 10;
+/** "Recent" overall = the player's latest 300 matches (ADR 0064). */
+export const RECENT_MATCHES = 300;
+/** "Recent" per hero = that hero's latest 20 matches (ADR 0064). */
+export const RECENT_HERO_MATCHES = 20;
+
+/** Win rate over the latest `window` rows; null unless the player has more than that many. */
+export interface RecentRate {
+  matches: number;
+  winRate: number;
+}
+export function recentRate(rows: PlayerMatch[], window: number): RecentRate | null {
+  if (rows.length <= window) return null;
+  const latest = [...rows].sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
+  const slice = latest.slice(0, window);
+  return { matches: window, winRate: slice.filter((r) => r.won).length / window };
+}
 
 export interface RankPoint {
   at: Date;
@@ -40,13 +56,22 @@ export interface Story {
     wins: number;
     winRate: number;
     share: number;
+    /** Latest 20 matches on this hero; null at 20 or fewer. */
+    recent: RecentRate | null;
     /** Ranked against players of the same hero; empty below MIN_HERO_SAMPLE matches. */
     percentiles: PercentileResult[];
   } | null;
   roster: {
     heroesPlayed: number;
     label: "one-trick" | "flex";
-    topHeroes: { heroId: number; matches: number; winRate: number }[];
+    /** Latest 300 matches overall; null at 300 or fewer. */
+    recent: RecentRate | null;
+    topHeroes: {
+      heroId: number;
+      matches: number;
+      winRate: number;
+      recent: RecentRate | null;
+    }[];
   };
   scavenger: { breakables: number; sinnerJackpots: number; idolsReturned: number };
   kills: {
@@ -69,7 +94,6 @@ export interface Story {
   roast: {
     deaths: number;
     deathPositions: [number, number][];
-    avgUnspentGoldMinutes: number;
     worstMatch: { matchId: number; heroId: number; deaths: number } | null;
   };
   rank: { journey: RankPoint[]; current: RankPoint | null };
@@ -124,6 +148,7 @@ export function computeStory(input: StoryInput): Story {
         wins: top.wins,
         winRate: rate(top.wins, top.matches),
         share: rate(top.matches, rows.length),
+        recent: recentRate(top.rows, RECENT_HERO_MATCHES),
         percentiles:
           top.matches >= MIN_HERO_SAMPLE ? comparePlayer(top.rows, input.mainHeroMetrics) : [],
       }
@@ -164,10 +189,12 @@ export function computeStory(input: StoryInput): Story {
     roster: {
       heroesPlayed: heroesByPlay.length,
       label: main && main.share >= ONE_TRICK_SHARE ? "one-trick" : "flex",
+      recent: recentRate(rows, RECENT_MATCHES),
       topHeroes: heroesByPlay.slice(0, 5).map((h) => ({
         heroId: h.heroId,
         matches: h.matches,
         winRate: rate(h.wins, h.matches),
+        recent: recentRate(h.rows, RECENT_HERO_MATCHES),
       })),
     },
     scavenger: {
@@ -206,10 +233,6 @@ export function computeStory(input: StoryInput): Story {
     roast: {
       deaths: total((r) => r.deaths),
       deathPositions: rows.flatMap((r) => r.deathPositions),
-      avgUnspentGoldMinutes: rate(
-        total((r) => r.unspentGoldMinutes),
-        rows.length,
-      ),
       worstMatch: worst
         ? { matchId: worst.matchId, heroId: worst.heroId, deaths: worst.deaths }
         : null,

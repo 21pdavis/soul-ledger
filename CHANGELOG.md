@@ -4,8 +4,28 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Fixed
+
+- On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger (#70).
+
+## [0.2.0] - 2026-10-11
+
+**Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with real hero artwork. The 3D world arrives in M3.
+
 ### Added
 
+- **Paste your Steam profile link and get your story.** The home page asks for your Steam profile URL (no login needed) and remembers it for next time.
+- **All time or This patch.** Choose whether the story covers your whole history or only matches since the latest patch. The story says which one you are looking at, and "Based on N matches" shows how many games it counts.
+- **A loading screen that shows real progress.** While your ledger is being built you see your Steam name and avatar, then your match count with the heroes you have played, then a live tally of matches read, kills and crates smashed. It follows what is actually happening instead of a fake timer: from the first second it says what it is doing (contacting Deadlock, how many matches are left, waiting in line when Deadlock's servers ask us to slow down), and if nothing has happened for 20 seconds it says so and offers a Try again button. Each step stays on screen long enough to read, the counters count up at a readable pace, but a slow lookup is not made any slower, and asking for your profile and match list together makes lookups a little faster.
+- **The 11-slide story.** Your hours and matches, your main hero and how you rank on it, your roster, your Scavenger stats (Crate Goblin, Gambler, and Urn Mule with the urns you returned), how you kill, your precision and parries (you are a parry king from 40%), Mid Boss, where you like to die (a heatmap of your deaths on a map of the lanes), your rank climb, and your signature stat with two honorable mentions. Players with only a few matches still get a story, just without the same-hero rankings.
+- **Your recent form next to your all-time win rate.** The main hero and roster slides show your win rate over your last 300 matches (last 20 per hero) beside the all-time number, with an arrow when you have moved 3 points or more.
+- **Real hero art.** Your main hero, roster, signature stat and the loading screen show the hero's own artwork (heroes without art show initials). The footer says that Valve and its properties are trademarks of Valve Corporation, and that this is a non-commercial fan project not affiliated with Valve.
+- **Play it your way.** On a phone, tap the right side of the screen to go forward and the left to go back (press and hold to pause). On desktop the story is a vertical page of wide cards: scroll down, or use the arrow keys, space or the progress bar down the right edge.
+- **A summary card to finish.** The last slide gathers your headline numbers and your hero pool (your five most-played heroes with their win rates). Replay the story, Refresh to fetch your latest matches, or look up another player.
+- **Friendly problem screens.** If your profile can't be found (check that it's public), the service is down (try again in a minute), the connection drops, or you have no Deadlock matches yet (or none since the latest patch), you get a clear full-screen message with what to do next instead of an error code.
+- **Easier to use for everyone.** The whole site works with the keyboard alone and shows where the keyboard is, text meets contrast guidelines, screen readers announce each slide as you move through the story, and animations are skipped if your device asks for reduced motion.
+- **Every slide fits small phones.** On a small screen the rank climb never runs off the bottom (a long climb shows fewer rows instead), and the other slides tighten up the same way for long hero names and big numbers.
+- **Pressing Enter too early no longer wipes your link.** The profile field and the button wait until the page has finished loading.
 - A private **staging** site for reviewing changes before they go live. It is unlocked with a private access link and deploys from the `staging` branch with its own database. Production is unchanged and still needs no login.
 
 ## [0.1.0] - 2026-10-07
@@ -40,5 +60,6 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - The Render build no longer installs pnpm globally, because Render's global modules folder is read-only.
 - Failed Steam vanity-URL lookups are now logged with the reason. They had failed intermittently in production right after the first deploy.
 
-[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/21pdavis/soul-ledger/releases/tag/v0.1.0

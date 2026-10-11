@@ -1,0 +1,303 @@
+/* One ledger page. Its three entries start as blank ruled lines and fill in as real events arrive. */
+.page {
+  width: min(100%, 30rem);
+}
+
+.announce,
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sheet {
+  padding: 1.75rem 1.5rem 1.5rem;
+  border: 1px solid var(--brass);
+  outline: 1px solid var(--rule);
+  outline-offset: -8px;
+  background: var(--panel);
+}
+
+.entries {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem 0.25rem;
+  border-bottom: 1px dotted var(--rule);
+}
+
+.entry:first-child {
+  padding-top: 0;
+}
+
+.entry:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--brass);
+}
+
+.entry[data-state="blank"] .heading {
+  color: var(--bone-muted);
+}
+
+/* The empty line waiting to be written on. */
+.blank {
+  height: 1.1rem;
+  border-bottom: 1px dashed var(--rule);
+}
+
+.teaser {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--bone-muted);
+}
+
+/* Stage 1 */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* An octagon with a brass rim: the outer shape is brass, the inner one is the picture. */
+.avatar {
+  --cut: 22%;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  background: var(--brass);
+  clip-path: polygon(
+    var(--cut) 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut)),
+    0 var(--cut)
+  );
+}
+
+.avatar img,
+.avatar i {
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  object-fit: cover;
+  background: var(--ink);
+  clip-path: inherit;
+}
+
+.avatar i {
+  display: block;
+  background:
+    radial-gradient(circle at 50% 38%, var(--bone-muted) 0 16%, transparent 17%),
+    radial-gradient(ellipse at 50% 100%, var(--bone-muted) 0 34%, transparent 35%), var(--ink);
+}
+
+.name {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 6vw, 1.75rem);
+  line-height: 1.1;
+  color: var(--bone);
+  overflow-wrap: anywhere;
+}
+
+/* Stage 2 */
+.figure {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 5.4vw, 1.5rem);
+  line-height: 1.2;
+  color: var(--bone);
+  text-wrap: balance;
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  --cut: 28%;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  background: var(--brass);
+  clip-path: polygon(
+    var(--cut) 0,
+    100% 0,
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    0 100%,
+    0 var(--cut)
+  );
+}
+
+.monogram {
+  display: grid;
+  place-items: center;
+  width: calc(100% - 3px);
+  height: calc(100% - 3px);
+  background: var(--ink);
+  clip-path: inherit;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--brass);
+  overflow: hidden;
+}
+
+.art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.more {
+  padding-left: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--bone-muted);
+}
+
+/* Stage 3 */
+.counter {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+}
+
+.count {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 11vw, 3rem);
+  line-height: 1;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.of {
+  font-size: 1rem;
+  color: var(--bone-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: var(--bone-muted);
+}
+
+/* A stepped bar: the fill ends in a ziggurat notch. */
+.track {
+  height: 0.75rem;
+  border: 1px solid var(--rule);
+  background: var(--ink);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8d6f2e, var(--brass));
+  transform-origin: left center;
+}
+
+.tally {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0.9rem 0;
+}
+
+.tally div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.tally dt {
+  font-size: 0.85rem;
+  color: var(--bone-muted);
+}
+
+.tally dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--green);
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  margin: 1.25rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9rem;
+  color: var(--brass);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .note {
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes breathe {
+  /* The note is text: its dimmest point must still meet AA contrast (brass on the panel, tested in a11y.spec.ts). */
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.stalled {
+  margin: 1.25rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.stalledTitle {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+.retry {
+  margin-top: 0.75rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
+  font: inherit;
+  color: var(--brass);
+  background: transparent;
+  border: 1px solid var(--brass);
+  cursor: pointer;
+}

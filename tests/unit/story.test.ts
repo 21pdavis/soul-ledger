@@ -96,10 +96,10 @@ describe("computeStory on the test account", () => {
     });
   });
 
-  it("roast: every death position, hoarded souls and the worst match", () => {
+  it("roast: every death position and the worst match", () => {
     expect(story.roast.deaths).toBe(total((r) => r.deaths));
     expect(story.roast.deathPositions).toHaveLength(total((r) => r.deathPositions.length));
-    expect(story.roast.avgUnspentGoldMinutes).toBeCloseTo(total((r) => r.unspentGoldMinutes) / 351);
+    expect(story.roast).not.toHaveProperty("avgUnspentGoldMinutes");
     const worst = Math.max(...normal.map((r) => r.deaths));
     expect(story.roast.worstMatch).toMatchObject({ deaths: worst });
   });
@@ -175,10 +175,10 @@ describe("computeStory edge cases", () => {
   });
 
   it.each([
-    [6, "king"],
-    [5, "clown"],
+    [4, "king"],
+    [3, "clown"],
   ] as const)(
-    "parry king line is 60 percent: %i of 10 parries landed is %s (ADR 0040)",
+    "parry king line is 40 percent: %i of 10 parries landed is %s (ADR 0061)",
     (n, label) => {
       const s = computeStory({
         matches: [row({ parrySuccess: n, parryMiss: 10 - n })],
@@ -265,5 +265,40 @@ describe("computeStory edge cases", () => {
     expect(s.intro).toMatchObject({ matches: 0, winRate: 0, firstMatchAt: null });
     expect(s.roast.worstMatch).toBeNull();
     expect(s.rank.current).toBeNull();
+  });
+});
+
+describe("recent win rates (ADR 0064)", () => {
+  /** n matches of one hero, oldest first; the first `lost` are losses, the rest wins. */
+  const synth = (heroId: number, n: number, lost: number, startAt = 0): PlayerMatch[] =>
+    Array.from({ length: n }, (_, i) => ({
+      ...normal[0],
+      matchId: 900000 + heroId * 10000 + i,
+      heroId,
+      won: i >= lost,
+      startTime: new Date(1_700_000_000_000 + (startAt + i) * 3_600_000),
+    }));
+  const run = (matches: PlayerMatch[]) =>
+    computeStory({ matches, rankHistory: [], globalMetrics: metrics, mainHeroMetrics: metrics });
+
+  it("overall recent = the latest 300 matches", () => {
+    const s = run(synth(1, 400, 100));
+    expect(s.roster.recent).toEqual({ matches: 300, winRate: 1 });
+    expect(s.intro.winRate).toBeCloseTo(0.75);
+  });
+
+  it("overall recent is null when the player has 300 matches or fewer", () => {
+    expect(run(synth(1, 300, 100)).roster.recent).toBeNull();
+  });
+
+  it("main recent = the hero's latest 20 matches, null at 20 or fewer", () => {
+    expect(run(synth(1, 80, 30)).main?.recent).toEqual({ matches: 20, winRate: 1 });
+    expect(run(synth(1, 20, 10)).main?.recent).toBeNull();
+  });
+
+  it("top heroes carry their own recent 20", () => {
+    const s = run([...synth(1, 80, 30), ...synth(2, 60, 60, 100)]);
+    expect(s.roster.topHeroes[0].recent).toEqual({ matches: 20, winRate: 1 });
+    expect(s.roster.topHeroes[1].recent).toEqual({ matches: 20, winRate: 0 });
   });
 });

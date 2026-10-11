@@ -1,0 +1,66 @@
+.bar {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Desktop: a column of segments down the side, the same states and hit areas turned 90 degrees. */
+.bar[data-orientation="vertical"] {
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bar[data-orientation="vertical"] .segment {
+  flex: none;
+  width: 4px;
+  height: 2.25rem;
+}
+
+.bar[data-orientation="vertical"] .hit {
+  inset: 0 -10px;
+  width: auto;
+  height: 100%;
+}
+
+.segment {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--rule);
+}
+
+.segment[data-state="done"] {
+  background: var(--brass);
+}
+
+.segment[data-state="current"] {
+  background: var(--bone);
+}
+
+/* A taller invisible hit area so the thin segment is easy to click or tap. */
+.hit {
+  position: absolute;
+  inset: -10px 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

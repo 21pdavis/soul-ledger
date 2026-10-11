@@ -1,0 +1,172 @@
+/* Slide 7: a single faceted Rejuvenator over the count, in a centred column. */
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 1rem;
+  height: 100%;
+  min-height: 0;
+  text-align: center;
+}
+
+.gem {
+  width: clamp(5rem, 28vw, 8rem);
+  height: auto;
+  filter: drop-shadow(0 0 14px rgb(79 179 124 / 0.45));
+}
+
+.body {
+  fill: rgb(79 179 124 / 0.22);
+  stroke: var(--brass);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.facet {
+  fill: none;
+  stroke: var(--green);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+/* Nothing claimed: the same gem, drawn as an empty outline. */
+.gem[data-filled="false"] {
+  filter: none;
+}
+
+.gem[data-filled="false"] .body {
+  fill: none;
+  stroke: var(--bone-muted);
+  stroke-dasharray: 5 5;
+}
+
+.gem[data-filled="false"] .facet {
+  stroke: var(--rule);
+}
+
+.count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 0.75rem 0 0.5rem;
+  border-top: 3px double var(--brass);
+  border-bottom: 1px solid var(--rule);
+}
+
+.numeral {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 20vw, 6rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone);
+}
+
+.label {
+  font-size: 0.9375rem;
+  color: var(--bone-muted);
+}
+
+.empty {
+  margin: 0;
+  padding: 0.75rem 0 0.5rem;
+  width: 100%;
+  border-top: 3px double var(--brass);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--bone);
+  text-wrap: balance;
+}
+
+.line {
+  margin: 0;
+  max-width: 30ch;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  color: var(--bone);
+}
+
+/* A ruled plate for the steal, like a note pencilled in the margin of the ledger. */
+.stolen {
+  margin: 0.25rem 0 0;
+  padding: 0.5rem 0.875rem;
+  max-width: 32ch;
+  border: 1px solid var(--green);
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--green);
+}
+
+.slide[data-animate="true"] .gem {
+  animation: rise 450ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.slide[data-animate="true"] .stolen {
+  animation: fade 250ms ease-out both;
+  animation-delay: 550ms;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.85);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (max-height: 680px) {
+  .slide {
+    gap: 0.625rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide .gem,
+  .slide .stolen {
+    animation: none;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .slide {
+    gap: 0.4rem;
+  }
+
+  .gem {
+    width: 3.5rem;
+  }
+
+  .numeral {
+    font-size: 2.75rem;
+  }
+
+  .count {
+    padding: 0.4rem 0 0.3rem;
+  }
+
+  .label,
+  .stolen {
+    font-size: 0.8rem;
+  }
+
+  .line {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  .stolen {
+    padding: 0.3rem 0.6rem;
+    line-height: 1.3;
+  }
+}

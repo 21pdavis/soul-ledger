@@ -1,38 +1,30 @@
 name: CI
 
 # One run per change (ADR 0047): PRs, plus pushes to the long-lived branches.
+# Two depths (ADR 0063): a PR into staging runs the smoke end-to-end set; anything aimed at main
+# (the staging -> main PR, and pushes to main) runs the full suite with coverage.
+# Three parallel jobs: checks and unit tests on one runner, end-to-end split by device on two more.
 on:
   pull_request:
   push:
     branches: [main, staging]
 
 jobs:
-  test:
+  checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Docs-only PRs (markdown, wiki/, .claude/) skip typecheck, tests and e2e.
-      # Pushes to main/staging and any PR touching other files run everything.
       - name: Classify changes
         id: changes
+        run: bash scripts/ci-classify.sh
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: |
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "code=true" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          files=$(git diff --name-only "origin/$BASE_REF...HEAD")
-          echo "Changed files:"; echo "$files"
-          if echo "$files" | grep -qvE '(\.md$|^wiki/|^\.claude/)'; then
-            echo "code=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "code=false" >> "$GITHUB_OUTPUT"
-            echo "Docs-only change: running format, lint and wiki check only."
-          fi
+          REF: ${{ github.ref }}
+          EVENT_NAME: ${{ github.event_name }}
 
       - uses: pnpm/action-setup@v4
 
@@ -58,20 +50,86 @@ jobs:
 
       # Integration tests use in-process PGlite, so no database service is needed.
       - name: Unit and integration tests
-        if: steps.changes.outputs.code == 'true'
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full != 'true'
         run: pnpm test
+
+      - name: Unit and integration tests with coverage (full)
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full == 'true'
+        run: pnpm test:coverage
+
+  e2e:
+    name: e2e (${{ matrix.device }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - device: phone
+            projects: --project=phone
+          # The gate project (staging access link) is desktop-only, so it rides with desktop.
+          - device: desktop
+            projects: --project=desktop --project=gate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Classify changes
+        id: changes
+        run: bash scripts/ci-classify.sh
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          REF: ${{ github.ref }}
+          EVENT_NAME: ${{ github.event_name }}
+
+      - uses: pnpm/action-setup@v4
+        if: steps.changes.outputs.code == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.changes.outputs.code == 'true'
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - if: steps.changes.outputs.code == 'true'
+        run: pnpm install --frozen-lockfile
+
+      # Next.js reuses its compile cache between runs; Playwright keeps its downloaded browser.
+      - uses: actions/cache@v4
+        if: steps.changes.outputs.code == 'true'
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**') }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      - uses: actions/cache@v4
+        if: steps.changes.outputs.code == 'true'
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright browser
         if: steps.changes.outputs.code == 'true'
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: End-to-end tests (phone and desktop)
+      - name: Build
         if: steps.changes.outputs.code == 'true'
-        run: pnpm test:e2e
+        run: pnpm build
+
+      # Smoke: every spec except the worst-case slide-fit matrix, which keeps its tightest phone size
+      # (360x640). The rest of that matrix runs in the full suite.
+      - name: End-to-end tests, smoke
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full != 'true'
+        run: pnpm e2e:smoke ${{ matrix.projects }}
+
+      - name: End-to-end tests, full
+        if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full == 'true'
+        run: pnpm exec playwright test ${{ matrix.projects }}
 
       - uses: actions/upload-artifact@v4
         if: failure() && steps.changes.outputs.code == 'true'
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.device }}
           path: playwright-report/
           retention-days: 7

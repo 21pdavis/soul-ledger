@@ -1,0 +1,177 @@
+.slide {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  height: 100%;
+}
+
+/* A stamped figure: big deco numerals over a brass double rule, the unit set small beneath. */
+.figure {
+  padding-bottom: 1rem;
+  border-bottom: 3px double var(--brass);
+}
+
+.line {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: clamp(3.75rem, 19vw, 6.25rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: 1.125rem;
+  color: var(--bone-muted);
+}
+
+.dates {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* A ledger line: label, dotted leader, date. */
+.entry {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--bone);
+}
+
+.leader {
+  flex: 1;
+  border-bottom: 1px dotted var(--rule);
+}
+
+.footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-bottom: 0.5rem;
+}
+
+.basedOn {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--bone);
+}
+
+.window {
+  margin: 0.125rem 0 0;
+  font-size: 0.875rem;
+  color: var(--bone-muted);
+}
+
+.refresh {
+  flex: none;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.125rem;
+  border: 1px solid var(--brass);
+  background: transparent;
+  color: var(--brass);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.refresh:hover {
+  background: var(--brass);
+  color: var(--ink);
+}
+
+.refresh:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+/* Smaller stages (the frame's tiers, see SlideFrame.module.css): the figures and gaps tighten. */
+@container (max-height: 639px) {
+  .slide {
+    gap: 1.25rem;
+  }
+
+  .figure {
+    padding-bottom: 0.75rem;
+  }
+
+  .number {
+    font-size: clamp(3rem, 17cqw, 5rem);
+  }
+
+  .unit {
+    font-size: 1rem;
+  }
+}
+
+@container (max-height: 519px) {
+  .slide {
+    gap: 0.75rem;
+  }
+
+  .figure {
+    padding-bottom: 0.5rem;
+  }
+
+  .number {
+    font-size: clamp(2.5rem, 17cqw, 3.25rem);
+  }
+
+  .unit {
+    font-size: 0.9rem;
+  }
+
+  .entry,
+  .basedOn {
+    font-size: 0.85rem;
+  }
+
+  .window {
+    font-size: 0.8rem;
+  }
+
+  .refresh {
+    min-height: 2.5rem;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+@container (max-height: 419px) {
+  .slide {
+    gap: 0.5rem;
+  }
+
+  .figure {
+    padding-bottom: 0.35rem;
+  }
+
+  .number {
+    font-size: 2.25rem;
+  }
+
+  .unit {
+    font-size: 0.85rem;
+  }
+
+  .dates {
+    gap: 0.25rem;
+  }
+
+  .footer {
+    padding-bottom: 0;
+  }
+}

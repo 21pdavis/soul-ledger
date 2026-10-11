@@ -1,0 +1,16 @@
+/* Palette and type tokens (ADR 0031, 0051). Contrast is checked in tests/unit/story/contrast.test.ts. */
+:root {
+  --ink: #0d0b10;
+  --panel: #17131c;
+  --bone: #ece6d8;
+  --bone-muted: #a9a293;
+  --brass: #c9a24b;
+  --green: #4fb37c;
+  --rule: #3a3140;
+
+  --font-display: var(--font-limelight), Georgia, serif;
+  --font-body: var(--font-space-grotesk), system-ui, sans-serif;
+
+  --story-width: 480px;
+  --slide-ms: 250ms;
+}

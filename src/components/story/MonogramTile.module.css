@@ -1,0 +1,61 @@
+.tile {
+  --size: 2.75rem;
+  --cut: 28%;
+  --octagon: polygon(
+    var(--cut) 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut)),
+    0 var(--cut)
+  );
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--size);
+  aspect-ratio: 1;
+  background: var(--brass);
+  clip-path: var(--octagon);
+}
+
+.tile[data-size="lg"] {
+  --size: clamp(4rem, 29cqw, 7.5rem);
+  --cut: 24%;
+}
+
+/* The smallest stages (see SlideFrame.module.css): smaller tiles, so names keep their room. */
+@container (max-height: 419px) {
+  .tile {
+    --size: 2rem;
+  }
+
+  .tile[data-size="lg"] {
+    --size: 3.5rem;
+  }
+}
+
+/* The ink face sits 2px inside the brass edge, cut to the same octagon. */
+.inner {
+  position: absolute;
+  inset: 2px;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  clip-path: var(--octagon);
+  color: var(--brass);
+  font-family: var(--font-display);
+  font-size: calc(var(--size) * 0.36);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+/* Hero art fills the octagon, cropped to its centre. */
+.art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
