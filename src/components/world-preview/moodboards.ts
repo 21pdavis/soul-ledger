@@ -1,82 +1,78 @@
 /**
- * Mood boards for the three rough worlds. Images are hot-linked from Steam's store page for
- * Deadlock (app 1422450) and never committed: the repo is public (ADR 0068).
+ * The mood board for the city tour: official images from the City Never Sleeps map update page
+ * (playdeadlock.com/cityneversleeps). Hot-linked from Valve's CDN and never committed: the repo is
+ * public (ADR 0068).
  */
-const steam = (hash: string) =>
-  `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1422450/${hash}/ss_${hash}.600x338.jpg`;
+const CNS = "https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/cityneversleeps";
+const img = (file: string, caption: string) => ({ src: `${CNS}/${file}`, caption });
 
-const REF = {
-  header:
-    "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1422450/aa249c5e8cc8f90941bd1dbdc311773cd1afe065/header.jpg",
-  ritual: steam("fa25560cf85debe669f5d4acd76cf81b0943019b"),
-  roster: steam("1a5a68e51d6aff5e2910410f84854c4c39af68cc"),
-  amberPatron: steam("52159118573367c304c43fc9ed85588c0c518a19"),
-  sapphirePatron: steam("ac02851ede518092df55746dbc98a199c91d7411"),
-  alley: steam("caaf254176430d69244b99e565d3d56559f1743b"),
-};
-
-export type WorldId = "street" | "fog" | "lane";
-
-export interface MoodBoard {
-  id: WorldId;
-  name: string;
-  pitch: string;
+export interface BoardSection {
+  title: string;
   palette: string[];
   notes: string[];
   images: { src: string; caption: string }[];
 }
 
-export const MOOD_BOARDS: MoodBoard[] = [
-  {
-    id: "street",
-    name: "Neon Cursed Apple street",
-    pitch:
-      "Night on a wet 1920s New York street: Art Deco towers, neon signs, a glowing apple sign.",
-    palette: ["#0d0b10", "#ff3d7f", "#3de0c8", "#4fb37c", "#ffb347"],
-    notes: [
-      "Stepped Art Deco towers with lit windows, fading into fog",
-      "Neon signs in pink, teal and green; a Cursed Apple sign at the end of the street",
-      "Wet road that catches the neon; street lamps; floating dust",
-      "Busiest look of the three, so the story cards sit on a darker glass panel",
-    ],
-    images: [
-      { src: REF.header, caption: "Key art: the cast and the city" },
-      { src: REF.alley, caption: "Street-level brick and stone, warm lamps" },
-      { src: REF.roster, caption: "Poster-style red, teal and ink" },
-    ],
-  },
-  {
-    id: "fog",
-    name: "Occult fog",
-    pitch: "A thick green fog, a ritual circle, floating crystals and the Patron looming behind.",
-    palette: ["#0a120e", "#4fb37c", "#9dffb0", "#6a4c8c", "#c9a24b"],
-    notes: [
-      "Heavy green fog: buildings are silhouettes, so it is the calmest behind text",
-      "A glowing ritual circle with floating green crystals, like the mansion seance",
-      "Slow-turning sigil rings in the air; a tall antlered Patron figure far back",
-      "Cheapest of the three to run (fog hides distance)",
-    ],
-    images: [
-      { src: REF.ritual, caption: "Green ritual circle and candles" },
-      { src: REF.amberPatron, caption: "The Patron: a looming figure, warm light" },
-      { src: REF.sapphirePatron, caption: "The other Patron: cold blue glow" },
-    ],
-  },
-  {
-    id: "lane",
-    name: "The lane",
-    pitch: "Dusk in a Deadlock lane: troopers march, Guardians stand watch, zip lines overhead.",
-    palette: ["#2a1e1a", "#e8a25a", "#ff8a3d", "#3d8bff", "#ece6d8"],
-    notes: [
-      "A city street turned battle lane, amber team at one end, sapphire at the other",
-      "Small troopers marching to meet in the middle; Guardian statues on plinths",
-      "Zip lines on poles along the lane with a rider sliding along",
-      "Warmest light; most like real gameplay, best fit for duels later",
-    ],
-    images: [
-      { src: REF.alley, caption: "Lane-side stone, sand and warm light" },
-      { src: REF.amberPatron, caption: "Amber team colour" },
-      { src: REF.sapphirePatron, caption: "Sapphire team colour" },
-    ],
-  },
-];
+export const MOOD_BOARD: { name: string; pitch: string; sections: BoardSection[] } = {
+  name: "City Never Sleeps tour",
+  pitch:
+    "A low-poly copy of the new map. The camera swoops through the three lanes past still, posed heroes; your stats decide who stands where.",
+  sections: [
+    {
+      title: "The map",
+      palette: ["#1a2030", "#4a3e4c", "#b97a52", "#2a2628"],
+      notes: [
+        "Round city: Blue lane down the middle, Green on the right, Yellow on the left",
+        "Four districts between them: Theater, Chinatown, Haunted Lot, Plaza; mid boss in the middle",
+        "Dusk everywhere: dark blue-grey sky, mauve haze, a warm band at the horizon",
+        "Each lane's zip line glows in its colour, as in game; nothing flickers",
+      ],
+      images: [
+        img("map_neutral.png", "All three lanes and the four districts"),
+        img("header_city.webp", "The skyline"),
+      ],
+    },
+    {
+      title: "Blue lane: Uptown, Times Square, Downtown",
+      palette: ["#3a3842", "#4c3f3c", "#5ab4ff", "#ffcf7a", "#ff3d5a"],
+      notes: ["Grey stone and brick, marquees, billboards, elevated tracks, tall Deco towers"],
+      images: [
+        img("uptown_01.jpg", "Uptown: the ritual circle plaza"),
+        img("times_square_05.jpg", "Times Square: the elevated tracks"),
+        img("broadway_01.jpg", "Broadway signs"),
+      ],
+    },
+    {
+      title: "Green lane: Umbria University, Central Park, Brownstones",
+      palette: ["#0e1915", "#24402d", "#50805c", "#6dff9a"],
+      notes: ["Green lamps and hedges, the Hangman's Elm, stone bridges, brownstone rows"],
+      images: [
+        img("campus_01.jpg", "Umbria University gates"),
+        img("central_park_02.jpg", "Central Park and the Hangman's Elm"),
+        img("campus_02.jpg", "Brownstones"),
+      ],
+    },
+    {
+      title: "Yellow lane: Stock Exchange, Seaport, Old Fairfax",
+      palette: ["#372c23", "#4f4032", "#7a6347", "#b59c6b", "#ffd24a"],
+      notes: ["Sandstone and brass, the exchange's columns, dock cranes, silos and chimneys"],
+      images: [
+        img("stock_exchange_03.jpg", "Stock Exchange"),
+        img("seaport_01.jpg", "Seaport Dock"),
+        img("factory_03.jpg", "Old Fairfax Factories"),
+      ],
+    },
+    {
+      title: "Districts",
+      palette: ["#6a2a22", "#4a3a48", "#26302a", "#c46aff"],
+      notes: [
+        "Chinatown's red neon and bell tower, the Theater dome, the Haunted Lot, the Plaza statue",
+      ],
+      images: [
+        img("chinatown_01.jpg", "Chinatown"),
+        img("haunted_slums_01.jpg", "Haunted Lot"),
+        img("fairfax_plaza_01.jpg", "Plaza"),
+      ],
+    },
+  ],
+};

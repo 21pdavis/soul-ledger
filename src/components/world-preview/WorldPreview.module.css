@@ -7,15 +7,7 @@
   height: 100dvh;
   overflow: hidden;
   /* Glass panels, so the world shows through the story's cards. Stage and card both use it. */
-  --panel: rgb(23 19 28 / 0.55);
-}
-
-.page[data-world="street"] {
-  --panel: rgb(16 12 22 / 0.62);
-}
-
-.page[data-world="lane"] {
-  --panel: rgb(23 16 18 / 0.66);
+  --panel: rgb(20 16 24 / 0.6);
 }
 
 .world {
@@ -118,6 +110,12 @@
   background: none;
   border: 0;
   cursor: pointer;
+}
+
+.board h3 {
+  margin: 14px 0 6px;
+  font: 15px var(--font-display);
+  color: var(--bone);
 }
 
 .board ul {
