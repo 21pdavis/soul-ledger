@@ -48,6 +48,11 @@
   background: transparent;
 }
 
+/* The Scavenger slide draws its own solid ink card inside the frame; dev class names keep the module name. */
+.story :global([class*="ScavengerSlide"][class*="card"]) {
+  background: rgb(13 11 16 / 0.35);
+}
+
 .story :global([data-testid="story-stage"]) {
   backdrop-filter: blur(1.5px);
 }
