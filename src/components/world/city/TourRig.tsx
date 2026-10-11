@@ -66,11 +66,11 @@ interface Flight {
  * slow device arrives on time in fewer frames.
  */
 /**
- * Preview aid: `?cam=px,py,pz,lx,ly,lz` in the address pins the camera there (looking at the
+ * Preview aid (development only): `?cam=px,py,pz,lx,ly,lz` in the address pins the camera there (looking at the
  * second point) instead of following the story, for inspecting any part of the city.
  */
 function pinnedShot(): Shot | null {
-  if (typeof window === "undefined") return null;
+  if (process.env.NODE_ENV === "production" || typeof window === "undefined") return null;
   const v = new URLSearchParams(window.location.search).get("cam")?.split(",").map(Number);
   if (!v || v.length !== 6 || v.some((n) => !Number.isFinite(n))) return null;
   return { kind: "free", pos: [v[0], v[1], v[2]], look: [v[3], v[4], v[5]] };

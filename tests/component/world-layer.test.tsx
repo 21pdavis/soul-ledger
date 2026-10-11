@@ -5,8 +5,12 @@ import { GRAPHICS_KEY } from "@/lib/client/graphics";
 import { fixtureStory } from "../fixtures/story";
 
 // The real canvas needs WebGL, which jsdom lacks; a stand-in shows where it would mount.
+const canvasThrows = vi.hoisted(() => ({ on: false }));
 vi.mock("@/components/world/WorldCanvas", () => ({
-  default: ({ slide }: { slide: number }) => <div data-testid="world-canvas" data-slide={slide} />,
+  default: ({ slide }: { slide: number }) => {
+    if (canvasThrows.on) throw new Error("WebGL context lost");
+    return <div data-testid="world-canvas" data-slide={slide} />;
+  },
 }));
 
 /**
@@ -14,7 +18,18 @@ vi.mock("@/components/world/WorldCanvas", () => ({
  * graphics level allows it; otherwise (Off, or no WebGL) a still picture of the city.
  */
 describe("WorldLayer", () => {
-  afterEach(() => localStorage.clear());
+  afterEach(() => {
+    localStorage.clear();
+    canvasThrows.on = false;
+  });
+
+  it("falls back to the still picture if the 3D fails, instead of breaking the page", async () => {
+    canvasThrows.on = true;
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    render(<WorldLayer story={fixtureStory()} slide={0} started webgl reducedMotion={false} />);
+    expect(await screen.findByTestId("world-still")).toBeInTheDocument();
+    expect(screen.queryByTestId("world-canvas")).not.toBeInTheDocument();
+  });
 
   it("shows the still picture, not the canvas, without WebGL", async () => {
     render(

@@ -47,12 +47,22 @@ function safeStorage(): Storage | undefined {
   }
 }
 
-/** True when this browser can draw WebGL (checked once, on a throwaway canvas). */
+let webglSupport: boolean | undefined;
+
+/**
+ * True when this browser can draw WebGL. Checked once per page on a throwaway canvas whose
+ * context is released straight away (browsers cap live contexts, and Replay remounts the world).
+ */
 export function supportsWebGL(): boolean {
+  if (webglSupport !== undefined) return webglSupport;
   try {
     const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
+    const gl = (canvas.getContext("webgl2") ??
+      canvas.getContext("webgl")) as WebGLRenderingContext | null;
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    webglSupport = Boolean(gl);
   } catch {
-    return false;
+    webglSupport = false;
   }
+  return webglSupport;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy, useMemo } from "react";
+import { Component, Suspense, lazy, useMemo, type ReactNode } from "react";
 import { chooseGraphics, loadSavedGraphics, supportsWebGL } from "@/lib/client/graphics";
 import type { StoryData } from "@/story/types";
 import styles from "./World.module.css";
@@ -19,10 +19,30 @@ interface Props {
   reducedMotion?: boolean;
 }
 
+function Still() {
+  // eslint-disable-next-line @next/next/no-img-element -- a plain decorative backdrop
+  return <img className={styles.still} src="/world/still.webp" alt="" data-testid="world-still" />;
+}
+
+/**
+ * Anything that goes wrong in the 3D (a chunk that fails to load, a lost WebGL context, a scene
+ * error) shows the still picture instead. The world is decoration; it must never take the story
+ * down with it.
+ */
+class StillOnError extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? <Still /> : this.props.children;
+  }
+}
+
 /**
  * The world behind the story (ADR 0068, 0069): the low-poly city on Full or Simple, or a still
- * picture of it on Off (and wherever WebGL is missing). Purely decorative: hidden from assistive
- * technology and never takes the pointer.
+ * picture of it on Off (and wherever WebGL is missing or the 3D fails). Purely decorative: hidden
+ * from assistive technology and never takes the pointer.
  */
 export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Props) {
   const level = useMemo(
@@ -37,13 +57,14 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
   return (
     <div className={styles.layer} data-testid="world" data-level={level} aria-hidden="true">
       {level === "off" ? (
-        // eslint-disable-next-line @next/next/no-img-element -- a plain decorative backdrop
-        <img className={styles.still} src="/world/still.webp" alt="" data-testid="world-still" />
+        <Still />
       ) : (
         started && (
-          <Suspense fallback={null}>
-            <WorldCanvas slide={slide} story={story} />
-          </Suspense>
+          <StillOnError>
+            <Suspense fallback={null}>
+              <WorldCanvas slide={slide} story={story} />
+            </Suspense>
+          </StillOnError>
         )
       )}
     </div>

@@ -9,6 +9,8 @@ decided_on: 2026-10-06
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T16:00:00Z }
 ---
 
+> **Partly superseded** by [ADR 0069](0069-m3-city-tour-and-hero-cards.md) (2026-10-11); see its "Supersedes in part" section.
+
 # Decision
 
 - **Style:** flat-shaded, faceted low-poly. Each model is built around the hero's **silhouette and signature prop**. Colors come from the API hero `colors`, plus emissive accents.
