@@ -62,3 +62,38 @@ describe("WorldLayer", () => {
     expect(await screen.findByTestId("world-canvas")).toBeInTheDocument();
   });
 });
+
+describe("WorldLayer on a server-rendered page", () => {
+  it("renders the same thing on the server and on first browser render (no hydration mismatch)", async () => {
+    const { renderToString } = await import("react-dom/server");
+    const { hydrateRoot } = await import("react-dom/client");
+    const { act } = await import("react");
+    const ui = (
+      <WorldLayer story={fixtureStory()} slide={0} started={false} reducedMotion={false} />
+    );
+    // The server has no WebGL to probe; the browser here does (webgl defaults to the probe).
+    const realDocument = globalThis.document;
+    const html = (() => {
+      // @ts-expect-error simulate the server: no document to create a probe canvas on
+      delete globalThis.document;
+      try {
+        return renderToString(ui);
+      } finally {
+        globalThis.document = realDocument;
+      }
+    })();
+    const probe = vi
+      .spyOn(HTMLCanvasElement.prototype, "getContext")
+      .mockReturnValue({ getExtension: () => null } as unknown as RenderingContext);
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    document.body.appendChild(container);
+    const recoverable = vi.fn();
+    await act(async () => {
+      hydrateRoot(container, ui, { onRecoverableError: recoverable });
+    });
+    expect(recoverable).not.toHaveBeenCalled();
+    probe.mockRestore();
+    container.remove();
+  });
+});

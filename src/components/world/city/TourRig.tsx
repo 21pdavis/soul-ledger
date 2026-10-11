@@ -25,6 +25,8 @@ const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2
 const SPEED = 24;
 /** How far the camera drifts sideways at the middle of a hop between stops. */
 const WEAVE = 2.4;
+/** How far into the open space beside the card the focal point sits (0 = at the card's edge). */
+const FOCUS_INSET = 0.33;
 /** Only wide screens show the desktop card stack; phones keep the scene centred. */
 const WIDE_ASPECT = 1.2;
 
@@ -36,8 +38,12 @@ const WIDE_ASPECT = 1.2;
 function sceneShift(width: number, side: "left" | "right") {
   const gutter = THREE.MathUtils.clamp(width * 0.12, 72, 192);
   const card = Math.min(480, width * 0.42, width - 2 * gutter);
-  const open = side === "left" ? [gutter + card, width - 48] : [48, width - gutter - card];
-  return ((open[0] + open[1]) / 2 - width / 2) / width;
+  // The focal point sits in the inner part of the open space, close to the card, so the eye
+  // moves between the two instead of across the whole screen.
+  const edge = side === "left" ? gutter + card : width - gutter - card;
+  const open = side === "left" ? width - 48 - edge : edge - 48;
+  const focus = side === "left" ? edge + open * FOCUS_INSET : edge - open * FOCUS_INSET;
+  return (focus - width / 2) / width;
 }
 
 interface Flight {
@@ -66,8 +72,8 @@ interface Flight {
  * slow device arrives on time in fewer frames.
  */
 /**
- * Preview aid (development only): `?cam=px,py,pz,lx,ly,lz` in the address pins the camera there (looking at the
- * second point) instead of following the story, for inspecting any part of the city.
+ * Preview aid (development only): `?cam=px,py,pz,lx,ly,lz` in the address pins the camera
+ * there, looking at the second point, instead of following the story. For inspecting the city.
  */
 function pinnedShot(): Shot | null {
   if (process.env.NODE_ENV === "production" || typeof window === "undefined") return null;
@@ -173,7 +179,7 @@ export function TourRig({ shots: storyShots, slide }: { shots: Shot[]; slide: nu
     // Lens shift: slide the picture so the scene sits in the space beside the card. The frustum
     // moves by filmOffset / filmWidth of the near-plane width.
     const wide = cam.aspect > WIDE_ASPECT;
-    const want = wide ? sceneShift(frame.size.width, CARD_SIDES[i]) : 0;
+    const want = wide ? sceneShift(frame.size.width, CARD_SIDES[i]) + (shot.nudge ?? 0) : 0;
     shift.current += (want - shift.current) * Math.min(1, Math.min(delta, 0.1) * 3);
     const nearWidth = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect;
     const offset = -shift.current * nearWidth * cam.getFilmWidth();

@@ -1,6 +1,7 @@
 "use client";
 
 import { Component, Suspense, lazy, useMemo, type ReactNode } from "react";
+import { useIsClient } from "@/components/story/useIsClient";
 import { chooseGraphics, loadSavedGraphics, supportsWebGL } from "@/lib/client/graphics";
 import type { StoryData } from "@/story/types";
 import styles from "./World.module.css";
@@ -45,15 +46,21 @@ class StillOnError extends Component<{ children: ReactNode }, { failed: boolean 
  * from assistive technology and never takes the pointer.
  */
 export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Props) {
+  // The level depends on the browser (WebGL, saved choice), which the server cannot see. Decide
+  // it only once the browser has taken over, so server and first browser render match.
+  const client = useIsClient();
   const level = useMemo(
     () =>
-      chooseGraphics({
-        webgl: webgl ?? supportsWebGL(),
-        reducedMotion: reducedMotion ?? false,
-        saved: loadSavedGraphics(),
-      }),
-    [webgl, reducedMotion],
+      !client
+        ? null
+        : chooseGraphics({
+            webgl: webgl ?? supportsWebGL(),
+            reducedMotion: reducedMotion ?? false,
+            saved: loadSavedGraphics(),
+          }),
+    [client, webgl, reducedMotion],
   );
+  if (!level) return <div className={styles.layer} data-testid="world" aria-hidden="true" />;
   return (
     <div className={styles.layer} data-testid="world" data-level={level} aria-hidden="true">
       {level === "off" ? (

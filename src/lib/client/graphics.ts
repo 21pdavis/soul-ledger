@@ -54,6 +54,8 @@ let webglSupport: boolean | undefined;
  * context is released straight away (browsers cap live contexts, and Replay remounts the world).
  */
 export function supportsWebGL(): boolean {
+  // On the server there is nothing to probe; say no, but do not remember it.
+  if (typeof document === "undefined") return false;
   if (webglSupport !== undefined) return webglSupport;
   try {
     const canvas = document.createElement("canvas");

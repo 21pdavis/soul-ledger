@@ -223,7 +223,9 @@
   background: transparent;
 }
 
+/* Off to the side on desktop, the card can be nearly solid: the scene beside it is not behind it. */
 .root[data-world="on"] .card {
+  --panel: rgb(20 16 24 / 0.86);
   max-width: min(30rem, 42vw);
 }
 
