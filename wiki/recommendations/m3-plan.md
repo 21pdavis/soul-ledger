@@ -37,6 +37,8 @@ Iterate on localhost first and get the owner's sign-off before PRs to `staging` 
 - The owner asked that every hero model also get a **zip-line hang pose**: the climb slide shows your main riding the Blue lane's zip line.
 - The preview tour and its look are on branch `m3-style-roughs` (`/dev/world`); map reference in [the Cursed Apple research](../research/cursed-apple-map.md).
 
-# Open at the start of M3
+# Settled during step 1
 
-- Which heroes are the owner's top 3 (from the roster card of the owner's account).
+- **Checkpoint heroes:** the owner's top 3 are **Celeste** (id 81), **Paradox** (10) and **Ivy** (20), from deadlock-api hero stats on the owner's account and confirmed by the owner (2026-10-11). Next after them: Paige (67) and The Doorman (69).
+- **Duel opponent:** the owner confirmed duels show the reader's real nemesis, as ADR 0068 already sets out (the killer slot in match data). The preview still uses a stand-in rival.
+- **Still open:** the [model style](../open-questions/m3-model-style.md), faceted or sculpted.
