@@ -18,3 +18,5 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T12:00:00Z }
 # Open
 
 How the models get made, and how many heroes to model, is in [model pipeline](0019-code-built-hero-models.md).
+
+> **Superseded in part ([ADR 0068](0068-m3-scope-and-order.md)):** the world should read as a low-poly Deadlock (1920s occult New York, Art Deco, the Cursed Apple), not only fog and neon.
