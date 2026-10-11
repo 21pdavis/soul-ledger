@@ -53,6 +53,11 @@
   background: rgb(13 11 16 / 0.35);
 }
 
+/* Desktop: thinner cards, pushed to one side per slide (rules generated in WorldPreview). */
+.story :global([data-testid="story-card"]) {
+  max-width: min(30rem, 42vw);
+}
+
 .story :global([data-testid="story-stage"]) {
   backdrop-filter: blur(1.5px);
 }

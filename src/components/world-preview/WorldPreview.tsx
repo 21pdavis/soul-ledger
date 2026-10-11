@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { StoryStage } from "@/components/app/StoryStage";
 import { SLIDES } from "@/story/copy";
 import { fixtureSlideProps } from "../../../tests/fixtures/story";
+import { CARD_SIDES } from "./city/tour";
 import { MOOD_BOARD } from "./moodboards";
 import styles from "./WorldPreview.module.css";
 
@@ -13,6 +14,12 @@ const WorldCanvas = dynamic(() => import("./WorldCanvas"), { ssr: false });
 
 const props = fixtureSlideProps();
 const SLIDE_IDS = SLIDES.map((s) => s.id);
+
+/** Desktop cards sit to one side, per slide, so the scene beside them shows (see CARD_SIDES). */
+const CARD_SIDE_CSS = SLIDE_IDS.map(
+  (id, i) =>
+    `[data-testid="story-card"][data-slide="${id}"] { margin-${CARD_SIDES[i] === "left" ? "right" : "left"}: auto; }`,
+).join("\n");
 
 /** Follows the story's current slide from the stage's data-slide, without touching the player. */
 function useCurrentSlide() {
@@ -55,6 +62,7 @@ export function WorldPreview() {
 
   return (
     <div className={styles.page}>
+      <style>{CARD_SIDE_CSS}</style>
       <div className={styles.world}>
         <WorldCanvas slide={slide} story={props.story} />
       </div>

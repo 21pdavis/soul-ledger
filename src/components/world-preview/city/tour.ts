@@ -9,6 +9,25 @@ export interface Shot {
   look: Vec3;
 }
 
+/**
+ * On desktop, which side of the screen each slide's card sits on (story order). The camera frames
+ * its scene in the open space on the other side. Zig-zags so the scroll down the stack weaves.
+ */
+export type CardSide = "left" | "right";
+export const CARD_SIDES: CardSide[] = [
+  "left", // intro
+  "right", // main
+  "left", // roster
+  "right", // scavenger
+  "left", // kills
+  "right", // precision
+  "left", // mid boss
+  "right", // roast
+  "left", // rank
+  "right", // mvp
+  "left", // summary
+];
+
 /** A hero standing in the city: an art-card standee now, a posed model later (ADR 0068). */
 export interface CastMember {
   heroId: number;
@@ -84,7 +103,7 @@ export function planTour(story: StoryData): TourPlan {
   stand(main, lineUp("fairfax", 1, -2)[0], ff, 1.25);
 
   // 3 roster: your top heroes lined up on the Seaport dock.
-  const sea = streetShot("seaport", 15, -2, 2.8, 2.4);
+  const sea = streetShot("seaport", 20, -2, 3.2, 2.4);
   shots.push(sea);
   lineUp("seaport", Math.min(roster.length, 5), -3).forEach((p, i) => stand(roster[i], p, sea));
 
@@ -115,7 +134,7 @@ export function planTour(story: StoryData): TourPlan {
   // 8 roast: wherever you die most, with the hero of your worst match.
   const fallback = lanePoint("blue", 0.3).p;
   const [dx, dz] = deathSpot ?? [fallback.x, fallback.z];
-  const roast: Shot = { pos: [dx + 5, 20, dz + 13], look: [dx, 1, dz] };
+  const roast: Shot = { pos: [dx + 4, 28, dz + 12], look: [dx, 1, dz] };
   shots.push(roast);
   stand(worst, [dx + 1.5, 0, dz], roast);
 

@@ -3,7 +3,12 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
-import type { Shot } from "./tour";
+import { CARD_SIDES, type Shot } from "./tour";
+
+/** Where the scene's centre lands, as a fraction of screen width from the middle, beside a side card. */
+const SCENE_SHIFT = 0.22;
+/** Only wide screens show the desktop card stack; phones keep the scene centred. */
+const WIDE_ASPECT = 1.2;
 
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
@@ -21,8 +26,9 @@ export function SwoopRig({ shots, slide }: { shots: Shot[]; slide: number }) {
     duration: number;
     lift: number;
   } | null>(null);
+  const shift = useRef(0);
 
-  useFrame((frame) => {
+  useFrame((frame, delta) => {
     // Flights run on the clock, not frame counts, so a slow device arrives on time (in fewer frames).
     const now = frame.clock.elapsedTime;
     const i = Math.min(slide, shots.length - 1);
@@ -54,6 +60,19 @@ export function SwoopRig({ shots, slide }: { shots: Shot[]; slide: number }) {
     camera.position.setY(camera.position.y + Math.sin(Math.PI * k) * s.lift);
     s.look.lerpVectors(s.from.look, new THREE.Vector3(...shot.look), k);
     camera.lookAt(s.look);
+
+    // Lens shift: slide the picture so the scene sits beside the card, not behind it. The frustum
+    // moves by filmOffset / filmWidth of the near-plane width (filmWidth is the gauge on wide screens).
+    const cam = frame.camera as THREE.PerspectiveCamera;
+    const wide = cam.aspect > WIDE_ASPECT;
+    const want = wide ? (CARD_SIDES[i] === "left" ? SCENE_SHIFT : -SCENE_SHIFT) : 0;
+    shift.current += (want - shift.current) * Math.min(1, Math.min(delta, 0.1) * 3);
+    const nearWidth = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect;
+    const offset = -shift.current * nearWidth * cam.getFilmWidth();
+    if (Math.abs(offset - cam.filmOffset) > 1e-4) {
+      cam.filmOffset = offset;
+      cam.updateProjectionMatrix();
+    }
   });
   return null;
 }
