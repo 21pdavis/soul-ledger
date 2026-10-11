@@ -213,3 +213,24 @@
     transition: none;
   }
 }
+
+/*
+ * With the 3D world behind the story (ADR 0069): glass panels instead of solid ink, no lattice
+ * backdrop, and on desktop thinner cards stepping left or right so the scene shows beside them.
+ */
+.root[data-world="on"] {
+  --panel: rgb(20 16 24 / 0.6);
+  background: transparent;
+}
+
+.root[data-world="on"] .card {
+  max-width: min(30rem, 42vw);
+}
+
+.root[data-world="on"] .card[data-side="left"] {
+  margin-right: auto;
+}
+
+.root[data-world="on"] .card[data-side="right"] {
+  margin-left: auto;
+}

@@ -1,0 +1,26 @@
+/* The 3D world behind the story (ADR 0068, 0069): a fixed layer under the player. */
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The canvas fades in once its first frame is drawn, so it never pops in. */
+.canvas {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.canvas[data-ready="true"] {
+  opacity: 1;
+}
+
+/* Off (and no WebGL): one still picture of the city, dimmed under the story. */
+.still {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.55;
+}

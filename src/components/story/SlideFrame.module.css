@@ -76,3 +76,8 @@
     font-size: 1.2rem;
   }
 }
+
+/* With the world behind (ADR 0069) the card or stage is the one glass layer; the frame stays clear. */
+:global([data-world="on"]) .frame {
+  background: transparent;
+}

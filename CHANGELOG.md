@@ -4,6 +4,11 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Added
+
+- A low-poly copy of the Cursed Apple now sits behind your story. Devices that can't show 3D, and anyone who prefers reduced motion, see a still picture of the city instead.
+- On desktop the story cards are slimmer and step left and right, leaving room for the city beside them.
+
 ### Fixed
 
 - On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger (#70).

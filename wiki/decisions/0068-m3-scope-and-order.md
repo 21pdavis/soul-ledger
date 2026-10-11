@@ -9,6 +9,8 @@ decided_on: 2026-10-11
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-11T06:30:00Z }
 ---
 
+> **Partly superseded** by [ADR 0069](0069-m3-city-tour-and-hero-cards.md) (2026-10-11); see its "Supersedes in part" section.
+
 # Context
 
 The owner settled M3 in a grilling session on 2026-10-11. Since the original plan ([ADR 0028](0028-milestones.md), [ADR 0019](0019-code-built-hero-models.md)), the owner approved real hero art ([ADR 0065](0065-hero-art-served-locally.md)), so heroes no longer need a model to appear. Build steps are in the [M3 plan](../recommendations/m3-plan.md).

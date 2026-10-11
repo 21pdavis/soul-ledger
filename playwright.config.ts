@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { GRAPHICS_KEY } from "./src/lib/client/graphics";
 import { PACE_OVERRIDE_KEY } from "./src/lib/client/loading-pace";
 
 const DEFAULT_PORT = 3100;
@@ -42,7 +43,12 @@ const paceOff = {
   origins: [
     {
       origin: new URL(remote ?? `http://localhost:${PORT}`).origin,
-      localStorage: [{ name: PACE_OVERRIDE_KEY, value: "off" }],
+      localStorage: [
+        { name: PACE_OVERRIDE_KEY, value: "off" },
+        // The 3D world off by default: test browsers draw WebGL in software, far too slowly for
+        // the story specs. world.spec.ts turns it back on to test the world itself.
+        { name: GRAPHICS_KEY, value: "off" },
+      ],
     },
   ],
 };

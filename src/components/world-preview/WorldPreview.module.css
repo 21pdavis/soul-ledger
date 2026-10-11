@@ -1,0 +1,131 @@
+/* The style preview (ADR 0068 step 1): the world fills the screen, the real story sits on top. */
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.story {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+/* Hide story (H) hides the player only, leaving the world behind it in view. */
+.story[data-hidden="true"] :global([data-testid="story-player"]) {
+  visibility: hidden;
+}
+
+.toolbar {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: calc(100vw - 16px);
+}
+
+.toolbar button {
+  padding: 4px 8px;
+  font: 12px/1.2 var(--font-body);
+  color: var(--bone);
+  background: rgb(13 11 16 / 0.8);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toolbar button[aria-pressed="true"] {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.board {
+  position: fixed;
+  top: 44px;
+  right: 8px;
+  z-index: 3;
+  width: min(380px, calc(100vw - 16px));
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
+  padding: 12px 14px;
+  background: rgb(13 11 16 / 0.94);
+  border: 1px solid var(--brass);
+  font-size: 13px;
+}
+
+.board header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.board h2 {
+  margin: 0;
+  font: 20px var(--font-display);
+  color: var(--brass);
+}
+
+.board header button {
+  font-size: 20px;
+  color: var(--bone);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.board h3 {
+  margin: 14px 0 6px;
+  font: 15px var(--font-display);
+  color: var(--bone);
+}
+
+.board ul {
+  padding-left: 18px;
+  color: var(--bone-muted);
+}
+
+.swatches {
+  display: flex;
+  gap: 4px;
+}
+
+.swatches span {
+  width: 28px;
+  height: 18px;
+  border: 1px solid var(--rule);
+}
+
+.images {
+  display: grid;
+  gap: 8px;
+}
+
+.images figure {
+  margin: 0;
+}
+
+.images img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+}
+
+.images figcaption {
+  margin-top: 2px;
+  color: var(--bone-muted);
+  font-size: 12px;
+}
+
+.credit {
+  color: var(--bone-muted);
+  font-size: 11px;
+}
