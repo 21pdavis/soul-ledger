@@ -1,0 +1,164 @@
+/* The style preview (ADR 0068 step 1): the world fills the screen, the real story sits on top. */
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  /* Glass panels, so the world shows through the story's cards. Stage and card both use it. */
+  --panel: rgb(23 19 28 / 0.55);
+}
+
+.page[data-world="street"] {
+  --panel: rgb(16 12 22 / 0.62);
+}
+
+.page[data-world="lane"] {
+  --panel: rgb(23 16 18 / 0.66);
+}
+
+.world {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+.canvas {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.canvas[data-ready="true"] {
+  opacity: 1;
+}
+
+.story {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+}
+
+.story[data-hidden="true"] {
+  visibility: hidden;
+}
+
+/* The player paints an ink lattice behind the stage; let the world show instead. */
+.story :global([data-testid="story-player"]) {
+  background: transparent;
+}
+
+/* Only one glass layer: the slide frame inside the card or stage stays clear. */
+.story :global(section) {
+  background: transparent;
+}
+
+.story :global([data-testid="story-stage"]) {
+  backdrop-filter: blur(1.5px);
+}
+
+.toolbar {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: calc(100vw - 16px);
+}
+
+.toolbar button {
+  padding: 4px 8px;
+  font: 12px/1.2 var(--font-body);
+  color: var(--bone);
+  background: rgb(13 11 16 / 0.8);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toolbar button[aria-pressed="true"] {
+  border-color: var(--brass);
+  color: var(--brass);
+}
+
+.board {
+  position: fixed;
+  top: 44px;
+  right: 8px;
+  z-index: 3;
+  width: min(380px, calc(100vw - 16px));
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
+  padding: 12px 14px;
+  background: rgb(13 11 16 / 0.94);
+  border: 1px solid var(--brass);
+  font-size: 13px;
+}
+
+.board header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.board h2 {
+  margin: 0;
+  font: 20px var(--font-display);
+  color: var(--brass);
+}
+
+.board header button {
+  font-size: 20px;
+  color: var(--bone);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.board ul {
+  padding-left: 18px;
+  color: var(--bone-muted);
+}
+
+.swatches {
+  display: flex;
+  gap: 4px;
+}
+
+.swatches span {
+  width: 28px;
+  height: 18px;
+  border: 1px solid var(--rule);
+}
+
+.images {
+  display: grid;
+  gap: 8px;
+}
+
+.images figure {
+  margin: 0;
+}
+
+.images img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+}
+
+.images figcaption {
+  margin-top: 2px;
+  color: var(--bone-muted);
+  font-size: 12px;
+}
+
+.credit {
+  color: var(--bone-muted);
+  font-size: 11px;
+}
