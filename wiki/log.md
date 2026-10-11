@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-11
+* **Decision**: [ADR 0069](decisions/0069-m3-city-tour-and-hero-cards.md): the M3 world is a static low-poly City Never Sleeps tour (Yellow to Blue to Green, level weaving camera, projected death map, sewer mid boss), and heroes stay art cards for 0.3.0 because code-sculpted models fell short. Resolves the [model style question](open-questions/m3-model-style.md); supersedes parts of ADRs 0068 and 0025.
 * **Creation**: [M3 model style](open-questions/m3-model-style.md): open question on faceted blocks (ADR 0025) versus the sculpted low-poly look the owner asked for on the mid boss.
 * **Research**: [The Cursed Apple map after City Never Sleeps](research/cursed-apple-map.md): the post-update layout, lane stops, bridges, Guardians, mid boss pit and look, as reference for the M3 low-poly city preview.
 * **Decision**: [ADR 0068](decisions/0068-m3-scope-and-order.md): M3 settled in a grilling session: a story-following low-poly Deadlock world, art cards for every hero, nemesis duels, Full/Simple/Off graphics with an auto-drop below 20 fps, and low-poly posed models starting with a three-hero checkpoint before the rest of 0.3.0. Supersedes parts of ADRs 0013, 0019 and 0028.

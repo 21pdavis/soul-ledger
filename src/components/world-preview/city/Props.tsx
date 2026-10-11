@@ -5,7 +5,6 @@ import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { DeathBins } from "@/story/death-bins";
-import { HeroModel, MODELLED_HEROES, gripHeight } from "./HeroModel";
 import { PALETTE, type Vec3 } from "./layout";
 import { MIDBOSS_PARTS, buildMidBossGeometry, frontAt } from "./midboss";
 import type { CastMember, Duel } from "./tour";
@@ -35,30 +34,21 @@ export function Glow({ color, opacity = 1 }: { color: string; opacity?: number }
   );
 }
 
-/** The zip lines hang this high over the street. */
-export const ZIP_HEIGHT = 10.5;
-
 /**
- * A hero in the city: their sculpted model in the scene's pose if they have one, otherwise the
- * art-card standee (which also shows while a model builds).
+ * A flat colour in the shape of a picture's opaque part: the cut-out's outline and back. (A plain
+ * alphaMap would read the picture's green channel, not its transparency.)
  */
-export function Figure({ member }: { member: CastMember }) {
-  if (!MODELLED_HEROES.has(member.heroId)) return <Standee member={member} />;
-  const pose = member.pose ?? "idle";
-  const [x, y, z] = member.pos;
-  const at: Vec3 = pose === "zipline" ? [x, ZIP_HEIGHT - gripHeight(pose), z] : [x, y, z];
-  return (
-    <HeroModel
-      heroId={member.heroId}
-      pose={pose}
-      pos={at}
-      facing={member.facing}
-      fallback={<Standee member={member} />}
-    />
-  );
+function silhouetteMaterial(map: THREE.Texture, color: string) {
+  return new THREE.ShaderMaterial({
+    side: THREE.DoubleSide,
+    uniforms: { map: { value: map }, color: { value: new THREE.Color(color) } },
+    vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: `uniform sampler2D map; uniform vec3 color; varying vec2 vUv;
+      void main() { if (texture2D(map, vUv).a < 0.4) discard; gl_FragColor = vec4(color, 1.0); }`,
+  });
 }
 
-/** A hero as an art-card standee on a stone plinth. Static: it never turns to follow the camera. */
+/** A hero as a cut-out standee on an Art Deco plinth. Static: it never turns to follow the camera. */
 export function Standee({ member }: { member: CastMember }) {
   const texture = useTexture(`/heroes/${member.heroId}-card.webp`, (t) => {
     t.colorSpace = THREE.SRGBColorSpace;
@@ -68,22 +58,33 @@ export function Standee({ member }: { member: CastMember }) {
   const s = member.scale ?? 1;
   const h = 2.9 * s;
   const [x, y, z] = member.pos;
+  const silhouette = useMemo(() => silhouetteMaterial(texture, "#c9a24b"), [texture]);
+  useLayoutEffect(() => () => silhouette.dispose(), [silhouette]);
   return (
     <>
       <group position={member.pos} rotation={[0, member.facing, 0]}>
         {!member.zipline && (
-          <mesh position={[0, 0.15, 0]}>
-            <cylinderGeometry args={[0.85 * s, 0.95 * s, 0.3, 8]} />
-            <Mat color="#2a2428" metal={0.4} />
-          </mesh>
+          // A stepped Art Deco plinth with a brass band, like a carnival display stand.
+          <>
+            <mesh position={[0, 0.12, 0]}>
+              <boxGeometry args={[h * aspect * 0.95, 0.24, 0.7 * s]} />
+              <Mat color="#2a2428" metal={0.3} />
+            </mesh>
+            <mesh position={[0, 0.27, 0]}>
+              <boxGeometry args={[h * aspect * 0.8, 0.08, 0.6 * s]} />
+              <Mat color="#c9a24b" metal={0.7} rough={0.35} />
+            </mesh>
+          </>
         )}
-        <mesh position={[0, 0.3 + h / 2, -0.02]}>
-          <planeGeometry args={[h * aspect + 0.14, h + 0.14]} />
-          <meshBasicMaterial color="#c9a24b" toneMapped={false} side={THREE.DoubleSide} />
+        {/* The cut-out: the hero's bust (the card art is transparent around them), with a brass
+            outline following their silhouette, which also backs the figure when seen from behind. */}
+        <mesh position={[0, 0.3 + h / 2, -0.03]} scale={[1.045, 1.03, 1]}>
+          <planeGeometry args={[h * aspect, h]} />
+          <primitive object={silhouette} attach="material" />
         </mesh>
         <mesh position={[0, 0.3 + h / 2, 0]}>
           <planeGeometry args={[h * aspect, h]} />
-          <meshBasicMaterial map={texture} toneMapped={false} />
+          <meshBasicMaterial map={texture} alphaTest={0.4} toneMapped={false} />
         </mesh>
       </group>
       {member.zipline && (
@@ -187,8 +188,8 @@ export function DuelStage({ duel }: { duel: Duel }) {
   const [cx, cy, cz] = duel.clash;
   return (
     <>
-      <Figure member={duel.a} />
-      <Figure member={duel.b} />
+      <Standee member={duel.a} />
+      <Standee member={duel.b} />
       {/* One side's fire, the other's spirit, meeting in the middle. */}
       <Line points={[[ax, 2, az], duel.clash]} color="#ff8a3d" lineWidth={5} toneMapped={false} />
       <Line points={[[bx, 2, bz], duel.clash]} color="#9ad4ff" lineWidth={5} toneMapped={false} />

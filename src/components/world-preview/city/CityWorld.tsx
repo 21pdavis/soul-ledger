@@ -23,10 +23,10 @@ import {
   Car,
   DeathProjector,
   DuelStage,
-  Figure,
   Glow,
   PrecisionShot,
   SewerPit,
+  Standee,
   Truck,
 } from "./Props";
 import { TourRig } from "./TourRig";
@@ -386,7 +386,7 @@ export default function CityWorld({ slide, story }: { slide: number; story: Stor
       <Lanes />
       <Landmarks />
       {tour.cast.map((m, i) => (
-        <Figure key={i} member={m} />
+        <Standee key={i} member={m} />
       ))}
       <DuelStage duel={tour.duel} />
       <PrecisionShot from={tour.shot.from} target={tour.shot.target} />

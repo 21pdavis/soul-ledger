@@ -123,8 +123,6 @@ export interface CastMember {
   scale?: number;
   /** Hanging from the lane's zip line by a hook (pos is the card's bottom). */
   zipline?: boolean;
-  /** The pose a sculpted model takes here (standees ignore it). */
-  pose?: "idle" | "attack" | "zipline";
 }
 
 export interface Duel {
@@ -227,14 +225,12 @@ export function planTour(story: StoryData): TourPlan {
   const duel: Duel = {
     a: {
       heroId: main,
-      pose: "attack",
       pos: aPos,
       facing: blend(toward(aPos, bPos), faceToward(aPos, camUp), 0.6),
       scale: 1.1,
     },
     b: {
       heroId: rival,
-      pose: "attack",
       pos: bPos,
       facing: blend(toward(bPos, aPos), faceToward(bPos, camUp), 0.6),
       scale: 1.1,
@@ -247,7 +243,7 @@ export function planTour(story: StoryData): TourPlan {
   shots.push(ts);
   const from = atStop("timesSquare", 0, 3.2, 7.45);
   const target = atStop("timesSquare", -14, -1.2, 0);
-  stand(main, from, ts, { pose: "attack" });
+  stand(main, from, ts);
 
   // 7 mid boss: down in the sewer pit under Times Square.
   const p = stopPoint("timesSquare").p;
