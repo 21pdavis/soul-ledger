@@ -14,7 +14,7 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | Priority | Item | Links |
 |---|---|---|
 | P0 | Before the repo goes public (ADR 0032), fix every open issue labelled [`pre-public`](https://github.com/21pdavis/soul-ledger/issues?q=is%3Aissue%20is%3Aopen%20label%3Apre-public), including #8 and #9. They gate the M2 staging to main promotion | [ADR 0032](../decisions/0032-github-private-ci.md) |
-| P0 | Build M3: the 3D world behind the story column, then hero models for all playable heroes in batches | [ADR 0028](../decisions/0028-milestones.md), [ADR 0050](../decisions/0050-m2-story-flow-and-controllers.md) |
+| P0 | Build M3 per the [M3 plan](m3-plan.md): style roughs, a three-model checkpoint, then 0.3.0 and model batches | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
 | P1 | Trial Haiku 5.5 for one well-specified implementer task in M3; record cost and quality in the milestone log, then decide | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md) |
 | P2 | Add a PreToolUse hook that filters test output down to failures (`.claude/settings.json` is the hard-limit file, so this needs owner approval) | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md), [Claude Code costs](https://code.claude.com/docs/en/costs) |
 | P2 | Move the OKF/wiki detail out of CLAUDE.md into a skill, keeping CLAUDE.md small (it loads in every agent every turn) | [ADR 0057](../decisions/0057-token-efficient-unattended-runs.md) |
@@ -26,6 +26,9 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P1 | Check what accolade 11 (breakables) includes. The unspent-souls stat was dropped on 2026-10-08 ([ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md)) | [bulk metadata](../research/bulk-match-metadata.md) |
 | P1 | Replace monogram tiles with deadlock-api hero images | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P2 | Remove the unspent-souls code path (`SHOW_UNSPENT_SOULS_FIGURE`, roast copy); keep the DB column and parsing | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
+| P2 | Optional ambient sound (rain, city hum), off by default with a mute button; a separate design job, not in M3 | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
+| P2 | Load the next slides' 3D assets ahead of time (like Reels), only if lag shows up in M3 | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
+| P2 | Picture-comparison tests for hero models (they hold still, so they compare reliably) | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
 | P2 | Big visual style pass (fonts, look) after M3 or later | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P1 | Make the cached-matches note an overlay so it stops squeezing the stage on tiny phones (#38) | [M2 plan](m2-plan.md) |
 | P2 | Add an e2e reduced-motion check (today only component tests cover it) | [ADR 0054](../decisions/0054-m2-testing-and-accessibility.md) |
