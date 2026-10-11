@@ -12,7 +12,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
-        sync: false # Neon main branch connection string, set in the Render Dashboard
+        sync: false # Neon main branch, as the limited soul_ledger_app login (ADR 0067); set in the Render Dashboard
       - key: STEAM_API_KEY
         sync: false # optional; set only if vanity lookups start failing (wiki/research/steam-vanity-resolution.md)
 
@@ -33,6 +33,6 @@ services:
       - key: STAGING_ACCESS_KEY
         sync: false # 32+ random chars; open the site once with ?key=<it>, or send it as x-staging-token
       - key: DATABASE_URL
-        sync: false # Neon staging branch connection string
+        sync: false # Neon staging branch, as soul_ledger_app (ADR 0067)
       - key: STEAM_API_KEY
         sync: false # optional, as in production

@@ -1,5 +1,8 @@
 # Directory Update Log
 
+## 2026-10-11
+* **Decision**: [ADR 0067](decisions/0067-database-logins-per-environment.md): production and staging now connect as a limited `soul_ledger_app` login (rows only), and the production owner password was reset and lives only in the owner's password manager. Closes #8 and #9.
+
 ## 2026-10-09
 * **Decision**: [ADR 0066](decisions/0066-death-map-on-roast-slide.md): the roast slide’s death heatmap is drawn on a stylised Deadlock map on a finer grid (supersedes the "no map" part of ADR 0053).
 * **Decision**: [ADR 0063](decisions/0063-two-depth-ci.md): CI runs a smoke browser set on PRs into `staging` and the full suite with coverage only on the `staging` to `main` PR and pushes to `main`. Prompted by 11 to 12 minute CI runs.
