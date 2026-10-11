@@ -94,6 +94,33 @@ test.describe("phone: tap controller", () => {
     await expect(stage(page)).toHaveAttribute("data-slide", "summary");
   });
 
+  // #70: after a touch ends the browser sends a click at the finger's spot. When the tap has just
+  // swapped in the summary, that click used to land on Replay / Look up another player.
+  test("the tap that opens the summary does not also press a summary button", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await openStory(page);
+    for (let i = 0; i < SLIDES.length - 1; i++) {
+      await settled(page);
+      await tapSide(page, "right");
+    }
+    await expect(stage(page)).toHaveAttribute("data-slide", "summary");
+    const spots: { x: number; y: number }[] = [];
+    for (const name of ["Replay", "Look up another player"]) {
+      const box = (await page.getByRole("button", { name }).boundingBox())!;
+      spots.push({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
+    }
+    for (const spot of spots) {
+      await settled(page);
+      await tapSide(page, "left"); // back to the last story slide
+      await expect(stage(page)).toHaveAttribute("data-slide", "mvp");
+      await settled(page);
+      await page.touchscreen.tap(spot.x, spot.y);
+      await expect(stage(page)).toHaveAttribute("data-slide", "summary");
+      await page.waitForTimeout(300); // long enough for a stray click to have been handled
+      await expect(stage(page)).toHaveAttribute("data-slide", "summary");
+    }
+  });
+
   test("tapping the left side goes back, and does nothing on the first slide", async ({ page }) => {
     await openStory(page);
     await tapSide(page, "left");
