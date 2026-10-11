@@ -189,8 +189,9 @@ export function meshField(field: Field, min: V3, max: V3, cell: number): THREE.B
   const index: number[] = [];
   const quad = (a: number, b: number, c: number, d: number, flip: boolean) => {
     if (a < 0 || b < 0 || c < 0 || d < 0) return;
-    if (flip) index.push(a, c, b, a, d, c);
-    else index.push(a, b, c, a, c, d);
+    // Wound so the outside faces out (the side the browser draws).
+    if (flip) index.push(a, b, c, a, c, d);
+    else index.push(a, c, b, a, d, c);
   };
   for (let k = 1; k < nz - 1; k++) {
     for (let j = 1; j < ny - 1; j++) {

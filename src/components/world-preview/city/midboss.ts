@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import {
   blend,
   carve,
@@ -82,18 +83,27 @@ const carved = carve(
 /** The tongue, hanging from the mouth down the trunk. */
 const field = blend(0.2, carved, limb([0, 7.6, 2.3], [0.15, 3.6, 1.95], 0.3, 0.24, MAROON));
 
-/** Builds the mesh: about a 0.3-unit grid, so it reads low-poly but organic. */
+/**
+ * Builds the mesh: about a 0.3-unit grid, so it reads low-poly but organic. The grid reaches below
+ * the floor so the tentacles' undersides close (the pit floor hides that part).
+ */
 export function buildMidBossGeometry() {
-  return meshField(field, [-5.6, 0, -5.6], [5.6, 14.2, 5.6], 0.3);
+  return meshField(field, [-6, -1.2, -6], [6, 15, 6], 0.3);
+}
+
+/** How far forward (+z) the body's surface is at a height, found by stepping in from the front. */
+export function frontAt(y: number, x = 0): number {
+  const p = new Vector3();
+  for (let z = 5; z > 0; z -= 0.02) if (field(p.set(x, y, z)).d < 0) return z;
+  return 0;
 }
 
 /** The small and shiny parts, in the boss's own frame. */
 export const MIDBOSS_PARTS = {
   dome: { at: [0, 12.35, 0.15] as V3, r: 1.6 },
   eye: { at: [0, 12.3, 0.35] as V3, r: 0.95 },
-  /** Teeth line the groove, pointing inward from each side. */
+  /** Teeth line the groove, pointing inward from each side, set into the surface. */
   teeth: Array.from({ length: 5 }, (_, i) => 9.6 - i * 0.5),
-  mouthZ: 2.3,
   /** Hands at the ends of the four arms, for the claws. */
   hands: [
     [4.3, 6.5, 1.6],

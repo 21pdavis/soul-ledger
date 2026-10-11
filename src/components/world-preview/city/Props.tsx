@@ -6,7 +6,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { DeathBins } from "@/story/death-bins";
 import { PALETTE, type Vec3 } from "./layout";
-import { MIDBOSS_PARTS, buildMidBossGeometry } from "./midboss";
+import { MIDBOSS_PARTS, buildMidBossGeometry, frontAt } from "./midboss";
 import type { CastMember, Duel } from "./tour";
 
 /** Flat-shaded low-poly material, the look for everything solid (ADR 0025). */
@@ -300,7 +300,9 @@ export function SewerPit({ at, beamTo }: { at: Vec3; beamTo: Vec3 }) {
 function MidBoss({ beamTo }: { beamTo: Vec3 }) {
   const geometry = useMemo(() => buildMidBossGeometry(), []);
   useLayoutEffect(() => () => geometry.dispose(), [geometry]);
-  const { dome, eye, teeth, mouthZ, hands } = MIDBOSS_PARTS;
+  const { dome, eye, teeth, hands } = MIDBOSS_PARTS;
+  // Seat each tooth just inside the groove's edge, wherever the sculpt put the surface.
+  const toothZ = useMemo(() => teeth.map((y) => frontAt(y, 0.3) - 0.05), [teeth]);
   const origin: Vec3 = [-1, 0, -1];
   // Turned to face the camera's corner of the pit; the beam target is taken into the turned frame.
   const turn = Math.PI / 4;
@@ -315,7 +317,12 @@ function MidBoss({ beamTo }: { beamTo: Vec3 }) {
   return (
     <group position={origin} rotation={[0, turn, 0]}>
       <mesh geometry={geometry}>
-        <meshStandardMaterial vertexColors roughness={0.75} metalness={0.05} />
+        <meshStandardMaterial
+          vertexColors
+          roughness={0.75}
+          metalness={0.05}
+          side={THREE.DoubleSide}
+        />
       </mesh>
       <mesh position={eye.at}>
         <sphereGeometry args={[eye.r, 16, 12]} />
@@ -337,10 +344,10 @@ function MidBoss({ beamTo }: { beamTo: Vec3 }) {
         />
       </mesh>
       {[-1, 1].map((sd) =>
-        teeth.map((y) => (
+        teeth.map((y, ti) => (
           <mesh
             key={`${sd}${y}`}
-            position={[sd * 0.3, y, mouthZ]}
+            position={[sd * 0.3, y, toothZ[ti]]}
             rotation={[0, 0, (sd * Math.PI) / 2]}
           >
             <coneGeometry args={[0.08, 0.3, 4]} />
