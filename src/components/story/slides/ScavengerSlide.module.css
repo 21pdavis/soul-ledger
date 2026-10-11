@@ -168,3 +168,8 @@
     font-size: 1.125rem;
   }
 }
+
+/* With the world behind (ADR 0069), the inner card is glass too, so the city shows through. */
+:global([data-world="on"]) .card {
+  background: rgb(13 11 16 / 0.35);
+}

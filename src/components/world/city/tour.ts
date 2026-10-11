@@ -11,24 +11,7 @@ import {
   type Vec3,
 } from "./layout";
 
-/**
- * On desktop, which side of the screen each slide's card sits on (story order). The camera frames
- * its scene in the open space on the other side. Zig-zags so the scroll down the stack weaves.
- */
-export type CardSide = "left" | "right";
-export const CARD_SIDES: CardSide[] = [
-  "left", // intro
-  "right", // main
-  "left", // roster
-  "right", // scavenger
-  "left", // kills
-  "right", // precision
-  "left", // mid boss
-  "right", // roast
-  "left", // rank
-  "right", // mvp
-  "left", // summary
-];
+export { CARD_SIDES, type CardSide } from "@/story/card-sides";
 
 /** The height the camera cruises at along the lanes: below the rooftops, above the heroes. */
 export const CRUISE_HEIGHT = 4.6;

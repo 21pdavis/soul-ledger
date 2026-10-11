@@ -174,15 +174,22 @@ test.describe("desktop: scroll controller", () => {
     await expect(segments(page).nth(0)).toHaveAttribute("data-state", "current");
   });
 
-  test("the slides are wide cards with room above and gutters left and right", async ({ page }) => {
+  // ADR 0069 replaced the wide centred cards of ADR 0062: with the 3D world behind, cards are
+  // thinner and step left and right so each scene shows beside its card.
+  test("the slides are thin cards stepping left and right, with room above and a gutter", async ({
+    page,
+  }) => {
     await openStory(page);
     const viewport = page.viewportSize()!;
-    const box = (await card(page, 0).boundingBox())!;
-    expect(box.width).toBeGreaterThan(640); // not the 480px phone column
-    expect(box.width).toBeGreaterThan(box.height * 0.9); // landscape-ish, not 9:16
-    expect(box.y).toBeGreaterThanOrEqual(24); // breathing room above the story
-    expect(box.x).toBeGreaterThanOrEqual(64); // gutters either side
-    expect(viewport.width - (box.x + box.width)).toBeGreaterThanOrEqual(64);
+    const first = (await card(page, 0).boundingBox())!;
+    const second = (await card(page, 1).boundingBox())!;
+    expect(first.width).toBeLessThanOrEqual(Math.min(480, viewport.width * 0.42) + 1);
+    expect(first.y).toBeGreaterThanOrEqual(24); // breathing room above the story
+    expect(first.x).toBeGreaterThanOrEqual(64); // the left gutter
+    // Slide 1 sits on the left, leaving most of the screen open on the right; slide 2 swaps.
+    expect(viewport.width - (first.x + first.width)).toBeGreaterThan(viewport.width * 0.4);
+    expect(second.x).toBeGreaterThan(viewport.width * 0.4);
+    expect(viewport.width - (second.x + second.width)).toBeGreaterThanOrEqual(64);
   });
 
   test("scrolling down moves the page: the first card leaves the top and the next arrives", async ({

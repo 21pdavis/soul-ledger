@@ -42,3 +42,10 @@ M3 step 1 ([ADR 0068](0068-m3-scope-and-order.md)) built style previews on a hid
   - the world's look is this map tour, not a generic Deadlock-flavoured world;
   - the model checkpoint ended at "stop at cards", so 0.3.0 ships no hero models and there are no model batch releases for now.
 - [ADR 0025](0025-model-style.md): there are no code-built hero models for now, so its style rules are on hold until hero models return.
+- [ADR 0062](0062-desktop-vertical-card-stack.md): with the world behind the story, desktop cards are no longer wide and centred. They are at most 30rem (or 42% of the width), alternating left and right per slide. The vertical stack and scroll checkpoints stay.
+
+# How it is built
+
+- The player reports its current slide (`onSlideChange`), and the story stage puts the world layer behind it.
+- The 3D code loads only after the story starts. Off (also chosen for reduced motion, and wherever WebGL is missing) shows a still render of the city (`public/world/still.webp`, our own render).
+- Browser tests run with graphics Off by default, because test browsers draw WebGL in software, far too slowly for the story tests. `world.spec.ts` turns graphics back on to test the world itself.

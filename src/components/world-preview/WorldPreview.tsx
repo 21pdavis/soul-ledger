@@ -1,16 +1,10 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { StoryStage } from "@/components/app/StoryStage";
-import { SLIDES } from "@/story/copy";
 import { fixtureSlideProps } from "../../../tests/fixtures/story";
-import { CARD_SIDES } from "./city/tour";
 import { MOOD_BOARD } from "./moodboards";
 import styles from "./WorldPreview.module.css";
-
-// The 3D never renders on the server and loads after the story is up (ADR 0068).
-const WorldCanvas = dynamic(() => import("./WorldCanvas"), { ssr: false });
 
 /**
  * The owner's heroes stand in for the sample story's: Celeste as the main, then Paradox, Ivy,
@@ -67,40 +61,7 @@ function usePreviewProps() {
   }, []);
   return props;
 }
-const SLIDE_IDS = SLIDES.map((s) => s.id);
-
-/** Desktop cards sit to one side, per slide, so the scene beside them shows (see CARD_SIDES). */
-const CARD_SIDE_CSS = SLIDE_IDS.map(
-  (id, i) =>
-    `[data-testid="story-card"][data-slide="${id}"] { margin-${CARD_SIDES[i] === "left" ? "right" : "left"}: auto; }`,
-).join("\n");
-
-/** Follows the story's current slide from the stage's data-slide, without touching the player. */
-function useCurrentSlide() {
-  const [slide, setSlide] = useState(0);
-  useEffect(() => {
-    const read = () => {
-      const el = document.querySelector("[data-testid=story-stage][data-slide]");
-      const i = SLIDE_IDS.indexOf(
-        (el?.getAttribute("data-slide") ?? "") as (typeof SLIDE_IDS)[number],
-      );
-      if (i >= 0) setSlide(i);
-    };
-    read();
-    const observer = new MutationObserver(read);
-    observer.observe(document.body, {
-      subtree: true,
-      childList: true,
-      attributes: true,
-      attributeFilter: ["data-slide"],
-    });
-    return () => observer.disconnect();
-  }, []);
-  return slide;
-}
-
 export function WorldPreview() {
-  const slide = useCurrentSlide();
   const props = usePreviewProps();
   const [boardOpen, setBoardOpen] = useState(false);
   const [storyOn, setStoryOn] = useState(true);
@@ -117,11 +78,7 @@ export function WorldPreview() {
 
   return (
     <div className={styles.page}>
-      <style>{CARD_SIDE_CSS}</style>
-      <div className={styles.world}>
-        <WorldCanvas slide={slide} story={props.story} />
-      </div>
-
+      {/* The real story stage, which carries the 3D world behind the player. */}
       <div className={styles.story} data-hidden={!storyOn}>
         <StoryStage {...props} />
       </div>

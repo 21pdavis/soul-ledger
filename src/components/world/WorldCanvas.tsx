@@ -5,7 +5,7 @@ import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { Suspense, useState } from "react";
 import type { StoryData } from "@/story/types";
 import CityWorld from "./city/CityWorld";
-import styles from "./WorldPreview.module.css";
+import styles from "./World.module.css";
 
 export default function WorldCanvas({ slide, story }: { slide: number; story: StoryData }) {
   const [ready, setReady] = useState(false);

@@ -6,56 +6,19 @@
   flex-direction: column;
   height: 100dvh;
   overflow: hidden;
-  /* Glass panels, so the world shows through the story's cards. Stage and card both use it. */
-  --panel: rgb(20 16 24 / 0.6);
-}
-
-.world {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-}
-
-.canvas {
-  opacity: 0;
-  transition: opacity 1.2s ease;
-}
-
-.canvas[data-ready="true"] {
-  opacity: 1;
 }
 
 .story {
   position: relative;
-  z-index: 1;
   display: flex;
   flex: 1;
   min-height: 0;
   flex-direction: column;
 }
 
-.story[data-hidden="true"] {
+/* Hide story (H) hides the player only, leaving the world behind it in view. */
+.story[data-hidden="true"] :global([data-testid="story-player"]) {
   visibility: hidden;
-}
-
-/* The player paints an ink lattice behind the stage; let the world show instead. */
-.story :global([data-testid="story-player"]) {
-  background: transparent;
-}
-
-/* Only one glass layer: the slide frame inside the card or stage stays clear. */
-.story :global(section) {
-  background: transparent;
-}
-
-/* The Scavenger slide draws its own solid ink card inside the frame; dev class names keep the module name. */
-.story :global([class*="ScavengerSlide"][class*="card"]) {
-  background: rgb(13 11 16 / 0.35);
-}
-
-/* Desktop: thinner cards, pushed to one side per slide (rules generated in WorldPreview). */
-.story :global([data-testid="story-card"]) {
-  max-width: min(30rem, 42vw);
 }
 
 .toolbar {
