@@ -339,17 +339,32 @@ export function buildCity(
   return out;
 }
 
-/** A ring of far skyline towers past the map edge, tinted toward each lane's side. */
-export function buildSkyline(seed = 5) {
+/**
+ * The city carrying on past the playable map: a band of ordinary blocks outside the edge, lower
+ * toward the horizon, so the overhead shots show a city, not a disc floating in space.
+ */
+export function buildOuterRing(seed = 5): Building[] {
   const r = rng(seed);
-  const out: { x: number; z: number; w: number; h: number; color: string; spire: boolean }[] = [];
-  for (let i = 0; i < 90; i++) {
-    const a = (i / 90) * Math.PI * 2 + r() * 0.03;
-    const dist = 175 + r() * 40;
-    const x = Math.sin(a) * dist;
-    const z = Math.cos(a) * dist;
-    const color = x > 30 ? "#1e2a24" : x < -30 ? "#2c2620" : "#1e2430";
-    out.push({ x, z, w: 10 + r() * 12, h: 40 + r() * 80, color, spire: r() > 0.75 });
+  const out: Building[] = [];
+  const stones = ["#3a3842", "#4c3f3c", "#463a30", "#2f3a33", "#3e3a4a"];
+  for (let ring = 0; ring < 4; ring++) {
+    const dist = MAP_RADIUS + 6 + ring * 11;
+    const count = Math.floor((2 * Math.PI * dist) / 10);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2 + ring * 0.13 + r() * 0.02;
+      const w = 7 + r() * 2.5;
+      out.push({
+        x: Math.sin(a) * dist,
+        z: Math.cos(a) * dist,
+        w,
+        d: 7 + r() * 2.5,
+        h: (16 + r() * 22) * (1 - ring * 0.15),
+        rot: a,
+        color: stones[Math.floor(r() * stones.length)],
+        windows: PALETTE.windowWarm,
+        facesLane: false,
+      });
+    }
   }
   return out;
 }

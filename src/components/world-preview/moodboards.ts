@@ -5,6 +5,11 @@
  */
 const CNS = "https://cdn.fastly.steamstatic.com/apps/deadlock/images/react/cityneversleeps";
 const img = (file: string, caption: string) => ({ src: `${CNS}/${file}`, caption });
+/** Post-update (2026-09-30 on) uploads on the community Deadlock Wiki, deadlock.wiki. */
+const wiki = (path: string, caption: string) => ({
+  src: `https://deadlock.wiki/images/${path}`,
+  caption,
+});
 
 export interface BoardSection {
   title: string;
@@ -18,6 +23,25 @@ export const MOOD_BOARD: { name: string; pitch: string; sections: BoardSection[]
   pitch:
     "A low-poly copy of the new map. The camera swoops through the three lanes past still, posed heroes; your stats decide who stands where.",
   sections: [
+    {
+      title: "Bridges, Guardians, mid boss and bases",
+      palette: ["#8a8478", "#7a807a", "#5a4636", "#d8d2c6", "#6dfff0"],
+      notes: [
+        "Each lane has a bridge: Broadway's stone overpass, the park's arched footbridge, the Seaport's steel trestle",
+        "Guardians are squat pale robots on green ritual circles",
+        "The mid boss is a hunched sack-bodied ghoul with one teal eye, in a sewer pit under Times Square",
+        "Bases: the Hidden King's run-down factory (amber), the Archmother's museum (sapphire)",
+      ],
+      images: [
+        wiki("b/b7/TimesSquare_blue.jpeg", "Times Square overpass"),
+        wiki("1/1b/Greenwich_centralpark.jpg", "Central Park bridge"),
+        wiki("a/af/York_dock.jpg", "Seaport trestle"),
+        wiki("6/6f/Broadway_uptown.jpg", "A Guardian on its circle, Uptown"),
+        wiki("c/cd/Midboss.png", "The mid boss"),
+        wiki("c/c6/Hiddenking_base.jpeg", "The Hidden King's base"),
+        wiki("8/8c/Archmother_base.jpeg", "The Archmother's base"),
+      ],
+    },
     {
       title: "The map",
       palette: ["#1a2030", "#4a3e4c", "#b97a52", "#2a2628"],

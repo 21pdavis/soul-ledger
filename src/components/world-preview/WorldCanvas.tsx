@@ -13,6 +13,8 @@ export default function WorldCanvas({ slide, story }: { slide: number; story: St
     <Canvas
       className={styles.canvas}
       data-ready={ready}
+      // Shadows only so the death-map spotlight can carry its picture (nothing casts one).
+      shadows
       dpr={[1, 1.5]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
       camera={{ fov: 50, near: 0.3, far: 1000 }}

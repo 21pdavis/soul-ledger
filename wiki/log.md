@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-11
+* **Research**: [The Cursed Apple map after City Never Sleeps](research/cursed-apple-map.md): the post-update layout, lane stops, bridges, Guardians, mid boss pit and look, as reference for the M3 low-poly city preview.
 * **Decision**: [ADR 0068](decisions/0068-m3-scope-and-order.md): M3 settled in a grilling session: a story-following low-poly Deadlock world, art cards for every hero, nemesis duels, Full/Simple/Off graphics with an auto-drop below 20 fps, and low-poly posed models starting with a three-hero checkpoint before the rest of 0.3.0. Supersedes parts of ADRs 0013, 0019 and 0028.
 * **Creation**: [M3 plan](recommendations/m3-plan.md): four owner-gated steps and a draft 0.3.0 PR breakdown.
 * **Decision**: [ADR 0063](decisions/0063-two-depth-ci.md) amended: CI runs as three parallel jobs (checks, e2e phone, e2e desktop) with build and browser caches, same tests as before. Required checks under #10 must name all three.

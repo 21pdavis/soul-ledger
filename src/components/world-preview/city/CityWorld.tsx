@@ -1,6 +1,6 @@
 "use client";
 
-import { Line, useTexture } from "@react-three/drei";
+import { Line } from "@react-three/drei";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { StoryData } from "@/story/types";
@@ -11,13 +11,25 @@ import {
   MAP_RADIUS,
   PALETTE,
   SIDEWALK,
+  STOPS,
   buildCity,
-  buildSkyline,
+  buildOuterRing,
   rng,
+  stopPoint,
   type Building,
 } from "./layout";
-import { SwoopRig } from "./SwoopRig";
-import { planTour, type CastMember } from "./tour";
+import {
+  Car,
+  DeathProjector,
+  DuelStage,
+  Glow,
+  PrecisionShot,
+  SewerPit,
+  Standee,
+  Truck,
+} from "./Props";
+import { TourRig } from "./TourRig";
+import { planTour, routeConnectors } from "./tour";
 
 /** A dusk sky: dark blue-grey overhead, mauve, then a warm band at the horizon. */
 function Sky() {
@@ -31,13 +43,15 @@ function Sky() {
           top: { value: new THREE.Color(PALETTE.skyTop) },
           mid: { value: new THREE.Color(PALETTE.skyMid) },
           horizon: { value: new THREE.Color(PALETTE.horizon) },
+          below: { value: new THREE.Color(PALETTE.fog) },
         },
         vertexShader: `varying vec3 vDir; void main() { vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `uniform vec3 top; uniform vec3 mid; uniform vec3 horizon; varying vec3 vDir;
+        fragmentShader: `uniform vec3 top; uniform vec3 mid; uniform vec3 horizon; uniform vec3 below; varying vec3 vDir;
           void main() {
-            float h = clamp(vDir.y, -0.2, 1.0);
-            vec3 c = mix(horizon, mid, smoothstep(-0.02, 0.18, h));
-            c = mix(c, top, smoothstep(0.18, 0.7, h));
+            float h = clamp(vDir.y, -1.0, 1.0);
+            vec3 c = mix(below, horizon, smoothstep(-0.06, 0.02, h));
+            c = mix(c, mid, smoothstep(0.02, 0.2, h));
+            c = mix(c, top, smoothstep(0.2, 0.7, h));
             gl_FragColor = vec4(c, 1.0);
           }`,
       }),
@@ -193,59 +207,66 @@ function Buildings({ buildings }: { buildings: Building[] }) {
   );
 }
 
-function Skyline() {
-  const items = useMemo(
-    () =>
-      buildSkyline().map((s) => ({
-        m: new THREE.Matrix4().compose(
-          new THREE.Vector3(s.x, s.h / 2 - 2, s.z),
-          new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.atan2(s.x, s.z)),
-          new THREE.Vector3(s.w, s.h, s.w * 0.7),
-        ),
-        c: s.color,
-      })),
-    [],
-  );
-  const ref = useRef<THREE.InstancedMesh>(null);
-  useInstances(ref, items);
-  return (
-    <instancedMesh ref={ref} args={[undefined, undefined, items.length]}>
-      <boxGeometry />
-      <meshStandardMaterial flatShading roughness={1} />
-    </instancedMesh>
-  );
-}
+const STOP_POINTS = STOPS.map((s) => stopPoint(s.id).p);
+/** True near a lane stop, where street furniture would block the slide's shot. */
+const nearStop = (p: THREE.Vector3, r = 10) =>
+  STOP_POINTS.some((q) => (q.x - p.x) ** 2 + (q.z - p.z) ** 2 < r * r);
 
-/** Each lane: road, pavements, a glowing zip line on poles in the lane colour, and lamps. */
+const NEON = ["#ff3d7f", "#3de0c8", "#ffb347", "#f4f0e6", "#5ab4ff", "#ff5a3a"];
+
+/**
+ * Each lane: road and pavements, the glowing zip line in the lane colour (in game it hangs in
+ * the air, no poles), lamps, and the street dressing that tells the lanes apart: Broadway's
+ * vertical neon signs and cabs, Greenwich's trees, York's crates and trucks. Nothing sits close to
+ * a stop.
+ */
 function Lanes() {
-  const lanes = useMemo(
-    () =>
-      LANES.map((l) => {
-        const len = l.curve.getLength();
-        const zip = l.curve
-          .getSpacedPoints(120)
-          .map((p) => [p.x, 9.5, p.z] as [number, number, number]);
-        const poles: THREE.Vector3[] = [];
-        const lamps: THREE.Vector3[] = [];
-        for (let s = 10; s < len - 10; s += 22) {
-          poles.push(l.curve.getPointAt(s / len));
+  const lanes = useMemo(() => {
+    const r = rng(17);
+    return LANES.map((l) => {
+      const len = l.curve.getLength();
+      const zip = l.curve
+        .getSpacedPoints(120)
+        .map((p) => [p.x, 10.5, p.z] as [number, number, number]);
+      const lamps: THREE.Vector3[] = [];
+      const signs: { p: THREE.Vector3; rot: number; h: number; color: string }[] = [];
+      const trees: THREE.Vector3[] = [];
+      const crates: THREE.Vector3[] = [];
+      const cars: { p: THREE.Vector3; rot: number; kind: "cab" | "sedan" | "truck" }[] = [];
+      for (let s = 6; s < len - 6; s += 5.5) {
+        const u = s / len;
+        const p = l.curve.getPointAt(u);
+        const t = l.curve.getTangentAt(u).setY(0).normalize();
+        const n = new THREE.Vector3(-t.z, 0, t.x);
+        const rot = Math.atan2(t.x, t.z);
+        if (nearStop(p, 11)) continue;
+        const side = r() > 0.5 ? 1 : -1;
+        const kerb = p.clone().addScaledVector(n, side * (LANE_HALF + 0.8));
+        const step = Math.round(s / 5.5);
+        if (step % 2 === 0) lamps.push(kerb.clone());
+        if (l.id === "blue" && r() > 0.45) {
+          signs.push({
+            p: p.clone().addScaledVector(n, side * (LANE_HALF + SIDEWALK + 0.2)),
+            rot: rot + (side > 0 ? -Math.PI / 2 : Math.PI / 2),
+            h: 3 + r() * 4,
+            color: NEON[Math.floor(r() * NEON.length)],
+          });
         }
-        for (let s = 6; s < len - 6; s += 11) {
-          const u = s / len;
-          const p = l.curve.getPointAt(u);
-          const t = l.curve.getTangentAt(u).setY(0).normalize();
-          const side = Math.round(s / 11) % 2 ? 1 : -1;
-          lamps.push(
-            p.add(new THREE.Vector3(-t.z, 0, t.x).multiplyScalar(side * (LANE_HALF + 0.8))),
-          );
+        if (l.id === "green" && r() > 0.35) trees.push(kerb.clone().addScaledVector(n, side * 0.6));
+        if (l.id === "yellow" && r() > 0.6)
+          crates.push(kerb.clone().addScaledVector(n, side * 0.4));
+        if (r() > 0.8) {
+          const kind =
+            l.id === "yellow" ? "truck" : l.id === "blue" ? (r() > 0.5 ? "cab" : "truck") : "sedan";
+          cars.push({ p: p.clone().addScaledVector(n, -side * (LANE_HALF - 1.4)), rot, kind });
         }
-        return { lane: l, zip, poles, lamps };
-      }),
-    [],
-  );
+      }
+      return { lane: l, zip, lamps, signs, trees, crates, cars };
+    });
+  }, []);
   return (
     <>
-      {lanes.map(({ lane, zip, poles, lamps }) => (
+      {lanes.map(({ lane, zip, lamps, signs, trees, crates, cars }) => (
         <group key={lane.id}>
           <Ribbon
             curve={lane.curve}
@@ -255,12 +276,6 @@ function Lanes() {
           />
           <Ribbon curve={lane.curve} width={LANE_HALF * 2} y={0.05} color={PALETTE.road} />
           <Line points={zip} color={lane.color} lineWidth={2.5} toneMapped={false} />
-          {poles.map((p, i) => (
-            <mesh key={i} position={[p.x, 4.75, p.z]}>
-              <cylinderGeometry args={[0.12, 0.18, 9.5, 5]} />
-              <meshStandardMaterial color="#1b1a1f" flatShading metalness={0.5} />
-            </mesh>
-          ))}
           {lamps.map((p, i) => (
             <group key={i} position={[p.x, 0, p.z]}>
               <mesh position={[0, 1.8, 0]}>
@@ -273,73 +288,103 @@ function Lanes() {
               </mesh>
             </group>
           ))}
+          {signs.map((s, i) => (
+            <group key={i} position={[s.p.x, 4 + s.h / 2, s.p.z]} rotation={[0, s.rot, 0]}>
+              <mesh>
+                <boxGeometry args={[0.9, s.h, 0.2]} />
+                <meshStandardMaterial color="#1e1a20" flatShading />
+              </mesh>
+              <mesh position={[0, 0, 0.12]}>
+                <boxGeometry args={[0.6, s.h - 0.5, 0.05]} />
+                <Glow color={s.color} />
+              </mesh>
+            </group>
+          ))}
+          {trees.map((p, i) => (
+            <group key={i} position={[p.x, 0, p.z]}>
+              <mesh position={[0, 1.4, 0]}>
+                <cylinderGeometry args={[0.18, 0.28, 2.8, 5]} />
+                <meshStandardMaterial color="#3a2c24" flatShading />
+              </mesh>
+              <mesh position={[0, 3.6, 0]}>
+                <icosahedronGeometry args={[1.7]} />
+                <meshStandardMaterial color={i % 2 ? "#2c4a30" : "#24402d"} flatShading />
+              </mesh>
+            </group>
+          ))}
+          {crates.map((p, i) => (
+            <group key={i} position={[p.x, 0, p.z]} rotation={[0, i * 0.7, 0]}>
+              <mesh position={[0, 0.5, 0]}>
+                <boxGeometry args={[1, 1, 1]} />
+                <meshStandardMaterial color="#8a6a44" flatShading />
+              </mesh>
+              <mesh position={[0.9, 0.45, 0.3]}>
+                <cylinderGeometry args={[0.4, 0.4, 0.9, 7]} />
+                <meshStandardMaterial color="#6a4a32" flatShading />
+              </mesh>
+            </group>
+          ))}
+          {cars.map((c, i) =>
+            c.kind === "truck" ? (
+              <Truck
+                key={i}
+                p={[c.p.x, 0, c.p.z]}
+                rot={c.rot}
+                color={i % 2 ? "#4a4a50" : "#5a3a32"}
+              />
+            ) : (
+              <Car
+                key={i}
+                p={[c.p.x, 0, c.p.z]}
+                rot={c.rot}
+                color={c.kind === "cab" ? "#e8b23a" : i % 2 ? "#2a3a4a" : "#4a2a2a"}
+              />
+            ),
+          )}
         </group>
       ))}
     </>
   );
 }
 
-/** A hero standing in the city as an art-card standee on a plinth. Static: it never turns. */
-function Standee({ member }: { member: CastMember }) {
-  const texture = useTexture(`/heroes/${member.heroId}-card.webp`, (t) => {
-    t.colorSpace = THREE.SRGBColorSpace;
-  });
-  const image = texture.image as { width: number; height: number } | undefined;
-  const aspect = image ? image.width / image.height : 0.62;
-  const s = member.scale ?? 1;
-  const h = 2.9 * s;
-  return (
-    <group position={member.pos} rotation={[0, member.facing, 0]}>
-      <mesh position={[0, 0.15, 0]}>
-        <cylinderGeometry args={[0.9 * s, 1 * s, 0.3, 8]} />
-        <meshStandardMaterial color="#2a2428" flatShading metalness={0.4} />
-      </mesh>
-      <mesh position={[0, 0.31, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.7 * s, 0.85 * s, 16]} />
-        <meshBasicMaterial color={PALETTE.occult} toneMapped={false} />
-      </mesh>
-      <mesh position={[0, 0.3 + h / 2, -0.02]}>
-        <planeGeometry args={[h * aspect + 0.14, h + 0.14]} />
-        <meshBasicMaterial color="#c9a24b" toneMapped={false} side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, 0.3 + h / 2, 0]}>
-        <planeGeometry args={[h * aspect, h]} />
-        <meshBasicMaterial map={texture} toneMapped={false} />
-      </mesh>
-    </group>
-  );
-}
-
 export default function CityWorld({ slide, story }: { slide: number; story: StoryData }) {
   const tour = useMemo(() => planTour(story), [story]);
-  // Keep the death spot clear, so the roast slide can see it.
+  // Keep the camera's hops between lanes clear of buildings.
   const buildings = useMemo(
-    () =>
-      buildCity(11, tour.deathSpot ? [{ x: tour.deathSpot[0], z: tour.deathSpot[1], r: 6 }] : []),
-    [tour.deathSpot],
+    () => [
+      ...buildCity(
+        11,
+        routeConnectors().map(([x, z]) => ({ x, z, r: 6 })),
+      ),
+      ...buildOuterRing(),
+    ],
+    [],
   );
   return (
     <>
       <Sky />
-      <fog attach="fog" args={[PALETTE.fog, 70, 330]} />
+      <fog attach="fog" args={[PALETTE.fog, 150, 560]} />
       <hemisphereLight args={["#a898b8", "#3a3034", 1.7]} />
       {/* A low, warm sun from the horizon, as in the update's dusk shots. */}
       <directionalLight position={[-120, 50, 80]} intensity={2.4} color="#ffb27a" />
       <directionalLight position={[80, 60, -100]} intensity={0.8} color="#8a9cff" />
 
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]}>
-        <circleGeometry args={[MAP_RADIUS + 70, 48]} />
+        <circleGeometry args={[MAP_RADIUS + 500, 48]} />
         <meshStandardMaterial color={PALETTE.ground} roughness={1} />
       </mesh>
 
       <Buildings buildings={buildings} />
-      <Skyline />
       <Lanes />
-      <Landmarks deathSpot={tour.deathSpot} />
+      <Landmarks />
       {tour.cast.map((m, i) => (
         <Standee key={i} member={m} />
       ))}
-      <SwoopRig shots={tour.shots} slide={slide} />
+      <DuelStage duel={tour.duel} />
+      <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
+      <SewerPit at={tour.pit} />
+      <DeathProjector bins={tour.deaths} on={slide === 7} />
+      <TourRig shots={tour.shots} slide={slide} />
     </>
   );
 }

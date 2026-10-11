@@ -12,7 +12,30 @@ import styles from "./WorldPreview.module.css";
 // The 3D never renders on the server and loads after the story is up (ADR 0068).
 const WorldCanvas = dynamic(() => import("./WorldCanvas"), { ssr: false });
 
-const props = fixtureSlideProps();
+const BASE_PROPS = fixtureSlideProps();
+
+/**
+ * Sample stats, with one override for trying the death map: `?deaths=x,y` (game units, about
+ * ±10,000) moves where the reader dies most.
+ */
+function usePreviewProps() {
+  const [props, setProps] = useState(BASE_PROPS);
+  useEffect(() => {
+    const raw = new URLSearchParams(window.location.search).get("deaths");
+    const [x, y] = (raw ?? "").split(",").map(Number);
+    if (!raw || !Number.isFinite(x) || !Number.isFinite(y) || !BASE_PROPS.story.roast) return;
+    const deathPositions = Array.from(
+      { length: 40 },
+      (_, i) => [x + (i % 7) * 120, y + (i % 5) * 120] as [number, number],
+    );
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- read once from the URL after mount
+    setProps({
+      ...BASE_PROPS,
+      story: { ...BASE_PROPS.story, roast: { ...BASE_PROPS.story.roast, deathPositions } },
+    });
+  }, []);
+  return props;
+}
 const SLIDE_IDS = SLIDES.map((s) => s.id);
 
 /** Desktop cards sit to one side, per slide, so the scene beside them shows (see CARD_SIDES). */
@@ -47,6 +70,7 @@ function useCurrentSlide() {
 
 export function WorldPreview() {
   const slide = useCurrentSlide();
+  const props = usePreviewProps();
   const [boardOpen, setBoardOpen] = useState(false);
   const [storyOn, setStoryOn] = useState(true);
   const board = MOOD_BOARD;

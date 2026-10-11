@@ -1,10 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import * as THREE from "three";
+import { Car, Guardian, Truck } from "./Props";
 import {
   DISTRICTS,
-  MID_BOSS,
   PALETTE,
   lanePoint,
   stopPoint,
@@ -131,7 +130,8 @@ function Tree({ p, s = 1, color = "#2c4a30" }: { p: V3; s?: number; color?: stri
 function Uptown() {
   return (
     <AtStop id="uptown">
-      <RitualCircle r={3.6} />
+      {/* The lane's Guardian on its ritual circle, behind the duel, facing up the street. */}
+      <Guardian p={[0, 0, -12]} team={PALETTE.amber} />
       {/* Theatre marquee and a diner sign, steady neon. */}
       <Box p={[-9.5, 6, 0]} s={[6, 12, 9]} color="#3a3842" />
       <Box p={[-6.4, 4.2, 0]} s={[0.6, 1.4, 7]} color={PALETTE.windowWarm} glow />
@@ -139,33 +139,103 @@ function Uptown() {
       <Box p={[9.5, 4, -2]} s={[6, 8, 8]} color="#4c3f3c" />
       <Box p={[6.5, 5.5, -2]} s={[0.4, 1.3, 5]} color="#f4f0e6" glow />
       <Box p={[6.4, 3, -2]} s={[0.3, 0.25, 6]} color="#5ab4ff" glow />
-      <Tower p={[-6, 0, -16]} w={7} h={44} color="#45454f" crown="#ff6a4a" />
-      <pointLight position={[0, 4, 0]} color={PALETTE.occult} intensity={60} distance={18} />
+      <Car p={[5.2, 0, 4]} rot={0.1} color="#3a5a8a" />
+      <Tower p={[-6, 0, -24]} w={7} h={44} color="#45454f" crown="#ff6a4a" />
+      <pointLight position={[0, 5, -8]} color={PALETTE.occult} intensity={50} distance={18} />
     </AtStop>
+  );
+}
+
+/** A stone balustrade: a rail on a row of short posts, as on the park and Broadway bridges. */
+function Balustrade({ p, length, color }: { p: V3; length: number; color: string }) {
+  const posts = Math.floor(length / 0.8);
+  return (
+    <group position={p}>
+      <Box p={[0, 1, 0]} s={[length, 0.25, 0.45]} color={color} />
+      <Box p={[0, 0.05, 0]} s={[length, 0.2, 0.5]} color={color} />
+      {Array.from({ length: posts }, (_, i) => (
+        <mesh key={i} position={[-length / 2 + 0.4 + i * 0.8, 0.5, 0]}>
+          <cylinderGeometry args={[0.12, 0.16, 0.8, 5]} />
+          <Mat color={color} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** A stone arch across the street: piers, an arched underside in segments, a deck and railings. */
+function ArchBridge({
+  span,
+  z,
+  height,
+  color,
+  width = 4.5,
+}: {
+  span: number;
+  z: number;
+  height: number;
+  color: string;
+  width?: number;
+}) {
+  const segs = 9;
+  const rise = 1.6;
+  return (
+    <group position={[0, 0, z]}>
+      {[-1, 1].map((sd) => (
+        <Box
+          key={sd}
+          p={[sd * (span / 2 + 1.2), height / 2, 0]}
+          s={[2.6, height, width + 0.6]}
+          color={color}
+        />
+      ))}
+      {Array.from({ length: segs }, (_, i) => {
+        const a0 = (i / segs) * Math.PI;
+        const a1 = ((i + 1) / segs) * Math.PI;
+        const x0 = -Math.cos(a0) * (span / 2);
+        const x1 = -Math.cos(a1) * (span / 2);
+        const y0 = height - rise + Math.sin(a0) * rise;
+        const y1 = height - rise + Math.sin(a1) * rise;
+        const len = Math.hypot(x1 - x0, y1 - y0);
+        return (
+          <mesh
+            key={i}
+            position={[(x0 + x1) / 2, (y0 + y1) / 2 - 0.4, 0]}
+            rotation={[0, 0, Math.atan2(y1 - y0, x1 - x0)]}
+          >
+            <boxGeometry args={[len + 0.05, 0.8, width]} />
+            <Mat color={color} />
+          </mesh>
+        );
+      })}
+      <Box p={[0, height + 0.2, 0]} s={[span + 5, 0.7, width + 0.4]} color={color} />
+      <Balustrade p={[0, height + 0.55, width / 2]} length={span + 5} color={color} />
+      <Balustrade p={[0, height + 0.55, -width / 2]} length={span + 5} color={color} />
+    </group>
   );
 }
 
 function TimesSquare() {
   return (
     <AtStop id="timesSquare">
-      {/* The elevated tracks crossing the street. */}
-      <Box p={[0, 6.6, 0]} s={[24, 1.1, 4]} color="#4a4446" />
-      <Box p={[0, 7.4, 1.9]} s={[24, 0.6, 0.3]} color="#5b5456" />
-      <Box p={[0, 7.4, -1.9]} s={[24, 0.6, 0.3]} color="#5b5456" />
-      {[-6.5, 6.5].map((x) => (
-        <Box key={x} p={[x, 3.2, 0]} s={[1, 6.4, 3]} color="#3e3a3c" />
-      ))}
+      {/* Broadway's stone overpass, trucks rolling under it. */}
+      <ArchBridge span={13} z={0} height={6.8} color="#8a8478" width={4.5} />
+      <Truck p={[-2, 0, -6]} rot={Math.PI} />
+      <Truck p={[2.4, 0, -13]} rot={Math.PI} color="#5a3a32" />
       {/* Billboards, the brightest place on the map. */}
-      <Box p={[-8, 14, -4]} s={[0.4, 8, 4]} color="#ffb347" glow />
-      <Box p={[-8, 9, 4]} s={[0.4, 3.5, 5]} color="#3de0c8" glow />
-      <Box p={[8, 12, -6]} s={[0.4, 5, 6]} color="#ff3d5a" glow />
-      <Box p={[8, 18, 2]} s={[0.4, 4, 3]} color="#f4f0e6" glow />
-      <Box p={[-11, 12, -4]} s={[6, 24, 10]} color="#3a3842" />
-      <Box p={[11, 11, -2]} s={[6, 22, 12]} color="#5b4e4e" />
-      {/* Subway entrance. */}
-      <Box p={[5.5, 0.8, 6]} s={[1.6, 1.6, 3]} color="#2a5a3a" />
-      <Box p={[5.5, 1.8, 6]} s={[1.8, 0.3, 3.2]} color="#9dffb0" glow />
-      <pointLight position={[0, 9, -2]} color="#ffb347" intensity={80} distance={26} />
+      <Box p={[-8, 14, -6]} s={[0.4, 8, 4]} color="#ffb347" glow />
+      <Box p={[-8, 9.5, 5]} s={[0.4, 3.5, 5]} color="#3de0c8" glow />
+      <Box p={[8, 12, -8]} s={[0.4, 5, 6]} color="#ff3d5a" glow />
+      <Box p={[8, 18, 3]} s={[0.4, 4, 3]} color="#f4f0e6" glow />
+      <Box p={[-11, 12, -6]} s={[6, 24, 10]} color="#3a3842" />
+      <Box p={[11, 11, -4]} s={[6, 22, 12]} color="#5b4e4e" />
+      {/* The way down to the mid boss: a sewer stair under a Rejuvenator sign. */}
+      <Box p={[6.2, 0.6, -9]} s={[2, 1.2, 3]} color="#3a3436" />
+      <mesh position={[6.2, 2.6, -9]}>
+        <octahedronGeometry args={[0.5]} />
+        <Glow color="#ffd24a" />
+      </mesh>
+      <pointLight position={[0, 9, -4]} color="#ffb347" intensity={80} distance={26} />
     </AtStop>
   );
 }
@@ -249,11 +319,8 @@ function CentralPark() {
           </mesh>
         ))}
       </group>
-      {/* A stone arch bridge over the path. */}
-      <Box p={[0, 3.6, 10]} s={[13, 0.9, 3]} color="#5a5e5a" />
-      {[-5.5, 5.5].map((x) => (
-        <Box key={x} p={[x, 1.6, 10]} s={[2, 3.2, 3]} color="#4e524e" />
-      ))}
+      {/* The park's stone footbridge over the path, beyond the Elm. */}
+      <ArchBridge span={10} z={11} height={4.2} color="#7a807a" width={3.6} />
       <Tree p={[11, 0, 5]} s={1.1} />
       <Tree p={[13, 0, -6]} />
       <Tree p={[-13, 0, 8]} s={0.9} />
@@ -327,6 +394,44 @@ function StockExchange() {
 function Seaport() {
   return (
     <AtStop id="seaport">
+      {/* The Seaport's steel trestle, carrying the rail line across the lane. */}
+      <group position={[0, 0, 3]}>
+        {[-7, 7].map((x) => (
+          <group key={x}>
+            <Box p={[x, 3, 0]} s={[0.6, 6, 3.6]} color="#4a3a30" />
+            <Box p={[x, 0.2, 0]} s={[1.6, 0.4, 4.4]} color="#3a2e28" />
+          </group>
+        ))}
+        <Box p={[0, 6.3, 0]} s={[20, 0.8, 3.4]} color="#5a4636" />
+        {[-1.6, 1.6].map((z) => (
+          <group key={z}>
+            <Box p={[0, 7.6, z]} s={[20, 0.3, 0.3]} color="#5a4636" />
+            {Array.from({ length: 10 }, (_, i) => (
+              <Box key={i} p={[-9 + i * 2, 7, z]} s={[0.2, 1.6, 0.2]} color="#5a4636" />
+            ))}
+            {Array.from({ length: 9 }, (_, i) => (
+              <mesh
+                key={i}
+                position={[-8 + i * 2, 7, z]}
+                rotation={[0, 0, (i % 2 ? 1 : -1) * 0.68]}
+              >
+                <boxGeometry args={[0.14, 2.4, 0.14]} />
+                <Mat color="#4a3a30" />
+              </mesh>
+            ))}
+          </group>
+        ))}
+        {/* A crane car parked on top. */}
+        <Box p={[-4, 8.4, 0]} s={[3, 2.4, 2.6]} color="#c9a24b" />
+      </group>
+      <Truck p={[-2.8, 0, 9]} rot={0.05} color="#5a4636" />
+      {/* Sandbags by the kerb. */}
+      {[-5, -4.2, 4.6].map((x, i) => (
+        <mesh key={x} position={[x, 0.35, -6 + i]} scale={[1, 0.5, 0.7]}>
+          <dodecahedronGeometry args={[0.7]} />
+          <Mat color="#b8a07a" />
+        </mesh>
+      ))}
       {/* A dock crane. */}
       <group position={[9, 0, 4]}>
         <Box p={[0, 5, 0]} s={[1.2, 10, 1.2]} color="#5a4636" />
@@ -372,12 +477,19 @@ function Fairfax() {
           <Mat color="#4f4032" />
         </mesh>
       </group>
-      {/* Spilled sand and coal. */}
-      <mesh position={[-3, 0, -2]}>
-        <coneGeometry args={[3, 1.4, 7]} />
-        <Mat color="#554a4c" />
-      </mesh>
-      <Box p={[0, 13, -14]} s={[10, 2, 0.4]} color="#ffd24a" glow />
+      {/* Coal heaps against the silos, off the road. */}
+      {[
+        [-7, 4, 3.4, 1.6],
+        [-8.5, 9, 2.6, 1.2],
+        [7.5, 11, 2.8, 1.3],
+      ].map(([x, z, r, h], i) => (
+        <mesh key={i} position={[x, h / 2 - 0.05, z]}>
+          <coneGeometry args={[r, h, 7]} />
+          <Mat color="#3e383a" />
+        </mesh>
+      ))}
+      {/* The FAIRFAX sign over the far end. */}
+      <Box p={[0, 15, 18]} s={[10, 2, 0.4]} color="#ffd24a" glow />
       <pointLight position={[0, 6, 0]} color="#ffc46b" intensity={40} distance={22} />
     </AtStop>
   );
@@ -461,25 +573,6 @@ function Districts() {
   );
 }
 
-function MidBoss() {
-  const [x, z] = MID_BOSS;
-  return (
-    <group position={[x, 0, z]}>
-      <mesh position={[0, 0.6, 0]}>
-        <cylinderGeometry args={[7, 7.6, 1.2, 10, 1, true]} />
-        <meshStandardMaterial color="#3a3436" flatShading side={THREE.DoubleSide} />
-      </mesh>
-      <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[7, 10]} />
-        <Mat color="#1a1c1a" />
-      </mesh>
-      <RitualCircle r={5} />
-      <Crystal p={[0, 4, 0]} s={1.1} />
-      <pointLight position={[0, 4, 0]} color={PALETTE.occult} intensity={90} distance={26} />
-    </group>
-  );
-}
-
 /** A Patron at each base: a tall robed statue, amber in the north, sapphire in the south. */
 function Patron({ z, color, face }: { z: number; color: string; face: number }) {
   return (
@@ -505,40 +598,30 @@ function Patron({ z, color, face }: { z: number; color: string; face: number }) 
   );
 }
 
-/** Guardians: team statues a short way up each lane from both bases. */
+/** Guardians: the lane robots a short way up each lane from both bases. */
 function Guardians() {
-  const out: { lane: LaneId; u: number; color: string }[] = [];
+  const out: { lane: LaneId; u: number; color: string; rot: number }[] = [];
   for (const lane of ["blue", "green", "yellow"] as LaneId[]) {
-    out.push({ lane, u: 0.1, color: PALETTE.sapphire }, { lane, u: 0.9, color: PALETTE.amber });
+    out.push(
+      { lane, u: 0.12, color: PALETTE.sapphire, rot: 0 },
+      { lane, u: 0.88, color: PALETTE.amber, rot: Math.PI },
+    );
   }
   return (
     <>
-      {out.map(({ lane, u, color }) => {
-        const { p, n } = lanePoint(lane, u);
-        const q = p.clone().addScaledVector(n, 4.2);
+      {out.map(({ lane, u, color, rot }) => {
+        const { p, t, n } = lanePoint(lane, u);
+        const q = p.clone().addScaledVector(n, 3.2);
         return (
-          <group key={lane + u} position={[q.x, 0, q.z]}>
-            <Box p={[0, 1, 0]} s={[2.4, 2, 2.4]} color="#3a3436" />
-            <mesh position={[0, 4, 0]}>
-              <cylinderGeometry args={[0.6, 1, 4, 6]} />
-              <Mat color="#2a2428" metal={0.3} />
-            </mesh>
-            <Crystal p={[0, 6.8, 0]} s={0.5} color={color} />
-          </group>
+          <Guardian
+            key={lane + u}
+            p={[q.x, 0, q.z]}
+            rot={Math.atan2(t.x, t.z) + rot}
+            team={color}
+          />
         );
       })}
     </>
-  );
-}
-
-/** Where you die most: a gravestone and a red ring on the ground. */
-function DeathSpot({ at }: { at: [number, number] }) {
-  return (
-    <group position={[at[0], 0, at[1]]}>
-      <RitualCircle r={2.4} color="#ff3d3d" />
-      <Box p={[-1.6, 0.9, -1]} s={[1.2, 1.8, 0.4]} color="#6a6a70" />
-      <pointLight position={[0, 3, 0]} color="#ff3d3d" intensity={30} distance={12} />
-    </group>
   );
 }
 
@@ -563,7 +646,7 @@ function Harbour() {
   );
 }
 
-export function Landmarks({ deathSpot }: { deathSpot: [number, number] | null }) {
+export function Landmarks() {
   return (
     <>
       <Uptown />
@@ -576,12 +659,10 @@ export function Landmarks({ deathSpot }: { deathSpot: [number, number] | null })
       <Seaport />
       <Fairfax />
       <Districts />
-      <MidBoss />
       <Patron z={-104} color={PALETTE.amber} face={0} />
       <Patron z={104} color={PALETTE.sapphire} face={Math.PI} />
       <Guardians />
       <Harbour />
-      {deathSpot && <DeathSpot at={deathSpot} />}
     </>
   );
 }
