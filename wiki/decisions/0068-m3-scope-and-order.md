@@ -19,7 +19,7 @@ The owner settled M3 in a grilling session on 2026-10-11. Since the original pla
 
 | Topic | Decision |
 |---|---|
-| Role | One world that **follows the story**: each slide shifts the camera or light (not a static backdrop, not 11 separate scenes) |
+| Role | One world that **follows the story**: each slide shifts the camera or light (not a static backdrop, not 11 separate scenes). On desktop's vertical card stack ([ADR 0062](0062-desktop-vertical-card-stack.md)) the card in view is the active slide, so scrolling drives the camera the same way tapping does on a phone |
 | Look | A **low-poly Deadlock**: recognisably Deadlock's world (1920s occult New York, Art Deco, the Cursed Apple), not a generic or another IP's look. Some creative liberty is fine |
 | Heroes in it | Your **main hero is a constant companion**, other heroes appear around the world, and **duels** stage two heroes facing off in lane (e.g. Celeste casting vs Doorman throwing a bell, Venator aiming) |
 | Duel opponent | Your **nemesis**: the hero that killed you most (`death_details` killer slot). Fallback: hand-picked stock pairings |
@@ -48,7 +48,7 @@ The owner settled M3 in a grilling session on 2026-10-11. Since the original pla
 1. **Style:** 3 rough versions (neon Cursed Apple street, occult fog, the lane), each with a mood board, on a hidden localhost page behind the real story. Reference images load from their hosts and are **never committed** (the repo is public). The owner picks one.
 2. **Model checkpoint** (above), in the picked style, on the same localhost page.
 3. **0.3.0:** the world, cards, duels, graphics levels, and the checkpoint's 3 models.
-4. **Model batches** as patch releases (0.3.1, …).
+4. **Model batches** as patch releases (0.3.1, …). This is a deliberate exception to [ADR 0041](0041-changelog-and-releases.md)'s one release per milestone: the owner chose waves so players get the world sooner.
 
 ## Testing
 
