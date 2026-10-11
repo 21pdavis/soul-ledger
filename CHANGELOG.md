@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Fixed
+
+- On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger (#70).
+
 ## [0.2.0] - 2026-10-11
 
 **Milestone M2: the playable 2D story.** The 11-slide story now plays on phone and desktop, with real hero artwork. The 3D world arrives in M3.

@@ -64,6 +64,10 @@ export function TapZone({ side, onTap, onHoldChange }: Props) {
       aria-hidden="true"
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
+      // A touch is fully handled by the pointer events above. Cancelling touchend stops the browser
+      // sending a click at the finger's spot afterwards, which would press whatever the tap just
+      // revealed there (the summary's Replay button, #70).
+      onTouchEnd={(e) => e.preventDefault()}
       onPointerCancel={clear}
       onPointerLeave={clear}
       onContextMenu={(e) => e.preventDefault()}
