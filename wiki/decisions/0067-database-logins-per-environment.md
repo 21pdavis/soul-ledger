@@ -45,7 +45,7 @@ Only the owner does this: it touches production secrets, which agents may not ch
    ALTER DEFAULT PRIVILEGES FOR ROLE soul_ledger_owner IN SCHEMA public
      GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO soul_ledger_app;
    ```
-   Create the login with SQL, not the Console's "New role" button: Console, CLI and API roles join `neon_superuser` (with `CREATEDB`, `CREATEROLE` and more), while SQL-created roles don't[^neon-roles]. The last statement gives tables created later by migrations the same access.
+   Create the login with SQL, not the Console's "New role" button: Console, CLI and API roles join `neon_superuser` (with `CREATEDB`, `CREATEROLE` and more), while SQL-created roles don't[^neon-roles]. The last statement gives tables created later by migrations the same access; it only works when run as `soul_ledger_owner` (the SQL Editor's default) or a member of it.
 3. In Render, set the service's `DATABASE_URL` to `postgresql://soul_ledger_app:<password>@<host>/soul_ledger?sslmode=require`.
 4. To change the password later: `ALTER ROLE soul_ledger_app WITH PASSWORD '<new>';` on that branch, then update Render.
 5. Check: a real lookup (`/api/lookup?q=<steam id>`) streams `profile` and `history` events. A bad URL logs `Invalid URL`; a wrong password logs `password authentication failed`.
