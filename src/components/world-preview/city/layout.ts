@@ -368,3 +368,34 @@ export function buildOuterRing(seed = 5): Building[] {
   }
   return out;
 }
+
+export type DefenderKind = "guardian" | "walker";
+
+/**
+ * Where each lane's defences stand, per team: a Walker near the base and a Guardian further out
+ * (sapphire at the south end, amber at the north), at the lane's edge and clear of the slide stops.
+ * Walkers stand well off the road, since the camera flies down the middle of it.
+ */
+export function defenderSpots() {
+  const out: {
+    x: number;
+    z: number;
+    face: number;
+    team: "amber" | "sapphire";
+    kind: DefenderKind;
+  }[] = [];
+  for (const lane of LANES) {
+    for (const [u, team, kind] of [
+      [0.1, "sapphire", "walker"],
+      [0.36, "sapphire", "guardian"],
+      [0.64, "amber", "guardian"],
+      [0.9, "amber", "walker"],
+    ] as const) {
+      const { p, t, n } = lanePoint(lane.id, u);
+      const q = p.clone().addScaledVector(n, kind === "walker" ? 8.5 : 3.2);
+      const face = Math.atan2(t.x, t.z) + (team === "amber" ? Math.PI : 0);
+      out.push({ x: q.x, z: q.z, face, team, kind });
+    }
+  }
+  return out;
+}

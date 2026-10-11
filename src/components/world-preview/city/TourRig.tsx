@@ -1,7 +1,7 @@
 "use client";
 
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import * as THREE from "three";
 import { CARD_SIDES, LANE_CHANGES, routeAt, routeTangent, shotPosition, type Shot } from "./tour";
 
@@ -65,7 +65,20 @@ interface Flight {
  * straight there. Timing runs on the clock, so a
  * slow device arrives on time in fewer frames.
  */
-export function TourRig({ shots, slide }: { shots: Shot[]; slide: number }) {
+/**
+ * Preview aid: `?cam=px,py,pz,lx,ly,lz` in the address pins the camera there (looking at the
+ * second point) instead of following the story, for inspecting any part of the city.
+ */
+function pinnedShot(): Shot | null {
+  if (typeof window === "undefined") return null;
+  const v = new URLSearchParams(window.location.search).get("cam")?.split(",").map(Number);
+  if (!v || v.length !== 6 || v.some((n) => !Number.isFinite(n))) return null;
+  return { kind: "free", pos: [v[0], v[1], v[2]], look: [v[3], v[4], v[5]] };
+}
+
+export function TourRig({ shots: storyShots, slide }: { shots: Shot[]; slide: number }) {
+  const [pinned] = useState(pinnedShot);
+  const shots = pinned ? [pinned] : storyShots;
   const flight = useRef<Flight | null>(null);
   const look = useRef(new THREE.Vector3());
   const routeS = useRef<number | null>(null);

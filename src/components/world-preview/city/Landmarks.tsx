@@ -1,14 +1,14 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Car, Guardian, Truck } from "./Props";
+import { Guardian, TEAMS, Walker } from "./Defenders";
+import { Car, Truck } from "./Props";
 import {
   DISTRICTS,
   PALETTE,
-  lanePoint,
   stopPoint,
   type DistrictId,
-  type LaneId,
+  defenderSpots,
   type StopId,
 } from "./layout";
 
@@ -131,7 +131,7 @@ function Uptown() {
   return (
     <AtStop id="uptown">
       {/* The lane's Guardian on its ritual circle, behind the duel, facing up the street. */}
-      <Guardian p={[0, 0, -12]} team={PALETTE.amber} />
+      <Guardian p={[0, 0, -12]} team={TEAMS.amber} />
       {/* Theatre marquee and a diner sign, steady neon. */}
       <Box p={[-9.5, 6, 0]} s={[6, 12, 9]} color="#3a3842" />
       <Box p={[-6.4, 4.2, 0]} s={[0.6, 1.4, 7]} color={PALETTE.windowWarm} glow />
@@ -598,29 +598,17 @@ function Patron({ z, color, face }: { z: number; color: string; face: number }) 
   );
 }
 
-/** Guardians: the lane robots a short way up each lane from both bases. */
-function Guardians() {
-  const out: { lane: LaneId; u: number; color: string; rot: number }[] = [];
-  for (const lane of ["blue", "green", "yellow"] as LaneId[]) {
-    out.push(
-      { lane, u: 0.12, color: PALETTE.sapphire, rot: 0 },
-      { lane, u: 0.88, color: PALETTE.amber, rot: Math.PI },
-    );
-  }
+/** Each lane's defences, per team (see defenderSpots). */
+function Defences() {
   return (
     <>
-      {out.map(({ lane, u, color, rot }) => {
-        const { p, t, n } = lanePoint(lane, u);
-        const q = p.clone().addScaledVector(n, 3.2);
-        return (
-          <Guardian
-            key={lane + u}
-            p={[q.x, 0, q.z]}
-            rot={Math.atan2(t.x, t.z) + rot}
-            team={color}
-          />
-        );
-      })}
+      {defenderSpots().map(({ x, z, face, team, kind }, i) =>
+        kind === "walker" ? (
+          <Walker key={i} p={[x, 0, z]} rot={face} team={TEAMS[team]} scale={2.6} />
+        ) : (
+          <Guardian key={i} p={[x, 0, z]} rot={face} team={TEAMS[team]} />
+        ),
+      )}
     </>
   );
 }
@@ -661,7 +649,7 @@ export function Landmarks() {
       <Districts />
       <Patron z={-104} color={PALETTE.amber} face={0} />
       <Patron z={104} color={PALETTE.sapphire} face={Math.PI} />
-      <Guardians />
+      <Defences />
       <Harbour />
     </>
   );

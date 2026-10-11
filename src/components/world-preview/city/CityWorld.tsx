@@ -15,6 +15,7 @@ import {
   STOPS,
   buildCity,
   buildOuterRing,
+  defenderSpots,
   rng,
   stopPoint,
   type Building,
@@ -360,10 +361,12 @@ export default function CityWorld({ slide, story }: { slide: number; story: Stor
   // Keep the camera's hops between lanes clear of buildings.
   const buildings = useMemo(
     () => [
-      ...buildCity(
-        11,
-        routeConnectors().map(([x, z]) => ({ x, z, r: 6 })),
-      ),
+      ...buildCity(11, [
+        ...routeConnectors().map(([x, z]) => ({ x, z, r: 6 })),
+        ...defenderSpots()
+          .filter((d) => d.kind === "walker")
+          .map(({ x, z }) => ({ x, z, r: 5.5 })),
+      ]),
       ...buildOuterRing(),
     ],
     [],

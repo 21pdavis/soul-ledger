@@ -114,54 +114,6 @@ export function Standee({ member }: { member: CastMember }) {
   );
 }
 
-/**
- * A Guardian: the squat, pale robot that guards each lane, on its ritual circle. Big fists on
- * the ground, a small head, glowing eye slits, its team colour on the chest.
- */
-export function Guardian({ p, rot = 0, team }: { p: Vec3; rot?: number; team: string }) {
-  const shell = "#d8d2c6";
-  const dark = "#4a4448";
-  return (
-    <group position={p} rotation={[0, rot, 0]}>
-      <RitualRing r={3.4} color={PALETTE.occult} />
-      <mesh position={[0, 3.2, 0]} scale={[1.6, 1.25, 1.3]}>
-        <dodecahedronGeometry args={[1.6]} />
-        <Mat color={shell} />
-      </mesh>
-      <mesh position={[0, 4.9, 0.5]}>
-        <boxGeometry args={[1.3, 0.9, 1.1]} />
-        <Mat color={shell} />
-      </mesh>
-      <mesh position={[0, 4.95, 1.07]}>
-        <boxGeometry args={[0.9, 0.14, 0.05]} />
-        <Glow color={team} />
-      </mesh>
-      <mesh position={[0, 3.3, 1.75]}>
-        <octahedronGeometry args={[0.35]} />
-        <Glow color={team} />
-      </mesh>
-      {[-1, 1].map((sd) => (
-        <group key={sd} position={[sd * 2.7, 0, 0.4]}>
-          <mesh position={[0, 3.4, 0]} rotation={[0, 0, sd * 0.25]}>
-            <cylinderGeometry args={[0.55, 0.7, 2.4, 6]} />
-            <Mat color={dark} metal={0.4} />
-          </mesh>
-          <mesh position={[sd * 0.25, 1.4, 0.2]}>
-            <boxGeometry args={[1.5, 2.2, 1.6]} />
-            <Mat color={shell} />
-          </mesh>
-        </group>
-      ))}
-      {[-0.9, 0.9].map((x) => (
-        <mesh key={x} position={[x, 1, -0.4]}>
-          <boxGeometry args={[0.9, 2, 1]} />
-          <Mat color={dark} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
 export function RitualRing({ r, color, y = 0.08 }: { r: number; color: string; y?: number }) {
   return (
     <group position={[0, y, 0]} rotation={[-Math.PI / 2, 0, 0]}>
