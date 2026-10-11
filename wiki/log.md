@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-11
+* **Creation**: [M3 model style](open-questions/m3-model-style.md): open question on faceted blocks (ADR 0025) versus the sculpted low-poly look the owner asked for on the mid boss.
 * **Research**: [The Cursed Apple map after City Never Sleeps](research/cursed-apple-map.md): the post-update layout, lane stops, bridges, Guardians, mid boss pit and look, as reference for the M3 low-poly city preview.
 * **Decision**: [ADR 0068](decisions/0068-m3-scope-and-order.md): M3 settled in a grilling session: a story-following low-poly Deadlock world, art cards for every hero, nemesis duels, Full/Simple/Off graphics with an auto-drop below 20 fps, and low-poly posed models starting with a three-hero checkpoint before the rest of 0.3.0. Supersedes parts of ADRs 0013, 0019 and 0028.
 * **Creation**: [M3 plan](recommendations/m3-plan.md): four owner-gated steps and a draft 0.3.0 PR breakdown.
