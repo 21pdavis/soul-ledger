@@ -58,6 +58,25 @@ export const bulkPlayer = z.object({
 });
 export type BulkPlayer = z.infer<typeof bulkPlayer>;
 
+/**
+ * Who stood in which slot of one match, so a killer slot can be turned into a hero. The
+ * reader's own entry also lists the slot that killed them, death by death, in the same order
+ * as the bulk metadata's `death_details`.
+ */
+export const matchLineup = z.object({
+  match_id: z.number(),
+  players: z.array(
+    z.object({
+      account_id: z.number().nullish(),
+      player_slot: z.number(),
+      hero_id: z.number(),
+      team: z.string(),
+      death_details: z.array(z.object({ killer_player_slot: z.number().nullish() })).default([]),
+    }),
+  ),
+});
+export type MatchLineup = z.infer<typeof matchLineup>;
+
 export const bulkMatch = z.object({
   match_id: z.number(),
   /** UTC, formatted "YYYY-MM-DD HH:MM:SS". */

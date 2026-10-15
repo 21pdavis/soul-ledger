@@ -49,6 +49,45 @@ describe("deadlock-api client", () => {
     expect(q.get("limit")).toBe("3");
   });
 
+  it("asks for every player's slot and hero (the killer lookup), without the heavy stats", async () => {
+    const all = fixtureJson<{ match_id: number }[]>("api/lineups.json");
+    const { client, calls } = api({ [`${API}/v1/matches/metadata`]: () => json(all) });
+    const ids = all.map((m) => m.match_id);
+    const lineups = await client.getLineups(TEST_ACCOUNT_ID, ids);
+
+    expect(lineups).toHaveLength(all.length);
+    expect(lineups[0].players).toHaveLength(12);
+    const q = calls[0].searchParams;
+    expect(q.get("account_ids")).toBe(String(TEST_ACCOUNT_ID));
+    expect(q.get("only_filtered_players")).toBe("false");
+    expect(q.get("include_player_info")).toBe("false");
+    expect(q.get("include_player_final_stats")).toBeNull();
+    expect(q.get("include_player_death_details")).toBe("true");
+  });
+
+  it("accepts a null or missing killer slot instead of failing the parse", async () => {
+    const lineup = {
+      match_id: 1,
+      players: [
+        {
+          account_id: 5,
+          player_slot: 1,
+          hero_id: 2,
+          team: "Team0",
+          death_details: [{ killer_player_slot: null }, {}],
+        },
+      ],
+    };
+    const { client } = api({ [`${API}/v1/matches/metadata`]: () => json([lineup]) });
+    await expect(client.getLineups(TEST_ACCOUNT_ID, [1])).resolves.toHaveLength(1);
+  });
+
+  it("makes no lineup request for an empty id list", async () => {
+    const { client, calls } = api({});
+    await expect(client.getLineups(TEST_ACCOUNT_ID, [])).resolves.toEqual([]);
+    expect(calls).toHaveLength(0);
+  });
+
   it("splits large bulk requests into chunks", async () => {
     const { client, calls } = api({ [`${API}/v1/matches/metadata`]: () => json([]) });
     const ids = Array.from({ length: 1201 }, (_, i) => i + 1);

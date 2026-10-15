@@ -62,7 +62,7 @@ All analytics endpoints share **200 req/min per IP**.
 # Implications
 
 - **Key tier:** the spec's rate-limit tables have a separate "Key" row next to "IP" (for example `account-stats`: 20 req/min and 800 req/h per key). How to obtain a key is not documented there.
-- **Capacity:** bulk metadata is 30 req/min per IP and a 650-match player takes about 7 requests, so one server IP handles roughly 200 to 250 cold lookups an hour. Cached and returning players are nearly free. Squad mode multiplies the cost. We queue rather than evade the limits ([ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md)).
+- **Capacity:** bulk metadata is 30 req/min per IP and a 650-match player takes about 7 requests, plus 2 more for the killer lineups (one per 500 matches, same limiter, [nemesis](match-metadata-fields.md)), so one server IP handles roughly 150 to 200 cold lookups an hour. Cached and returning players are nearly free. Squad mode multiplies the cost. We queue rather than evade the limits ([ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md)).
 - Rate limits are per IP, so the server must cache in Postgres ([ADR 0001](../decisions/0001-public-site-postgres-cache.md)) and queue fetches.
 
 [^openapi]: deadlock-api OpenAPI spec

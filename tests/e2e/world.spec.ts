@@ -96,6 +96,19 @@ test("the graphics button never straddles the story frame's bottom edge", async 
   ).toBe(true);
 });
 
+test("the world follows the story: its slide updates when the slide changes", async ({ page }) => {
+  await openStory(page);
+  const world = page.getByTestId("world");
+  await expect(world).toHaveAttribute("data-slide", "0");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "main");
+  await expect(world).toHaveAttribute("data-slide", "1");
+  await stageSettled(page);
+  await page.keyboard.press("ArrowLeft");
+  await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "intro");
+  await expect(world).toHaveAttribute("data-slide", "0");
+});
+
 test("the graphics button stays clear of the summary's buttons", async ({ page }) => {
   await openStory(page);
   const button = page.getByTestId("graphics-button");

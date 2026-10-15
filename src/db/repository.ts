@@ -1,6 +1,6 @@
-import { and, asc, eq, gte, lt, ne, or } from "drizzle-orm";
+import { and, asc, desc, eq, gte, lt, ne, or } from "drizzle-orm";
 import type { MmrHistoryEntry } from "@/lib/deadlock-api/schemas";
-import type { PlayerMatch } from "@/lib/stats/types";
+import type { DeathPoint, PlayerMatch } from "@/lib/stats/types";
 import type { Db } from "./index";
 import { apiCache, fetchJobs, playerMatches, players } from "./schema";
 
@@ -22,6 +22,41 @@ export async function savePlayerMatches(db: Db, rows: PlayerMatch[]): Promise<vo
       .insert(playerMatches)
       .values(rows.slice(i, i + INSERT_CHUNK))
       .onConflictDoNothing();
+  }
+}
+
+/**
+ * Stored matches that have deaths but no killer on any of them (the nemesis, ADR 0068): rows
+ * saved before killers were recorded, or whose lineup lookup failed. Newest first.
+ */
+export async function getMatchesMissingKillers(
+  db: Db,
+  accountId: number,
+): Promise<{ matchId: number; deathPositions: DeathPoint[] }[]> {
+  const rows = await db
+    .select({
+      matchId: playerMatches.matchId,
+      deathPositions: playerMatches.deathPositions,
+    })
+    .from(playerMatches)
+    .where(eq(playerMatches.accountId, accountId))
+    .orderBy(desc(playerMatches.startTime));
+  return rows.filter(
+    (r) => r.deathPositions.length > 0 && r.deathPositions.every((d) => d.length === 2),
+  );
+}
+
+/** Rewrites only the death list of stored matches (saves otherwise never change a row). */
+export async function updateDeathPositions(
+  db: Db,
+  accountId: number,
+  updates: { matchId: number; deathPositions: DeathPoint[] }[],
+): Promise<void> {
+  for (const u of updates) {
+    await db
+      .update(playerMatches)
+      .set({ deathPositions: u.deathPositions })
+      .where(and(eq(playerMatches.accountId, accountId), eq(playerMatches.matchId, u.matchId)));
   }
 }
 

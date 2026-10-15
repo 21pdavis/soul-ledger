@@ -52,6 +52,12 @@ export interface PlayerMatch {
   midBossClaimed: number;
   midBossStolen: number;
 
-  /** Map x/y of every death. */
-  deathPositions: [number, number][];
+  /**
+   * Map x/y of every death. A third number, when present, is the hero id of the enemy that
+   * made the kill (it lives inside the existing JSON column, so it needs no migration).
+   */
+  deathPositions: DeathPoint[];
 }
+
+/** `[x, y]`, or `[x, y, killerHeroId]` when the killer is known. */
+export type DeathPoint = [number, number] | [number, number, number];

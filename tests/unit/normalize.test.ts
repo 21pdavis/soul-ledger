@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { bulkMatch, type BulkMatch } from "@/lib/deadlock-api/schemas";
-import { normalizePlayerMatch } from "@/lib/stats/normalize";
+import { bulkMatch, matchLineup, type BulkMatch } from "@/lib/deadlock-api/schemas";
+import { normalizePlayerMatch, tagKillers } from "@/lib/stats/normalize";
+import type { DeathPoint } from "@/lib/stats/types";
 import { fixtureJson, TEST_ACCOUNT_ID } from "../helpers/fixtures";
 
 const matches = bulkMatch.array().parse(fixtureJson("api/bulk-metadata.json"));
+const lineups = matchLineup.array().parse(fixtureJson("api/lineups.json"));
+const lineupOf = (id: number) => lineups.find((l) => l.match_id === id)!;
 const byId = (id: number) => matches.find((m) => m.match_id === id)!;
 
 describe("normalizePlayerMatch", () => {
@@ -100,5 +103,67 @@ describe("normalizePlayerMatch", () => {
 
   it("throws when the player is not in the match", () => {
     expect(() => normalizePlayerMatch(byId(112055054), 1)).toThrow(/not in match/);
+  });
+
+  describe("tagKillers (the nemesis data)", () => {
+    // Recorded: the killer slots are 4, 4, 4, 5, 1, 1, 2 and the lineup maps them to heroes.
+    const plain = (id: number): DeathPoint[] =>
+      normalizePlayerMatch(byId(id), TEST_ACCOUNT_ID).deathPositions;
+
+    it("starts a stored row as plain [x, y] deaths", () => {
+      expect(plain(111236243).every((d) => d.length === 2)).toBe(true);
+    });
+
+    it("tags each death with the hero that killed the player", () => {
+      const tagged = tagKillers(plain(111236243), TEST_ACCOUNT_ID, lineupOf(111236243));
+      expect(tagged).toHaveLength(7);
+      expect(tagged!.map((d) => d[2])).toEqual([4, 4, 4, 12, 18, 18, 27]);
+      expect(tagged![0].slice(0, 2)).toEqual(plain(111236243)[0]);
+    });
+
+    it("marks a death 0 (read, but no enemy killer) when the killer is a teammate, self or unknown", () => {
+      const lineup = lineupOf(111236243);
+      const me = lineup.players.find((p) => p.account_id === TEST_ACCOUNT_ID)!;
+      const mate = lineup.players.find(
+        (p) => p.team === me.team && p.player_slot !== me.player_slot,
+      )!;
+      const enemy = lineup.players.find((p) => p.team !== me.team)!;
+      const slots = [me.player_slot, mate.player_slot, null, 99, enemy.player_slot];
+      const edited = {
+        ...lineup,
+        players: lineup.players.map((p) =>
+          p === me ? { ...p, death_details: slots.map((k) => ({ killer_player_slot: k })) } : p,
+        ),
+      };
+      const tagged = tagKillers(plain(111236243).slice(0, 5), TEST_ACCOUNT_ID, edited);
+      expect(tagged!.map((d) => d[2])).toEqual([0, 0, 0, 0, enemy.hero_id]);
+    });
+
+    it("still tags the row when no death has an enemy killer, so it is never asked about again", () => {
+      const lineup = lineupOf(111236243);
+      const noEnemy = {
+        ...lineup,
+        players: lineup.players.map((p) =>
+          p.account_id === TEST_ACCOUNT_ID
+            ? { ...p, death_details: p.death_details.map(() => ({ killer_player_slot: null })) }
+            : p,
+        ),
+      };
+      const tagged = tagKillers(plain(111236243), TEST_ACCOUNT_ID, noEnemy);
+      expect(tagged!.map((d) => d[2])).toEqual([0, 0, 0, 0, 0, 0, 0]);
+    });
+
+    it("returns null when the lineup cannot be read (so the row is not rewritten)", () => {
+      const lineup = lineupOf(111236243);
+      expect(tagKillers(plain(111236243), 1, lineup)).toBeNull();
+      const bare = { ...lineup, players: lineup.players.map((p) => ({ ...p, death_details: [] })) };
+      expect(tagKillers(plain(111236243), TEST_ACCOUNT_ID, bare)).toBeNull();
+    });
+
+    it("refuses to guess when the lineup lists a different number of deaths", () => {
+      expect(
+        tagKillers(plain(111236243).slice(0, 3), TEST_ACCOUNT_ID, lineupOf(111236243)),
+      ).toBeNull();
+    });
   });
 });

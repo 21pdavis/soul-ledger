@@ -10,6 +10,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import type { MmrHistoryEntry } from "@/lib/deadlock-api/schemas";
+import type { DeathPoint } from "@/lib/stats/types";
 
 // Account ids are 32-bit unsigned, so they overflow Postgres `integer`.
 const accountId = () => bigint("account_id", { mode: "number" });
@@ -75,7 +76,7 @@ export const playerMatches = pgTable(
     midBossClaimed: integer("mid_boss_claimed").notNull(),
     midBossStolen: integer("mid_boss_stolen").notNull(),
 
-    deathPositions: jsonb("death_positions").$type<[number, number][]>().notNull(),
+    deathPositions: jsonb("death_positions").$type<DeathPoint[]>().notNull(),
   },
   (t) => [
     primaryKey({ columns: [t.accountId, t.matchId] }),

@@ -2,9 +2,10 @@
 
 import { Line, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { Component, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import type { DeathBins } from "@/story/death-bins";
+import { FALLBACK_CARD_SRC, heroCardSrc } from "@/story/hero-art";
 import { PALETTE, type Vec3 } from "./layout";
 import { MIDBOSS_PARTS, buildMidBossGeometry, frontAt } from "./midboss";
 import type { CastMember, Duel } from "./tour";
@@ -48,9 +49,34 @@ function silhouetteMaterial(map: THREE.Texture, color: string) {
   });
 }
 
-/** A hero as a cut-out standee on an Art Deco plinth. Static: it never turns to follow the camera. */
+/** Swaps in a fallback if its children throw, so one bad texture costs one standee, not the city. */
+class FigureBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+/**
+ * A hero as a cut-out standee on an Art Deco plinth. Static: it never turns to follow the camera.
+ * If the hero's card fails to load, this one standee shows the generic silhouette instead.
+ */
 export function Standee({ member }: { member: CastMember }) {
-  const texture = useTexture(`/heroes/${member.heroId}-card.webp`, (t) => {
+  return (
+    <FigureBoundary fallback={<StandeeFigure member={member} src={FALLBACK_CARD_SRC} />}>
+      <StandeeFigure member={member} src={heroCardSrc(member.heroId)} />
+    </FigureBoundary>
+  );
+}
+
+function StandeeFigure({ member, src }: { member: CastMember; src: string }) {
+  const texture = useTexture(src, (t) => {
     t.colorSpace = THREE.SRGBColorSpace;
   });
   const image = texture.image as { width: number; height: number } | undefined;
