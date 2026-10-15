@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { lowerGraphics } from "@/lib/client/fps-monitor";
 import { useIsClient } from "@/components/story/useIsClient";
 import {
@@ -42,6 +43,25 @@ interface Props {
 function Still() {
   // eslint-disable-next-line @next/next/no-img-element -- a plain decorative backdrop
   return <img className={styles.still} src="/world/still.webp" alt="" data-testid="world-still" />;
+}
+
+/** A small isometric cube: the graphics-level button's icon. */
+function GraphicsIcon() {
+  return (
+    <svg
+      className={styles.graphicsIcon}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M12 2.5 20.5 7.25v9.5L12 21.5 3.5 16.75v-9.5Z" />
+      <path d="M3.5 7.25 12 12l8.5-4.75M12 12v9.5" />
+    </svg>
+  );
 }
 
 /**
@@ -138,22 +158,29 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
           )
         )}
       </div>
-      {hasWebGL && (
-        <div className={styles.graphicsNote} role="status" aria-live="polite">
-          {note ? `Graphics lowered to ${graphicsLabel(note.level)} to keep things smooth` : ""}
-        </div>
-      )}
-      {hasWebGL && (
-        <button
-          type="button"
-          className={styles.graphics}
-          onClick={cycle}
-          aria-label={`Graphics: ${graphicsLabel(level)}. Press to change.`}
-          data-testid="graphics-button"
-        >
-          <span aria-hidden="true">Graphics: {graphicsLabel(level)}</span>
-        </button>
-      )}
+      {hasWebGL &&
+        // In the page's bottom-right corner, outside the story area (#79), so it never sits on the
+        // story frame. The story area is a size container, which would trap a fixed child.
+        createPortal(
+          <>
+            <div className={styles.graphicsNote} role="status" aria-live="polite">
+              {note ? `Graphics lowered to ${graphicsLabel(note.level)} to keep things smooth` : ""}
+            </div>
+            <button
+              type="button"
+              className={styles.graphics}
+              onClick={cycle}
+              aria-label={`Graphics: ${graphicsLabel(level)}. Press to change.`}
+              data-testid="graphics-button"
+            >
+              <GraphicsIcon />
+              <span className={styles.graphicsLabel} aria-hidden="true">
+                Graphics: {graphicsLabel(level)}
+              </span>
+            </button>
+          </>,
+          document.body,
+        )}
     </>
   );
 }

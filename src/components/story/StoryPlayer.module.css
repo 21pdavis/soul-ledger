@@ -5,11 +5,7 @@
 
 .root {
   /* The stage is as wide as --story-width allows and 9:16 tall, but never taller than the screen. */
-  /* --pill-room (phone, from StoryStage) is a strip left clear under the stage for the graphics pill. */
-  --stage-h: min(
-    calc(var(--player-h, 100dvh) - var(--pill-room, 0px)),
-    calc(min(100vw, var(--story-width)) * 16 / 9)
-  );
+  --stage-h: min(var(--player-h, 100dvh), calc(min(100vw, var(--story-width)) * 16 / 9));
   position: relative;
   min-height: var(--player-h, 100dvh);
   color: var(--bone);
@@ -23,11 +19,17 @@
 
 /* Phone: the stage fills the screen, letterboxed to 9:16 if the screen is taller. */
 .phone {
+  /* The frame's 8px double rule is drawn outside the stage: keep room for it at the top on screens
+     short enough for the stage to fill the height (below, the notice strip's padding has room). */
+  --stage-h: min(
+    calc(var(--player-h, 100dvh) - 8px),
+    calc(min(100vw, var(--story-width)) * 16 / 9)
+  );
   display: grid;
   place-items: center;
-  height: var(--player-h, 100dvh);
   box-sizing: border-box;
-  padding-bottom: var(--pill-room, 0px);
+  padding-top: 8px;
+  height: var(--player-h, 100dvh);
   overflow: hidden;
 }
 

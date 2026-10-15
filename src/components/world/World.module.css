@@ -26,18 +26,21 @@
 }
 
 /*
- * The graphics-level button: a small pill in the bottom-centre of the story. The corners are taken
- * (the previous/next skip links sit bottom left and right when focused, the progress bar runs along
- * the top on a phone and the rail down the right side on desktop), and it sits above the tap zones.
+ * The graphics-level button (#79): a small cube icon fixed in the screen's bottom-right corner,
+ * outside the story frame. On a phone it sits in the notice strip under the story, which keeps a
+ * gap on its right for it (App.module.css). On desktop it widens to name the level on hover/focus.
  */
 .graphics {
-  position: absolute;
-  bottom: 0.5rem;
-  left: 50%;
+  position: fixed;
+  right: 0.375rem;
+  bottom: calc(0.375rem + env(safe-area-inset-bottom, 0px));
   z-index: 5;
-  transform: translateX(-50%);
-  min-height: 2rem;
-  padding: 0.25rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.5rem;
   border: 1px solid rgb(255 255 255 / 0.25);
   border-radius: 999px;
   color: var(--bone, #eee);
@@ -47,6 +50,22 @@
   white-space: nowrap;
   cursor: pointer;
   pointer-events: auto;
+  transition:
+    gap 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.graphicsIcon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* The level's name: hidden until hover or keyboard focus on desktop; never shown on a phone. */
+.graphicsLabel {
+  max-width: 0;
+  overflow: hidden;
+  transition: max-width 0.2s ease;
 }
 
 .graphics:focus-visible {
@@ -54,13 +73,37 @@
   outline-offset: 2px;
 }
 
-/* The short "graphics lowered" note: sits just above the graphics button and fades out. */
+@media (min-width: 1024px) and (pointer: fine) {
+  .graphics {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .graphics:hover,
+  .graphics:focus-visible {
+    gap: 0.5rem;
+    border-color: rgb(255 255 255 / 0.5);
+  }
+
+  .graphics:hover .graphicsLabel,
+  .graphics:focus-visible .graphicsLabel {
+    max-width: 10rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graphics,
+  .graphicsLabel {
+    transition: none;
+  }
+}
+
+/* The short "graphics lowered" note: sits just above the graphics button, right-aligned, and fades out. */
 .graphicsNote {
-  position: absolute;
-  bottom: 3rem;
-  left: 50%;
+  position: fixed;
+  right: 0.375rem;
+  bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
   z-index: 5;
-  transform: translateX(-50%);
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
   color: var(--bone, #eee);
@@ -89,50 +132,5 @@
 @media (prefers-reduced-motion: reduce) {
   .graphicsNote {
     animation: none;
-  }
-}
-
-/*
- * Phone (the tap controller): the story's frame is a 9:16 stage letterboxed in the screen, so the
- * pill must not sit on its bottom rule. The player keeps a strip under the stage for it
- * (--pill-room, set in StoryStage.module.css and used by StoryPlayer.module.css), and --band is the
- * whole dark strip under the frame. The pill is centred in it, below the frame's 8px double rule
- * and above the bottom safe area; the "graphics lowered" note sits just above the frame's rule.
- */
-@media not ((min-width: 1024px) and (pointer: fine)) {
-  .graphics,
-  .graphicsNote {
-    --room: var(--pill-room, 0px);
-    --stage-h: min(
-      calc(100cqh - var(--room)),
-      calc(min(100vw, var(--story-width, 480px)) * 16 / 9)
-    );
-    --band: calc((100cqh - var(--room) - var(--stage-h)) / 2 + var(--room));
-    --safe: env(safe-area-inset-bottom, 0px);
-  }
-
-  .graphics {
-    bottom: calc(var(--safe) + (var(--band) - var(--safe) - 8px - 2rem) / 2);
-  }
-
-  .graphicsNote {
-    bottom: calc(var(--band) + 0.75rem);
-  }
-}
-
-/*
- * Short phone (no strip is reserved, the stage fills the screen): a compact pill fully inside the
- * frame, just above its bottom rule, and the note a line above it.
- */
-@media (not ((min-width: 1024px) and (pointer: fine))) and (max-height: 699px) {
-  .graphics {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px + 0.25rem);
-    min-height: 1.5rem;
-    padding: 0.125rem 0.5rem;
-    font-size: 0.625rem;
-  }
-
-  .graphicsNote {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px + 2.25rem);
   }
 }

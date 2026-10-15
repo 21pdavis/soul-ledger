@@ -76,24 +76,75 @@ test("the corner button cycles the graphics level, stays clear of the controls, 
   await expect(page.getByTestId("graphics-button")).toHaveAccessibleName(/Graphics: Simple/);
 });
 
-test("the graphics button never straddles the story frame's bottom edge", async ({ page }) => {
+type Box = { x: number; y: number; width: number; height: number };
+const intersects = (a: Box, b: Box) =>
+  a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+
+// Short phones are where space runs out (#79): the button must keep off the story frame, its
+// double rule and every slide, and stay a comfortable tap target.
+for (const [width, height] of [
+  [320, 568],
+  [360, 640],
+  [360, 699],
+  [412, 915],
+] as const) {
+  test(`${width}x${height}: the graphics icon sits in the bottom-right corner, off the story frame`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "phone", "phone sizes");
+    await page.setViewportSize({ width, height });
+    await openStory(page);
+    const button = page.getByTestId("graphics-button");
+    test.skip((await button.count()) === 0, "this browser has no WebGL");
+    const box = (await button.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(32);
+    expect(box.height).toBeGreaterThanOrEqual(32);
+    // Bottom-right corner of the screen.
+    expect(box.x + box.width).toBeGreaterThan(width - 24);
+    expect(box.y + box.height).toBeGreaterThan(height - 24);
+    expect(box.x + box.width).toBeLessThanOrEqual(width);
+    expect(box.y + box.height).toBeLessThanOrEqual(height);
+    // Clear of the frame and the 8px double rule drawn outside it, so no slide is covered.
+    const f = (await page.getByTestId("story-stage").boundingBox())!;
+    const ring = 8;
+    const frame = {
+      x: f.x - ring,
+      y: f.y - ring,
+      width: f.width + 2 * ring,
+      height: f.height + 2 * ring,
+    };
+    expect(intersects(box, frame), "graphics icon on the story frame").toBe(false);
+    // And clear of the notice text under the story.
+    const notice = (await page.locator("footer small").boundingBox())!;
+    expect(intersects(box, notice), "graphics icon on the notice").toBe(false);
+  });
+
+  test(`${width}x${height}: the story frame's outer rule is not cut off at the top`, async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== "phone", "phone sizes");
+    await page.setViewportSize({ width, height });
+    await openStory(page);
+    const f = (await page.getByTestId("story-stage").boundingBox())!;
+    expect(f.y).toBeGreaterThanOrEqual(8);
+  });
+}
+
+test("the graphics icon shows only an icon on a phone, and names its level on hover on desktop", async ({
+  page,
+}, info) => {
   await openStory(page);
   const button = page.getByTestId("graphics-button");
   test.skip((await button.count()) === 0, "this browser has no WebGL");
-  const box = (await button.boundingBox())!;
-  // On a phone the frame is the stage; on desktop it is the first story card.
-  const desktop = (await page.getByTestId("story-card").count()) > 0;
-  const frame = desktop ? page.getByTestId("story-card").first() : page.getByTestId("story-stage");
-  const f = (await frame.boundingBox())!;
-  const bottom = f.y + f.height;
-  const ring = 8; // the double rule drawn outside the frame
-  const beside = box.x + box.width <= f.x || box.x >= f.x + f.width;
-  const below = box.y >= bottom + ring;
-  const inside = box.y + box.height <= bottom - ring;
-  expect(
-    beside || below || inside,
-    `pill ${box.y}-${box.y + box.height} vs frame bottom ${bottom}`,
-  ).toBe(true);
+  await expect(button.locator("svg")).toBeVisible();
+  const label = button.getByText("Graphics: Off");
+  if (info.project.name === "phone") {
+    await expect(label).toBeHidden();
+    return;
+  }
+  await expect(label).toBeHidden();
+  await button.hover();
+  await expect(label).toBeVisible();
 });
 
 test("the world follows the story: its slide updates when the slide changes", async ({ page }) => {
