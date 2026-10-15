@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-14
+
+**Milestone M3: the city behind the story.** A low-poly copy of the Cursed Apple now sits behind your story, and the camera tours it slide by slide. Heroes stand in the city as cut-out cards placed from your stats, and the duel shows your real nemesis. Posed 3D hero models come later.
+
 ### Added
 
 - The duel in the city now shows the hero that has killed you the most, not a stand-in rival. For players already looked up, the next refresh fills in who killed them in past games; the real rival appears once most of their deaths are known, and until then the old pairing shows.
@@ -69,6 +73,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - The Render build no longer installs pnpm globally, because Render's global modules folder is read-only.
 - Failed Steam vanity-URL lookups are now logged with the reason. They had failed intermittently in production right after the first deploy.
 
-[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/21pdavis/soul-ledger/releases/tag/v0.1.0
