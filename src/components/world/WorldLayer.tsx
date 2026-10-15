@@ -113,7 +113,13 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
   };
   return (
     <>
-      <div className={styles.layer} data-testid="world" data-level={level} aria-hidden="true">
+      <div
+        className={styles.layer}
+        data-testid="world"
+        data-level={level}
+        data-slide={slide}
+        aria-hidden="true"
+      >
         {level === "off" ? (
           <Still />
         ) : (
