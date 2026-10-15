@@ -1,10 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Db } from "@/db";
 import * as repo from "@/db/repository";
 import { syncPlayer, type SyncEvent } from "@/lib/ingest/sync-player";
 import { computeStory } from "@/lib/stats/story";
 import { createTestDb } from "../helpers/db";
-import { fakeApi } from "../helpers/fake-api";
+import { fakeApi, fixtureLineups } from "../helpers/fake-api";
 import { TEST_ACCOUNT_ID } from "../helpers/fixtures";
 
 let db: Db;
@@ -181,29 +181,89 @@ describe("syncPlayer", () => {
 });
 
 describe("syncPlayer nemesis data (ADR 0068)", () => {
-  it("stores who killed the player, so the story can name a nemesis", async () => {
-    const { api } = fakeApi();
-    await syncPlayer(TEST_ACCOUNT_ID, { db, api });
-
-    const rows = await repo.getPlayerMatches(db, TEST_ACCOUNT_ID);
-    const story = computeStory({
-      matches: rows,
+  const storyOf = async () =>
+    computeStory({
+      matches: await repo.getPlayerMatches(db, TEST_ACCOUNT_ID),
       rankHistory: [],
       globalMetrics: {},
       mainHeroMetrics: {},
     });
-    // The recorded lineups cover six matches (heroes 4, 20, 64 and 67 tie on 3 kills; 4 wins).
-    expect(story.nemesis).toEqual({ heroId: 4, kills: 3 });
+  const tagged = async () =>
+    (await repo.getPlayerMatches(db, TEST_ACCOUNT_ID))
+      .flatMap((r) => r.deathPositions)
+      .filter((d) => d.length === 3).length;
+  /** Only the six matches with recorded lineups, so every death can be tagged. */
+  const onlyLineupMatches = (state: ReturnType<typeof fakeApi>["state"]) => {
+    const ids = new Set(fixtureLineups().map((l) => l.match_id));
+    state.history = state.history.filter((m) => ids.has(m.match_id));
+  };
+
+  it("stores who killed the player, so the story can name a nemesis", async () => {
+    const { api, state } = fakeApi();
+    onlyLineupMatches(state);
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api });
+    // Heroes 4, 20, 64 and 67 tie on 3 kills; the lowest id wins.
+    expect((await storyOf()).nemesis).toEqual({ heroId: 4, kills: 3 });
   });
 
   it("still saves every match when the killer lookup fails", async () => {
     const { api, state } = fakeApi();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
     state.lineupsFailWith = new Error("lineups down");
 
     await expect(syncPlayer(TEST_ACCOUNT_ID, { db, api })).resolves.toBe("synced");
 
     const rows = await repo.getPlayerMatches(db, TEST_ACCOUNT_ID);
     expect(rows).toHaveLength(352);
-    expect(rows.flatMap((r) => r.deathPositions).every((d) => d.length === 2)).toBe(true);
+    expect(await tagged()).toBe(0);
+  });
+
+  it("logs a warning when the killer lookup fails, so an outage shows in the logs", async () => {
+    const { api, state } = fakeApi();
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    state.lineupsFailWith = new Error("lineups down");
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api });
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("lineups down"));
+  });
+
+  it("backfills matches stored without killers on a later refresh (the reviewer's probe)", async () => {
+    const { api, state } = fakeApi();
+    onlyLineupMatches(state);
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    state.lineupsFailWith = new Error("lineups down");
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api });
+    expect((await storyOf()).nemesis).toBeNull();
+
+    state.lineupsFailWith = null;
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api, force: true });
+
+    expect(state.calls.bulk).toHaveLength(1); // the six matches were not read again
+    expect((await storyOf()).nemesis).toEqual({ heroId: 4, kills: 3 });
+  });
+
+  it("fetches lineups per 500 matches, not per 100, and tells the loader when it waits", async () => {
+    const { api, state } = fakeApi();
+    const events: SyncEvent[] = [];
+    const getLineups = api.getLineups;
+    api.getLineups = async (id, ids, hooks) => {
+      hooks?.onWait?.(1500);
+      hooks?.onStart?.();
+      return getLineups(id, ids, hooks);
+    };
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api, onEvent: (e) => events.push(e) });
+
+    expect(state.calls.lineups).toHaveLength(1);
+    expect(state.calls.lineups[0].length).toBeGreaterThan(300);
+    expect(events).toContainEqual({ type: "status", step: "rate_limited", waitMs: 1500 });
+  });
+
+  it("asks again only about matches that still lack killers", async () => {
+    const { api, state } = fakeApi();
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api });
+    const first = state.calls.lineups[0];
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api, force: true });
+    const again = state.calls.lineups[1];
+    expect(again.length).toBeLessThan(first.length);
+    expect(again).not.toContain(110497230); // already tagged
   });
 });

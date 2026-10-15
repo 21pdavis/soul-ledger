@@ -40,8 +40,6 @@ export const finalStats = z.object({
 export const bulkPlayer = z.object({
   account_id: z.number(),
   hero_id: z.number(),
-  /** Lines up with `killer_player_slot` in every player's death_details. */
-  player_slot: z.number().optional(),
   team: z.string(),
   kills: z.number(),
   deaths: z.number(),
@@ -54,20 +52,17 @@ export const bulkPlayer = z.object({
     .array(z.object({ accolade_id: z.number(), accolade_stat_value: z.number() }))
     .default([]),
   death_details: z
-    .array(
-      z.object({
-        game_time_s: z.number(),
-        death_pos: z.array(z.number()).min(2),
-        /** The slot that landed the kill; absent for some deaths. */
-        killer_player_slot: z.number().optional(),
-      }),
-    )
+    .array(z.object({ game_time_s: z.number(), death_pos: z.array(z.number()).min(2) }))
     .default([]),
   final_stats: finalStats.optional(),
 });
 export type BulkPlayer = z.infer<typeof bulkPlayer>;
 
-/** Who stood in which slot of one match, so a killer slot can be turned into a hero. */
+/**
+ * Who stood in which slot of one match, so a killer slot can be turned into a hero. The
+ * reader's own entry also lists the slot that killed them, death by death, in the same order
+ * as the bulk metadata's `death_details`.
+ */
 export const matchLineup = z.object({
   match_id: z.number(),
   players: z.array(
@@ -76,6 +71,7 @@ export const matchLineup = z.object({
       player_slot: z.number(),
       hero_id: z.number(),
       team: z.string(),
+      death_details: z.array(z.object({ killer_player_slot: z.number().nullish() })).default([]),
     }),
   ),
 });

@@ -249,16 +249,26 @@ export function computeStory(input: StoryInput): Story {
 }
 
 /**
- * The enemy hero that killed the player most. Deaths without a known killer are skipped, and
+ * The enemy hero that killed the player most, named only when at least half of all deaths have a
+ * known killer. Deaths without one are skipped, and
  * a tie goes to the lowest hero id so the answer is the same on every load.
  */
 function pickNemesis(rows: PlayerMatch[]): Story["nemesis"] {
   const kills = new Map<number, number>();
+  let deaths = 0;
+  let tagged = 0;
   for (const r of rows) {
     for (const d of r.deathPositions) {
-      if (d.length === 3) kills.set(d[2], (kills.get(d[2]) ?? 0) + 1);
+      deaths++;
+      if (d.length === 3) {
+        tagged++;
+        kills.set(d[2], (kills.get(d[2]) ?? 0) + 1);
+      }
     }
   }
+  // A handful of tagged deaths among many untagged ones is not a trustworthy nemesis (killers
+  // are still being filled in for an older history), so the story uses the stock rival instead.
+  if (tagged * 2 < deaths) return null;
   let best: { heroId: number; kills: number } | null = null;
   for (const [heroId, n] of kills) {
     if (!best || n > best.kills || (n === best.kills && heroId < best.heroId)) {

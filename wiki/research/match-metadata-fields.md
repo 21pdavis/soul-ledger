@@ -5,7 +5,7 @@ description: The per-player and match-level fields in deadlock-api match metadat
 resource: https://api.deadlock-api.com/openapi.json
 tags: [data-source, schema, match-metadata]
 status: stable
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-07T05:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-14T12:00:00Z }
 verified: { by: claude-code/claude-opus-5-5, at: 2026-10-06T00:00:00Z }
 stale_after: 2027-01-06T00:00:00Z
 sources:
@@ -41,8 +41,9 @@ Confirmed against the live API and a recorded fixture on 2026-10-14.[^openapi]
 - Each `death_details` entry carries `killer_player_slot` (a number), next to `death_pos`, `killer_pos`, `death_duration_s` and `time_to_kill_s`. Slots 1 to 6 are one team and 7 to 12 the other. It can be missing, so the schema treats it as optional.
 - Every player has a `player_slot`, `hero_id` and `team`. A killer slot maps to the killer's hero through the same match's players. Checked on six recorded matches: every killer resolved and was on the other team.
 - The bulk request in use (`only_filtered_players=true`) returns only the reader, so the killer's hero is not in it. A second call (`only_filtered_players=false&include_player_info=false&include_player_death_details=true`) returns all twelve players with just `account_id`, `player_slot`, `hero_id`, `team` and `death_details`: about 13 KB per match, against about 95 KB with full info and final stats. The app uses that call ([client](../../src/lib/deadlock-api/client.ts) `getLineups`).
-- Storage: the killer's hero id rides as an optional third number in the existing `death_positions` JSON (`[x, y, killerHeroId]`), so no database migration. Rows saved before this have `[x, y]` and give no nemesis until re-fetched, so the duel falls back to the stock rival.
-- Only enemy killers count; a death with no slot, an unknown slot, or a killer on the reader's own team is left untagged. The nemesis is the hero with the most kills; a tie goes to the lowest hero id.
+- Storage: the killer's hero id rides as an optional third number in the existing `death_positions` JSON (`[x, y, killerHeroId]`), so no database migration.
+- Filling it in: after each sync, every stored match that has deaths but no tagged killer (new ones, rows from before this existed, or a batch whose lineup call failed) gets its lineup fetched, one request per 500 matches, and its death list rewritten with the killer heroes. The reader's lineup entry lists the killer slot of each death in the same order as the bulk metadata; a match whose death count differs is left alone. A failed lineup call logs a warning and leaves the rows untagged, so the next sync retries. A match with no resolvable enemy killer is asked about again each sync (cheap, bounded by the 500 chunk).
+- Only enemy killers count; a death with no slot, an unknown slot, or a killer on the reader's own team is left untagged. The nemesis is the hero with the most kills; a tie goes to the lowest hero id. The story names a nemesis only when at least half of all counted deaths are tagged; below that the duel uses the stock rival, so a half-filled history never gives a misleading answer.
 
 # Accolade ids
 

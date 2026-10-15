@@ -65,6 +65,23 @@ describe("deadlock-api client", () => {
     expect(q.get("include_player_death_details")).toBe("true");
   });
 
+  it("accepts a null or missing killer slot instead of failing the parse", async () => {
+    const lineup = {
+      match_id: 1,
+      players: [
+        {
+          account_id: 5,
+          player_slot: 1,
+          hero_id: 2,
+          team: "Team0",
+          death_details: [{ killer_player_slot: null }, {}],
+        },
+      ],
+    };
+    const { client } = api({ [`${API}/v1/matches/metadata`]: () => json([lineup]) });
+    await expect(client.getLineups(TEST_ACCOUNT_ID, [1])).resolves.toHaveLength(1);
+  });
+
   it("makes no lineup request for an empty id list", async () => {
     const { client, calls } = api({});
     await expect(client.getLineups(TEST_ACCOUNT_ID, [])).resolves.toEqual([]);

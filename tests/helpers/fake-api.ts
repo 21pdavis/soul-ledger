@@ -33,6 +33,7 @@ export function fakeApi() {
     calls: {
       history: 0,
       bulk: [] as number[][],
+      lineups: [] as number[][],
       profile: 0,
       mmr: 0,
       metrics: [] as unknown[],
@@ -59,6 +60,7 @@ export function fakeApi() {
     },
     async getLineups(_accountId, matchIds) {
       guard();
+      state.calls.lineups.push(matchIds);
       if (state.lineupsFailWith) throw state.lineupsFailWith;
       const have = fixtureLineups();
       return matchIds.flatMap((id) => have.find((l) => l.match_id === id) ?? []);

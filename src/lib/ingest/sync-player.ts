@@ -1,7 +1,7 @@
 import type { Db } from "@/db";
 import * as repo from "@/db/repository";
 import type { DeadlockApi } from "@/lib/deadlock-api/client";
-import { normalizePlayerMatch } from "@/lib/stats/normalize";
+import { normalizePlayerMatch, tagKillers } from "@/lib/stats/normalize";
 
 /** Progress events that drive the staged loading screen (ADR 0014). */
 export type SyncEvent =
@@ -147,22 +147,19 @@ async function fetchAndStore(
     } as const;
     onEvent(batchStatus);
     let waited = false;
-    const details = await api.getBulkMetadata(accountId, batch, {
-      onWait: (waitMs) => {
-        waited = true;
-        onEvent({ type: "status", step: "rate_limited", waitMs });
-      },
-      // The wait is over and the request is going out: drop the "waiting" note.
-      onStart: () => {
-        if (waited) onEvent(batchStatus);
-        waited = false;
-      },
-    });
-    // Who killed the player is garnish (the nemesis, ADR 0068): never sink the sync over it.
-    const lineups = new Map(
-      (await api.getLineups(accountId, batch).catch(() => [])).map((l) => [l.match_id, l]),
-    );
-    const rows = details.map((m) => normalizePlayerMatch(m, accountId, lineups.get(m.match_id)));
+    const rows = (
+      await api.getBulkMetadata(accountId, batch, {
+        onWait: (waitMs) => {
+          waited = true;
+          onEvent({ type: "status", step: "rate_limited", waitMs });
+        },
+        // The wait is over and the request is going out: drop the "waiting" note.
+        onStart: () => {
+          if (waited) onEvent(batchStatus);
+          waited = false;
+        },
+      })
+    ).map((m) => normalizePlayerMatch(m, accountId));
     await repo.savePlayerMatches(db, rows);
     saved += rows.length;
     await repo.heartbeatJob(db, accountId, now());
@@ -180,6 +177,7 @@ async function fetchAndStore(
   }
 
   onEvent({ type: "status", step: "finishing" });
+  await tagKillersInStoredMatches(accountId, db, api, onEvent);
 
   // Rank history only feeds one slide, so its failure should not sink the whole lookup.
   try {
@@ -189,6 +187,41 @@ async function fetchAndStore(
   }
 
   onEvent({ type: "done", matchCount: known.size + saved });
+}
+
+/**
+ * Records which enemy hero killed the player in each stored death (the nemesis, ADR 0068).
+ * It covers the matches just saved and any stored earlier without killers, one lineup request
+ * per 500 matches inside the bulk rate limit. It is garnish, so a failure logs a warning and
+ * leaves those rows as they were: the next sync tries again. It never fails the sync.
+ */
+async function tagKillersInStoredMatches(
+  accountId: number,
+  db: Db,
+  api: DeadlockApi,
+  onEvent: (event: SyncEvent) => void,
+): Promise<void> {
+  const untagged = await repo.getMatchesMissingKillers(db, accountId);
+  if (untagged.length === 0) return;
+  try {
+    const lineups = await api.getLineups(
+      accountId,
+      untagged.map((m) => m.matchId),
+      {
+        onWait: (waitMs) => onEvent({ type: "status", step: "rate_limited", waitMs }),
+        onStart: () => onEvent({ type: "status", step: "finishing" }),
+      },
+    );
+    const byMatch = new Map(lineups.map((l) => [l.match_id, l]));
+    const updates = untagged.flatMap((m) => {
+      const lineup = byMatch.get(m.matchId);
+      const deathPositions = lineup && tagKillers(m.deathPositions, accountId, lineup);
+      return deathPositions ? [{ matchId: m.matchId, deathPositions }] : [];
+    });
+    await repo.updateDeathPositions(db, accountId, updates);
+  } catch (err) {
+    console.warn(`Could not record killers for player ${accountId}: ${errorMessage(err)}`);
+  }
 }
 
 function errorMessage(err: unknown): string {

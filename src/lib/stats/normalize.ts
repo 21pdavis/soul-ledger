@@ -1,6 +1,33 @@
 import type { BulkMatch, MatchLineup } from "@/lib/deadlock-api/schemas";
 import type { DeathPoint, PlayerMatch } from "./types";
 
+/**
+ * Adds the killer's hero id to a stored match's deaths (`[x, y]` becomes `[x, y, heroId]`),
+ * using the match lineup (the nemesis, ADR 0068). Only an enemy counts: a teammate, the player
+ * themselves, or an unknown slot leaves that death as `[x, y]`.
+ *
+ * Returns null when nothing could be tagged: the player is missing from the lineup, it lists a
+ * different number of deaths than we stored (so the order cannot be trusted), or no killer
+ * resolved to an enemy. The caller then leaves the row alone.
+ */
+export function tagKillers(
+  deaths: DeathPoint[],
+  accountId: number,
+  lineup: MatchLineup,
+): DeathPoint[] | null {
+  const me = lineup.players.find((p) => p.account_id === accountId);
+  if (!me || me.death_details.length !== deaths.length) return null;
+  let tagged = 0;
+  const out = deaths.map((d, i): DeathPoint => {
+    const slot = me.death_details[i].killer_player_slot;
+    const killer = slot == null ? undefined : lineup.players.find((p) => p.player_slot === slot);
+    if (!killer || killer.team === me.team) return [d[0], d[1]];
+    tagged++;
+    return [d[0], d[1], killer.hero_id];
+  });
+  return tagged > 0 ? out : null;
+}
+
 /** Accolade ids from /v1/assets/accolades (wiki/research/match-metadata-fields.md). */
 export const ACCOLADE = {
   breakablesDestroyed: 11,
@@ -26,11 +53,7 @@ function snake(value: string): string {
   return value.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
 }
 
-export function normalizePlayerMatch(
-  match: BulkMatch,
-  accountId: number,
-  lineup?: MatchLineup,
-): PlayerMatch {
+export function normalizePlayerMatch(match: BulkMatch, accountId: number): PlayerMatch {
   const p = match.players.find((pl) => pl.account_id === accountId);
   if (!p) throw new Error(`Account ${accountId} is not in match ${match.match_id}`);
 
@@ -88,15 +111,6 @@ export function normalizePlayerMatch(
     midBossClaimed: claimed.length,
     midBossStolen: claimed.filter((b) => b.team_killed !== p.team).length,
 
-    deathPositions: p.death_details.map((d): DeathPoint => {
-      const killer =
-        d.killer_player_slot === undefined
-          ? undefined
-          : lineup?.players.find((l) => l.player_slot === d.killer_player_slot);
-      // Only an enemy counts: a teammate or the player themselves is no nemesis.
-      return killer && killer.team !== p.team
-        ? [d.death_pos[0], d.death_pos[1], killer.hero_id]
-        : [d.death_pos[0], d.death_pos[1]];
-    }),
+    deathPositions: p.death_details.map((d) => [d.death_pos[0], d.death_pos[1]]),
   };
 }

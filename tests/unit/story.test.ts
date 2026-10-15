@@ -5,7 +5,7 @@ import {
   type Quantiles,
   type StatMetrics,
 } from "@/lib/deadlock-api/schemas";
-import { normalizePlayerMatch } from "@/lib/stats/normalize";
+import { normalizePlayerMatch, tagKillers } from "@/lib/stats/normalize";
 import { computeStory } from "@/lib/stats/story";
 import type { PlayerMatch } from "@/lib/stats/types";
 import { fixtureMatches } from "../helpers/fake-api";
@@ -328,7 +328,7 @@ describe("nemesis: the hero that killed the reader most (ADR 0068)", () => {
   });
 
   it("ignores deaths with no known killer, and is null when none are known", () => {
-    expect(run([died(1, [undefined, undefined, 5])]).nemesis).toEqual({ heroId: 5, kills: 1 });
+    expect(run([died(1, [undefined, 5])]).nemesis).toEqual({ heroId: 5, kills: 1 });
     expect(run([died(1, [undefined])]).nemesis).toBeNull();
     expect(run([]).nemesis).toBeNull();
   });
@@ -341,17 +341,26 @@ describe("nemesis: the hero that killed the reader most (ADR 0068)", () => {
     ]);
   });
 
+  it("names no nemesis when fewer than half the deaths have a known killer", () => {
+    // 1 of 3 deaths tagged: too thin a sample, so the story falls back to the stock rival.
+    expect(run([died(1, [7, undefined, undefined])]).nemesis).toBeNull();
+    // Exactly half is enough.
+    expect(run([died(1, [7, undefined])]).nemesis).toEqual({ heroId: 7, kills: 1 });
+  });
+
   it("finds a nemesis in recorded matches", () => {
     const lineups = matchLineup.array().parse(fixtureJson("api/lineups.json"));
     const rows = fixtureMatches()
       .filter((m) => lineups.some((l) => l.match_id === m.match_id))
-      .map((m) =>
-        normalizePlayerMatch(
-          m,
+      .map((m) => {
+        const r = normalizePlayerMatch(m, TEST_ACCOUNT_ID);
+        const tagged = tagKillers(
+          r.deathPositions,
           TEST_ACCOUNT_ID,
-          lineups.find((l) => l.match_id === m.match_id),
-        ),
-      );
+          lineups.find((l) => l.match_id === m.match_id)!,
+        );
+        return { ...r, deathPositions: tagged ?? r.deathPositions };
+      });
     // Recorded killers: heroes 4, 20, 64 and 67 each killed the reader 3 times, so the
     // lowest hero id (4) wins the tie.
     expect(run(rows).nemesis).toEqual({ heroId: 4, kills: 3 });
