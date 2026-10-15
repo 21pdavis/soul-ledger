@@ -1,6 +1,16 @@
 "use client";
 
-import { Component, Suspense, lazy, useMemo, useState, type ReactNode } from "react";
+import {
+  Component,
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { lowerGraphics } from "@/lib/client/fps-monitor";
 import { useIsClient } from "@/components/story/useIsClient";
 import {
   browserDeviceHint,
@@ -73,11 +83,30 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
   );
   // The reader's choice from the corner button, applied live without touching the story.
   const [picked, setPicked] = useState<GraphicsLevel | null>(null);
-  const level = hasWebGL ? (picked ?? startLevel) : startLevel;
+  // Auto-drop (ADR 0068): when the city runs too slowly the level steps down. Never up, and it
+  // stops for this visit as soon as the reader picks a level by hand.
+  const [dropped, setDropped] = useState<GraphicsLevel | null>(null);
+  const [note, setNote] = useState(false);
+  const level = hasWebGL ? (picked ?? dropped ?? startLevel) : startLevel;
+  useEffect(() => {
+    if (!note) return;
+    const id = setTimeout(() => setNote(false), 5000);
+    return () => clearTimeout(id);
+  }, [note]);
+  const onSlow = useCallback(() => {
+    if (!level) return;
+    const next = lowerGraphics(level);
+    if (next === level) return;
+    setDropped(next);
+    // Saved like a choice, so a weak device starts lower next time. The reader can still raise it.
+    saveGraphics(next);
+    setNote(true);
+  }, [level]);
   if (!level) return <div className={styles.layer} data-testid="world" aria-hidden="true" />;
   const cycle = () => {
     const next = nextGraphicsLevel(level);
     setPicked(next);
+    setNote(false);
     saveGraphics(next);
   };
   return (
@@ -89,12 +118,23 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
           started && (
             <StillOnError>
               <Suspense fallback={null}>
-                <WorldCanvas key={level} slide={slide} story={story} level={level} />
+                <WorldCanvas
+                  key={level}
+                  slide={slide}
+                  story={story}
+                  level={level}
+                  onSlow={picked === null ? onSlow : undefined}
+                />
               </Suspense>
             </StillOnError>
           )
         )}
       </div>
+      {hasWebGL && (
+        <div className={styles.graphicsNote} role="status" aria-live="polite">
+          {note ? "Graphics lowered to keep things smooth" : ""}
+        </div>
+      )}
       {hasWebGL && (
         <button
           type="button"
