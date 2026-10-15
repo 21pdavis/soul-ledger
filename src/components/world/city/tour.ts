@@ -157,7 +157,9 @@ export const PIT_FLOOR = -18;
  */
 export function planTour(story: StoryData): TourPlan {
   const main = story.main?.heroId ?? story.roster?.topHeroes[0]?.heroId ?? 1;
-  const roster = story.roster?.topHeroes.map((h) => h.heroId) ?? [main];
+  // Top heroes in order, each once; the main alone when the list is missing or empty.
+  const topIds = [...new Set(story.roster?.topHeroes.map((h) => h.heroId) ?? [])];
+  const roster = topIds.length > 0 ? topIds : [main];
   const mvpHero = story.mvp && "heroId" in story.mvp ? story.mvp.heroId : main;
   // The hero that killed the reader most; a stock rival when there is none (or it is the main).
   const nemesis = story.nemesis?.heroId;
