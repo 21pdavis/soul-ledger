@@ -14,12 +14,13 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - A low-poly copy of the Cursed Apple now sits behind your story. Devices that can't show 3D, and anyone who prefers reduced motion, see a still picture of the city instead.
 - A small "Graphics" button at the bottom of the story switches the city between Full, Simple (lighter on slower phones and laptops) and Off (a still picture). It changes right away without restarting the story, and your choice is remembered on that device. Slower devices now start on Simple.
 - If the city runs too slowly for a few seconds, it now steps down a graphics level by itself (Full to Simple, Simple to Off) and shows a brief note. It never goes back up on its own, stops once you pick a level yourself, and a drop to Simple is remembered on that device (a drop to Off lasts only for that visit).
+- Your heroes stand in the city as cut-out cards: your main beside you, your most-played heroes around the map, placed from your stats.
 - On desktop the story cards are slimmer and step left and right, leaving room for the city beside them.
 
 ### Fixed
 
 - Heroes in the city whose art we don't have yet (new heroes from a patch) now stand as a plain grey silhouette instead of failing to load. A hero repeated in your top heroes no longer stands twice in the line-up, and a story with an empty top-heroes list still shows your main.
-- On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger (#70).
+- On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger.
 
 ## [0.2.0] - 2026-10-11
 
