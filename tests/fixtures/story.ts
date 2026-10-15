@@ -77,6 +77,7 @@ export function fixtureStory(overrides: Partial<StoryData> = {}): StoryData {
       ],
       worstMatch: { matchId: 99, heroId: 1, deaths: 21 },
     },
+    nemesis: null,
     rank: {
       journey: [rank(1, 41), rank(2, 62), rank(3, 81)],
       current: rank(3, 81),

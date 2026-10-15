@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { MmrHistoryEntry, Quantiles, StatMetrics } from "@/lib/deadlock-api/schemas";
-import { normalizePlayerMatch } from "@/lib/stats/normalize";
+import {
+  matchLineup,
+  type MmrHistoryEntry,
+  type Quantiles,
+  type StatMetrics,
+} from "@/lib/deadlock-api/schemas";
+import { normalizePlayerMatch, tagKillers } from "@/lib/stats/normalize";
 import { computeStory } from "@/lib/stats/story";
 import type { PlayerMatch } from "@/lib/stats/types";
 import { fixtureMatches } from "../helpers/fake-api";
@@ -300,5 +305,75 @@ describe("recent win rates (ADR 0064)", () => {
     const s = run([...synth(1, 80, 30), ...synth(2, 60, 60, 100)]);
     expect(s.roster.topHeroes[0].recent).toEqual({ matches: 20, winRate: 1 });
     expect(s.roster.topHeroes[1].recent).toEqual({ matches: 20, winRate: 0 });
+  });
+});
+
+describe("nemesis: the hero that killed the reader most (ADR 0068)", () => {
+  const run = (rows: PlayerMatch[]) =>
+    computeStory({ matches: rows, rankHistory: [], globalMetrics: {}, mainHeroMetrics: {} });
+  const died = (matchId: number, killers: (number | undefined)[]) =>
+    row({
+      matchId,
+      deathPositions: killers.map((k) => (k === undefined ? [0, 0] : [0, 0, k])),
+    });
+
+  it("is the killer with the most kills across matches", () => {
+    const s = run([died(1, [7, 7, 9]), died(2, [9, 9, 9, 7])]);
+    expect(s.nemesis).toEqual({ heroId: 9, kills: 4 });
+  });
+
+  it("breaks a tie with the lowest hero id, so the answer never wobbles", () => {
+    const s = run([died(1, [20, 4]), died(2, [4, 20])]);
+    expect(s.nemesis).toEqual({ heroId: 4, kills: 2 });
+  });
+
+  it("ignores deaths with no known killer, and is null when none are known", () => {
+    expect(run([died(1, [undefined, 5])]).nemesis).toEqual({ heroId: 5, kills: 1 });
+    expect(run([died(1, [undefined])]).nemesis).toBeNull();
+    expect(run([]).nemesis).toBeNull();
+  });
+
+  it("counts a 0 killer as read but never names it, and still needs half the deaths read", () => {
+    expect(run([died(1, [0, 0, 0, 5])]).nemesis).toEqual({ heroId: 5, kills: 1 });
+    expect(run([died(1, [0, 0])]).nemesis).toBeNull();
+    // The 0s count as read, so 1 kill among 3 read deaths is a fair sample.
+    expect(run([died(1, [5, 0, 0, undefined, undefined])]).nemesis).toEqual({
+      heroId: 5,
+      kills: 1,
+    });
+    expect(run([died(1, [5, 0, undefined, undefined, undefined])]).nemesis).toBeNull();
+  });
+
+  it("leaves the death map as plain [x, y] pairs", () => {
+    const s = run([died(1, [7, undefined])]);
+    expect(s.roast.deathPositions).toEqual([
+      [0, 0],
+      [0, 0],
+    ]);
+  });
+
+  it("names no nemesis when fewer than half the deaths have a known killer", () => {
+    // 1 of 3 deaths tagged: too thin a sample, so the story falls back to the stock rival.
+    expect(run([died(1, [7, undefined, undefined])]).nemesis).toBeNull();
+    // Exactly half is enough.
+    expect(run([died(1, [7, undefined])]).nemesis).toEqual({ heroId: 7, kills: 1 });
+  });
+
+  it("finds a nemesis in recorded matches", () => {
+    const lineups = matchLineup.array().parse(fixtureJson("api/lineups.json"));
+    const rows = fixtureMatches()
+      .filter((m) => lineups.some((l) => l.match_id === m.match_id))
+      .map((m) => {
+        const r = normalizePlayerMatch(m, TEST_ACCOUNT_ID);
+        const tagged = tagKillers(
+          r.deathPositions,
+          TEST_ACCOUNT_ID,
+          lineups.find((l) => l.match_id === m.match_id)!,
+        );
+        return { ...r, deathPositions: tagged ?? r.deathPositions };
+      });
+    // Recorded killers: heroes 4, 20, 64 and 67 each killed the reader 3 times, so the
+    // lowest hero id (4) wins the tie.
+    expect(run(rows).nemesis).toEqual({ heroId: 4, kills: 3 });
   });
 });

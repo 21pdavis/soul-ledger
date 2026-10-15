@@ -2,6 +2,8 @@ import { z } from "zod";
 import { RateLimiter, type ScheduleOptions } from "./rate-limiter";
 import {
   bulkMatch,
+  matchLineup,
+  type MatchLineup,
   matchHistoryEntry,
   mmrHistoryEntry,
   patchEntry,
@@ -125,6 +127,38 @@ export function createDeadlockApi({
             limit: chunk.length,
           },
           z.array(bulkMatch),
+          hooks,
+        );
+        out.push(...matches);
+      }
+      return out;
+    },
+
+    /**
+     * Every player's slot, hero and team in the given matches. A killer's `killer_player_slot`
+     * needs this to become a hero (the nemesis, ADR 0068). `include_player_info=false` with the
+     * death-details flag returns just those slim player records for all twelve players.
+     */
+    async getLineups(
+      accountId: number,
+      matchIds: number[],
+      hooks: ScheduleOptions = {},
+    ): Promise<MatchLineup[]> {
+      const out: MatchLineup[] = [];
+      for (let i = 0; i < matchIds.length; i += BULK_CHUNK) {
+        const chunk = matchIds.slice(i, i + BULK_CHUNK);
+        const matches = await get(
+          limiters.bulk,
+          "/v1/matches/metadata",
+          {
+            match_ids: chunk.join(","),
+            account_ids: accountId,
+            only_filtered_players: false,
+            include_player_info: false,
+            include_player_death_details: true,
+            limit: chunk.length,
+          },
+          z.array(matchLineup),
           hooks,
         );
         out.push(...matches);

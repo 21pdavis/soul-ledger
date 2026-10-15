@@ -96,6 +96,8 @@ export interface Story {
     deathPositions: [number, number][];
     worstMatch: { matchId: number; heroId: number; deaths: number } | null;
   };
+  /** The enemy hero that killed the player most; null when no killer is known. */
+  nemesis: { heroId: number; kills: number } | null;
   rank: { journey: RankPoint[]; current: RankPoint | null };
   /** Global percentiles across all counted matches. */
   percentiles: PercentileResult[];
@@ -232,15 +234,48 @@ export function computeStory(input: StoryInput): Story {
     midBoss: { claimed: total((r) => r.midBossClaimed), stolen: total((r) => r.midBossStolen) },
     roast: {
       deaths: total((r) => r.deaths),
-      deathPositions: rows.flatMap((r) => r.deathPositions),
+      deathPositions: rows.flatMap((r) =>
+        r.deathPositions.map((d): [number, number] => [d[0], d[1]]),
+      ),
       worstMatch: worst
         ? { matchId: worst.matchId, heroId: worst.heroId, deaths: worst.deaths }
         : null,
     },
+    nemesis: pickNemesis(rows),
     rank: { journey, current: journey.at(-1) ?? null },
     percentiles,
     mvp: pickMvp(percentiles, main),
   };
+}
+
+/**
+ * The enemy hero that killed the player most, named only when at least half of all deaths have
+ * been read. A death marked `0` (read, no enemy killer) counts as read but never as a killer.
+ * A tie goes to the lowest hero id so the answer is the same on every load.
+ */
+function pickNemesis(rows: PlayerMatch[]): Story["nemesis"] {
+  const kills = new Map<number, number>();
+  let deaths = 0;
+  let tagged = 0;
+  for (const r of rows) {
+    for (const d of r.deathPositions) {
+      deaths++;
+      if (d.length === 3) {
+        tagged++;
+        if (d[2] !== 0) kills.set(d[2], (kills.get(d[2]) ?? 0) + 1);
+      }
+    }
+  }
+  // A handful of tagged deaths among many untagged ones is not a trustworthy nemesis (killers
+  // are still being filled in for an older history), so the story uses the stock rival instead.
+  if (tagged * 2 < deaths) return null;
+  let best: { heroId: number; kills: number } | null = null;
+  for (const [heroId, n] of kills) {
+    if (!best || n > best.kills || (n === best.kills && heroId < best.heroId)) {
+      best = { heroId, kills: n };
+    }
+  }
+  return best;
 }
 
 /**
