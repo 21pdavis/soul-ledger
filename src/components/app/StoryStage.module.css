@@ -10,8 +10,17 @@
   overflow: hidden;
   container-type: size;
   --player-h: 100cqh;
-  /* Phone: a strip under the story frame for the graphics pill (see World.module.css). */
-  --pill-room: calc(3rem + env(safe-area-inset-bottom, 0px));
+}
+
+/*
+ * Phone, tall enough for every slide to still fit: leave a strip under the story frame for the
+ * graphics pill (see World.module.css). On shorter screens no height is spared, so the pill sits
+ * inside the frame instead (World.module.css) and the slides keep all of it.
+ */
+@media (min-height: 700px) {
+  .stage {
+    --pill-room: calc(3rem + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /*

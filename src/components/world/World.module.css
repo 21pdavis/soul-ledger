@@ -119,3 +119,20 @@
     bottom: calc(var(--band) + 0.75rem);
   }
 }
+
+/*
+ * Short phone (no strip is reserved, the stage fills the screen): a compact pill fully inside the
+ * frame, just above its bottom rule, and the note a line above it.
+ */
+@media (not ((min-width: 1024px) and (pointer: fine))) and (max-height: 699px) {
+  .graphics {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px + 0.25rem);
+    min-height: 1.5rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.625rem;
+  }
+
+  .graphicsNote {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px + 2.25rem);
+  }
+}
