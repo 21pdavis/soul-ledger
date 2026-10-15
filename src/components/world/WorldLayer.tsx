@@ -86,11 +86,12 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
   // Auto-drop (ADR 0068): when the city runs too slowly the level steps down. Never up, and it
   // stops for this visit as soon as the reader picks a level by hand.
   const [dropped, setDropped] = useState<GraphicsLevel | null>(null);
-  const [note, setNote] = useState(false);
+  // A fresh object per drop, so a second drop restarts the timer and is announced again.
+  const [note, setNote] = useState<{ level: GraphicsLevel } | null>(null);
   const level = hasWebGL ? (picked ?? dropped ?? startLevel) : startLevel;
   useEffect(() => {
     if (!note) return;
-    const id = setTimeout(() => setNote(false), 5000);
+    const id = setTimeout(() => setNote(null), 5000);
     return () => clearTimeout(id);
   }, [note]);
   const onSlow = useCallback(() => {
@@ -98,15 +99,16 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
     const next = lowerGraphics(level);
     if (next === level) return;
     setDropped(next);
-    // Saved like a choice, so a weak device starts lower next time. The reader can still raise it.
-    saveGraphics(next);
-    setNote(true);
+    // A drop to Simple is remembered so a weak device starts lower next time. A drop to Off is
+    // not: it applies for this visit only, so one stall cannot hide the world for good.
+    if (next !== "off") saveGraphics(next);
+    setNote({ level: next });
   }, [level]);
   if (!level) return <div className={styles.layer} data-testid="world" aria-hidden="true" />;
   const cycle = () => {
     const next = nextGraphicsLevel(level);
     setPicked(next);
-    setNote(false);
+    setNote(null);
     saveGraphics(next);
   };
   return (
@@ -132,7 +134,7 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
       </div>
       {hasWebGL && (
         <div className={styles.graphicsNote} role="status" aria-live="polite">
-          {note ? "Graphics lowered to keep things smooth" : ""}
+          {note ? `Graphics lowered to ${graphicsLabel(note.level)} to keep things smooth` : ""}
         </div>
       )}
       {hasWebGL && (

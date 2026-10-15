@@ -162,12 +162,41 @@ describe("WorldLayer auto-drop", () => {
 
     await user.click(await screen.findByTestId("fake-slow"));
     expect(screen.getByTestId("world")).toHaveAttribute("data-level", "simple");
-    expect(screen.getByRole("status")).toHaveTextContent("Graphics lowered to keep things smooth");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Graphics lowered to Simple to keep things smooth",
+    );
     expect(screen.getByRole("button", { name: /graphics: simple/i })).toBeInTheDocument();
     expect(localStorage.getItem(GRAPHICS_KEY)).toBe("simple");
     // It never raises by itself: Simple is still Simple, and a second slow report goes to Off.
     await user.click(await screen.findByTestId("fake-slow"));
     expect(screen.getByTestId("world")).toHaveAttribute("data-level", "off");
+    // An auto-drop to Off applies for this visit but is never saved, so a one-off stall cannot
+    // leave the world hidden for good.
+    expect(localStorage.getItem(GRAPHICS_KEY)).toBe("simple");
+  });
+
+  it("a second drop restarts the note timer and names the new level", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      render(ui());
+      await user.click(await screen.findByTestId("fake-slow"));
+      await act(async () => {
+        vi.advanceTimersByTime(3000);
+      });
+      await user.click(await screen.findByTestId("fake-slow"));
+      expect(screen.getByRole("status")).toHaveTextContent("Graphics lowered to Off");
+      await act(async () => {
+        vi.advanceTimersByTime(3000); // 6 s after the first drop, 3 s after the second
+      });
+      expect(screen.getByRole("status")).toHaveTextContent(/lowered/i);
+      await act(async () => {
+        vi.advanceTimersByTime(3000);
+      });
+      expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("the note fades away after a few seconds", async () => {

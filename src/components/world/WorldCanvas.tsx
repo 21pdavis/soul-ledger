@@ -66,9 +66,11 @@ export default function WorldCanvas({
       camera={{ fov: 50, near: 0.3, far: 1000 }}
       onCreated={() => requestAnimationFrame(() => setReady(true))}
     >
-      {onSlow && <FrameWatch onSlow={onSlow} />}
       <Suspense fallback={null}>
         <CityWorld slide={slide} story={story} simple={simple} />
+        {/* Inside the boundary, so it mounts only once the city's assets have loaded: a long load
+            stall is never counted as slow rendering. */}
+        {onSlow && <FrameWatch onSlow={onSlow} />}
         {/* Edge smoothing happens here: the canvas own antialias is off because effects bypass it. */}
         {!simple && (
           <EffectComposer multisampling={coarse ? 0 : 4}>
