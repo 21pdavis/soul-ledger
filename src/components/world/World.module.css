@@ -24,3 +24,32 @@
   object-fit: cover;
   opacity: 0.55;
 }
+
+/*
+ * The graphics-level button: a small pill in the bottom-centre of the story. The corners are taken
+ * (the previous/next skip links sit bottom left and right when focused, the progress bar runs along
+ * the top on a phone and the rail down the right side on desktop), and it sits above the tap zones.
+ */
+.graphics {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  min-height: 2rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 999px;
+  color: var(--bone, #eee);
+  background: rgb(20 16 24 / 0.7);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.graphics:focus-visible {
+  outline: 2px solid var(--bone, #eee);
+  outline-offset: 2px;
+}

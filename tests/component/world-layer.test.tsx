@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WorldLayer } from "@/components/world/WorldLayer";
 import { GRAPHICS_KEY } from "@/lib/client/graphics";
 import { fixtureStory } from "../fixtures/story";
@@ -7,9 +8,9 @@ import { fixtureStory } from "../fixtures/story";
 // The real canvas needs WebGL, which jsdom lacks; a stand-in shows where it would mount.
 const canvasThrows = vi.hoisted(() => ({ on: false }));
 vi.mock("@/components/world/WorldCanvas", () => ({
-  default: ({ slide }: { slide: number }) => {
+  default: ({ slide, level }: { slide: number; level: string }) => {
     if (canvasThrows.on) throw new Error("WebGL context lost");
-    return <div data-testid="world-canvas" data-slide={slide} />;
+    return <div data-testid="world-canvas" data-slide={slide} data-level={level} />;
   },
 }));
 
@@ -18,6 +19,10 @@ vi.mock("@/components/world/WorldCanvas", () => ({
  * graphics level allows it; otherwise (Off, or no WebGL) a still picture of the city.
  */
 describe("WorldLayer", () => {
+  beforeEach(() => {
+    // jsdom reports this machine's cores; pin a strong device so the start level is predictable.
+    vi.spyOn(navigator, "hardwareConcurrency", "get").mockReturnValue(8);
+  });
   afterEach(() => {
     localStorage.clear();
     canvasThrows.on = false;
@@ -61,6 +66,71 @@ describe("WorldLayer", () => {
     render(<WorldLayer story={fixtureStory()} slide={0} started webgl reducedMotion />);
     expect(screen.getByTestId("world")).toHaveAttribute("data-level", "full");
     expect(await screen.findByTestId("world-canvas")).toBeInTheDocument();
+  });
+});
+
+describe("WorldLayer graphics button", () => {
+  beforeEach(() => {
+    vi.spyOn(navigator, "hardwareConcurrency", "get").mockReturnValue(8);
+  });
+  afterEach(() => {
+    localStorage.clear();
+    vi.restoreAllMocks();
+  });
+
+  const ui = (slide = 0) => (
+    <WorldLayer story={fixtureStory()} slide={slide} started webgl reducedMotion={false} />
+  );
+
+  it("cycles Full, Simple, Off, Full live, and remembers each choice on this device", async () => {
+    const user = userEvent.setup();
+    render(ui(3));
+    const button = screen.getByRole("button", { name: /graphics: full/i });
+    expect(button).toHaveTextContent("Full");
+    expect(await screen.findByTestId("world-canvas")).toHaveAttribute("data-level", "full");
+
+    await user.click(button);
+    expect(screen.getByRole("button", { name: /graphics: simple/i })).toHaveTextContent("Simple");
+    expect(localStorage.getItem(GRAPHICS_KEY)).toBe("simple");
+    expect(screen.getByTestId("world")).toHaveAttribute("data-level", "simple");
+    const canvas = await screen.findByTestId("world-canvas");
+    expect(canvas).toHaveAttribute("data-level", "simple");
+    // The story's place is untouched by the switch.
+    expect(canvas).toHaveAttribute("data-slide", "3");
+
+    await user.click(screen.getByRole("button", { name: /graphics: simple/i }));
+    expect(localStorage.getItem(GRAPHICS_KEY)).toBe("off");
+    expect(screen.getByTestId("world-still")).toBeInTheDocument();
+    expect(screen.queryByTestId("world-canvas")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: /graphics: off/i }));
+    expect(localStorage.getItem(GRAPHICS_KEY)).toBe("full");
+    expect(await screen.findByTestId("world-canvas")).toBeInTheDocument();
+  });
+
+  it("works from the keyboard", async () => {
+    const user = userEvent.setup();
+    render(ui());
+    await user.tab();
+    expect(screen.getByRole("button", { name: /graphics: full/i })).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByTestId("world")).toHaveAttribute("data-level", "simple");
+  });
+
+  it("starts on a saved level, and on Simple for a weak device", () => {
+    localStorage.setItem(GRAPHICS_KEY, "off");
+    const { unmount } = render(ui());
+    expect(screen.getByTestId("world")).toHaveAttribute("data-level", "off");
+    unmount();
+    localStorage.clear();
+    vi.spyOn(navigator, "hardwareConcurrency", "get").mockReturnValue(2);
+    render(ui());
+    expect(screen.getByTestId("world")).toHaveAttribute("data-level", "simple");
+  });
+
+  it("has no button where there is no WebGL to switch", () => {
+    render(<WorldLayer story={fixtureStory()} slide={0} started webgl={false} />);
+    expect(screen.queryByRole("button", { name: /graphics/i })).not.toBeInTheDocument();
   });
 });
 

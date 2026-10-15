@@ -229,7 +229,7 @@ const NEON = ["#ff3d7f", "#3de0c8", "#ffb347", "#f4f0e6", "#5ab4ff", "#ff5a3a"];
  * vertical neon signs and cabs, Greenwich's trees, York's crates and trucks. Nothing sits close to
  * a stop.
  */
-function Lanes() {
+function Lanes({ simple }: { simple: boolean }) {
   const lanes = useMemo(() => {
     const r = rng(17);
     return LANES.map((l) => {
@@ -270,9 +270,20 @@ function Lanes() {
           cars.push({ p: p.clone().addScaledVector(n, -side * (LANE_HALF - 1.4)), rot, kind });
         }
       }
-      return { lane: l, zip, lamps, signs, trees, crates, cars };
+      // Simple keeps every other decorative prop (chosen after the random picks, so the rest of
+      // the street does not shift).
+      const thin = <T,>(a: T[]) => (simple ? a.filter((_, i) => i % 2 === 0) : a);
+      return {
+        lane: l,
+        zip,
+        lamps,
+        signs: thin(signs),
+        trees: thin(trees),
+        crates: thin(crates),
+        cars: thin(cars),
+      };
     });
-  }, []);
+  }, [simple]);
   return (
     <>
       {lanes.map(({ lane, zip, lamps, signs, trees, crates, cars }) => (
@@ -356,7 +367,16 @@ function Lanes() {
   );
 }
 
-export default function CityWorld({ slide, story }: { slide: number; story: StoryData }) {
+export default function CityWorld({
+  slide,
+  story,
+  simple = false,
+}: {
+  slide: number;
+  story: StoryData;
+  /** The Simple graphics level: the same scene with fewer street props. */
+  simple?: boolean;
+}) {
   const tour = useMemo(() => planTour(story), [story]);
   // Keep the camera's hops between lanes clear of buildings.
   const buildings = useMemo(
@@ -386,7 +406,7 @@ export default function CityWorld({ slide, story }: { slide: number; story: Stor
       </mesh>
 
       <Buildings buildings={buildings} />
-      <Lanes />
+      <Lanes simple={simple} />
       <Landmarks />
       {tour.cast.map((m, i) => (
         <Standee key={i} member={m} />

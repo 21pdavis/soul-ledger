@@ -1,8 +1,17 @@
 "use client";
 
-import { Component, Suspense, lazy, useMemo, type ReactNode } from "react";
+import { Component, Suspense, lazy, useMemo, useState, type ReactNode } from "react";
 import { useIsClient } from "@/components/story/useIsClient";
-import { chooseGraphics, loadSavedGraphics, supportsWebGL } from "@/lib/client/graphics";
+import {
+  browserDeviceHint,
+  chooseGraphics,
+  graphicsLabel,
+  loadSavedGraphics,
+  nextGraphicsLevel,
+  saveGraphics,
+  supportsWebGL,
+  type GraphicsLevel,
+} from "@/lib/client/graphics";
 import type { StoryData } from "@/story/types";
 import styles from "./World.module.css";
 
@@ -49,31 +58,54 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
   // The level depends on the browser (WebGL, saved choice), which the server cannot see. Decide
   // it only once the browser has taken over, so server and first browser render match.
   const client = useIsClient();
-  const level = useMemo(
+  const hasWebGL = client && (webgl ?? supportsWebGL());
+  const startLevel = useMemo(
     () =>
       !client
         ? null
         : chooseGraphics({
-            webgl: webgl ?? supportsWebGL(),
+            webgl: hasWebGL,
             reducedMotion: reducedMotion ?? false,
             saved: loadSavedGraphics(),
+            hint: browserDeviceHint(),
           }),
-    [client, webgl, reducedMotion],
+    [client, hasWebGL, reducedMotion],
   );
+  // The reader's choice from the corner button, applied live without touching the story.
+  const [picked, setPicked] = useState<GraphicsLevel | null>(null);
+  const level = hasWebGL ? (picked ?? startLevel) : startLevel;
   if (!level) return <div className={styles.layer} data-testid="world" aria-hidden="true" />;
+  const cycle = () => {
+    const next = nextGraphicsLevel(level);
+    setPicked(next);
+    saveGraphics(next);
+  };
   return (
-    <div className={styles.layer} data-testid="world" data-level={level} aria-hidden="true">
-      {level === "off" ? (
-        <Still />
-      ) : (
-        started && (
-          <StillOnError>
-            <Suspense fallback={null}>
-              <WorldCanvas slide={slide} story={story} />
-            </Suspense>
-          </StillOnError>
-        )
+    <>
+      <div className={styles.layer} data-testid="world" data-level={level} aria-hidden="true">
+        {level === "off" ? (
+          <Still />
+        ) : (
+          started && (
+            <StillOnError>
+              <Suspense fallback={null}>
+                <WorldCanvas key={level} slide={slide} story={story} level={level} />
+              </Suspense>
+            </StillOnError>
+          )
+        )}
+      </div>
+      {hasWebGL && (
+        <button
+          type="button"
+          className={styles.graphics}
+          onClick={cycle}
+          aria-label={`Graphics: ${graphicsLabel(level)}. Press to change.`}
+          data-testid="graphics-button"
+        >
+          <span aria-hidden="true">Graphics: {graphicsLabel(level)}</span>
+        </button>
       )}
-    </div>
+    </>
   );
 }
