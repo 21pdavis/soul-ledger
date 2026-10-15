@@ -21,6 +21,7 @@ describe("WorldLayer", () => {
   afterEach(() => {
     localStorage.clear();
     canvasThrows.on = false;
+    vi.restoreAllMocks();
   });
 
   it("falls back to the still picture if the 3D fails, instead of breaking the page", async () => {
@@ -60,5 +61,42 @@ describe("WorldLayer", () => {
     render(<WorldLayer story={fixtureStory()} slide={0} started webgl reducedMotion />);
     expect(screen.getByTestId("world")).toHaveAttribute("data-level", "full");
     expect(await screen.findByTestId("world-canvas")).toBeInTheDocument();
+  });
+});
+
+describe("WorldLayer on a server-rendered page", () => {
+  it("renders the same thing on the server and on first browser render (no hydration mismatch)", async () => {
+    const { renderToString } = await import("react-dom/server");
+    const { hydrateRoot } = await import("react-dom/client");
+    const { act } = await import("react");
+    const ui = (
+      <WorldLayer story={fixtureStory()} slide={0} started={false} reducedMotion={false} />
+    );
+    // The server has no WebGL to probe; the browser here does (webgl defaults to the probe).
+    const realDocument = globalThis.document;
+    const html = (() => {
+      // @ts-expect-error simulate the server: no document to create a probe canvas on
+      delete globalThis.document;
+      try {
+        return renderToString(ui);
+      } finally {
+        globalThis.document = realDocument;
+      }
+    })();
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
+      getExtension: () => null,
+    } as unknown as RenderingContext);
+    const container = document.createElement("div");
+    container.innerHTML = html;
+    document.body.appendChild(container);
+    try {
+      const recoverable = vi.fn();
+      await act(async () => {
+        hydrateRoot(container, ui, { onRecoverableError: recoverable });
+      });
+      expect(recoverable).not.toHaveBeenCalled();
+    } finally {
+      container.remove();
+    }
   });
 });

@@ -4,6 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useRef, useState } from "react";
 import * as THREE from "three";
 import { CARD_SIDES, LANE_CHANGES, routeAt, routeTangent, shotPosition, type Shot } from "./tour";
+import { sceneShift } from "./framing";
 
 /**
  * The camera rotation that looks from `eye` at `target`. Looking (nearly) straight down, "up" on
@@ -27,18 +28,6 @@ const SPEED = 24;
 const WEAVE = 2.4;
 /** Only wide screens show the desktop card stack; phones keep the scene centred. */
 const WIDE_ASPECT = 1.2;
-
-/**
- * Where the open space beside a side card is centred, as a fraction of the screen width from the
- * middle. Mirrors the preview's card CSS: gutters of clamp(72px, 12vw, 192px), a card of at most
- * min(480px, 42vw), and the progress rail in the right gutter.
- */
-function sceneShift(width: number, side: "left" | "right") {
-  const gutter = THREE.MathUtils.clamp(width * 0.12, 72, 192);
-  const card = Math.min(480, width * 0.42, width - 2 * gutter);
-  const open = side === "left" ? [gutter + card, width - 48] : [48, width - gutter - card];
-  return ((open[0] + open[1]) / 2 - width / 2) / width;
-}
 
 interface Flight {
   target: number;
@@ -66,8 +55,8 @@ interface Flight {
  * slow device arrives on time in fewer frames.
  */
 /**
- * Preview aid (development only): `?cam=px,py,pz,lx,ly,lz` in the address pins the camera there (looking at the
- * second point) instead of following the story, for inspecting any part of the city.
+ * Preview aid (development only): `?cam=px,py,pz,lx,ly,lz` in the address pins the camera
+ * there, looking at the second point, instead of following the story. For inspecting the city.
  */
 function pinnedShot(): Shot | null {
   if (process.env.NODE_ENV === "production" || typeof window === "undefined") return null;
@@ -173,7 +162,7 @@ export function TourRig({ shots: storyShots, slide }: { shots: Shot[]; slide: nu
     // Lens shift: slide the picture so the scene sits in the space beside the card. The frustum
     // moves by filmOffset / filmWidth of the near-plane width.
     const wide = cam.aspect > WIDE_ASPECT;
-    const want = wide ? sceneShift(frame.size.width, CARD_SIDES[i]) : 0;
+    const want = wide ? sceneShift(frame.size.width, CARD_SIDES[i], shot.nudge) : 0;
     shift.current += (want - shift.current) * Math.min(1, Math.min(delta, 0.1) * 3);
     const nearWidth = 2 * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) * cam.aspect;
     const offset = -shift.current * nearWidth * cam.getFilmWidth();

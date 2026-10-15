@@ -90,8 +90,15 @@ export function routeConnectors(): [number, number][] {
 }
 
 /** A shot on the route (the camera flies along the lanes to it) or a free one (it glides there). */
-export type Shot =
-  { kind: "route"; s: number; look: Vec3 } | { kind: "free"; pos: Vec3; look: Vec3 };
+export type Shot = (
+  { kind: "route"; s: number; look: Vec3 } | { kind: "free"; pos: Vec3; look: Vec3 }
+) & {
+  /**
+   * On desktop, an extra sideways nudge (fraction of the screen width, + is right) for shots whose
+   * action would otherwise sit behind the card or split away from it.
+   */
+  nudge?: number;
+};
 
 export function shotPosition(shot: Shot, out = new THREE.Vector3()) {
   return shot.kind === "route" ? routeAt(shot.s, out) : out.set(...shot.pos);
@@ -184,7 +191,8 @@ export function planTour(story: StoryData): TourPlan {
 
   // 3 roster: your top heroes lined up under the Seaport trestle, centred on the lane.
   const sea = routeShot("seaport", 19, 2.6, -2);
-  shots.push(sea);
+  // The line-up is wide: nudge it right, clear of the card on the left.
+  shots.push({ ...sea, nudge: 0.07 });
   const count = Math.min(roster.length, 5);
   for (let i = 0; i < count; i++) {
     stand(roster[i], atStop("seaport", -2, (i - (count - 1) / 2) * 2.5), sea);
@@ -223,7 +231,8 @@ export function planTour(story: StoryData): TourPlan {
 
   // 6 precision: your main on the Times Square overpass, picking off a trooper down the street.
   const ts = routeShot("timesSquare", 17, 7.5, -1);
-  shots.push(ts);
+  // Hero on the bridge and the trooper below: pull both toward the card on the right.
+  shots.push({ ...ts, nudge: 0.12 });
   const from = atStop("timesSquare", 0, 3.2, 7.45);
   const target = atStop("timesSquare", -14, -1.2, 0);
   stand(main, from, ts);
@@ -236,7 +245,8 @@ export function planTour(story: StoryData): TourPlan {
     pos: [p.x + 14, PIT_FLOOR + 7, p.z + 14],
     look: [p.x - 1, PIT_FLOOR + 5.5, p.z - 1],
   };
-  shots.push(pitShot);
+  // Your hero stands at the boss's feet; nudge right so they clear the card on the left.
+  shots.push({ ...pitShot, nudge: 0.08 });
   stand(main, [p.x - 0.3, PIT_FLOOR, p.z + 4.5], pitShot);
 
   // 8 roast: straight overhead, your deaths projected onto the city.
