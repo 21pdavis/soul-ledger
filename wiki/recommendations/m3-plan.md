@@ -22,15 +22,17 @@ Iterate on localhost first and get the owner's sign-off before PRs to `staging` 
 
 # 0.3.0 PR breakdown (draft, refine after step 2)
 
+Progress 2026-10-14: world foundation, graphics levels, auto-drop, nemesis and duels, and hero cut-outs are merged into `staging`. The story-following camera is partly done (framing in #74; the per-slide target tests are still owed). Phone placement of the graphics button is pending an owner design decision (#79, open).
+
 | PR | Scope | Tested by |
 |---|---|---|
-| World foundation | Canvas behind the story on phone and desktop, lazy-loaded after the story starts, fade-in, Off fallback image | e2e: canvas mounts after the story, story timing and controls unchanged, no-WebGL shows the still |
-| Graphics levels | Full, Simple, Off; corner button; per-device memory; device-hint start; reduced motion starts Off | Unit: level choice from hints; e2e: button cycles and persists |
-| Auto-drop | Frame-rate monitor: below 20 fps for about 3 s drops a level with a note; never auto-raises; manual choice wins | Unit: monitor with fake frame times |
-| Story-following camera | Per-slide camera and light targets with eased transitions | Unit: slide to target map; e2e: slide change updates the target |
-| Heroes in the world | Main-hero companion, other heroes around, art cards; model replaces card when present | Unit: card or model choice |
-| Nemesis and duels | Killer-slot nemesis from match data (with a fallback pairing table); duel staging with card or posed model and effect | Unit and integration: nemesis on recorded matches; e2e: duel renders |
-| Hero cut-outs | Art-card standees placed from the stats (no models, ADR 0069) | Unit: cast placement; e2e: cards render |
+| World foundation (done, #73) | Canvas behind the story on phone and desktop, lazy-loaded after the story starts, fade-in, Off fallback image | e2e: canvas mounts after the story, story timing and controls unchanged, no-WebGL shows the still |
+| Graphics levels (done, #75) | Full, Simple, Off; corner button; per-device memory; device-hint start; reduced motion starts Off | Unit: level choice from hints; e2e: button cycles and persists |
+| Auto-drop (done, #77; whether a drop is remembered is the [open question](../open-questions/auto-drop-memory.md)) | Frame-rate monitor: below 20 fps for about 3 s drops a level with a note; never auto-raises; manual choice wins | Unit: monitor with fake frame times |
+| Story-following camera (framing and nudges in #74; target-map tests still owed) | Per-slide camera and light targets with eased transitions | Unit: slide to target map; e2e: slide change updates the target |
+| Heroes in the world (done as cut-outs, #80; model swap waits for the first model) | Main-hero companion, other heroes around, art cards; model replaces card when present | Unit: card or model choice |
+| Nemesis and duels (done, #76; real nemesis only when at least half of deaths are tagged, else the stock rival) | Killer-slot nemesis from match data (with a fallback pairing table); duel staging with card or posed model and effect | Unit and integration: nemesis on recorded matches; e2e: duel renders |
+| Hero cut-outs (done, #80) | Art-card standees placed from the stats (no models, ADR 0069) | Unit: cast placement; e2e: cards render |
 
 # Notes from the style preview (2026-10-11)
 
