@@ -17,14 +17,61 @@ export function chooseGraphics({
   webgl,
   reducedMotion,
   saved,
+  hint = "full",
 }: {
   webgl: boolean;
   reducedMotion: boolean;
   saved: GraphicsLevel | null;
+  /** Where to start when nothing else decides (see deviceHintLevel). */
+  hint?: GraphicsLevel;
 }): GraphicsLevel {
   if (!webgl) return "off";
   if (saved) return saved;
-  return reducedMotion ? "off" : "full";
+  return reducedMotion ? "off" : hint;
+}
+
+/**
+ * A weak device (few cores or little memory) starts on Simple. Unknown values count as fine.
+ * The thresholds are a first guess, not tuned on real devices yet.
+ */
+export function deviceHintLevel({
+  cores,
+  memory,
+}: {
+  cores?: number;
+  memory?: number;
+}): GraphicsLevel {
+  if (cores !== undefined && cores <= 4) return "simple";
+  if (memory !== undefined && memory <= 4) return "simple";
+  return "full";
+}
+
+/** The hint for this browser (`deviceMemory` is Chromium-only, so it may be missing). */
+export function browserDeviceHint(): GraphicsLevel {
+  if (typeof navigator === "undefined") return "full";
+  const n = navigator as Navigator & { deviceMemory?: number };
+  return deviceHintLevel({ cores: n.hardwareConcurrency, memory: n.deviceMemory });
+}
+
+/** The button's order: Full, then Simple, then Off, then round again. */
+export function nextGraphicsLevel(level: GraphicsLevel): GraphicsLevel {
+  return LEVELS[(LEVELS.indexOf(level) + 1) % LEVELS.length];
+}
+
+export function graphicsLabel(level: GraphicsLevel): string {
+  return { full: "Full", simple: "Simple", off: "Off" }[level];
+}
+
+/** Remember the reader's choice on this device. Storage can be blocked, so failures are ignored. */
+export function saveGraphics(
+  level: GraphicsLevel,
+  storage: Pick<Storage, "setItem"> | undefined = safeStorage(),
+): void {
+  try {
+    storage?.setItem(GRAPHICS_KEY, level);
+  } catch {
+    // Not saved; the choice still holds for this visit.
+  }
 }
 
 /** The level saved on this device, or null. Storage can be missing or throw, so it is guarded. */

@@ -7,6 +7,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 ### Added
 
 - A low-poly copy of the Cursed Apple now sits behind your story. Devices that can't show 3D, and anyone who prefers reduced motion, see a still picture of the city instead.
+- A small "Graphics" button at the bottom of the story switches the city between Full, Simple (lighter on slower phones and laptops) and Off (a still picture). It changes right away without restarting the story, and your choice is remembered on that device. Slower devices now start on Simple.
 - On desktop the story cards are slimmer and step left and right, leaving room for the city beside them.
 
 ### Fixed

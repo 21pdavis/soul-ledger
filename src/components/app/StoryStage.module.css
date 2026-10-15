@@ -4,6 +4,7 @@
  * matches note makes it taller) and however the mobile browser bars move.
  */
 .stage {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow: hidden;
