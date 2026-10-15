@@ -1,6 +1,7 @@
 # Open questions
 
 * [Source for the Hoarder squad role now that unspent souls is dropped](hoarder-role-source.md) - The Hoarder squad role was awarded for unspent gold minutes, a stat the owner dropped, so it needs another source or must be removed.
+* [Should an automatic graphics drop be remembered?](auto-drop-memory.md) - Whether an automatic graphics drop is remembered on the device, only for the visit, or remembered except for Off.
 
 # Resolved (kept for reference)
 

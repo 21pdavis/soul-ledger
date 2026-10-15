@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WorldLayer } from "@/components/world/WorldLayer";
@@ -8,9 +8,14 @@ import { fixtureStory } from "../fixtures/story";
 // The real canvas needs WebGL, which jsdom lacks; a stand-in shows where it would mount.
 const canvasThrows = vi.hoisted(() => ({ on: false }));
 vi.mock("@/components/world/WorldCanvas", () => ({
-  default: ({ slide, level }: { slide: number; level: string }) => {
+  default: ({ slide, level, onSlow }: { slide: number; level: string; onSlow?: () => void }) => {
     if (canvasThrows.on) throw new Error("WebGL context lost");
-    return <div data-testid="world-canvas" data-slide={slide} data-level={level} />;
+    return (
+      <div data-testid="world-canvas" data-slide={slide} data-level={level}>
+        {/* Stands in for the frame-rate monitor deciding the city is too slow. */}
+        {onSlow && <button data-testid="fake-slow" tabIndex={-1} onClick={onSlow} />}
+      </div>
+    );
   },
 }));
 
@@ -131,6 +136,97 @@ describe("WorldLayer graphics button", () => {
   it("has no button where there is no WebGL to switch", () => {
     render(<WorldLayer story={fixtureStory()} slide={0} started webgl={false} />);
     expect(screen.queryByRole("button", { name: /graphics/i })).not.toBeInTheDocument();
+  });
+});
+
+describe("WorldLayer auto-drop", () => {
+  beforeEach(() => {
+    vi.spyOn(navigator, "hardwareConcurrency", "get").mockReturnValue(8);
+  });
+  afterEach(() => {
+    localStorage.clear();
+    vi.restoreAllMocks();
+  });
+
+  const ui = () => (
+    <WorldLayer story={fixtureStory()} slide={0} started webgl reducedMotion={false} />
+  );
+
+  it("drops one level when the city is too slow, says so politely, and remembers it", async () => {
+    const user = userEvent.setup();
+    render(ui());
+    // The polite announcement area exists before any message, so screen readers pick it up.
+    const status = screen.getByRole("status");
+    expect(status).toHaveAttribute("aria-live", "polite");
+    expect(status).toBeEmptyDOMElement();
+
+    await user.click(await screen.findByTestId("fake-slow"));
+    expect(screen.getByTestId("world")).toHaveAttribute("data-level", "simple");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Graphics lowered to Simple to keep things smooth",
+    );
+    expect(screen.getByRole("button", { name: /graphics: simple/i })).toBeInTheDocument();
+    expect(localStorage.getItem(GRAPHICS_KEY)).toBe("simple");
+    // It never raises by itself: Simple is still Simple, and a second slow report goes to Off.
+    await user.click(await screen.findByTestId("fake-slow"));
+    expect(screen.getByTestId("world")).toHaveAttribute("data-level", "off");
+    // An auto-drop to Off applies for this visit but is never saved, so a one-off stall cannot
+    // leave the world hidden for good.
+    expect(localStorage.getItem(GRAPHICS_KEY)).toBe("simple");
+  });
+
+  it("a second drop restarts the note timer and names the new level", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      render(ui());
+      await user.click(await screen.findByTestId("fake-slow"));
+      await act(async () => {
+        vi.advanceTimersByTime(3000);
+      });
+      await user.click(await screen.findByTestId("fake-slow"));
+      expect(screen.getByRole("status")).toHaveTextContent("Graphics lowered to Off");
+      await act(async () => {
+        vi.advanceTimersByTime(3000); // 6 s after the first drop, 3 s after the second
+      });
+      expect(screen.getByRole("status")).toHaveTextContent(/lowered/i);
+      await act(async () => {
+        vi.advanceTimersByTime(3000);
+      });
+      expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("the note fades away after a few seconds", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      render(ui());
+      await user.click(await screen.findByTestId("fake-slow"));
+      expect(screen.getByRole("status")).toHaveTextContent(/lowered/i);
+      await act(async () => {
+        vi.advanceTimersByTime(6000);
+      });
+      expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("stops watching once the reader picks a level by hand", async () => {
+    const user = userEvent.setup();
+    render(ui());
+    await user.click(screen.getByRole("button", { name: /graphics: full/i }));
+    expect(screen.getByTestId("world")).toHaveAttribute("data-level", "simple");
+    await user.click(screen.getByRole("button", { name: /graphics: simple/i }));
+    await user.click(screen.getByRole("button", { name: /graphics: off/i }));
+    await user.click(screen.getByRole("button", { name: /graphics: full/i }));
+    expect(await screen.findByTestId("world-canvas")).toHaveAttribute("data-level", "simple");
+    // No monitor is wired in once a manual choice has been made this visit.
+    expect(screen.queryByTestId("fake-slow")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 });
 
