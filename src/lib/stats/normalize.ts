@@ -1,5 +1,5 @@
-import type { BulkMatch } from "@/lib/deadlock-api/schemas";
-import type { PlayerMatch } from "./types";
+import type { BulkMatch, MatchLineup } from "@/lib/deadlock-api/schemas";
+import type { DeathPoint, PlayerMatch } from "./types";
 
 /** Accolade ids from /v1/assets/accolades (wiki/research/match-metadata-fields.md). */
 export const ACCOLADE = {
@@ -26,7 +26,11 @@ function snake(value: string): string {
   return value.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
 }
 
-export function normalizePlayerMatch(match: BulkMatch, accountId: number): PlayerMatch {
+export function normalizePlayerMatch(
+  match: BulkMatch,
+  accountId: number,
+  lineup?: MatchLineup,
+): PlayerMatch {
   const p = match.players.find((pl) => pl.account_id === accountId);
   if (!p) throw new Error(`Account ${accountId} is not in match ${match.match_id}`);
 
@@ -84,6 +88,15 @@ export function normalizePlayerMatch(match: BulkMatch, accountId: number): Playe
     midBossClaimed: claimed.length,
     midBossStolen: claimed.filter((b) => b.team_killed !== p.team).length,
 
-    deathPositions: p.death_details.map((d) => [d.death_pos[0], d.death_pos[1]]),
+    deathPositions: p.death_details.map((d): DeathPoint => {
+      const killer =
+        d.killer_player_slot === undefined
+          ? undefined
+          : lineup?.players.find((l) => l.player_slot === d.killer_player_slot);
+      // Only an enemy counts: a teammate or the player themselves is no nemesis.
+      return killer && killer.team !== p.team
+        ? [d.death_pos[0], d.death_pos[1], killer.hero_id]
+        : [d.death_pos[0], d.death_pos[1]];
+    }),
   };
 }

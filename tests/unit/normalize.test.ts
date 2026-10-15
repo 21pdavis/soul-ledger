@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { bulkMatch, type BulkMatch } from "@/lib/deadlock-api/schemas";
+import { bulkMatch, matchLineup, type BulkMatch } from "@/lib/deadlock-api/schemas";
 import { normalizePlayerMatch } from "@/lib/stats/normalize";
 import { fixtureJson, TEST_ACCOUNT_ID } from "../helpers/fixtures";
 
 const matches = bulkMatch.array().parse(fixtureJson("api/bulk-metadata.json"));
+const lineups = matchLineup.array().parse(fixtureJson("api/lineups.json"));
+const lineupOf = (id: number) => lineups.find((l) => l.match_id === id)!;
 const byId = (id: number) => matches.find((m) => m.match_id === id)!;
 
 describe("normalizePlayerMatch", () => {
@@ -100,5 +102,48 @@ describe("normalizePlayerMatch", () => {
 
   it("throws when the player is not in the match", () => {
     expect(() => normalizePlayerMatch(byId(112055054), 1)).toThrow(/not in match/);
+  });
+
+  describe("killers (the nemesis data)", () => {
+    // Recorded: the killer slots are 4, 4, 4, 5, 1, 1, 2 and the lineup maps them to heroes.
+    it("tags each death with the hero that killed the player", () => {
+      const row = normalizePlayerMatch(byId(111236243), TEST_ACCOUNT_ID, lineupOf(111236243));
+      expect(row.deathPositions).toHaveLength(7);
+      expect(row.deathPositions.map((d) => d[2])).toEqual([4, 4, 4, 12, 18, 18, 27]);
+      expect(row.deathPositions[0].slice(0, 2)).toEqual(
+        byId(111236243).players[0].death_details[0].death_pos.slice(0, 2),
+      );
+    });
+
+    it("keeps plain [x, y] deaths when there is no lineup (stored rows look the same)", () => {
+      const row = normalizePlayerMatch(byId(111236243), TEST_ACCOUNT_ID);
+      expect(row.deathPositions.every((d) => d.length === 2)).toBe(true);
+    });
+
+    it("leaves a death untagged when the killer is on the player's own team or unknown", () => {
+      const base = byId(111236243);
+      const lineup = lineupOf(111236243);
+      const me = lineup.players.find((p) => p.account_id === TEST_ACCOUNT_ID)!;
+      const mate = lineup.players.find(
+        (p) => p.team === me.team && p.player_slot !== me.player_slot,
+      )!;
+      const dd = base.players[0].death_details;
+      const match: BulkMatch = {
+        ...base,
+        players: [
+          {
+            ...base.players[0],
+            death_details: [
+              { ...dd[0], killer_player_slot: me.player_slot },
+              { ...dd[1], killer_player_slot: mate.player_slot },
+              { ...dd[2], killer_player_slot: undefined },
+              { ...dd[3], killer_player_slot: 99 },
+            ],
+          },
+        ],
+      };
+      const row = normalizePlayerMatch(match, TEST_ACCOUNT_ID, lineup);
+      expect(row.deathPositions.map((d) => d.length)).toEqual([2, 2, 2, 2]);
+    });
   });
 });

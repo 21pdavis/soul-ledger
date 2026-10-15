@@ -1,5 +1,8 @@
 # Directory Update Log
 
+## 2026-10-14
+* **Research**: [Match metadata fields](research/match-metadata-fields.md) now records the killer slot in `death_details`, how it maps to a hero through the match lineup, and that the lineup needs a second slim API call.
+
 ## 2026-10-11
 * **Decision**: [ADR 0069](decisions/0069-m3-city-tour-and-hero-cards.md): the M3 world is a static low-poly City Never Sleeps tour (Yellow to Blue to Green, level weaving camera, projected death map, sewer mid boss), and heroes stay art cards for 0.3.0 because code-sculpted models fell short. Resolves the [model style question](open-questions/m3-model-style.md); supersedes parts of ADRs 0068 and 0025.
 * **Creation**: [M3 model style](open-questions/m3-model-style.md): open question on faceted blocks (ADR 0025) versus the sculpted low-poly look the owner asked for on the mid boss.

@@ -144,7 +144,7 @@ function atStop(id: StopId, forward = 0, across = 0, y = 0): Vec3 {
   return v(p.clone().addScaledVector(t, forward).addScaledVector(n, across).setY(y));
 }
 
-/** Stock duel opponents until real nemesis data arrives (ADR 0068): main hero id to rival id. */
+/** Duel opponents for a reader with no known nemesis (ADR 0068): main hero id to rival id. */
 const STOCK_RIVALS: Record<number, number> = { 1: 13, 13: 1, 2: 3, 3: 2, 4: 7, 7: 4, 6: 12, 12: 6 };
 
 /** The sewer pit's floor height, well below the street. */
@@ -159,7 +159,12 @@ export function planTour(story: StoryData): TourPlan {
   const main = story.main?.heroId ?? story.roster?.topHeroes[0]?.heroId ?? 1;
   const roster = story.roster?.topHeroes.map((h) => h.heroId) ?? [main];
   const mvpHero = story.mvp && "heroId" in story.mvp ? story.mvp.heroId : main;
-  const rival = STOCK_RIVALS[main] ?? (main === 13 ? 1 : 13);
+  // The hero that killed the reader most; a stock rival when there is none (or it is the main).
+  const nemesis = story.nemesis?.heroId;
+  const rival =
+    nemesis !== undefined && nemesis !== main
+      ? nemesis
+      : (STOCK_RIVALS[main] ?? (main === 13 ? 1 : 13));
 
   const deaths = binDeaths(story.roast?.deathPositions ?? []);
   const hot = hottestCell(deaths);

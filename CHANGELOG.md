@@ -6,6 +6,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Added
 
+- The duel in the city now shows the hero that has killed you the most, not a stand-in rival. Players already looked up show it after their next refresh; until then the old pairing appears.
 - A low-poly copy of the Cursed Apple now sits behind your story. Devices that can't show 3D, and anyone who prefers reduced motion, see a still picture of the city instead.
 - On desktop the story cards are slimmer and step left and right, leaving room for the city beside them.
 

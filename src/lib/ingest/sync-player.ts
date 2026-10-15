@@ -147,19 +147,22 @@ async function fetchAndStore(
     } as const;
     onEvent(batchStatus);
     let waited = false;
-    const rows = (
-      await api.getBulkMetadata(accountId, batch, {
-        onWait: (waitMs) => {
-          waited = true;
-          onEvent({ type: "status", step: "rate_limited", waitMs });
-        },
-        // The wait is over and the request is going out: drop the "waiting" note.
-        onStart: () => {
-          if (waited) onEvent(batchStatus);
-          waited = false;
-        },
-      })
-    ).map((m) => normalizePlayerMatch(m, accountId));
+    const details = await api.getBulkMetadata(accountId, batch, {
+      onWait: (waitMs) => {
+        waited = true;
+        onEvent({ type: "status", step: "rate_limited", waitMs });
+      },
+      // The wait is over and the request is going out: drop the "waiting" note.
+      onStart: () => {
+        if (waited) onEvent(batchStatus);
+        waited = false;
+      },
+    });
+    // Who killed the player is garnish (the nemesis, ADR 0068): never sink the sync over it.
+    const lineups = new Map(
+      (await api.getLineups(accountId, batch).catch(() => [])).map((l) => [l.match_id, l]),
+    );
+    const rows = details.map((m) => normalizePlayerMatch(m, accountId, lineups.get(m.match_id)));
     await repo.savePlayerMatches(db, rows);
     saved += rows.length;
     await repo.heartbeatJob(db, accountId, now());

@@ -34,6 +34,16 @@ From `/v1/matches/{match_id}/metadata` ([API](deadlock-api.md)), observed on 202
 | `pings` | Ping counts |
 | `player_rank_data` | Rank data |
 
+# Killer slot and the nemesis
+
+Confirmed against the live API and a recorded fixture on 2026-10-14.[^openapi]
+
+- Each `death_details` entry carries `killer_player_slot` (a number), next to `death_pos`, `killer_pos`, `death_duration_s` and `time_to_kill_s`. Slots 1 to 6 are one team and 7 to 12 the other. It can be missing, so the schema treats it as optional.
+- Every player has a `player_slot`, `hero_id` and `team`. A killer slot maps to the killer's hero through the same match's players. Checked on six recorded matches: every killer resolved and was on the other team.
+- The bulk request in use (`only_filtered_players=true`) returns only the reader, so the killer's hero is not in it. A second call (`only_filtered_players=false&include_player_info=false&include_player_death_details=true`) returns all twelve players with just `account_id`, `player_slot`, `hero_id`, `team` and `death_details`: about 13 KB per match, against about 95 KB with full info and final stats. The app uses that call ([client](../../src/lib/deadlock-api/client.ts) `getLineups`).
+- Storage: the killer's hero id rides as an optional third number in the existing `death_positions` JSON (`[x, y, killerHeroId]`), so no database migration. Rows saved before this have `[x, y]` and give no nemesis until re-fetched, so the duel falls back to the stock rival.
+- Only enemy killers count; a death with no slot, an unknown slot, or a killer on the reader's own team is left untagged. The nemesis is the hero with the most kills; a tie goes to the lowest hero id.
+
 # Accolade ids
 
 The full list of 31, fetched from `/v1/assets/accolades` on 2026-10-06.[^accolades] Which ids feed which slide: [bulk match metadata](bulk-match-metadata.md).
