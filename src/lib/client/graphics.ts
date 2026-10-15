@@ -30,7 +30,10 @@ export function chooseGraphics({
   return reducedMotion ? "off" : hint;
 }
 
-/** A weak device (few cores or little memory) starts on Simple. Unknown values count as fine. */
+/**
+ * A weak device (few cores or little memory) starts on Simple. Unknown values count as fine.
+ * The thresholds are a first guess, not tuned on real devices yet.
+ */
 export function deviceHintLevel({
   cores,
   memory,

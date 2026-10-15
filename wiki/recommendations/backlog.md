@@ -61,6 +61,7 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 - Per-metric MVP one-liners, replacing the single generic template ([ADR 0053](../decisions/0053-m2-copy-and-data-presentation.md)).
 - More detailed filters (beyond all time / this patch), reusing the M2 window control ([ADR 0052](../decisions/0052-m2-entry-loading-error-states.md)).
 - Video export ([export](../decisions/0011-sharing.md)).
+- Turn shadows off in the Simple graphics level once the frame-rate auto-drop has landed, if the death-map spotlight can do without them; tune the weak-device thresholds that pick Simple from real devices.
 
 # Standing recommendations
 

@@ -75,3 +75,27 @@ test("the corner button cycles the graphics level, stays clear of the controls, 
   await expect(page.getByTestId("world")).toHaveAttribute("data-level", "simple");
   await expect(page.getByTestId("graphics-button")).toHaveAccessibleName(/Graphics: Simple/);
 });
+
+test("the graphics button stays clear of the summary's buttons", async ({ page }) => {
+  await openStory(page);
+  const button = page.getByTestId("graphics-button");
+  test.skip((await button.count()) === 0, "this browser has no WebGL");
+  const stage = page.getByTestId("story-stage");
+  while ((await stage.getAttribute("data-slide")) !== "summary") {
+    await page.keyboard.press("ArrowRight");
+    await stageSettled(page);
+  }
+  const box = (await button.boundingBox())!;
+  for (const name of ["Replay", "Look up another player", "Refresh", "Open the ledger"]) {
+    const target = page.getByRole("button", { name, exact: true });
+    // Refresh and Open the ledger only show for some stories.
+    if ((await target.count()) === 0) continue;
+    const other = (await target.first().boundingBox())!;
+    const overlaps =
+      box.x < other.x + other.width &&
+      box.x + box.width > other.x &&
+      box.y < other.y + other.height &&
+      box.y + box.height > other.y;
+    expect(overlaps, `graphics button overlaps ${name}`).toBe(false);
+  }
+});
