@@ -266,4 +266,56 @@ describe("syncPlayer nemesis data (ADR 0068)", () => {
     expect(again.length).toBeLessThan(first.length);
     expect(again).not.toContain(110497230); // already tagged
   });
+
+  it("does not ask again about a match whose killers were read but none was an enemy", async () => {
+    const { api, state } = fakeApi();
+    onlyLineupMatches(state);
+    const getLineups = api.getLineups;
+    api.getLineups = async (id, ids, hooks) =>
+      (await getLineups(id, ids, hooks)).map((l) => ({
+        ...l,
+        players: l.players.map((p) => ({
+          ...p,
+          death_details: p.death_details.map(() => ({ killer_player_slot: null })),
+        })),
+      }));
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api });
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api, force: true });
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api, force: true });
+    expect(state.calls.lineups).toHaveLength(1);
+  });
+
+  it("keeps earlier chunks' killers and heartbeats per chunk when a later chunk fails", async () => {
+    const { api, state } = fakeApi();
+    onlyLineupMatches(state);
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    // 600 filler matches, older than the six real ones, so the real ones are in chunk one.
+    const template = state.history[0];
+    for (let i = 0; i < 600; i++) {
+      const id = 900_000_000 + i;
+      state.history.push({ ...template, match_id: id, start_time: 1_000_000 + i });
+      state.matches.set(id, {
+        ...state.matches.get(template.match_id)!,
+        match_id: id,
+        start_time: "2000-01-01 00:00:00",
+      });
+    }
+    let calls = 0;
+    let beatsAtSecondChunk = 0;
+    const beat = vi.spyOn(repo, "heartbeatJob");
+    const getLineups = api.getLineups;
+    api.getLineups = async (id, ids, hooks) => {
+      if (++calls === 1) return getLineups(id, ids, hooks);
+      beatsAtSecondChunk = beat.mock.calls.length;
+      throw new Error("second chunk down");
+    };
+    const beatsBeforeTagging = () => beat.mock.calls.length;
+    await syncPlayer(TEST_ACCOUNT_ID, { db, api });
+
+    expect(calls).toBe(2);
+    expect(await tagged()).toBeGreaterThan(0);
+    // 7 detail batches for 606 matches, then one beat after chunk one, before chunk two.
+    expect(beatsAtSecondChunk).toBe(7 + 1);
+    expect(beatsBeforeTagging()).toBeGreaterThanOrEqual(beatsAtSecondChunk);
+  });
 });

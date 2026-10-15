@@ -333,6 +333,17 @@ describe("nemesis: the hero that killed the reader most (ADR 0068)", () => {
     expect(run([]).nemesis).toBeNull();
   });
 
+  it("counts a 0 killer as read but never names it, and still needs half the deaths read", () => {
+    expect(run([died(1, [0, 0, 0, 5])]).nemesis).toEqual({ heroId: 5, kills: 1 });
+    expect(run([died(1, [0, 0])]).nemesis).toBeNull();
+    // The 0s count as read, so 1 kill among 3 read deaths is a fair sample.
+    expect(run([died(1, [5, 0, 0, undefined, undefined])]).nemesis).toEqual({
+      heroId: 5,
+      kills: 1,
+    });
+    expect(run([died(1, [5, 0, undefined, undefined, undefined])]).nemesis).toBeNull();
+  });
+
   it("leaves the death map as plain [x, y] pairs", () => {
     const s = run([died(1, [7, undefined])]);
     expect(s.roast.deathPositions).toEqual([

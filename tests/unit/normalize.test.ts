@@ -121,7 +121,7 @@ describe("normalizePlayerMatch", () => {
       expect(tagged![0].slice(0, 2)).toEqual(plain(111236243)[0]);
     });
 
-    it("leaves a death untagged when the killer is on the player's own team or unknown", () => {
+    it("marks a death 0 (read, but no enemy killer) when the killer is a teammate, self or unknown", () => {
       const lineup = lineupOf(111236243);
       const me = lineup.players.find((p) => p.account_id === TEST_ACCOUNT_ID)!;
       const mate = lineup.players.find(
@@ -136,10 +136,24 @@ describe("normalizePlayerMatch", () => {
         ),
       };
       const tagged = tagKillers(plain(111236243).slice(0, 5), TEST_ACCOUNT_ID, edited);
-      expect(tagged!.map((d) => d.length)).toEqual([2, 2, 2, 2, 3]);
+      expect(tagged!.map((d) => d[2])).toEqual([0, 0, 0, 0, enemy.hero_id]);
     });
 
-    it("returns null when nothing could be tagged (so the row is not rewritten)", () => {
+    it("still tags the row when no death has an enemy killer, so it is never asked about again", () => {
+      const lineup = lineupOf(111236243);
+      const noEnemy = {
+        ...lineup,
+        players: lineup.players.map((p) =>
+          p.account_id === TEST_ACCOUNT_ID
+            ? { ...p, death_details: p.death_details.map(() => ({ killer_player_slot: null })) }
+            : p,
+        ),
+      };
+      const tagged = tagKillers(plain(111236243), TEST_ACCOUNT_ID, noEnemy);
+      expect(tagged!.map((d) => d[2])).toEqual([0, 0, 0, 0, 0, 0, 0]);
+    });
+
+    it("returns null when the lineup cannot be read (so the row is not rewritten)", () => {
       const lineup = lineupOf(111236243);
       expect(tagKillers(plain(111236243), 1, lineup)).toBeNull();
       const bare = { ...lineup, players: lineup.players.map((p) => ({ ...p, death_details: [] })) };

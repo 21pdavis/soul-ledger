@@ -249,9 +249,9 @@ export function computeStory(input: StoryInput): Story {
 }
 
 /**
- * The enemy hero that killed the player most, named only when at least half of all deaths have a
- * known killer. Deaths without one are skipped, and
- * a tie goes to the lowest hero id so the answer is the same on every load.
+ * The enemy hero that killed the player most, named only when at least half of all deaths have
+ * been read. A death marked `0` (read, no enemy killer) counts as read but never as a killer.
+ * A tie goes to the lowest hero id so the answer is the same on every load.
  */
 function pickNemesis(rows: PlayerMatch[]): Story["nemesis"] {
   const kills = new Map<number, number>();
@@ -262,7 +262,7 @@ function pickNemesis(rows: PlayerMatch[]): Story["nemesis"] {
       deaths++;
       if (d.length === 3) {
         tagged++;
-        kills.set(d[2], (kills.get(d[2]) ?? 0) + 1);
+        if (d[2] !== 0) kills.set(d[2], (kills.get(d[2]) ?? 0) + 1);
       }
     }
   }

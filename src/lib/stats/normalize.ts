@@ -1,14 +1,18 @@
 import type { BulkMatch, MatchLineup } from "@/lib/deadlock-api/schemas";
 import type { DeathPoint, PlayerMatch } from "./types";
 
+/** Third value of a death that was read but had no enemy killer (not a hero id). */
+export const NO_ENEMY_KILLER = 0;
+
 /**
  * Adds the killer's hero id to a stored match's deaths (`[x, y]` becomes `[x, y, heroId]`),
  * using the match lineup (the nemesis, ADR 0068). Only an enemy counts: a teammate, the player
- * themselves, or an unknown slot leaves that death as `[x, y]`.
+ * themselves, or an unknown slot gets the sentinel `0` (never a hero id), meaning "read, no enemy
+ * killer", so the match is not asked about again.
  *
- * Returns null when nothing could be tagged: the player is missing from the lineup, it lists a
- * different number of deaths than we stored (so the order cannot be trusted), or no killer
- * resolved to an enemy. The caller then leaves the row alone.
+ * Returns null when the lineup cannot be read: the player is missing from it, or it lists a
+ * different number of deaths than we stored (so the order cannot be trusted). The caller then
+ * leaves the row alone.
  */
 export function tagKillers(
   deaths: DeathPoint[],
@@ -17,15 +21,12 @@ export function tagKillers(
 ): DeathPoint[] | null {
   const me = lineup.players.find((p) => p.account_id === accountId);
   if (!me || me.death_details.length !== deaths.length) return null;
-  let tagged = 0;
-  const out = deaths.map((d, i): DeathPoint => {
+  return deaths.map((d, i): DeathPoint => {
     const slot = me.death_details[i].killer_player_slot;
     const killer = slot == null ? undefined : lineup.players.find((p) => p.player_slot === slot);
-    if (!killer || killer.team === me.team) return [d[0], d[1]];
-    tagged++;
+    if (!killer || killer.team === me.team) return [d[0], d[1], NO_ENEMY_KILLER];
     return [d[0], d[1], killer.hero_id];
   });
-  return tagged > 0 ? out : null;
 }
 
 /** Accolade ids from /v1/assets/accolades (wiki/research/match-metadata-fields.md). */
