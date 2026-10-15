@@ -91,3 +91,31 @@
     animation: none;
   }
 }
+
+/*
+ * Phone (the tap controller): the story's frame is a 9:16 stage letterboxed in the screen, so the
+ * pill must not sit on its bottom rule. The player keeps a strip under the stage for it
+ * (--pill-room, set in StoryStage.module.css and used by StoryPlayer.module.css), and --band is the
+ * whole dark strip under the frame. The pill is centred in it, below the frame's 8px double rule
+ * and above the bottom safe area; the "graphics lowered" note sits just above the frame's rule.
+ */
+@media not ((min-width: 1024px) and (pointer: fine)) {
+  .graphics,
+  .graphicsNote {
+    --room: var(--pill-room, 0px);
+    --stage-h: min(
+      calc(100cqh - var(--room)),
+      calc(min(100vw, var(--story-width, 480px)) * 16 / 9)
+    );
+    --band: calc((100cqh - var(--room) - var(--stage-h)) / 2 + var(--room));
+    --safe: env(safe-area-inset-bottom, 0px);
+  }
+
+  .graphics {
+    bottom: calc(var(--safe) + (var(--band) - var(--safe) - 8px - 2rem) / 2);
+  }
+
+  .graphicsNote {
+    bottom: calc(var(--band) + 0.75rem);
+  }
+}

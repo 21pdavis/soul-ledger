@@ -76,6 +76,26 @@ test("the corner button cycles the graphics level, stays clear of the controls, 
   await expect(page.getByTestId("graphics-button")).toHaveAccessibleName(/Graphics: Simple/);
 });
 
+test("the graphics button never straddles the story frame's bottom edge", async ({ page }) => {
+  await openStory(page);
+  const button = page.getByTestId("graphics-button");
+  test.skip((await button.count()) === 0, "this browser has no WebGL");
+  const box = (await button.boundingBox())!;
+  // On a phone the frame is the stage; on desktop it is the first story card.
+  const desktop = (await page.getByTestId("story-card").count()) > 0;
+  const frame = desktop ? page.getByTestId("story-card").first() : page.getByTestId("story-stage");
+  const f = (await frame.boundingBox())!;
+  const bottom = f.y + f.height;
+  const ring = 8; // the double rule drawn outside the frame
+  const beside = box.x + box.width <= f.x || box.x >= f.x + f.width;
+  const below = box.y >= bottom + ring;
+  const inside = box.y + box.height <= bottom - ring;
+  expect(
+    beside || below || inside,
+    `pill ${box.y}-${box.y + box.height} vs frame bottom ${bottom}`,
+  ).toBe(true);
+});
+
 test("the graphics button stays clear of the summary's buttons", async ({ page }) => {
   await openStory(page);
   const button = page.getByTestId("graphics-button");
