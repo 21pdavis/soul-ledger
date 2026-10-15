@@ -35,6 +35,7 @@ Iterate on localhost first and get the owner's sign-off before PRs to `staging` 
 # Notes from the style preview (2026-10-11)
 
 - The owner asked that every hero model also get a **zip-line hang pose**: the climb slide shows your main riding the Blue lane's zip line.
+- **Hero art in 3D:** the city's standees show a generic silhouette (`/hero-unknown-card.svg`) where the tiles show a monogram, for heroes with no card or whose card fails to load (one standee falls back, not the whole city). This adds to [ADR 0065](../decisions/0065-hero-art-served-locally.md)'s try-the-file-then-fall-back rule; the ADR is unchanged. The card-or-model choice (ADR 0068) waits for the first posed model: no unused seam is kept in the code.
 - The preview tour and its look are on branch `m3-style-roughs` (`/dev/world`); map reference in [the Cursed Apple research](../research/cursed-apple-map.md).
 
 # Settled during step 1

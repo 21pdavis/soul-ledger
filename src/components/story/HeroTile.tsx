@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { heroArtPath } from "@/story/hero-art";
 import { MonogramTile } from "./MonogramTile";
 import styles from "./MonogramTile.module.css";
 
 /** Where a hero’s art lives (see scripts/fetch-hero-art.mjs): the card at "lg", the small icon at "sm". */
-export const heroArtSrc = (heroId: number, size: "lg" | "sm") =>
-  `/heroes/${heroId}-${size === "lg" ? "card" : "sm"}.webp`;
+export const heroArtSrc = heroArtPath;
 
 interface Props {
   heroId: number;

@@ -1,7 +1,6 @@
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { FALLBACK_CARD_SRC, heroCardSrc, heroFigure, HEROES_WITH_CARD } from "@/story/hero-art";
-import { existsSync } from "node:fs";
+import { FALLBACK_CARD_SRC, heroArtPath, heroCardSrc, HEROES_WITH_CARD } from "@/story/hero-art";
 
 describe("hero cut-out art", () => {
   it("lists exactly the cards that exist in public/heroes", () => {
@@ -11,6 +10,11 @@ describe("hero cut-out art", () => {
       .map(Number)
       .sort((a, b) => a - b);
     expect([...HEROES_WITH_CARD].sort((a, b) => a - b)).toEqual(onDisk);
+  });
+
+  it("builds the art path for the card and the small icon", () => {
+    expect(heroArtPath(7, "lg")).toBe("/heroes/7-card.webp");
+    expect(heroArtPath(7, "sm")).toBe("/heroes/7-sm.webp");
   });
 
   it("points a hero with a card at it", () => {
@@ -24,17 +28,5 @@ describe("hero cut-out art", () => {
 
   it("ships the silhouette file", () => {
     expect(existsSync(`public${FALLBACK_CARD_SRC}`)).toBe(true);
-  });
-});
-
-describe("card or model (ADR 0068)", () => {
-  it("shows the card for every hero while there are no models", () => {
-    expect(heroFigure(1)).toBe("card");
-    expect(heroFigure(9999)).toBe("card");
-  });
-
-  it("switches to the model once one exists for that hero", () => {
-    expect(heroFigure(1, new Set([1]))).toBe("model");
-    expect(heroFigure(2, new Set([1]))).toBe("card");
   });
 });
