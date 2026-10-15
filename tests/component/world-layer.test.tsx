@@ -21,6 +21,7 @@ describe("WorldLayer", () => {
   afterEach(() => {
     localStorage.clear();
     canvasThrows.on = false;
+    vi.restoreAllMocks();
   });
 
   it("falls back to the still picture if the 3D fails, instead of breaking the page", async () => {
@@ -82,18 +83,20 @@ describe("WorldLayer on a server-rendered page", () => {
         globalThis.document = realDocument;
       }
     })();
-    const probe = vi
-      .spyOn(HTMLCanvasElement.prototype, "getContext")
-      .mockReturnValue({ getExtension: () => null } as unknown as RenderingContext);
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue({
+      getExtension: () => null,
+    } as unknown as RenderingContext);
     const container = document.createElement("div");
     container.innerHTML = html;
     document.body.appendChild(container);
-    const recoverable = vi.fn();
-    await act(async () => {
-      hydrateRoot(container, ui, { onRecoverableError: recoverable });
-    });
-    expect(recoverable).not.toHaveBeenCalled();
-    probe.mockRestore();
-    container.remove();
+    try {
+      const recoverable = vi.fn();
+      await act(async () => {
+        hydrateRoot(container, ui, { onRecoverableError: recoverable });
+      });
+      expect(recoverable).not.toHaveBeenCalled();
+    } finally {
+      container.remove();
+    }
   });
 });
