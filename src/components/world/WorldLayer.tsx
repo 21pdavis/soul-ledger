@@ -1,8 +1,27 @@
 "use client";
 
-import { Component, Suspense, lazy, useMemo, type ReactNode } from "react";
+import {
+  Component,
+  Suspense,
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { lowerGraphics } from "@/lib/client/fps-monitor";
 import { useIsClient } from "@/components/story/useIsClient";
-import { chooseGraphics, loadSavedGraphics, supportsWebGL } from "@/lib/client/graphics";
+import {
+  browserDeviceHint,
+  chooseGraphics,
+  graphicsLabel,
+  loadSavedGraphics,
+  nextGraphicsLevel,
+  saveGraphics,
+  supportsWebGL,
+  type GraphicsLevel,
+} from "@/lib/client/graphics";
 import type { StoryData } from "@/story/types";
 import styles from "./World.module.css";
 
@@ -49,31 +68,86 @@ export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Prop
   // The level depends on the browser (WebGL, saved choice), which the server cannot see. Decide
   // it only once the browser has taken over, so server and first browser render match.
   const client = useIsClient();
-  const level = useMemo(
+  const hasWebGL = client && (webgl ?? supportsWebGL());
+  const startLevel = useMemo(
     () =>
       !client
         ? null
         : chooseGraphics({
-            webgl: webgl ?? supportsWebGL(),
+            webgl: hasWebGL,
             reducedMotion: reducedMotion ?? false,
             saved: loadSavedGraphics(),
+            hint: browserDeviceHint(),
           }),
-    [client, webgl, reducedMotion],
+    [client, hasWebGL, reducedMotion],
   );
+  // The reader's choice from the corner button, applied live without touching the story.
+  const [picked, setPicked] = useState<GraphicsLevel | null>(null);
+  // Auto-drop (ADR 0068): when the city runs too slowly the level steps down. Never up, and it
+  // stops for this visit as soon as the reader picks a level by hand.
+  const [dropped, setDropped] = useState<GraphicsLevel | null>(null);
+  // A fresh object per drop, so a second drop restarts the timer and is announced again.
+  const [note, setNote] = useState<{ level: GraphicsLevel } | null>(null);
+  const level = hasWebGL ? (picked ?? dropped ?? startLevel) : startLevel;
+  useEffect(() => {
+    if (!note) return;
+    const id = setTimeout(() => setNote(null), 5000);
+    return () => clearTimeout(id);
+  }, [note]);
+  const onSlow = useCallback(() => {
+    if (!level) return;
+    const next = lowerGraphics(level);
+    if (next === level) return;
+    setDropped(next);
+    // A drop to Simple is remembered so a weak device starts lower next time. A drop to Off is
+    // not: it applies for this visit only, so one stall cannot hide the world for good.
+    if (next !== "off") saveGraphics(next);
+    setNote({ level: next });
+  }, [level]);
   if (!level) return <div className={styles.layer} data-testid="world" aria-hidden="true" />;
+  const cycle = () => {
+    const next = nextGraphicsLevel(level);
+    setPicked(next);
+    setNote(null);
+    saveGraphics(next);
+  };
   return (
-    <div className={styles.layer} data-testid="world" data-level={level} aria-hidden="true">
-      {level === "off" ? (
-        <Still />
-      ) : (
-        started && (
-          <StillOnError>
-            <Suspense fallback={null}>
-              <WorldCanvas slide={slide} story={story} />
-            </Suspense>
-          </StillOnError>
-        )
+    <>
+      <div className={styles.layer} data-testid="world" data-level={level} aria-hidden="true">
+        {level === "off" ? (
+          <Still />
+        ) : (
+          started && (
+            <StillOnError>
+              <Suspense fallback={null}>
+                <WorldCanvas
+                  key={level}
+                  slide={slide}
+                  story={story}
+                  level={level}
+                  onSlow={picked === null ? onSlow : undefined}
+                />
+              </Suspense>
+            </StillOnError>
+          )
+        )}
+      </div>
+      {hasWebGL && (
+        <div className={styles.graphicsNote} role="status" aria-live="polite">
+          {note ? `Graphics lowered to ${graphicsLabel(note.level)} to keep things smooth` : ""}
+        </div>
       )}
-    </div>
+      {hasWebGL && (
+        <button
+          type="button"
+          className={styles.graphics}
+          onClick={cycle}
+          aria-label={`Graphics: ${graphicsLabel(level)}. Press to change.`}
+          data-testid="graphics-button"
+        >
+          <span aria-hidden="true">Graphics: {graphicsLabel(level)}</span>
+        </button>
+      )}
+    </>
   );
 }

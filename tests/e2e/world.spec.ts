@@ -34,3 +34,68 @@ test("on Off the world is a still picture and no 3D loads", async ({ page }) => 
   await expect(page.getByTestId("world-still")).toBeVisible();
   await expect(world.locator("canvas")).toHaveCount(0);
 });
+
+test("the corner button cycles the graphics level, stays clear of the controls, and is remembered", async ({
+  page,
+}) => {
+  await openStory(page);
+  const button = page.getByTestId("graphics-button");
+  // Without WebGL there is nothing to switch, and the button is not shown.
+  test.skip((await button.count()) === 0, "this browser has no WebGL");
+  const world = page.getByTestId("world");
+  await expect(button).toBeVisible();
+  await expect(button).toHaveAccessibleName(/Graphics: Off/);
+
+  // It does not sit on the progress bar (top on a phone, side rail on desktop) or leave the screen.
+  const box = (await button.boundingBox())!;
+  const bar = (await page.getByRole("list", { name: "Story progress" }).boundingBox())!;
+  const viewport = page.viewportSize()!;
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+  expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+  const overlaps =
+    box.x < bar.x + bar.width &&
+    box.x + box.width > bar.x &&
+    box.y < bar.y + bar.height &&
+    box.y + box.height > bar.y;
+  expect(overlaps).toBe(false);
+
+  await button.click();
+  await expect(world).toHaveAttribute("data-level", "full");
+  await button.click();
+  await expect(world).toHaveAttribute("data-level", "simple");
+  await expect(button).toHaveAccessibleName(/Graphics: Simple/);
+  // Switching is live: the story is still on its first slide.
+  await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "intro");
+
+  await page.reload();
+  await mockLookup(page, ndjson({ type: "resolved", accountId: 1 }, storyEvent()));
+  await enter(page);
+  await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "intro");
+  await expect(page.getByTestId("world")).toHaveAttribute("data-level", "simple");
+  await expect(page.getByTestId("graphics-button")).toHaveAccessibleName(/Graphics: Simple/);
+});
+
+test("the graphics button stays clear of the summary's buttons", async ({ page }) => {
+  await openStory(page);
+  const button = page.getByTestId("graphics-button");
+  test.skip((await button.count()) === 0, "this browser has no WebGL");
+  const stage = page.getByTestId("story-stage");
+  while ((await stage.getAttribute("data-slide")) !== "summary") {
+    await page.keyboard.press("ArrowRight");
+    await stageSettled(page);
+  }
+  const box = (await button.boundingBox())!;
+  for (const name of ["Replay", "Look up another player", "Refresh", "Open the ledger"]) {
+    const target = page.getByRole("button", { name, exact: true });
+    // Refresh and Open the ledger only show for some stories.
+    if ((await target.count()) === 0) continue;
+    const other = (await target.first().boundingBox())!;
+    const overlaps =
+      box.x < other.x + other.width &&
+      box.x + box.width > other.x &&
+      box.y < other.y + other.height &&
+      box.y + box.height > other.y;
+    expect(overlaps, `graphics button overlaps ${name}`).toBe(false);
+  }
+});
