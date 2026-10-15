@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { DeathBins } from "@/story/death-bins";
+import { heroCardSrc } from "@/story/hero-art";
 import { PALETTE, type Vec3 } from "./layout";
 import { MIDBOSS_PARTS, buildMidBossGeometry, frontAt } from "./midboss";
 import type { CastMember, Duel } from "./tour";
@@ -50,7 +51,7 @@ function silhouetteMaterial(map: THREE.Texture, color: string) {
 
 /** A hero as a cut-out standee on an Art Deco plinth. Static: it never turns to follow the camera. */
 export function Standee({ member }: { member: CastMember }) {
-  const texture = useTexture(`/heroes/${member.heroId}-card.webp`, (t) => {
+  const texture = useTexture(heroCardSrc(member.heroId), (t) => {
     t.colorSpace = THREE.SRGBColorSpace;
   });
   const image = texture.image as { width: number; height: number } | undefined;
