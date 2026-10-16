@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { GRAPHICS_KEY } from "../../src/lib/client/graphics";
 import { LOADING_PACE } from "../../src/lib/client/loading-pace";
 import { PROFILE, mockLookup, ndjson, openEntry, storyEvent } from "./lookup-mock";
 import { push, startLookup, streamLookupByHand } from "./hand-stream";
@@ -9,6 +10,12 @@ import { push, startLookup, streamLookupByHand } from "./hand-stream";
 
 // Opt out of the config's "pacing off" start state, so this file runs the real pacing.
 test.use({ storageState: { cookies: [], origins: [] } });
+
+// Real pacing, but not the real 3D: these specs time the loader, and CI draws WebGL in software,
+// which starves the page and stalls Playwright's click stability check. The city has its own specs.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript((key) => localStorage.setItem(key, "off"), GRAPHICS_KEY);
+});
 
 const { stageDwellMs: DWELL, finalTailMs: TAIL } = LOADING_PACE;
 /** Timer and paint slack when comparing two timestamps. */

@@ -188,10 +188,12 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
   }
 
   // The city sits behind the entry, loading and error screens as scenery (no story to follow
-  // yet). It stays mounted across them; the story mounts its own, which follows the slides.
+  // yet). It stays mounted across them; the story mounts its own, which follows the slides. While
+  // a lookup loads the 3D stops drawing and the still picture stands in: a slow or software-drawn
+  // canvas must never starve the loading screen's timing (ADR 0068, 0073).
   return (
     <>
-      <WorldLayer started reducedMotion={reducedMotion} />
+      <WorldLayer started={phase.name !== "loading"} reducedMotion={reducedMotion} />
       <ScreenShell>
         {phase.name === "entry" && (
           <EntryScreen

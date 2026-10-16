@@ -9,6 +9,12 @@ vi.mock("@/components/world/WorldCanvas", () => ({
   ),
 }));
 
+// jsdom has no WebGL: say the browser does, so the page draws the (mocked) city.
+vi.mock("@/lib/client/graphics", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/client/graphics")>()),
+  supportsWebGL: () => true,
+}));
+
 /** The landing page has the city behind it too, with no story yet to follow. */
 describe("the world on the landing page", () => {
   beforeEach(() => {
@@ -29,9 +35,19 @@ describe("the world on the landing page", () => {
     const { enter } = setup(new Promise<Response>(() => {}));
     const world = screen.getByTestId("world");
     await enter();
-    expect(await screen.findByRole("status")).toHaveTextContent(/Looking up your ledger/);
+    expect((await screen.findAllByText(/Looking up your ledger/)).length).toBeGreaterThan(0);
     expect(screen.getByTestId("world")).toBe(world);
   });
+
+  // Software-rendered WebGL starves the page, so the loading screen must not share it (ADR 0068).
+  it("stops drawing the 3D city once the lookup starts, leaving the still picture", async () => {
+    const { enter } = setup(new Promise<Response>(() => {}));
+    expect(await screen.findByTestId("world-canvas", {}, { timeout: 10_000 })).toBeInTheDocument();
+    await enter();
+    expect((await screen.findAllByText(/Looking up your ledger/)).length).toBeGreaterThan(0);
+    expect(screen.queryByTestId("world-canvas")).not.toBeInTheDocument();
+    expect(screen.getByTestId("world-still")).toBeInTheDocument();
+  }, 20_000);
 
   it("shows the 3D city as scenery, without a story, straight away", async () => {
     render(<WorldLayer started webgl reducedMotion={false} />);
