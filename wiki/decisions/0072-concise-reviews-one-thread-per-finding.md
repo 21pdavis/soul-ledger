@@ -28,4 +28,5 @@ Agent reviews ([ADR 0044](0044-pr-gated-changes-and-agent-review.md), posted as 
 
 - Shorter reviews and fewer tokens; suggestions can be applied in one click.
 - Review state is visible per thread on GitHub, so nothing is lost in a long comment.
+- **Permissions (owner, 2026-10-15):** `.claude/settings.json` pre-allows only the `gh api` calls this needs (thread replies, listing threads, resolving them), not `gh api` in general, which could change repo settings.
 - Rules live in `.claude/agents/reviewer.md` and CLAUDE.md's review bullets.

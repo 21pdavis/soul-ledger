@@ -138,7 +138,7 @@ Rules for agents:
 Routine work is pre-allowed so runs don't stall on prompts:
 - `pnpm`;
 - `git` on feature branches;
-- `gh pr` / `run` / `issue` / `label`;
+- `gh pr` / `run` / `issue` / `label`, plus replying to and resolving review threads (`gh api`, those calls only, ADR 0072);
 - read-only Render tools.
 
 Running SQL on Neon, other risky Neon changes and triggering Render deploys always ask. **Always name the branch when pushing** (`git push -u origin <feature-branch>`): a bare `git push` is denied. These are pattern rules: a strong guardrail, not a guarantee. GitHub branch protection (#10) is the backstop.
