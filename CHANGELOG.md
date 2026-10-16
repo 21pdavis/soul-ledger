@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Fixed
+
+- On the smallest phones the roster slide no longer spills past the bottom of the card: when the list of top heroes cannot fit, the recent-form lines are left out.
+
 ## [0.3.0] - 2026-10-15
 
 **Milestone M3: the city behind the story.** A low-poly copy of the Cursed Apple now sits behind your story, and the camera tours it slide by slide. Heroes stand in the city as cut-out cards placed from your stats, and the duel shows your real nemesis. Posed 3D hero models come later.

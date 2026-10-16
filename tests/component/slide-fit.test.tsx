@@ -21,7 +21,8 @@ beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(function (
     this: HTMLElement,
   ) {
-    return 100 + rows(this) * 40;
+    // Hiding the recent-form lines (data-tight) frees 50px.
+    return 100 - (this.hasAttribute("data-tight") ? 50 : 0) + rows(this) * 40;
   });
   vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockImplementation(() => box.height);
   vi.stubGlobal(
@@ -146,5 +147,12 @@ describe("RosterSlide fits the stage it is in", () => {
     box.height = 10;
     renderRoster();
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
+  });
+
+  it("wins rows back once the recent-form lines are hidden to make room", () => {
+    // Three rows (220px) overflow; with the lines gone (50px freed) four rows (210px) fit.
+    box.height = 210;
+    renderRoster();
+    expect(screen.getAllByRole("listitem")).toHaveLength(4);
   });
 });
