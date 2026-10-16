@@ -1,6 +1,7 @@
 # Open questions
 
 * [Source for the Hoarder squad role now that unspent souls is dropped](hoarder-role-source.md) - The Hoarder squad role was awarded for unspent gold minutes, a stat the owner dropped, so it needs another source or must be removed.
+* [Should an automatic graphics drop be remembered?](auto-drop-memory.md) - Whether an automatic graphics drop is remembered on the device, only for the visit, or remembered except for Off.
 
 # Resolved (kept for reference)
 
@@ -13,3 +14,4 @@
 * [Font pairing for the M2 story](m2-font-pairing.md) - Which open-licence deco display face and grotesk to pair via next/font for the art-deco occult look.
 * [Terms for using deadlock-api hero images as story art](m2-hero-art-terms.md) - Whether the hero images served by deadlock-api assets may be shown on the site, which gates replacing the M2 monogram tiles with real hero art.
 * [Unit of avgUnspentGoldMinutes for the unspent-souls roast](m2-unspent-souls-unit.md) - What the Unspent Gold Minutes stat measures (souls times minutes or minutes), which decides how the roast slide can phrase it.
+* [M3 model style: faceted blocks or sculpted low poly](m3-model-style.md) - Whether M3 hero models stay flat-shaded faceted (ADR 0025) or move to the sculpted, smooth-shaded low-poly look the owner asked for on the mid boss.

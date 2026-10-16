@@ -9,6 +9,8 @@ decided_on: 2026-10-08
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T18:00:00Z }
 ---
 
+> **Partly superseded** by [ADR 0069](0069-m3-city-tour-and-hero-cards.md) (2026-10-11); see its "Supersedes in part" section.
+
 # Decision
 
 Refines [ADR 0050](0050-m2-story-flow-and-controllers.md) (desktop controller only) after owner feedback that the pinned column just faked the phone's tap navigation. The phone controller, the shared slide index and the slide contract are unchanged ([ADR 0012](0012-phone-first.md) stays phone-first).

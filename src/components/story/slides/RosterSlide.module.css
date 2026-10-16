@@ -278,11 +278,17 @@
   }
 }
 
-/* The shortest stages (a 320x568 phone with the cached-matches note): the recent-form lines go, the
-   all-time numbers stay (ADR 0064). */
+/* The recent-form lines go, the all-time numbers stay (ADR 0064): on the shortest stages (a 320x568
+   phone with the cached-matches note), and whatever the stage size when even the shortest list
+   still overflows (RosterSlide sets data-tight). */
 @container (max-height: 419px) {
   .overall,
   .recent {
     display: none;
   }
+}
+
+.slide[data-tight] .overall,
+.slide[data-tight] .recent {
+  display: none;
 }

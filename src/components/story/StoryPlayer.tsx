@@ -17,6 +17,10 @@ import styles from "./StoryPlayer.module.css";
 interface Props extends SlideProps {
   /** How long an entrance may run before taps advance again. Tests shorten it. */
   entranceMs?: number;
+  /** Told the current slide when the story starts and whenever it changes (the 3D world follows it). */
+  onSlideChange?: (index: number) => void;
+  /** A 3D world sits behind the story: panels turn to glass and desktop cards step aside. */
+  world?: boolean;
 }
 
 /**
@@ -25,7 +29,14 @@ interface Props extends SlideProps {
  * - scroll (desktop): a vertical stack of wide cards over scroll-snap checkpoints (ADR 0062).
  * Slides never navigate themselves and are the same components in both modes.
  */
-export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: Props) {
+export function StoryPlayer({
+  story,
+  meta,
+  actions,
+  entranceMs = ENTRANCE_MS,
+  onSlideChange,
+  world = false,
+}: Props) {
   const ready = useIsClient();
   const mode = useStoryMode();
   const reduced = usePrefersReducedMotion();
@@ -53,6 +64,14 @@ export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: 
     const timer = window.setTimeout(() => dispatch({ type: "settled" }), entranceMs);
     return () => window.clearTimeout(timer);
   }, [state.animating, state.index, paused, entranceMs]);
+
+  // Report the slide once the stage is up, and again only when it changes.
+  const reported = useRef<number | null>(null);
+  useEffect(() => {
+    if (!ready || reported.current === state.index) return;
+    reported.current = state.index;
+    onSlideChange?.(state.index);
+  }, [ready, state.index, onSlideChange]);
 
   const next = useCallback(() => dispatch({ type: "next", motion }), [motion]);
   const back = useCallback(() => dispatch({ type: "back", motion }), [motion]);
@@ -144,12 +163,23 @@ export function StoryPlayer({ story, meta, actions, entranceMs = ENTRANCE_MS }: 
   // only once the browser has taken over; until then there is just the ink background.
   if (!ready) {
     return (
-      <div className={styles.root} data-testid="story-player" data-mode="tap" aria-busy="true" />
+      <div
+        className={styles.root}
+        data-testid="story-player"
+        data-mode="tap"
+        data-world={world ? "on" : undefined}
+        aria-busy="true"
+      />
     );
   }
 
   return (
-    <div className={styles.root} data-testid="story-player" data-mode={mode}>
+    <div
+      className={styles.root}
+      data-testid="story-player"
+      data-mode={mode}
+      data-world={world ? "on" : undefined}
+    >
       {tap ? (
         <div className={styles.phone}>{stage}</div>
       ) : (

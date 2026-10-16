@@ -4,6 +4,7 @@
  * matches note makes it taller) and however the mobile browser bars move.
  */
 .stage {
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -20,6 +21,13 @@
   .stage {
     --player-h: round(down, 100cqh, 1px);
   }
+}
+
+/* The player sits above the world layer (a fixed backdrop) and fills the stage. */
+.player {
+  position: relative;
+  z-index: 1;
+  height: 100%;
 }
 
 .visuallyHidden {

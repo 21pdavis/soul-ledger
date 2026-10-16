@@ -1,3 +1,4 @@
+import { CARD_SIDES } from "@/story/card-sides";
 import { SLIDES } from "@/story/copy";
 import type { SlideProps } from "@/story/types";
 import { SlideFrame } from "./SlideFrame";
@@ -40,6 +41,7 @@ export function WideCard({
       data-testid="story-card"
       data-slide={id}
       data-current={isCurrent}
+      data-side={CARD_SIDES[index]}
       inert={!isCurrent}
     >
       {index <= reached ? (

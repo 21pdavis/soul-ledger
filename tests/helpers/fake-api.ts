@@ -2,17 +2,22 @@ import type { DeadlockApi } from "@/lib/deadlock-api/client";
 import {
   bulkMatch,
   matchHistoryEntry,
+  matchLineup,
   mmrHistoryEntry,
   patchEntry,
   statMetrics,
   steamProfile,
   type BulkMatch,
   type MatchHistoryEntry,
+  type MatchLineup,
 } from "@/lib/deadlock-api/schemas";
 import { fixtureJson } from "./fixtures";
 
 export const fixtureMatches = (): BulkMatch[] =>
   bulkMatch.array().parse(fixtureJson("api/bulk-metadata.json"));
+/** Recorded lineups exist for a handful of the fixture matches; the rest have none. */
+export const fixtureLineups = (): MatchLineup[] =>
+  matchLineup.array().parse(fixtureJson("api/lineups.json"));
 export const fixtureHistory = (): MatchHistoryEntry[] =>
   matchHistoryEntry.array().parse(fixtureJson("api/match-history.json"));
 
@@ -28,12 +33,14 @@ export function fakeApi() {
     calls: {
       history: 0,
       bulk: [] as number[][],
+      lineups: [] as number[][],
       profile: 0,
       mmr: 0,
       metrics: [] as unknown[],
       patches: 0,
     },
     metricsFailWith: null as Error | null,
+    lineupsFailWith: null as Error | null,
   };
 
   const guard = () => {
@@ -50,6 +57,13 @@ export function fakeApi() {
       guard();
       state.calls.bulk.push(matchIds);
       return matchIds.flatMap((id) => state.matches.get(id) ?? []);
+    },
+    async getLineups(_accountId, matchIds) {
+      guard();
+      state.calls.lineups.push(matchIds);
+      if (state.lineupsFailWith) throw state.lineupsFailWith;
+      const have = fixtureLineups();
+      return matchIds.flatMap((id) => have.find((l) => l.match_id === id) ?? []);
     },
     async getSteamProfile() {
       guard();

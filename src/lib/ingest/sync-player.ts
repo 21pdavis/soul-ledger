@@ -1,7 +1,7 @@
 import type { Db } from "@/db";
 import * as repo from "@/db/repository";
 import type { DeadlockApi } from "@/lib/deadlock-api/client";
-import { normalizePlayerMatch } from "@/lib/stats/normalize";
+import { normalizePlayerMatch, tagKillers } from "@/lib/stats/normalize";
 
 /** Progress events that drive the staged loading screen (ADR 0014). */
 export type SyncEvent =
@@ -56,6 +56,8 @@ const MATCHMAKING_MODES = new Set([1, 4]);
 
 /** Matches per bulk request: small enough that the loading counters tick visibly. */
 const DETAILS_BATCH = 100;
+/** Matches per lineup request: one bulk-limiter use each (the client's chunk size). */
+const LINEUP_CHUNK = 500;
 
 /**
  * Brings our cached copy of a player's matches up to date (ADR 0001), fetching only matches we
@@ -177,6 +179,7 @@ async function fetchAndStore(
   }
 
   onEvent({ type: "status", step: "finishing" });
+  await tagKillersInStoredMatches(accountId, db, api, onEvent, now);
 
   // Rank history only feeds one slide, so its failure should not sink the whole lookup.
   try {
@@ -186,6 +189,46 @@ async function fetchAndStore(
   }
 
   onEvent({ type: "done", matchCount: known.size + saved });
+}
+
+/**
+ * Records which enemy hero killed the player in each stored death (the nemesis, ADR 0068).
+ * It covers the matches just saved and any stored earlier without killers, one lineup request
+ * per 500 matches inside the bulk rate limit, writing and heartbeating after each chunk so a later
+ * chunk's failure keeps the earlier work. It is garnish, so a failure logs a warning and
+ * leaves those rows as they were: the next sync tries again. It never fails the sync.
+ */
+async function tagKillersInStoredMatches(
+  accountId: number,
+  db: Db,
+  api: DeadlockApi,
+  onEvent: (event: SyncEvent) => void,
+  now: () => Date,
+): Promise<void> {
+  const untagged = await repo.getMatchesMissingKillers(db, accountId);
+  for (let i = 0; i < untagged.length; i += LINEUP_CHUNK) {
+    const chunk = untagged.slice(i, i + LINEUP_CHUNK);
+    try {
+      const lineups = await api.getLineups(
+        accountId,
+        chunk.map((m) => m.matchId),
+        {
+          onWait: (waitMs) => onEvent({ type: "status", step: "rate_limited", waitMs }),
+          onStart: () => onEvent({ type: "status", step: "finishing" }),
+        },
+      );
+      const byMatch = new Map(lineups.map((l) => [l.match_id, l]));
+      const updates = chunk.flatMap((m) => {
+        const lineup = byMatch.get(m.matchId);
+        const deathPositions = lineup && tagKillers(m.deathPositions, accountId, lineup);
+        return deathPositions ? [{ matchId: m.matchId, deathPositions }] : [];
+      });
+      await repo.updateDeathPositions(db, accountId, updates);
+      await repo.heartbeatJob(db, accountId, now());
+    } catch (err) {
+      console.warn(`Could not record killers for player ${accountId}: ${errorMessage(err)}`);
+    }
+  }
 }
 
 function errorMessage(err: unknown): string {

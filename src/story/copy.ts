@@ -330,7 +330,14 @@ export const KILLS_COPY = {
   rangeHeading: "Range",
   closeup: "Close-up",
   longDistance: "Long-distance",
+  /** Names the hero dueling the reader's main in the city behind the card (ADR 0068). */
+  nemesis: "Your nemesis",
 } as const;
+
+/** How often the nemesis killed the reader, so one kill never reads "1 times". */
+export function nemesisKillsLine(kills: number): string {
+  return kills === 1 ? "killed you once" : `killed you ${kills.toLocaleString("en-US")} times`;
+}
 
 /** The label under the kill total, so one kill never reads "1 kills". */
 export function killsTotalLabel(total: number): string {

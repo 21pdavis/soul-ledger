@@ -9,6 +9,8 @@ decided_on: 2026-10-11
 generated: { by: claude-code/claude-opus-5-5, at: 2026-10-11T06:30:00Z }
 ---
 
+> **Partly superseded** by [ADR 0069](0069-m3-city-tour-and-hero-cards.md) (2026-10-11); see its "Supersedes in part" section.
+
 # Context
 
 The owner settled M3 in a grilling session on 2026-10-11. Since the original plan ([ADR 0028](0028-milestones.md), [ADR 0019](0019-code-built-hero-models.md)), the owner approved real hero art ([ADR 0065](0065-hero-art-served-locally.md)), so heroes no longer need a model to appear. Build steps are in the [M3 plan](../recommendations/m3-plan.md).
@@ -38,7 +40,7 @@ The owner settled M3 in a grilling session on 2026-10-11. Since the original pla
 | Topic | Decision |
 |---|---|
 | Levels | **Full**, **Simple** (fewer particles, lower detail), **Off** (a still image; also the no-WebGL fallback) |
-| Control | A small corner button in the story; the choice is remembered per device and always wins over automatic changes |
+| Control | A small corner button (placement: [ADR 0070](0070-graphics-button-is-a-corner-icon.md)); the choice is remembered per device and always wins over automatic changes |
 | Start | Chosen from device hints (memory, cores, WebGL2). **Reduced motion starts on Off** |
 | Auto-drop | Below **20 fps** for about 3 seconds (ignoring the first seconds after load) drops one level with a small note. 20 to 30 fps is acceptable. Never steps back up by itself in a visit |
 | Smoothness | Avoiding stutter is part of the build (load before fade-in, lower resolution before dropping a level, instancing). Loading ahead per slide, like Reels, only if lag shows up |

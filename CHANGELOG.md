@@ -4,9 +4,27 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-15
+
+**Milestone M3: the city behind the story.** A low-poly copy of the Cursed Apple now sits behind your story, and the camera tours it slide by slide. Heroes stand in the city as cut-out cards placed from your stats, and the duel shows your real nemesis. Posed 3D hero models come later.
+
+### Added
+
+- The duel in the city now shows the hero that has killed you the most, not a stand-in rival. For players already looked up, the next refresh fills in who killed them in past games; the real rival appears once most of their deaths are known, and until then the old pairing shows.
+- A low-poly copy of the Cursed Apple now sits behind your story. Devices that can't show 3D, and anyone who prefers reduced motion, see a still picture of the city instead.
+- A small cube button in the bottom-right corner of the screen switches the city between Full, Simple (lighter on slower phones and laptops) and Off (a still picture). On a computer, hover over it to see the current level. It changes right away without restarting the story, and your choice is remembered on that device. Slower devices now start on Simple.
+- If the city runs too slowly for a few seconds, it now steps down a graphics level by itself (Full to Simple, Simple to Off) and shows a brief note. It never goes back up on its own, stops once you pick a level yourself, and a drop to Simple is remembered on that device (a drop to Off lasts only for that visit).
+- Your heroes stand in the city as cut-out cards: your main beside you, your most-played heroes around the map, placed from your stats.
+- On desktop the story cards are slimmer and step left and right, leaving room for the city beside them.
+- The "how you kill" card now names your nemesis, the hero that has killed you the most, with their picture and how many times, so the duel in the city behind it makes sense. It shows at every graphics level, and stays hidden until we really know who your nemesis is.
+
 ### Fixed
 
-- On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger (#70).
+- Heroes in the city whose art we don't have yet (new heroes from a patch) now stand as a plain grey silhouette instead of failing to load. A hero repeated in your top heroes no longer stands twice in the line-up, and a story with an empty top-heroes list still shows your main.
+- On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger.
+- On shorter phones the top edge of the story frame is no longer cut off.
+- With graphics turned Off (from the cube button), the still picture of the city is now sharp on large and high-resolution screens instead of blurry.
+- On the smallest phones the roster slide no longer spills past the bottom of the card: when the list of top heroes cannot fit, the recent-form lines are left out.
 
 ## [0.2.0] - 2026-10-11
 
@@ -60,6 +78,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - The Render build no longer installs pnpm globally, because Render's global modules folder is read-only.
 - Failed Steam vanity-URL lookups are now logged with the reason. They had failed intermittently in production right after the first deploy.
 
-[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/21pdavis/soul-ledger/releases/tag/v0.1.0
