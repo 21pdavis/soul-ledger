@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-16
+* **Decision**: [ADR 0074](decisions/0074-no-ci-run-on-staging-pushes.md): CI no longer runs on pushes to staging (the up-to-date PR run already covers it), and a new commit on a PR cancels its older run. Amends ADR 0063 (owner decision).
 * **Milestone**: release 0.3.1 prepared: the city behind the landing page ([ADR 0073](decisions/0073-city-behind-the-landing-page.md), #95), a patch release per [ADR 0068](decisions/0068-m3-scope-and-order.md).
 
 ## 2026-10-15
