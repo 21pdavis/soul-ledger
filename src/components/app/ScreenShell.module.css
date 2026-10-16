@@ -1,13 +1,27 @@
+/* Above the city backdrop (a fixed layer, World.module.css), which shows through the dusk tint. */
 .shell {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
   padding: 1.5rem 1rem 1rem;
-  background: radial-gradient(ellipse 80% 50% at 50% 0%, #251b2e 0%, var(--ink) 70%);
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgb(37 27 46 / 0.75) 0%,
+    color-mix(in srgb, var(--ink) 60%, transparent) 70%
+  );
 }
 
 .main {
   display: grid;
   flex: 1;
   place-items: center;
+}
+
+/* Phone: keep the notice's right edge clear for the graphics icon (World.module.css, #79). */
+@media not ((min-width: 1024px) and (pointer: fine)) {
+  .shell > :last-child {
+    padding-right: 2.75rem;
+  }
 }

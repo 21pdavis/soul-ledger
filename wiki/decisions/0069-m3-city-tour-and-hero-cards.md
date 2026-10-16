@@ -47,5 +47,5 @@ M3 step 1 ([ADR 0068](0068-m3-scope-and-order.md)) built style previews on a hid
 # How it is built
 
 - The player reports its current slide (`onSlideChange`), and the story stage puts the world layer behind it.
-- The 3D code loads only after the story starts. Off (also chosen for reduced motion, and wherever WebGL is missing) shows a still render of the city (`public/world/still.webp`, our own render).
+- The 3D code loads only after the story starts (amended by [ADR 0073](0073-city-behind-the-landing-page.md): the landing page now shows the city too). Off (also chosen for reduced motion, and wherever WebGL is missing) shows a still render of the city (`public/world/still.webp`, our own render).
 - Browser tests run with graphics Off by default, because test browsers draw WebGL in software, far too slowly for the story tests. `world.spec.ts` turns graphics back on to test the world itself.

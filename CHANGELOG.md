@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Added
+
+- The front page now has the city behind it too, slowly circling from above while you paste your profile, and it stays there while your ledger loads. It follows the same graphics setting as the story (the cube button in the corner works here too).
+
 ## [0.3.0] - 2026-10-15
 
 **Milestone M3: the city behind the story.** A low-poly copy of the Cursed Apple now sits behind your story, and the camera tours it slide by slide. Heroes stand in the city as cut-out cards placed from your stats, and the duel shows your real nemesis. Posed 3D hero models come later.

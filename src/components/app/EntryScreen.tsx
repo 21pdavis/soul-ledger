@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { validateProfileInput } from "@/lib/client/profile-input";
 import type { Prefs } from "@/lib/client/prefs";
 import { useIsClient } from "@/components/story/useIsClient";
@@ -13,9 +13,18 @@ interface Props {
   /** The remembered URL and filters to start from. */
   initial: Prefs;
   onSubmit: (input: string, filters: LookupFilters) => void;
+  /**
+   * Coming back from a story or an error: the button that had focus is gone, so focus moves to
+   * the title and Tab goes on to the URL box. Not on a first visit, where focus is left alone.
+   */
+  focusTitle?: boolean;
 }
 
-export function EntryScreen({ initial, onSubmit }: Props) {
+export function EntryScreen({ initial, onSubmit, focusTitle = false }: Props) {
+  const title = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (focusTitle) title.current?.focus();
+  }, [focusTitle]);
   const [url, setUrl] = useState(initial.url);
   const [filters, setFilters] = useState(initial.filters);
   const [invalid, setInvalid] = useState(false);
@@ -47,7 +56,9 @@ export function EntryScreen({ initial, onSubmit }: Props) {
           <path d="M60 4 L60 36 M44 8 L60 4 L76 8 M30 14 L60 4 L90 14 M18 22 L60 4 L102 22" />
           <path d="M6 36 H114" />
         </svg>
-        <h1 className={styles.title}>{ENTRY_COPY.title}</h1>
+        <h1 ref={title} tabIndex={-1} className={styles.title}>
+          {ENTRY_COPY.title}
+        </h1>
         <p className={styles.tagline}>{ENTRY_COPY.tagline}</p>
       </header>
 
