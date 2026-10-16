@@ -199,6 +199,7 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
             key={lastEntry ? "typed" : stored ? "restored" : "initial"}
             initial={lastEntry ?? stored ?? defaultPrefs()}
             onSubmit={submit}
+            focusTitle={request !== null}
           />
         )}
         {phase.name === "loading" && (

@@ -66,4 +66,18 @@ describe("App to story player props", () => {
     expect(screen.getByLabelText("Paste your Steam profile URL")).toHaveValue(URL_A);
     expect(screen.queryByTestId("story-player")).not.toBeInTheDocument();
   });
+
+  it("Look up another player puts focus on the entry title, so Tab goes on to the URL box", async () => {
+    const { enter, user } = setup(ndjson(storyEvent()));
+    await enter();
+    await user.click(await screen.findByRole("button", { name: "Look up another player" }));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByLabelText("Paste your Steam profile URL")).toHaveFocus();
+  });
+
+  it("does not move focus on the first visit to the entry screen", () => {
+    setup();
+    expect(document.body).toHaveFocus();
+  });
 });
