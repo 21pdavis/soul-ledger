@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import * as THREE from "three";
 import { CARD_SIDES, LANE_CHANGES, routeAt, routeTangent, shotPosition, type Shot } from "./tour";
 import { sceneShift } from "./framing";
+import { flightProgress, planHop, routeS as routeAlong, weaveOffset } from "./flight";
 
 /**
  * The camera rotation that looks from `eye` at `target`. Looking (nearly) straight down, "up" on
@@ -20,12 +21,6 @@ function orientation(eye: THREE.Vector3, target: THREE.Vector3, out: THREE.Quate
   return out.setFromRotationMatrix(lookMatrix);
 }
 
-const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
-
-/** Cruise speed along the route, in world units a second. */
-const SPEED = 24;
-/** How far the camera drifts sideways at the middle of a hop between stops. */
-const WEAVE = 2.4;
 /** Only wide screens show the desktop card stack; phones keep the scene centred. */
 const WIDE_ASPECT = 1.2;
 
@@ -107,37 +102,32 @@ export function TourRig({ shots: storyShots, slide }: { shots: Shot[]; slide: nu
     const f = flight.current;
     if (f.target !== i) {
       // Start a new hop from wherever the camera is, even mid-flight.
-      const from = routeS.current;
-      const crossesLanes =
-        from !== null &&
-        shot.kind === "route" &&
-        LANE_CHANGES.some((c) => (c - from) * (c - shot.s) < 0);
-      const onRoute = from !== null && shot.kind === "route" && !crossesLanes;
-      const dist = onRoute
-        ? Math.abs(shot.s - routeS.current!)
-        : cam.position.distanceTo(shotPosition(shot, a));
-      f.route = onRoute ? { from: routeS.current!, to: shot.s } : null;
+      const hop = planHop({
+        fromS: routeS.current,
+        shot,
+        laneChanges: LANE_CHANGES,
+        freeDistance: () => cam.position.distanceTo(shotPosition(shot, a)),
+      });
+      f.route = hop.route;
       f.target = i;
       f.start = now;
-      f.duration = onRoute
-        ? THREE.MathUtils.clamp(dist / SPEED, 1.4, 6)
-        : THREE.MathUtils.clamp(1.2 + dist / 70, 1.6, 3.6);
+      f.duration = hop.duration;
       f.fromPos.copy(cam.position);
       f.fromLook.copy(look.current);
       f.fromQuat.copy(cam.quaternion);
       f.weaveSign = -f.weaveSign;
       f.fromSide = side.current;
-      f.lift = crossesLanes ? THREE.MathUtils.clamp(dist * 0.35, 22, 45) : 0;
+      f.lift = hop.lift;
     }
 
-    const k = ease(Math.min(1, (now - f.start) / f.duration));
+    const k = flightProgress(now, f.start, f.duration);
     if (f.route) {
-      const s = THREE.MathUtils.lerp(f.route.from, f.route.to, k);
+      const s = routeAlong(f.route, k);
       routeS.current = s;
       routeAt(s, cam.position);
       // Weave: a sideways arc that is zero at both stops.
       const t = routeTangent(s, a);
-      side.current = f.fromSide * (1 - k) + Math.sin(Math.PI * k) * WEAVE * f.weaveSign;
+      side.current = weaveOffset(f.fromSide, k, f.weaveSign);
       cam.position.x += -t.z * side.current;
       cam.position.z += t.x * side.current;
       // Look down the road while travelling, settling on the stop at either end.
