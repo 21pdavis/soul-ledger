@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-15
+* **Decision**: [ADR 0072](decisions/0072-concise-reviews-one-thread-per-finding.md): agent reviews list problems only, one comment per finding with inline suggested changes; a re-review waits until every thread is resolved or (rarely) blocked.
 * **Decision**: [ADR 0071](decisions/0071-remember-auto-drop-but-never-save-off.md): an automatic graphics drop to Simple is remembered on the device, a drop to Off lasts only for the visit, and Off is only saved by the reader's choice. Resolves the [auto-drop question](open-questions/auto-drop-memory.md); the code already did this.
 * **Milestone**: [M3 plan](recommendations/m3-plan.md): the cube graphics button (#79) and the sharper Off still (#86) are in `staging` and ship in release 0.3.0, not a 0.3.1 (owner decision).
 * **Decision**: [0070](decisions/0070-graphics-button-is-a-corner-icon.md): the graphics button becomes a cube icon in the screen's bottom-right corner, outside the story frame (#79).

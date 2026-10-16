@@ -109,12 +109,13 @@ Rules for agents:
 - **PRs gate every change.** Never push directly to `staging` or `main`, never force-push either, and never push to a branch after its PR has merged. Every change, including one-line doc fixes, goes through a PR with green CI.
 - Cut feature branches from `staging` and open PRs **into `staging`**. You may merge your own PR into `staging` only when **both** of these hold:
   1. **CI passes** on the PR's final commit.
-  2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts its findings as a PR comment (`pnpm bot:gh pr comment`, ADR 0059), even when it finds nothing.
+  2. **An agent review is done.** A separate reviewer agent, not the one that wrote the change, reviews the full diff against the plan, the ADRs and the TDD rule. It posts a PR review as the bot (`pnpm bot:gh`, ADR 0059): one comment per problem, inline with a suggested change where it can, and no summary of what was fine (ADR 0072).
 - **Act on agent review feedback without being asked**, as if the owner had said "go fix the feedback on this PR".
   - **Blocking** findings must be fixed. The only exception is a finding that turns on a business decision only the owner can make: ask the owner and don't merge until they answer. Never dismiss a blocking finding on your own.
   - **Non-blocking** findings and nits are fixed, or answered in a PR reply explaining why not.
-  - Fix **all findings from a review round in one commit and one push**, with one PR reply listing each fix. Every fix commit needs CI to pass again before merging.
-  - **Re-review only if the review had a blocking finding or the fixes were substantial.** If only non-blocking findings and nits remained, fix them and merge once CI passes, with no extra review pass (ADR 0047).
+  - Fix **all findings from a review round in one commit and one push**. Then reply on each finding's thread (what changed, or why not) and resolve it. Every fix commit needs CI to pass again before merging.
+  - **Blocked** threads are rare: only a decision only the owner can make. Reply `Blocked: <question>`, leave the thread open, and ask the owner.
+  - **Re-review only once every thread is resolved or blocked**, and only if the review had a blocking finding or the fixes were substantial. If only non-blocking findings and nits remained, fix them and merge once CI passes, with no extra review pass (ADR 0047, 0072).
   - **Scale reviewer effort to the change:** `medium` for docs or config only, `high` (Sonnet, the reviewer's default model) for code, `xhigh` on Opus (the orchestrator passes `model: "opus"`) for auth, data integrity, migrations or security (ADR 0057).
 - PRs into `staging` don't need the owner's review. **`staging` → `main` always does**, and only the owner merges it.
 - **Tell the owner about every merge.** Whenever you merge a PR, or notice that one was merged (including the owner's `staging` → `main`), report it in the conversation straight away: PR number and link, a one-line summary, the agent review outcome, and the CI result. During long unattended runs, also send a push notification. Don't batch merges silently into an end-of-run summary.
