@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
-import { KILLS_COPY, headlineFor, killsTotalLabel } from "@/story/copy";
+import { KILLS_COPY, headlineFor, killsTotalLabel, nemesisKillsLine } from "@/story/copy";
+import { heroName } from "@/story/heroes";
 import { killRows, rangeShares } from "@/story/kill-shares";
+import { HeroTile } from "../HeroTile";
 import { SlideFrame } from "../SlideFrame";
 import { StoryCountUp } from "../StoryCountUp";
 import type { SlideComponent } from "./contract";
@@ -8,7 +10,7 @@ import styles from "./KillsSlide.module.css";
 
 /** Slide 5: how you kill. The total, the four kinds of kill, and close-up versus long-distance. */
 export const KillsSlide: SlideComponent = ({ story, skipAnimation, reducedMotion, paused }) => {
-  const { kills } = story;
+  const { kills, nemesis } = story;
   const animate = !skipAnimation && !reducedMotion;
   const rows = killRows(kills);
   const range = rangeShares(kills.closeup, kills.longDistance);
@@ -97,6 +99,20 @@ export const KillsSlide: SlideComponent = ({ story, skipAnimation, reducedMotion
             </span>
           </div>
         </div>
+
+        {/* Who the city's duel is against. Unknown killers name no one, not the stand-in rival. */}
+        {nemesis && (
+          <p className={styles.nemesis} data-testid="kill-nemesis">
+            <HeroTile heroId={nemesis.heroId} />
+            <span className={styles.nemesisText}>
+              <span className={styles.nemesisLabel}>{KILLS_COPY.nemesis}</span>
+              <span>
+                <span className={styles.nemesisName}>{heroName(nemesis.heroId)}</span>{" "}
+                <span className={styles.nemesisKills}>{nemesisKillsLine(nemesis.kills)}</span>
+              </span>
+            </span>
+          </p>
+        )}
       </div>
     </SlideFrame>
   );

@@ -20,6 +20,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - If the city runs too slowly for a few seconds, it now steps down a graphics level by itself (Full to Simple, Simple to Off) and shows a brief note. It never goes back up on its own, stops once you pick a level yourself, and a drop to Simple is remembered on that device (a drop to Off lasts only for that visit).
 - Your heroes stand in the city as cut-out cards: your main beside you, your most-played heroes around the map, placed from your stats.
 - On desktop the story cards are slimmer and step left and right, leaving room for the city beside them.
+- The "how you kill" card now names your nemesis, the hero that has killed you the most, with their picture and how many times, so the duel in the city behind it makes sense. It shows at every graphics level, and stays hidden until we really know who your nemesis is.
 
 ### Fixed
 
@@ -27,6 +28,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger.
 - On shorter phones the top edge of the story frame is no longer cut off.
 - With graphics turned Off (from the cube button), the still picture of the city is now sharp on large and high-resolution screens instead of blurry.
+- On the smallest phones the roster slide no longer spills past the bottom of the card: when the list of top heroes cannot fit, the recent-form lines are left out.
 
 ## [0.2.0] - 2026-10-11
 

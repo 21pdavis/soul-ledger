@@ -28,12 +28,13 @@ export const RosterSlide: SlideComponent = ({ story, skipAnimation, reducedMotio
   const verdict = rosterVerdict(roster.label);
   const heroTrends = roster.topHeroes.map((h) => recentTrend(h.winRate, h.recent));
   const overall = recentTrend(story.intro.winRate, roster.recent);
-  // The slide never scrolls, so the list of top heroes shows as many as the stage has room for.
-  const { ref, count: shown } = useFitCount(roster.topHeroes.length, MIN_TOP_HEROES);
+  // The slide never scrolls, so the list of top heroes shows as many as the stage has room for;
+  // when even the shortest list overflows, the recent-form lines go (as on the smallest stages).
+  const { ref, count: shown, tight } = useFitCount(roster.topHeroes.length, MIN_TOP_HEROES);
 
   return (
     <SlideFrame headline={headlineFor("roster")}>
-      <div className={styles.slide} ref={ref}>
+      <div className={styles.slide} ref={ref} data-tight={tight || undefined}>
         <SlideReveal index={0} animate={playing} kind="stamp">
           <p data-testid="roster-heroes" className={styles.count}>
             <StoryCountUp
