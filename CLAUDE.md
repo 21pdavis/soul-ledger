@@ -171,6 +171,8 @@ Runs are limited by usage, so every agent follows these (reasoning and the rest 
 
 For autonomous runs, the **main session is the orchestrator**. It splits the milestone plan into PR-sized tasks, dispatches the specialists below, merges into `staging` when the rules above allow, reports every merge, and escalates only real blockers. The specialists carry their role in their agent file; every rule in this CLAUDE.md applies to all of them.
 
+**Parallel work means agents, not sessions.** When asked to do things in parallel, use background agents (`implementer`, `reviewer`, a Haiku agent for CI triage), never new sessions.
+
 | Agent | Does | Can't |
 |---|---|---|
 | `implementer` | One task → one branch (in its own worktree) → one PR into `staging`, with strict TDD | Merge, push to `staging`/`main`, touch production or secrets |
