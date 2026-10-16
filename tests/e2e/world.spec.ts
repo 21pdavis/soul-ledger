@@ -147,6 +147,21 @@ test("the graphics icon shows only an icon on a phone, and names its level on ho
   await expect(label).toBeVisible();
 });
 
+test("on desktop the graphics icon names its level when reached by keyboard", async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== "desktop", "desktop only");
+  await openStory(page);
+  const button = page.getByTestId("graphics-button");
+  test.skip((await button.count()) === 0, "this browser has no WebGL");
+  const label = button.getByText("Graphics: Off");
+  await expect(label).toBeHidden();
+  // A key press makes the next focus a keyboard focus (:focus-visible), as tabbing to it would.
+  await page.keyboard.press("Shift");
+  await button.focus();
+  await expect(label).toBeVisible();
+});
+
 test("the world follows the story: its slide updates when the slide changes", async ({ page }) => {
   await openStory(page);
   const world = page.getByTestId("world");

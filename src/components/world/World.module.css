@@ -79,6 +79,12 @@
     bottom: 1rem;
   }
 
+  /* Clear of the desktop button (1rem from the bottom, 2.25rem tall). */
+  .graphicsNote {
+    right: 1rem;
+    bottom: 3.75rem;
+  }
+
   .graphics:hover,
   .graphics:focus-visible {
     gap: 0.5rem;
@@ -110,7 +116,10 @@
   background: rgb(20 16 24 / 0.8);
   font-family: var(--font-body);
   font-size: 0.75rem;
-  white-space: nowrap;
+  /* Never wider than a narrow phone; wraps onto a second line there instead. */
+  max-width: calc(100vw - 0.75rem);
+  box-sizing: border-box;
+  text-align: right;
   pointer-events: none;
   animation: graphicsNoteFade 5s ease-out forwards;
 }
