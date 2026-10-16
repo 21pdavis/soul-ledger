@@ -17,6 +17,8 @@ import type { StoryWindow } from "@/lib/lookup";
 import type { ErrorKind } from "@/story/copy";
 import type { LookupFilters } from "@/story/filters";
 import type { SlideProps, StoryActions, StoryData, StoryMeta } from "@/story/types";
+import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
+import { WorldLayer } from "@/components/world/WorldLayer";
 import { EntryScreen } from "./EntryScreen";
 import { Disclaimer } from "./Disclaimer";
 import { ErrorScreen } from "./ErrorScreen";
@@ -61,6 +63,7 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
   const [lastEntry, setLastEntry] = useState<Prefs | null>(null);
   const [stalled, setStalled] = useState(false);
   const running = useRef<AbortController | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
 
   // Remembered URL and filters. `null` while server rendering, so hydration matches.
   const stored = useSyncExternalStore(subscribeNothing, readPrefsSnapshot, () => null);
@@ -184,33 +187,38 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
     );
   }
 
+  // The city sits behind the entry, loading and error screens as scenery (no story to follow
+  // yet). It stays mounted across them; the story mounts its own, which follows the slides.
   return (
-    <ScreenShell>
-      {phase.name === "entry" && (
-        <EntryScreen
-          // Remount when the remembered values arrive (after hydration) or change.
-          key={lastEntry ? "typed" : stored ? "restored" : "initial"}
-          initial={lastEntry ?? stored ?? defaultPrefs()}
-          onSubmit={submit}
-        />
-      )}
-      {phase.name === "loading" && (
-        <LoadingScreen
-          progress={phase.progress}
-          countMs={phase.countMs}
-          stalled={stalled}
-          onRetry={() => request && void run(request)}
-        />
-      )}
-      {phase.name === "error" && (
-        <ErrorScreen
-          kind={phase.kind}
-          window={phase.window}
-          excludedMatches={phase.excludedMatches}
-          onRetry={() => request && void run(request)}
-          onNewLookup={actions.onNewLookup}
-        />
-      )}
-    </ScreenShell>
+    <>
+      <WorldLayer started reducedMotion={reducedMotion} />
+      <ScreenShell>
+        {phase.name === "entry" && (
+          <EntryScreen
+            // Remount when the remembered values arrive (after hydration) or change.
+            key={lastEntry ? "typed" : stored ? "restored" : "initial"}
+            initial={lastEntry ?? stored ?? defaultPrefs()}
+            onSubmit={submit}
+          />
+        )}
+        {phase.name === "loading" && (
+          <LoadingScreen
+            progress={phase.progress}
+            countMs={phase.countMs}
+            stalled={stalled}
+            onRetry={() => request && void run(request)}
+          />
+        )}
+        {phase.name === "error" && (
+          <ErrorScreen
+            kind={phase.kind}
+            window={phase.window}
+            excludedMatches={phase.excludedMatches}
+            onRetry={() => request && void run(request)}
+            onNewLookup={actions.onNewLookup}
+          />
+        )}
+      </ScreenShell>
+    </>
   );
 }

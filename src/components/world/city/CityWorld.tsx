@@ -30,8 +30,9 @@ import {
   Standee,
   Truck,
 } from "./Props";
+import { AmbientRig } from "./AmbientRig";
 import { TourRig } from "./TourRig";
-import { planTour, routeConnectors } from "./tour";
+import { planTour, routeConnectors, type TourPlan } from "./tour";
 
 /** A dusk sky: dark blue-grey overhead, mauve, then a warm band at the horizon. */
 function Sky() {
@@ -367,17 +368,37 @@ function Lanes({ simple }: { simple: boolean }) {
   );
 }
 
+/** The reader's heroes, duel and death map, placed for the story, with the camera following it. */
+function StoryCast({ tour, slide }: { tour: TourPlan; slide: number }) {
+  return (
+    <>
+      {tour.cast.map((m, i) => (
+        <Standee key={i} member={m} />
+      ))}
+      <DuelStage duel={tour.duel} />
+      <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
+      <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
+      <DeathProjector bins={tour.deaths} on={slide === 7} />
+      <TourRig shots={tour.shots} slide={slide} />
+    </>
+  );
+}
+
+/**
+ * The city. With a story, its heroes stand in it and the camera follows the slides. Without one
+ * (the landing page) it is scenery: just the city, with the camera circling it slowly.
+ */
 export default function CityWorld({
-  slide,
+  slide = 0,
   story,
   simple = false,
 }: {
-  slide: number;
-  story: StoryData;
+  slide?: number;
+  story?: StoryData;
   /** The Simple graphics level: the same scene with fewer street props. */
   simple?: boolean;
 }) {
-  const tour = useMemo(() => planTour(story), [story]);
+  const tour = useMemo(() => (story ? planTour(story) : null), [story]);
   // Keep the camera's hops between lanes clear of buildings.
   const buildings = useMemo(
     () => [
@@ -408,14 +429,7 @@ export default function CityWorld({
       <Buildings buildings={buildings} />
       <Lanes simple={simple} />
       <Landmarks />
-      {tour.cast.map((m, i) => (
-        <Standee key={i} member={m} />
-      ))}
-      <DuelStage duel={tour.duel} />
-      <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
-      <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
-      <DeathProjector bins={tour.deaths} on={slide === 7} />
-      <TourRig shots={tour.shots} slide={slide} />
+      {tour ? <StoryCast tour={tour} slide={slide} /> : <AmbientRig />}
     </>
   );
 }

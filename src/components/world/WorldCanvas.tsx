@@ -42,8 +42,9 @@ export default function WorldCanvas({
   level = "full",
   onSlow,
 }: {
-  slide: number;
-  story: StoryData;
+  slide?: number;
+  /** Leave out for the landing page: the city as scenery, with no story to follow. */
+  story?: StoryData;
   level?: GraphicsLevel;
   /** Called once if the frame rate stays too low; leave out to stop watching. */
   onSlow?: () => void;

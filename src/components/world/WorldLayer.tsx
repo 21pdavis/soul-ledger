@@ -26,13 +26,14 @@ import {
 import type { StoryData } from "@/story/types";
 import styles from "./World.module.css";
 
-// The 3D code (three.js and the city) loads only when it is needed, after the story starts.
+// The 3D code (three.js and the city) loads only when it is needed: once the page is up.
 const WorldCanvas = lazy(() => import("./WorldCanvas"));
 
 interface Props {
-  story: StoryData;
+  /** Leave out on the landing page: the city is scenery there, with no story to follow yet. */
+  story?: StoryData;
   /** The story's current slide; the camera follows it. */
-  slide: number;
+  slide?: number;
   /** True once the story is up. The 3D never delays the loading screen or the story (ADR 0068). */
   started: boolean;
   /** Overrides for tests; by default they are read from the browser. */
@@ -84,7 +85,7 @@ class StillOnError extends Component<{ children: ReactNode }, { failed: boolean 
  * picture of it on Off (and wherever WebGL is missing or the 3D fails). Purely decorative: hidden
  * from assistive technology and never takes the pointer.
  */
-export function WorldLayer({ story, slide, started, webgl, reducedMotion }: Props) {
+export function WorldLayer({ story, slide = 0, started, webgl, reducedMotion }: Props) {
   // The level depends on the browser (WebGL, saved choice), which the server cannot see. Decide
   // it only once the browser has taken over, so server and first browser render match.
   const client = useIsClient();
