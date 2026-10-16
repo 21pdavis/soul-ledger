@@ -1,4 +1,4 @@
-import { render, screen, within, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, within, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { heroArtSrc } from "@/components/story/HeroTile";
 import { KillsSlide } from "@/components/story/slides/KillsSlide";
@@ -24,7 +24,11 @@ function renderKills(
 function renderWithNemesis(nemesis: ReturnType<typeof fixtureStory>["nemesis"]) {
   const story = fixtureStory();
   return render(
-    <KillsSlide {...fixtureSlideProps({ story: { ...story, nemesis } })} {...flags} reducedMotion />,
+    <KillsSlide
+      {...fixtureSlideProps({ story: { ...story, nemesis } })}
+      {...flags}
+      reducedMotion
+    />,
   );
 }
 
@@ -116,6 +120,14 @@ describe("KillsSlide", () => {
     it("says 'once', not '1 times', for a single kill", () => {
       renderWithNemesis({ heroId: 15, kills: 1 });
       expect(screen.getByTestId("kill-nemesis")).toHaveTextContent("killed you once");
+    });
+
+    it("falls back to the hero's initials when the picture fails to load", () => {
+      renderWithNemesis({ heroId: 15, kills: 12 });
+      const blurb = screen.getByTestId("kill-nemesis");
+      fireEvent.error(blurb.querySelector("img")!);
+      expect(blurb.querySelector("img")).toBeNull();
+      expect(within(blurb).getByText("Bebop")).toBeInTheDocument();
     });
 
     it("names no one while the killers are still unknown (no stand-in rival)", () => {

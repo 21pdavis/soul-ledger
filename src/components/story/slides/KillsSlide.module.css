@@ -241,9 +241,9 @@
     font-size: clamp(2.25rem, 15cqw, 2.75rem);
   }
 
+  /* A flourish: on short stages the room goes to the nemesis line. */
   .lead {
-    font-size: 0.875rem;
-    line-height: 1.3;
+    display: none;
   }
 
   .ledger {
@@ -292,10 +292,6 @@
     font-size: 0.8rem;
   }
 
-  .lead {
-    font-size: 0.8rem;
-  }
-
   .ledger {
     gap: 0.15rem;
   }
@@ -317,20 +313,21 @@
 
   .nemesis {
     gap: 0.5rem;
-    padding-top: 0.35rem;
-    font-size: 0.75rem;
+    padding-top: 0.25rem;
+    font-size: 0.7rem;
   }
 
-  /* One line where it fits: a smaller tile, and the label beside the name rather than above it. */
+  /* A smaller tile beside two short lines: the label over the name and count. */
   .nemesis > [aria-hidden="true"] {
     --size: 1.5rem;
   }
 
   .nemesisText {
-    flex-direction: row;
-    flex-wrap: wrap;
-    column-gap: 0.4rem;
-    align-items: baseline;
+    line-height: 1.15;
+  }
+
+  .nemesisLabel {
+    font-size: 0.6rem;
   }
 
   /* Too narrow for both labels side by side. */
