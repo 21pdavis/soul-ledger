@@ -26,7 +26,7 @@ The owner settled M3 in a grilling session on 2026-10-11. Since the original pla
 | Heroes in it | Your **main hero is a constant companion**, other heroes appear around the world, and **duels** stage two heroes facing off in lane (e.g. Celeste casting vs Doorman throwing a bell, Venator aiming) |
 | Duel opponent | Your **nemesis**: the hero that killed you most (`death_details` killer slot). Fallback: hand-picked stock pairings |
 | Sound | None in M3 (backlog) |
-| Loading | The 3D loads after the story starts and fades in; it **never delays** the loading screen or the story |
+| Loading | The 3D loads after the story starts and fades in; it **never delays** the loading screen or the story. (Amended by [ADR 0073](0073-city-behind-the-landing-page.md): it now loads on the landing page too, still without delaying anything.) |
 
 ## Heroes: cards first, models after a checkpoint
 

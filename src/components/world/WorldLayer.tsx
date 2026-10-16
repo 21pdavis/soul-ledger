@@ -34,7 +34,10 @@ interface Props {
   story?: StoryData;
   /** The story's current slide; the camera follows it. */
   slide?: number;
-  /** True once the story is up. The 3D never delays the loading screen or the story (ADR 0068). */
+  /**
+   * True once the 3D may load: when the story is up, or straight away on the landing page. The
+   * 3D never delays the loading screen or the story (ADR 0068, 0073).
+   */
   started: boolean;
   /** Overrides for tests; by default they are read from the browser. */
   webgl?: boolean;
@@ -81,9 +84,10 @@ class StillOnError extends Component<{ children: ReactNode }, { failed: boolean 
 }
 
 /**
- * The world behind the story (ADR 0068, 0069): the low-poly city on Full or Simple, or a still
- * picture of it on Off (and wherever WebGL is missing or the 3D fails). Purely decorative: hidden
- * from assistive technology and never takes the pointer.
+ * The world behind the story, or behind the landing page as scenery (ADR 0068, 0069, 0073): the
+ * low-poly city on Full or Simple, or a still picture of it on Off (and wherever WebGL is missing
+ * or the 3D fails). Purely decorative: hidden from assistive technology and never takes the
+ * pointer.
  */
 export function WorldLayer({ story, slide = 0, started, webgl, reducedMotion }: Props) {
   // The level depends on the browser (WebGL, saved choice), which the server cannot see. Decide
