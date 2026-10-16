@@ -55,6 +55,8 @@ function worstCaseStory() {
     closeup: 700000,
     longDistance: 234567,
   };
+  // The longest hero name as the nemesis, with a five-figure kill count.
+  story.nemesis = { heroId: 78, kills: 98765 };
   story.precision = { ...story.precision, parrySuccess: 12345, parryMiss: 9876 };
   story.midBoss = { claimed: 12345, stolen: 9876 };
   story.roast = {
@@ -180,6 +182,10 @@ test.describe("every slide fits its frame, worst case", () => {
           // A bigger stage never shows fewer rows than a smaller one: the climb has 14 distinct
           // badges, so every stage with the stage's usual room shows the full 7.
           if (!stale) await expect(frame.locator("ol li")).toHaveCount(7);
+        }
+        if (slide.id === "kills") {
+          // The worst case names a nemesis, so the fit check above really covers its line.
+          await expect(frame.getByTestId("kill-nemesis")).toBeVisible();
         }
         if (slide.id === "mvp") {
           // Spare room under the mentions: a wider fallback font on another machine (CI, a real
