@@ -35,9 +35,8 @@ interface Props {
   /** The story's current slide; the camera follows it. */
   slide?: number;
   /**
-   * True while the 3D may draw: on the landing page and once the story is up, but not while a
-   * lookup loads (the still stands in). The 3D never delays the loading screen or the story
-   * (ADR 0068, 0073).
+   * True once the 3D may load: when the story is up, or straight away on the landing page. The
+   * 3D never delays the loading screen or the story (ADR 0068, 0073).
    */
   started: boolean;
   /** Overrides for tests; by default they are read from the browser. */
@@ -146,20 +145,22 @@ export function WorldLayer({ story, slide = 0, started, webgl, reducedMotion }: 
         data-slide={slide}
         aria-hidden="true"
       >
-        {level === "off" || !started ? (
+        {level === "off" ? (
           <Still />
         ) : (
-          <StillOnError>
-            <Suspense fallback={null}>
-              <WorldCanvas
-                key={level}
-                slide={slide}
-                story={story}
-                level={level}
-                onSlow={picked === null ? onSlow : undefined}
-              />
-            </Suspense>
-          </StillOnError>
+          started && (
+            <StillOnError>
+              <Suspense fallback={null}>
+                <WorldCanvas
+                  key={level}
+                  slide={slide}
+                  story={story}
+                  level={level}
+                  onSlow={picked === null ? onSlow : undefined}
+                />
+              </Suspense>
+            </StillOnError>
+          )
         )}
       </div>
       {hasWebGL &&
