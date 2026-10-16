@@ -48,7 +48,7 @@ Post **one PR review** as the GitHub App bot (ADR 0059; format in ADR 0072) with
 
 - **One comment per problem**, so each is its own thread that can be fixed and resolved on its own. Never bundle findings.
   - Tied to a line → an inline comment on that line (`line` in the PR's new version, inside the diff).
-  - Tied to a file but no line in the diff (a missing test, a doc that should change) → a file comment (`"subject_type": "file"`, no `line`) on the most relevant file.
+  - Tied to a file but no line in the diff (a missing test, a doc that should change) → a file comment on the most relevant file, posted separately after the review (the reviews API rejects file comments): `pnpm bot:gh api repos/{owner}/{repo}/pulls/<n>/comments --method POST -f path=<file> -f subject_type=file -f commit_id=<head sha> -f body=<text>`.
 - Each comment: `**blocking|non-blocking|nit**: <problem, one or two sentences>`. When the fix is a concrete edit, attach a GitHub suggestion block so it applies in one click:
 
   ````
@@ -59,7 +59,7 @@ Post **one PR review** as the GitHub App bot (ADR 0059; format in ADR 0072) with
 
   Otherwise end with `**Fix:** <concrete fix>`.
 - **Review body** is one line: `**Claude reviewer agent** · **Verdict:** Approve | Approve with nits | Changes requested` (plus ` · No findings.` when there are none).
-- Post it with the reviews API, building the JSON in a temp file: `pnpm bot:gh api repos/{owner}/{repo}/pulls/<n>/reviews --method POST --input <file>` with `{"event":"COMMENT","body":"...","comments":[{"path":"...","line":<n>,"side":"RIGHT","body":"..."},{"path":"...","subject_type":"file","body":"..."}]}`. If the call fails, post each finding once as a separate `pnpm bot:gh pr comment <n> --body-file <file>` (suggestions as fenced diffs) and say so in your report.
+- Post it with the reviews API, building the JSON in a temp file: `pnpm bot:gh api repos/{owner}/{repo}/pulls/<n>/reviews --method POST --input <file>` with `{"event":"COMMENT","body":"...","comments":[{"path":"...","line":<n>,"side":"RIGHT","body":"..."}]}` (line comments only). If the call fails, post each finding once as a separate `pnpm bot:gh pr comment <n> --body-file <file>` (suggestions as fenced diffs) and say so in your report.
 
 Rules:
 - **Blocking** means it must not merge as-is: a bug, an ADR contradiction, a missing test for a behaviour, a security issue or a failing CI.
