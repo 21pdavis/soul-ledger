@@ -3,8 +3,9 @@ type: Open Question
 title: "Should an automatic graphics drop be remembered?"
 description: "Whether an automatic graphics drop is remembered on the device, only for the visit, or remembered except for Off."
 tags: [m3, graphics, performance]
-status: draft
-question_status: open
+status: stable
+question_status: resolved
+resolved_by: ../decisions/0071-remember-auto-drop-but-never-save-off.md
 recommendation: "Remember an auto-drop but never save an auto-drop to Off, so a one-off stall cannot leave the world hidden for good."
 raised_on: 2026-10-14
 generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-14T12:00:00Z }
@@ -22,4 +23,4 @@ generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-14T12:00:00Z }
 
 ## Recommendation
 
-Option 3. The code follows it for now: a drop to Simple is saved, a drop to Off applies for the visit only. The owner decides; if they pick another option, change `onSlow` in `WorldLayer.tsx` and write the ADR.
+Option 3. The code follows it for now: a drop to Simple is saved, a drop to Off applies for the visit only. Resolved 2026-10-15: the owner chose option 3 ([ADR 0071](../decisions/0071-remember-auto-drop-but-never-save-off.md)). If they pick another option, change `onSlow` in `WorldLayer.tsx` and write the ADR.
