@@ -241,9 +241,17 @@
     font-size: clamp(2.25rem, 15cqw, 2.75rem);
   }
 
-  /* A flourish: on short stages the room goes to the nemesis line. */
+  /* A flourish: on short stages the room goes to the nemesis line. Hidden visually only, so
+     screen readers still hear it. */
   .lead {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .ledger {

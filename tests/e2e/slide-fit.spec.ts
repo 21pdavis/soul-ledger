@@ -89,8 +89,15 @@ function worstCaseStory() {
   return story;
 }
 
-const SIZES: { width: number; height: number; phone: boolean; stale?: boolean }[] = [
+const SIZES: {
+  width: number;
+  height: number;
+  phone: boolean;
+  stale?: boolean;
+}[] = [
   { width: 320, height: 568, phone: true },
+  // Just past the small tier's cut-off (the frame is ~530px tall): the mid tier's sizes, little room.
+  { width: 320, height: 610, phone: true },
   { width: 360, height: 640, phone: true },
   { width: 375, height: 667, phone: true },
   { width: 320, height: 568, phone: true, stale: true },

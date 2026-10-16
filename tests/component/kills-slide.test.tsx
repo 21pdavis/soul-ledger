@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import { heroArtSrc } from "@/components/story/HeroTile";
 import { KillsSlide } from "@/components/story/slides/KillsSlide";
 import { KILLS_COPY, headlineFor } from "@/story/copy";
+import { heroName } from "@/story/heroes";
+import { monogramFor } from "@/story/monogram";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 
 const flags = { active: true, skipAnimation: false, reducedMotion: false, paused: false };
@@ -127,6 +129,7 @@ describe("KillsSlide", () => {
       const blurb = screen.getByTestId("kill-nemesis");
       fireEvent.error(blurb.querySelector("img")!);
       expect(blurb.querySelector("img")).toBeNull();
+      expect(within(blurb).getByText(monogramFor(heroName(15)))).toBeInTheDocument();
       expect(within(blurb).getByText("Bebop")).toBeInTheDocument();
     });
 
