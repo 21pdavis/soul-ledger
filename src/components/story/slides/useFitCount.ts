@@ -13,15 +13,19 @@ import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 export function useFitCount(
   max: number,
   min: number,
-): { ref: RefObject<HTMLDivElement | null>; count: number } {
+): { ref: RefObject<HTMLDivElement | null>; count: number; tight: boolean } {
   const ref = useRef<HTMLDivElement | null>(null);
   const [count, setCount] = useState(max);
+  // True when even `min` rows overflow: the slide must then give up something else to fit.
+  const [tight, setTight] = useState(false);
   // Bumped on every resize so the fit runs again even if `count` already is `max`.
   const [pass, setPass] = useState(0);
 
   useLayoutEffect(() => {
     const el = ref.current;
-    if (el && count > min && el.scrollHeight > el.clientHeight + 0.5) setCount(count - 1);
+    const overflows = !!el && el.scrollHeight > el.clientHeight + 0.5;
+    if (overflows && count > min) setCount(count - 1);
+    if (overflows && count <= min) setTight(true);
   }, [count, min, pass]);
 
   // A different list length (new data without a remount) starts the fit again from the full list.
@@ -29,6 +33,7 @@ export function useFitCount(
   if (seenMax !== max) {
     setSeenMax(max);
     setCount(max);
+    setTight(false);
     setPass((n) => n + 1);
   }
 
@@ -43,11 +48,12 @@ export function useFitCount(
         return;
       }
       setCount(max);
+      setTight(false);
       setPass((n) => n + 1);
     });
     observer.observe(el);
     return () => observer.disconnect();
   }, [max]);
 
-  return { ref, count };
+  return { ref, count, tight };
 }

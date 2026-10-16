@@ -286,3 +286,9 @@
     display: none;
   }
 }
+
+/* Whatever the stage size: when the shortest list still overflows, RosterSlide sets data-tight. */
+.slide[data-tight] .overall,
+.slide[data-tight] .recent {
+  display: none;
+}
