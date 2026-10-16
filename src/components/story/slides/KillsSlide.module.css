@@ -228,7 +228,7 @@
   }
 }
 
-@container (max-height: 519px) {
+@container (max-height: 589px) {
   .slide {
     gap: 0.5rem;
   }
