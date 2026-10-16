@@ -22,7 +22,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - Heroes in the city whose art we don't have yet (new heroes from a patch) now stand as a plain grey silhouette instead of failing to load. A hero repeated in your top heroes no longer stands twice in the line-up, and a story with an empty top-heroes list still shows your main.
 - On phones, tapping to open the final summary no longer also presses the Replay or Look up another player button underneath your finger.
 - On shorter phones the top edge of the story frame is no longer cut off.
-- With Graphics set to Off, the still picture of the city is now sharp on large and high-resolution screens instead of blurry.
+- With graphics turned Off (from the cube button), the still picture of the city is now sharp on large and high-resolution screens instead of blurry.
 
 ## [0.2.0] - 2026-10-11
 
