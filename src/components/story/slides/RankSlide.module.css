@@ -168,7 +168,8 @@
   }
 }
 
-@container (max-height: 519px) {
+/* Starts at 590px, not 520px, so a 320x610 phone still lists every row like a 320x568 one. */
+@container (max-height: 589px) {
   .content {
     gap: 0.5rem;
   }
