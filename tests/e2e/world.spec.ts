@@ -1,6 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
 import { GRAPHICS_KEY } from "../../src/lib/client/graphics";
-import { enter, mockLookup, ndjson, openEntry, stageSettled, storyEvent } from "./lookup-mock";
+import {
+  PROFILE,
+  enter,
+  mockLookup,
+  ndjson,
+  openEntry,
+  stageSettled,
+  storyEvent,
+} from "./lookup-mock";
 
 // The 3D world behind the story (ADR 0068, 0069), through the real flow with the lookup mocked.
 // Every spec starts with graphics Off (playwright.config.ts); the first test turns them back on.
@@ -15,8 +23,15 @@ async function openStory(page: Page) {
 test("the world mounts behind the story once it starts, and stays out of the way", async ({
   page,
 }) => {
-  await page.addInitScript((key) => localStorage.setItem(key, "full"), GRAPHICS_KEY);
-  await openStory(page);
+  // Full for the story only: the landing page has already started at Off. CI draws WebGL in
+  // software, and the landing city at Full stalls the entry form there (#97).
+  await mockLookup(page, ndjson({ type: "resolved", accountId: 1 }, storyEvent()));
+  await openEntry(page);
+  await page.evaluate((key) => localStorage.setItem(key, "full"), GRAPHICS_KEY);
+  await page.getByLabel("Paste your Steam profile URL").fill(PROFILE);
+  await page.getByRole("button", { name: "Open the ledger" }).click();
+  await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "intro");
+  await stageSettled(page);
   const world = page.getByTestId("world");
   await expect(world).toBeAttached();
   await expect(world).toHaveAttribute("aria-hidden", "true");
@@ -68,10 +83,10 @@ test("the corner button cycles the graphics level, stays clear of the controls, 
   // Switching is live: the story is still on its first slide.
   await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "intro");
 
+  // Remembered on the next visit: its first screen, the landing page, starts on Simple. (Not
+  // entering the story again: the landing city stalls the entry form under CI's software WebGL.)
   await page.reload();
-  await mockLookup(page, ndjson({ type: "resolved", accountId: 1 }, storyEvent()));
-  await enter(page);
-  await expect(page.getByTestId("story-stage")).toHaveAttribute("data-slide", "intro");
+  await expect(page.getByLabel("Paste your Steam profile URL")).toBeVisible();
   await expect(page.getByTestId("world")).toHaveAttribute("data-level", "simple");
   await expect(page.getByTestId("graphics-button")).toHaveAccessibleName(/Graphics: Simple/);
 });
