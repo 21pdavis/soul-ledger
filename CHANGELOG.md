@@ -4,6 +4,14 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-16
+
+**The city on the front page.** The 3D city from 0.3.0 now greets you before your story starts, too.
+
+### Added
+
+- The front page now has the city behind it too, slowly circling from above while you paste your profile, and it stays there while your ledger loads. It follows the same graphics setting as the story (the cube button in the corner works here too).
+
 ## [0.3.0] - 2026-10-15
 
 **Milestone M3: the city behind the story.** A low-poly copy of the Cursed Apple now sits behind your story, and the camera tours it slide by slide. Heroes stand in the city as cut-out cards placed from your stats, and the duel shows your real nemesis. Posed 3D hero models come later.
@@ -78,7 +86,8 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - The Render build no longer installs pnpm globally, because Render's global modules folder is read-only.
 - Failed Steam vanity-URL lookups are now logged with the reason. They had failed intermittently in production right after the first deploy.
 
-[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/21pdavis/soul-ledger/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/21pdavis/soul-ledger/releases/tag/v0.1.0
