@@ -11,6 +11,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 ### Fixed
 
 - On shorter phones the top edge of the story frame is no longer cut off.
+- With Graphics set to Off, the still picture of the city is now sharp on large and high-resolution screens instead of blurry.
 
 ## [0.3.0] - 2026-10-14
 
