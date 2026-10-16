@@ -1,13 +1,20 @@
 name: CI
 
-# One run per change (ADR 0047): PRs, plus pushes to the long-lived branches.
+# One run per change (ADR 0047): PRs, plus pushes to main. Not pushes to staging (ADR 0074):
+# every change reaches staging through a PR that must be up to date, so its PR run already
+# tested exactly what staging becomes.
 # Two depths (ADR 0063): a PR into staging runs the smoke end-to-end set; anything aimed at main
 # (the staging -> main PR, and pushes to main) runs the full suite with coverage.
 # Three parallel jobs: checks and unit tests on one runner, end-to-end split by device on two more.
 on:
   pull_request:
   push:
-    branches: [main, staging]
+    branches: [main]
+
+# A new commit on a PR cancels that PR's run still in progress; runs on main always finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   checks:
