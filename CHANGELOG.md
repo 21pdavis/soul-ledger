@@ -4,6 +4,14 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Changed
+
+- The Graphics button is now a small cube icon in the bottom-right corner of the screen, so it never covers the story on smaller phones. On a computer, hover over it to see the current level.
+
+### Fixed
+
+- On shorter phones the top edge of the story frame is no longer cut off.
+
 ## [0.3.0] - 2026-10-14
 
 **Milestone M3: the city behind the story.** A low-poly copy of the Cursed Apple now sits behind your story, and the camera tours it slide by slide. Heroes stand in the city as cut-out cards placed from your stats, and the duel shows your real nemesis. Posed 3D hero models come later.

@@ -1,5 +1,8 @@
 # Directory Update Log
 
+## 2026-10-15
+* **Decision**: [0070](decisions/0070-graphics-button-is-a-corner-icon.md): the graphics button becomes a cube icon in the screen's bottom-right corner, outside the story frame (#79).
+
 ## 2026-10-14
 * **Milestone**: [M3 plan](recommendations/m3-plan.md): 0.3.0 build is mostly in `staging` (world foundation #73, framing #74, graphics levels #75, real nemesis duels #76, auto-drop #77, hero cut-outs #80). Pending: the phone placement of the graphics button (#79, awaiting an owner design decision).
 * **Creation**: [Auto-drop memory](open-questions/auto-drop-memory.md): open question on whether an automatic graphics drop is remembered on the device.

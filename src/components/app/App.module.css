@@ -14,3 +14,10 @@
   align-items: center;
   background: var(--ink);
 }
+
+/* Phone: keep the bottom notice's right edge clear for the graphics icon (World.module.css, #79). */
+@media not ((min-width: 1024px) and (pointer: fine)) {
+  .notices > :last-child {
+    padding-right: 2.75rem;
+  }
+}
