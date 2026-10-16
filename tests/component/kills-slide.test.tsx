@@ -1,5 +1,6 @@
 import { render, screen, within, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { heroArtSrc } from "@/components/story/HeroTile";
 import { KillsSlide } from "@/components/story/slides/KillsSlide";
 import { KILLS_COPY, headlineFor } from "@/story/copy";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
@@ -17,6 +18,13 @@ function renderKills(
       {...flags}
       {...extra}
     />,
+  );
+}
+
+function renderWithNemesis(nemesis: ReturnType<typeof fixtureStory>["nemesis"]) {
+  const story = fixtureStory();
+  return render(
+    <KillsSlide {...fixtureSlideProps({ story: { ...story, nemesis } })} {...flags} reducedMotion />,
   );
 }
 
@@ -93,6 +101,28 @@ describe("KillsSlide", () => {
     expect(screen.getByText(KILLS_COPY.line)).toBeInTheDocument();
     expect(container.textContent).not.toMatch(/NaN|Infinity/);
     expect(container.innerHTML).not.toMatch(/NaN|Infinity/);
+  });
+
+  describe("nemesis (the hero that killed the reader most, ADR 0068)", () => {
+    it("names the nemesis with their picture and how often they killed the reader", () => {
+      renderWithNemesis({ heroId: 15, kills: 12 });
+      const blurb = screen.getByTestId("kill-nemesis");
+      expect(blurb).toHaveTextContent("Your nemesis");
+      expect(within(blurb).getByText("Bebop")).toBeInTheDocument();
+      expect(blurb).toHaveTextContent("killed you 12 times");
+      expect(blurb.querySelector("img")).toHaveAttribute("src", heroArtSrc(15, "sm"));
+    });
+
+    it("says 'once', not '1 times', for a single kill", () => {
+      renderWithNemesis({ heroId: 15, kills: 1 });
+      expect(screen.getByTestId("kill-nemesis")).toHaveTextContent("killed you once");
+    });
+
+    it("names no one while the killers are still unknown (no stand-in rival)", () => {
+      renderWithNemesis(null);
+      expect(screen.queryByTestId("kill-nemesis")).toBeNull();
+      expect(screen.queryByText(/nemesis/i)).toBeNull();
+    });
   });
 
   describe("entrance", () => {
