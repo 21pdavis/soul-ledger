@@ -22,7 +22,7 @@ Iterate on localhost first and get the owner's sign-off before PRs to `staging` 
 
 # 0.3.0 PR breakdown (draft, refine after step 2)
 
-Progress 2026-10-14: world foundation, graphics levels, auto-drop, nemesis and duels, and hero cut-outs are merged into `staging`. The story-following camera is partly done (framing in #74; the per-slide target tests are still owed). Update 2026-10-15: the graphics button is now a cube icon fixed bottom-right on all devices, with its label on hover on desktop ([ADR 0070](../decisions/0070-graphics-button-is-a-corner-icon.md), PR #79, merged into `staging` 2026-10-16 01:40 UTC). Off now shows a sharper still (PR #86, 2880x1800). The owner decided both ship in 0.3.0, not a 0.3.1. Whether an auto-drop is remembered is settled in [ADR 0071](../decisions/0071-remember-auto-drop-but-never-save-off.md).
+Progress 2026-10-14: world foundation, graphics levels, auto-drop, nemesis and duels, and hero cut-outs are merged into `staging`. The story-following camera is partly done (framing in #74; the per-slide target tests are still owed). Update 2026-10-15: the graphics button is now a cube icon fixed bottom-right on all devices, with its label on hover on desktop ([ADR 0070](../decisions/0070-graphics-button-is-a-corner-icon.md), PR #79, merged into `staging` 2026-10-15). Off now shows a sharper picture of the city (PR #86). The owner decided both ship in 0.3.0, not a 0.3.1. Whether an auto-drop is remembered is settled in [ADR 0071](../decisions/0071-remember-auto-drop-but-never-save-off.md).
 
 | PR | Scope | Tested by |
 |---|---|---|

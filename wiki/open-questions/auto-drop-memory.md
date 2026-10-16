@@ -23,4 +23,4 @@ generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-14T12:00:00Z }
 
 ## Recommendation
 
-Option 3. The code follows it for now: a drop to Simple is saved, a drop to Off applies for the visit only. Resolved 2026-10-15: the owner chose option 3 ([ADR 0071](../decisions/0071-remember-auto-drop-but-never-save-off.md)). If they pick another option, change `onSlow` in `WorldLayer.tsx` and write the ADR.
+Option 3. The code follows it for now: a drop to Simple is saved, a drop to Off applies for the visit only. Resolved 2026-10-15: the owner chose option 3 ([ADR 0071](../decisions/0071-remember-auto-drop-but-never-save-off.md)).
