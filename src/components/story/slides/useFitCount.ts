@@ -5,9 +5,9 @@ import { useLayoutEffect, useRef, useState, type RefObject } from "react";
  *
  * Starts at `max` and, while the box's content is taller than the box, drops one row at a time
  * (down to `min`) before the browser paints. If `min` still overflows it reports `tight`, so the
- * slide can drop its extras, and counts again from `max` with that room. It measures the real layout, so it holds for any
- * screen, font size or zoom without a table of breakpoints. When the box is resized (a phone
- * turned, a window dragged) it starts again from `max`.
+ * slide can drop its extras, and counts again from `max` with that room. It measures the real
+ * layout, so it holds for any screen, font size or zoom without a table of breakpoints. When the
+ * box is resized (a phone turned, a window dragged) it starts again from `max`.
  *
  * The box must have a definite height (it fills the slide body), so only its content can overflow.
  */
