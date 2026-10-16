@@ -228,7 +228,9 @@
   }
 }
 
-@container (max-height: 519px) {
+/* Kept equal to RankSlide's small tier (589px) on purpose, so the two short-stage tiers don't
+   drift apart again (#92, #94). */
+@container (max-height: 589px) {
   .slide {
     gap: 0.5rem;
   }
