@@ -6,7 +6,10 @@ import type { StoryMeta } from "./types";
  * client-computed one. A patch window without a patch date means the server fell back to all-time
  * data (#25), so it must not claim to be "this patch".
  */
-export function windowLabel(meta: Pick<StoryMeta, "window" | "patchStart">): string {
+export function windowLabel(
+  meta: Pick<StoryMeta, "window" | "patchStart" | "patchUnavailable">,
+): string {
+  if (meta.patchUnavailable) return "All time (couldn't find the patch date)";
   if (meta.window === "patch") {
     if (meta.patchStart) return `Since patch ${formatPatchDate(meta.patchStart)}`;
     return "All time (couldn't find the patch date)";

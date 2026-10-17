@@ -25,7 +25,7 @@ export interface LookupLimits {
  */
 export function createLookupHandler(deps: () => LookupDeps, limits: LookupLimits = {}) {
   return async function GET(request: Request): Promise<Response> {
-    // Before anything costs us a database write or a deadlock-api call (ADR 0075).
+    // Before anything costs us a database write or a deadlock-api call (ADR 0076).
     if (limits.limiter && !limits.exempt?.(request)) {
       const decision = limits.limiter.check(clientIp(request));
       if (!decision.allowed) {

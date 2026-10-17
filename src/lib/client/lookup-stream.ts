@@ -9,7 +9,7 @@ import type { Jsonify } from "@/story/types";
  */
 export type ClientLookupEvent =
   | Jsonify<LookupEvent>
-  /** Made by the client from an HTTP 429 (ADR 0075); the server never streams it. */
+  /** Made by the client from an HTTP 429 (ADR 0076); the server never streams it. */
   | { type: "error"; reason: "rate_limited"; retryAfter: number };
 
 export type ClientStoryEvent = Extract<ClientLookupEvent, { type: "story" }>;

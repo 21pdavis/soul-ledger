@@ -10,4 +10,4 @@
 * [Valve match files and the Steam cache](valve-match-files-and-steam-cache.md) - How match IDs and salts sit in Steam's httpcache, how Valve serves match files from them, and why a cache upload can't give full history (local experiment, 2026-10-08, scrapped).
 * [Primary test account](test-account.md) - The user's own Deadlock account, used as the main development and test case.
 * [The Cursed Apple map after City Never Sleeps](cursed-apple-map.md) - Layout, lane stops, bridges, objectives and look of Deadlock's map after the City Never Sleeps update, as reference for the M3 low-poly city.
-* [Client IP behind Render's proxy](render-client-ip.md) - Which header carries the real visitor address on Render (x-forwarded-for, first entry), and the spoofing caveat that applies to it.
+* [Client IP behind Render's proxy](render-client-ip.md) - On Render, Cloudflare sets true-client-ip and cf-connecting-ip to the real visitor address, while the first x-forwarded-for entry is whatever the client sent.

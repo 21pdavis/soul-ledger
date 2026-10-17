@@ -41,6 +41,7 @@ export function fakeApi() {
     },
     metricsFailWith: null as Error | null,
     lineupsFailWith: null as Error | null,
+    patchesFailWith: null as Error | null,
   };
 
   const guard = () => {
@@ -83,6 +84,7 @@ export function fakeApi() {
     },
     async getPatches() {
       guard();
+      if (state.patchesFailWith) throw state.patchesFailWith;
       state.calls.patches++;
       return patchEntry.array().parse(fixtureJson("api/patches.json"));
     },

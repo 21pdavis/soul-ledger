@@ -55,20 +55,63 @@ describe("createIpRateLimiter", () => {
 
   it("caps the number of live buckets, dropping the oldest, even inside one window", () => {
     const { limiter } = setup({ maxBuckets: 10 });
+    const limitOne = setup({ limit: 1, maxBuckets: 10 }).limiter;
     for (let i = 0; i < 50; i++) limiter.check(`10.0.0.${i}`);
     expect(limiter.size()).toBeLessThanOrEqual(10);
+
+    // The oldest bucket (10.0.0.0) is the one dropped; newer ones keep their count.
+    for (let i = 0; i < 10; i++) limitOne.check(`10.0.0.${i}`);
+    limitOne.check("10.0.0.10");
+    expect(limitOne.check("10.0.0.1").allowed).toBe(false);
+    expect(limitOne.check("10.0.0.0").allowed).toBe(true);
   });
 });
 
 describe("clientIp", () => {
   const req = (headers: Record<string, string>) => new Request("http://x/", { headers });
 
-  it("takes the first entry of x-forwarded-for, trimmed", () => {
-    expect(clientIp(req({ "x-forwarded-for": " 203.0.113.9 , 10.0.0.1" }))).toBe("203.0.113.9");
+  it("takes true-client-ip, trimmed, and falls back to cf-connecting-ip", () => {
+    expect(clientIp(req({ "true-client-ip": " 203.0.113.9 " }))).toBe("203.0.113.9");
+    expect(clientIp(req({ "cf-connecting-ip": "203.0.113.7" }))).toBe("203.0.113.7");
+    expect(
+      clientIp(req({ "true-client-ip": "203.0.113.9", "cf-connecting-ip": "203.0.113.7" })),
+    ).toBe("203.0.113.9");
+  });
+
+  it("never trusts x-forwarded-for, whose first entry the client controls", () => {
+    expect(clientIp(req({ "x-forwarded-for": "1.2.3.4, 10.0.0.1" }))).toBe("unknown");
+    expect(clientIp(req({ "true-client-ip": "203.0.113.9", "x-forwarded-for": "1.2.3.4" }))).toBe(
+      "203.0.113.9",
+    );
+  });
+
+  it("clamps the key to 45 characters so a forged header cannot bloat memory", () => {
+    expect(clientIp(req({ "true-client-ip": "9".repeat(5000) }))).toHaveLength(45);
+  });
+
+  it("buckets IPv6 visitors by their /64", () => {
+    const a = clientIp(req({ "true-client-ip": "2001:db8:1:2:aaaa::1" }));
+    const b = clientIp(req({ "true-client-ip": "2001:0DB8:1:2:bbbb:cccc:dddd:2" }));
+    const other = clientIp(req({ "true-client-ip": "2001:db8:1:3::1" }));
+    expect(a).toBe(b);
+    expect(a).not.toBe(other);
+    expect(clientIp(req({ "true-client-ip": "::1" }))).toBe(
+      clientIp(req({ "true-client-ip": "0:0:0:0:5::9" })),
+    );
   });
 
   it("puts requests with no usable address in one shared bucket", () => {
     expect(clientIp(req({}))).toBe("unknown");
-    expect(clientIp(req({ "x-forwarded-for": " " }))).toBe("unknown");
+    expect(clientIp(req({ "true-client-ip": " " }))).toBe("unknown");
+  });
+
+  it("still limits a client that rotates a forged x-forwarded-for", () => {
+    const { limiter } = setup({ limit: 2 });
+    const results = Array.from({ length: 4 }, (_, i) =>
+      limiter.check(
+        clientIp(req({ "true-client-ip": "203.0.113.9", "x-forwarded-for": `1.2.3.${i}` })),
+      ),
+    );
+    expect(results.map((r) => r.allowed)).toEqual([true, true, false, false]);
   });
 });

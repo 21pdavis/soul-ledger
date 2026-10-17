@@ -8,6 +8,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 - Looking up players is now limited to 10 a minute from one connection, so nobody can flood the site. If you go over, you see a short "Too many lookups, try again in N seconds" screen.
 
+### Fixed
+
+- If the current patch date cannot be found, "This patch" now says so and shows the story as "All time" instead of quietly mixing the two.
+
 ## [0.3.1] - 2026-10-16
 
 **The city on the front page.** The 3D city from 0.3.0 now greets you before your story starts, too.

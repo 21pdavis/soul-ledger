@@ -123,7 +123,7 @@ export const STORY_ACTIONS_COPY = {
 export type ErrorKind =
   "invalid" | "not_found" | "unavailable" | "fetch_failed" | "no_matches" | "rate_limited";
 
-/** The rate-limit screen's sentence (ADR 0075). */
+/** The rate-limit screen's sentence (ADR 0076). */
 export const rateLimitedBody = (seconds: number) =>
   `Too many lookups, try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}.`;
 

@@ -1,5 +1,5 @@
 /**
- * A per-client-IP fixed-window limiter held in this process's memory (ADR 0075). Correct for our
+ * A per-client-IP fixed-window limiter held in this process's memory (ADR 0076). Correct for our
  * single Render instance; sharing the count across instances is tracked in #16.
  */
 
@@ -73,8 +73,36 @@ export function createIpRateLimiter({
   };
 }
 
-/** The client address behind Render's proxy: the first `x-forwarded-for` entry, else "unknown". */
+/** The /64 an IPv6 address belongs to, as its first four groups; other strings pass through. */
+function bucketKey(ip: string): string {
+  if (!ip.includes(":") || ip.includes(".") || ip.includes("%")) return ip;
+  const [head, tail, ...extra] = ip.toLowerCase().split("::");
+  if (extra.length > 0) return ip;
+  const front = head ? head.split(":") : [];
+  const back = tail ? tail.split(":") : [];
+  const groups =
+    tail === undefined
+      ? front
+      : [
+          ...front,
+          ...Array<string>(Math.max(0, 8 - front.length - back.length)).fill("0"),
+          ...back,
+        ];
+  if (groups.length !== 8 || !groups.every((g) => /^[0-9a-f]{1,4}$/.test(g))) return ip;
+  return `${groups
+    .slice(0, 4)
+    .map((g) => g.replace(/^0+(?=.)/, ""))
+    .join(":")}::/64`;
+}
+
+/**
+ * The visitor's address behind Render (ADR 0076). Cloudflare, in front of Render, overwrites
+ * `true-client-ip` and `cf-connecting-ip` with the real client; `x-forwarded-for` keeps whatever
+ * the client sent first, so it is never trusted. IPv6 visitors are bucketed by /64, and the key is
+ * clamped to the longest textual IP (45 chars) so a forged header cannot bloat memory.
+ */
 export function clientIp(request: Request): string {
-  const first = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return first || "unknown";
+  const { headers } = request;
+  const ip = (headers.get("true-client-ip") ?? headers.get("cf-connecting-ip"))?.trim();
+  return ip ? bucketKey(ip.slice(0, 45)) : "unknown";
 }

@@ -84,7 +84,7 @@ describe("GET /api/lookup", () => {
   describe("rate limit", () => {
     const get = (ip?: string) =>
       new Request(`http://localhost/api/lookup?q=${TEST_ACCOUNT_ID}`, {
-        headers: ip ? { "x-forwarded-for": `${ip}, 10.0.0.1` } : {},
+        headers: ip ? { "true-client-ip": ip } : {},
       });
 
     function limited(opts: { exempt?: (r: Request) => boolean } = {}) {

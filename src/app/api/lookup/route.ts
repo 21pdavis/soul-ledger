@@ -9,7 +9,7 @@ const limiter = createIpRateLimiter();
 
 /**
  * GET /api/lookup?q=<steam url or id>&window=all|patch&refresh=1 streams NDJSON events. Limited
- * per client IP (ADR 0075); callers holding the staging access key are exempt, so the staging
+ * per client IP (ADR 0076); callers holding the staging access key are exempt, so the staging
  * e2e suites can run many lookups. That key only exists on the gated staging site.
  */
 export const GET = createLookupHandler(
