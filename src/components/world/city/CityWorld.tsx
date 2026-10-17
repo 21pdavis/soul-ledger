@@ -2,7 +2,7 @@
 
 import { Line } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { Suspense, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { StoryData } from "@/story/types";
 import { Landmarks } from "./Landmarks";
@@ -372,13 +372,18 @@ function Lanes({ simple }: { simple: boolean }) {
 function StoryCast({ tour, slide }: { tour: TourPlan; slide: number }) {
   return (
     <>
-      {tour.cast.map((m, i) => (
-        <Standee key={i} member={m} />
-      ))}
-      <DuelStage duel={tour.duel} />
-      <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
-      <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
-      <DeathProjector bins={tour.deaths} on={slide === 7} />
+      {/* The cast loads its own pictures. Waiting here, not at the canvas, keeps the city on
+          screen while they arrive, so the landing page's city never blinks out as the story
+          starts; the camera is already flying in. */}
+      <Suspense fallback={null}>
+        {tour.cast.map((m, i) => (
+          <Standee key={i} member={m} />
+        ))}
+        <DuelStage duel={tour.duel} />
+        <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
+        <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
+        <DeathProjector bins={tour.deaths} on={slide === 7} />
+      </Suspense>
       <TourRig shots={tour.shots} slide={slide} />
     </>
   );

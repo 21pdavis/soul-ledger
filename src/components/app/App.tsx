@@ -57,6 +57,8 @@ const subscribeNothing = () => () => {};
 
 export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
   const [phase, setPhase] = useState<Phase>({ name: "entry" });
+  // The story's current slide, for the city's camera to follow; null until the player is up.
+  const [slide, setSlide] = useState<number | null>(null);
   const [request, setRequest] = useState<ClientLookupRequest | null>(null);
   // Bumped by Replay: remounting the story starts it again at slide 1.
   const [replayCount, setReplayCount] = useState(0);
@@ -169,29 +171,45 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
       onNewLookup: () => {
         running.current?.abort();
         setPhase({ name: "entry" });
+        setSlide(null);
       },
     }),
     [request, run],
   );
 
+  // One city for the whole visit (ADR 0068, 0073): scenery behind the entry, loading and error
+  // screens, then the story's own world. It stays mounted throughout, so starting the story is a
+  // camera flight into the opening shot rather than a second city fading in.
+  const story = phase.name === "story" ? phase.story : undefined;
+  const world = (
+    <WorldLayer
+      story={story}
+      slide={story ? (slide ?? 0) : 0}
+      // Already running behind the landing page, so it simply carries on into the story.
+      started
+      reducedMotion={reducedMotion}
+    />
+  );
+
   if (phase.name === "story") {
     const props: SlideProps = { story: phase.story, meta: phase.meta, actions };
     return (
-      <div className={styles.storyPage}>
-        <StoryStage key={replayCount} {...props} />
-        <div className={styles.notices}>
-          {phase.meta.stale && <StaleNote />}
-          <Disclaimer />
+      <>
+        {world}
+        <div className={styles.storyPage}>
+          <StoryStage key={replayCount} {...props} onSlideChange={setSlide} />
+          <div className={styles.notices}>
+            {phase.meta.stale && <StaleNote />}
+            <Disclaimer />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  // The city sits behind the entry, loading and error screens as scenery (no story to follow
-  // yet). It stays mounted across them; the story mounts its own, which follows the slides.
   return (
     <>
-      <WorldLayer started reducedMotion={reducedMotion} />
+      {world}
       <ScreenShell>
         {phase.name === "entry" && (
           <EntryScreen

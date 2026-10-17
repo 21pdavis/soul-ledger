@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import * as THREE from "three";
 import { CARD_SIDES, LANE_CHANGES, routeAt, routeTangent, shotPosition, type Shot } from "./tour";
 import { sceneShift } from "./framing";
-import { flightProgress, planHop, routeS as routeAlong, weaveOffset } from "./flight";
+import { flightProgress, planFlyIn, planHop, routeS as routeAlong, weaveOffset } from "./flight";
 
 /**
  * The camera rotation that looks from `eye` at `target`. Looking (nearly) straight down, "up" on
@@ -82,6 +82,26 @@ export function TourRig({ shots: storyShots, slide }: { shots: Shot[]; slide: nu
     const shot = shots[i];
     const { a, b, c, q } = tmp.current;
 
+    if (!flight.current && cam.userData.posed) {
+      // The landing page's camera was already circling this city: fly down into the opening
+      // shot from wherever it is, instead of cutting to it (one city for the whole visit).
+      cam.getWorldDirection(a);
+      look.current.copy(cam.position).addScaledVector(a, 60);
+      const hop = planFlyIn(cam.position.distanceTo(shotPosition(shot, b)));
+      flight.current = {
+        target: i,
+        start: now,
+        duration: hop.duration,
+        route: null,
+        fromPos: cam.position.clone(),
+        fromLook: look.current.clone(),
+        fromQuat: cam.quaternion.clone(),
+        weaveSign: 1,
+        fromSide: 0,
+        lift: 0,
+      };
+      routeS.current = null;
+    }
     if (!flight.current) {
       shotPosition(shot, cam.position);
       look.current.set(...shot.look);
@@ -148,6 +168,7 @@ export function TourRig({ shots: storyShots, slide }: { shots: Shot[]; slide: nu
       side.current = 0;
     }
     if (f.route) cam.lookAt(look.current);
+    cam.userData.posed = true;
 
     // Lens shift: slide the picture so the scene sits in the space beside the card. The frustum
     // moves by filmOffset / filmWidth of the near-plane width.
