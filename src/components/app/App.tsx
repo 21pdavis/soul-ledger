@@ -119,7 +119,12 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
           setPhase({
             name: "story",
             story: event.story,
-            meta: { window: event.window, patchStart: event.patchStart, stale: event.stale },
+            meta: {
+              window: event.window,
+              patchStart: event.patchStart,
+              patchUnavailable: event.patchUnavailable,
+              stale: event.stale,
+            },
           });
         }
       };
