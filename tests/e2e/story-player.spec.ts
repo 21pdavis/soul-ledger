@@ -28,41 +28,23 @@ test.describe("both layouts", () => {
     expect(stageBox.y + stageBox.height).toBeLessThanOrEqual(noticeBox.y);
   });
 
-  test("the cached-matches note floats over the stage, clear of the progress bar and controls", async ({
+  test("the saved-matches line sits in the opening slide's footer beside Refresh", async ({
     page,
   }) => {
     await openStory(page, { stale: true });
-    const note = page.getByText(/showing cached matches/i);
-    await expect(note).toBeInViewport();
-    await expect(page.getByRole("status").filter({ hasText: /cached matches/i })).toHaveCount(1);
-    const bar = (await page.getByRole("list", { name: "Story progress" }).boundingBox())!;
-    const noteBox = (await note.boundingBox())!;
+    const line = stage(page).getByText(/from saved matches/i);
+    await expect(line).toBeInViewport();
+    // plain text, not a live region or a floating box: it is part of the slide
+    await expect(page.getByRole("status").filter({ hasText: /saved matches/i })).toHaveCount(0);
     const stageBox = (await stage(page).boundingBox())!;
-    type Box = { x: number; y: number; width: number; height: number };
-    const apart = (a: Box, b: Box) =>
-      a.y >= b.y + b.height ||
-      a.y + a.height <= b.y ||
-      a.x >= b.x + b.width ||
-      a.x + a.width <= b.x;
-    // an overlay: it sits inside the stage and overlaps neither the progress bar nor any control
-    expect(noteBox.y).toBeGreaterThanOrEqual(stageBox.y);
-    expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(stageBox.y + stageBox.height);
-    expect(apart(noteBox, bar)).toBe(true);
-    for (const control of await stage(page)
-      .getByRole("button")
-      .filter({ hasNotText: "Dismiss" })
-      .all()) {
-      const box = await control.boundingBox();
-      if (box && box.width > 1) expect(apart(noteBox, box)).toBe(true);
-    }
-    // dismissible by keyboard; the Valve notice is still there
-    await page.getByRole("button", { name: "Dismiss" }).focus();
-    await page.keyboard.press("Enter");
-    await expect(note).toHaveCount(0);
+    const lineBox = (await line.boundingBox())!;
+    expect(lineBox.y).toBeGreaterThanOrEqual(stageBox.y);
+    expect(lineBox.y + lineBox.height).toBeLessThanOrEqual(stageBox.y + stageBox.height);
+    // the Valve notice is still there
     await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeInViewport();
   });
 
-  test("the cached-matches note does not shrink the stage (320x568)", async ({ page }) => {
+  test("the saved-matches line does not shrink the stage (320x568)", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
     await openStory(page);
     const plain = (await stage(page).boundingBox())!;
@@ -70,7 +52,7 @@ test.describe("both layouts", () => {
     await other.setViewportSize({ width: 320, height: 568 });
     await openStory(other, { stale: true });
     page = other;
-    await expect(page.getByText(/showing cached matches/i)).toBeVisible();
+    await expect(page.getByText(/from saved matches/i)).toBeVisible();
     const withNote = (await stage(page).boundingBox())!;
     expect(withNote.width).toBe(plain.width);
     expect(withNote.height).toBe(plain.height);
@@ -101,21 +83,16 @@ test.describe("phone: tap controller", () => {
     [320, 568],
     [390, 844],
   ]) {
-    test(`the cached-matches note never covers the slide headline (${width}x${height})`, async ({
+    test(`the saved-matches line is for the first slide only (${width}x${height})`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height });
       await openStory(page, { stale: true });
-      const note = page.getByText(/showing cached matches/i);
-      await expect(note).toBeVisible();
-      const n = (await note.boundingBox())!;
-      const h = (await page.getByRole("heading", { level: 2 }).first().boundingBox())!;
-      const apart = n.y >= h.y + h.height || n.y + n.height <= h.y;
-      expect(apart).toBe(true);
-      // the note is for the first slide only: it is gone once the player moves on
+      const line = page.getByText(/from saved matches/i);
+      await expect(line).toBeVisible();
       await tapSide(page, "right");
       await expect(stage(page)).not.toHaveAttribute("data-slide", "intro");
-      await expect(note).toHaveCount(0);
+      await expect(line).toHaveCount(0);
     });
   }
 

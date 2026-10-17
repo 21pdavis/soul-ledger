@@ -1,5 +1,6 @@
 import {
   INTRO_COPY,
+  STALE_NOTE,
   STORY_ACTIONS_COPY,
   formatLedgerDate,
   headlineFor,
@@ -67,6 +68,7 @@ export const IntroSlide: SlideComponent = ({
           <div>
             <p className={styles.basedOn}>{basedOnMatches(story.matchCount)}</p>
             <WindowLabel meta={meta} className={styles.window} />
+            {meta.stale && <p className={styles.stale}>{STALE_NOTE}</p>}
           </div>
           <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
             {STORY_ACTIONS_COPY.refresh}

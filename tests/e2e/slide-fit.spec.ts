@@ -120,7 +120,7 @@ test.describe("every slide fits its frame, worst case", () => {
   });
 
   for (const { width, height, phone, stale } of SIZES) {
-    test(`${width}x${height}${stale ? " (cached-matches note)" : ""}: nothing on any slide runs past the frame`, async ({
+    test(`${width}x${height}${stale ? " (saved-matches line)" : ""}: nothing on any slide runs past the frame`, async ({
       page,
       isMobile,
     }) => {
@@ -181,7 +181,11 @@ test.describe("every slide fits its frame, worst case", () => {
           await expect(current).toContainText("Oracle");
           // A bigger stage never shows fewer rows than a smaller one: the climb has 14 distinct
           // badges, so every stage with the stage's usual room shows the full 7.
-          if (!stale) await expect(frame.locator("ol li")).toHaveCount(7);
+          await expect(frame.locator("ol li")).toHaveCount(7);
+        }
+        if (slide.id === "intro" && stale) {
+          // The line is in the footer's flow, so the fit check above already covers it.
+          await expect(frame.getByText(/from saved matches/i)).toBeVisible();
         }
         if (slide.id === "kills") {
           // The worst case names a nemesis, so the fit check above really covers its line.
@@ -207,6 +211,38 @@ test.describe("every slide fits its frame, worst case", () => {
         if (slide.id !== SLIDES.at(-1)!.id) await page.keyboard.press("ArrowRight");
       }
       expect(problems).toEqual([]);
+    });
+  }
+});
+
+// #44: the climb measured its rows while the entrance animation ran (a row mid-rise is shifted
+// down by its transform) and kept the lower count. The count is the same with default motion.
+test.describe("the rank climb lists the same rows with default motion", () => {
+  for (const { width, height } of [
+    { width: 412, height: 915 },
+    { width: 412, height: 839 },
+    { width: 360, height: 640 },
+  ]) {
+    test(`${width}x${height}: 7 rows`, async ({ page, isMobile }) => {
+      test.skip(!isMobile, "phone only");
+      await page.setViewportSize({ width, height });
+      await mockLookup(
+        page,
+        ndjson({ type: "resolved", accountId: 1 }, storyEvent({}, worstCaseStory())),
+      );
+      await openEntry(page);
+      await page.getByLabel("Paste your Steam profile URL").fill(PROFILE);
+      await page.getByRole("button", { name: "Open the ledger" }).click();
+      for (const slide of SLIDES) {
+        await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
+        if (slide.id === "rank") break;
+        await stageSettled(page);
+        await page.keyboard.press("ArrowRight");
+      }
+      await stageSettled(page);
+      const frame = current(page).locator("section").first();
+      await expect(frame.locator("li[aria-current=step]")).toContainText("Oracle");
+      await expect(frame.locator("ol li")).toHaveCount(7);
     });
   }
 });

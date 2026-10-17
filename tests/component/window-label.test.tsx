@@ -1,7 +1,5 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
-import { StaleNote } from "@/components/app/StaleNote";
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { WindowLabel } from "@/components/story/WindowLabel";
 
 describe("WindowLabel", () => {
@@ -34,22 +32,5 @@ describe("WindowLabel", () => {
     );
     expect(container).toHaveTextContent(/^All time/);
     expect(container).not.toHaveTextContent(/this patch/i);
-  });
-});
-
-describe("StaleNote", () => {
-  it("mounts an empty live region, then fills it with the cached-matches text", async () => {
-    render(<StaleNote onDismiss={() => {}} />);
-    expect(screen.getByRole("status")).toBeEmptyDOMElement();
-    await waitFor(() =>
-      expect(screen.getByRole("status")).toHaveTextContent(/showing cached matches/i),
-    );
-  });
-
-  it("asks to be dismissed when the button is pressed", async () => {
-    const onDismiss = vi.fn();
-    render(<StaleNote onDismiss={onDismiss} />);
-    await userEvent.click(await screen.findByRole("button", { name: "Dismiss" }));
-    expect(onDismiss).toHaveBeenCalledOnce();
   });
 });

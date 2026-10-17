@@ -22,3 +22,8 @@
     transform: scale(1.18);
   }
 }
+
+/* useFitCount measures its box with the entrance off (see data-fit-measuring there). */
+:global([data-fit-measuring]) .reveal {
+  animation: none;
+}

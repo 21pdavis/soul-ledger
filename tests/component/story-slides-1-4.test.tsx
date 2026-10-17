@@ -79,6 +79,18 @@ describe("slide 1: Intro", () => {
     expect(screen.getByText("Since patch Sep 1, 2026")).toBeInTheDocument();
   });
 
+  it("says the matches are saved ones when the story is stale, in plain text beside Refresh", () => {
+    show(IntroSlide, { meta: { stale: true } });
+    const line = screen.getByText(/from saved matches/i);
+    expect(line.closest("[role]")).toBeNull();
+    expect(screen.getByRole("button", { name: "Refresh" }).parentElement).toContainElement(line);
+  });
+
+  it("says nothing about saved matches when the story is fresh", () => {
+    show(IntroSlide, { meta: { stale: false } });
+    expect(screen.queryByText(/saved matches/i)).toBeNull();
+  });
+
   it("has a Refresh button that calls onRefresh", async () => {
     const onRefresh = vi.fn();
     show(IntroSlide, { actions: { onRefresh } });

@@ -244,36 +244,3 @@
 .root[data-world="on"] .card[data-side="right"] {
   margin-left: auto;
 }
-
-/* Frames the overlay to the stage (phone) or the card's footprint (desktop); the frame lets pointers through. */
-.overlayFrame {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.overlayFrame[data-mode="scroll"] {
-  display: flex;
-  padding: var(--card-top) var(--gutter) var(--card-bottom);
-}
-
-.overlayInner {
-  position: relative;
-  width: 100%;
-  max-width: 64rem;
-  height: 100%;
-}
-
-/* Same footprint as the world-mode card, which steps to one side. */
-.root[data-world="on"] .overlayInner {
-  max-width: min(30rem, 42vw);
-}
-
-.root[data-world="on"] .overlayInner[data-side="left"] {
-  margin-right: auto;
-}
-
-.root[data-world="on"] .overlayInner[data-side="right"] {
-  margin-left: auto;
-}

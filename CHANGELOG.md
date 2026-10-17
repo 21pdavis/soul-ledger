@@ -10,8 +10,9 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Fixed
 
+- The "Your climb" list now shows all seven rank steps on tall phones, instead of dropping one while the slide animates in.
 - If the current patch date cannot be found, "This patch" now says so and shows the story as "All time" instead of quietly mixing the two.
-- The "Showing cached matches" note now floats over the first slide's empty space instead of shrinking the story on small phones, never covers the headline, and you can still dismiss it.
+- When the latest matches could not be fetched, the first slide now says "From saved matches" next to Refresh, instead of a note that shrank the story on small phones.
 
 ## [0.3.1] - 2026-10-16
 
