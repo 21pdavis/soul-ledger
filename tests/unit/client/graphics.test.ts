@@ -6,6 +6,7 @@ import {
   chooseGraphics,
   deviceHintLevel,
   graphicsLabel,
+  isSoftwareRenderer,
   loadSavedGraphics,
   nextGraphicsLevel,
   saveGraphics,
@@ -41,12 +42,47 @@ describe("device hint start", () => {
     expect(deviceHintLevel({})).toBe("full");
   });
 
+  it("hints Simple for a software renderer, and the lowest hint wins", () => {
+    expect(deviceHintLevel({ cores: 16, memory: 16, softwareRenderer: true })).toBe("simple");
+    expect(deviceHintLevel({ cores: 16, memory: 16, softwareRenderer: false })).toBe("full");
+    expect(deviceHintLevel({ cores: 2, softwareRenderer: true })).toBe("simple");
+  });
+
   it("starts on the hint, but a saved choice, reduced motion and no WebGL all beat it", () => {
     const base = { webgl: true, reducedMotion: false, saved: null, hint: "simple" } as const;
     expect(chooseGraphics(base)).toBe("simple");
     expect(chooseGraphics({ ...base, saved: "full" })).toBe("full");
     expect(chooseGraphics({ ...base, reducedMotion: true })).toBe("off");
     expect(chooseGraphics({ ...base, webgl: false })).toBe("off");
+  });
+});
+
+describe("isSoftwareRenderer", () => {
+  it.each([
+    "Google SwiftShader",
+    "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "llvmpipe (LLVM 15.0.7, 256 bits)",
+    "Mesa llvmpipe",
+    "softpipe",
+    "Microsoft Basic Render Driver",
+    "ANGLE (Microsoft, Microsoft Basic Render Driver (0x0000008C) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "Mesa OffScreen",
+  ])("treats %s as software", (name) => {
+    expect(isSoftwareRenderer(name)).toBe(true);
+  });
+
+  it.each([
+    "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002503) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "ANGLE (Intel, Intel(R) UHD Graphics 630 (0x00003E92) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+    "Apple GPU",
+    "",
+  ])("does not treat %s as software", (name) => {
+    expect(isSoftwareRenderer(name)).toBe(false);
+  });
+
+  it("is false when the renderer is unknown", () => {
+    expect(isSoftwareRenderer(undefined)).toBe(false);
   });
 });
 
@@ -123,5 +159,91 @@ describe("supportsWebGL", () => {
     } finally {
       probe.mockRestore();
     }
+  });
+
+  it("reads the renderer name in the same probe, before releasing the context", async () => {
+    vi.resetModules();
+    const { supportsWebGL, browserDeviceHint } = await import("@/lib/client/graphics");
+    const lose = vi.fn();
+    let released = false;
+    const ctx = {
+      RENDERER: 0x1f01,
+      getExtension: (name: string) =>
+        name === "WEBGL_lose_context"
+          ? {
+              loseContext: () => {
+                released = true;
+                lose();
+              },
+            }
+          : name === "WEBGL_debug_renderer_info"
+            ? { UNMASKED_RENDERER_WEBGL: 0x9246 }
+            : null,
+      getParameter: (p: number) => {
+        expect(released).toBe(false);
+        return p === 0x9246 ? "Google SwiftShader" : "masked";
+      },
+    };
+    const probe = vi
+      .spyOn(HTMLCanvasElement.prototype, "getContext")
+      .mockReturnValue(ctx as unknown as RenderingContext);
+    try {
+      expect(supportsWebGL()).toBe(true);
+      expect(lose).toHaveBeenCalledTimes(1);
+      expect(browserDeviceHint()).toBe("simple");
+      expect(probe).toHaveBeenCalledTimes(1);
+    } finally {
+      probe.mockRestore();
+    }
+  });
+
+  async function probeWith(getParameter: (p: number) => unknown, debugInfo: boolean) {
+    vi.resetModules();
+    const { supportsWebGL, browserDeviceHint } = await import("@/lib/client/graphics");
+    const lose = vi.fn();
+    const ctx = {
+      RENDERER: 0x1f01,
+      getExtension: (name: string) =>
+        name === "WEBGL_lose_context"
+          ? { loseContext: lose }
+          : name === "WEBGL_debug_renderer_info" && debugInfo
+            ? { UNMASKED_RENDERER_WEBGL: 0x9246 }
+            : null,
+      getParameter,
+    };
+    const spy = vi
+      .spyOn(HTMLCanvasElement.prototype, "getContext")
+      .mockReturnValue(ctx as unknown as RenderingContext);
+    // A strong machine, so only the renderer can lower the hint (CI runners have few cores).
+    const cores = vi.spyOn(navigator, "hardwareConcurrency", "get").mockReturnValue(8);
+    try {
+      return { supported: supportsWebGL(), hint: browserDeviceHint(), lose };
+    } finally {
+      spy.mockRestore();
+      cores.mockRestore();
+    }
+  }
+
+  it("falls back to the generic RENDERER when the debug extension is missing", async () => {
+    const r = await probeWith((p) => (p === 0x1f01 ? "llvmpipe" : undefined), false);
+    expect(r.supported).toBe(true);
+    expect(r.hint).toBe("simple");
+    expect(r.lose).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not crash when getParameter throws, and still releases the context", async () => {
+    const r = await probeWith(() => {
+      throw new Error("blocked");
+    }, true);
+    expect(r.supported).toBe(true);
+    expect(r.hint).toBe("full");
+    expect(r.lose).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores a non-string renderer", async () => {
+    const r = await probeWith(() => 42, true);
+    expect(r.supported).toBe(true);
+    expect(r.hint).toBe("full");
+    expect(r.lose).toHaveBeenCalledTimes(1);
   });
 });
