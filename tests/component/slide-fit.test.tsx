@@ -86,6 +86,30 @@ describe("RankSlide fits the stage it is in", () => {
     expect(items.at(-1)).toHaveTextContent("Oracle 1");
   });
 
+  it("counts the same while the entrance animation runs as with reduced motion (#44)", () => {
+    // A row mid-entrance is shifted down 12px by its transform, and a transformed box widens the
+    // scrollable height, so measuring during the entrance saw a fake overflow and dropped a row.
+    // Fake that: the shift only shows while the box is not being measured with animations off.
+    vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const flat = 100 + this.querySelectorAll("li").length * 40;
+      const shifted =
+        this.querySelector("[data-motion=rise]") && !this.hasAttribute("data-fit-measuring");
+      return flat + (shifted ? 12 : 0);
+    });
+    box.height = 100 + 7 * 40; // exactly seven rows
+    render(
+      <RankSlide
+        {...fixtureSlideProps({ story: fixtureStory({ rank: longClimb() }) })}
+        {...motion}
+        skipAnimation={false}
+        reducedMotion={false}
+      />,
+    );
+    expect(screen.getAllByRole("listitem")).toHaveLength(7);
+  });
+
   it("plots the same badges it lists", () => {
     box.height = 100 + 4 * 40;
     const { container } = renderRank();

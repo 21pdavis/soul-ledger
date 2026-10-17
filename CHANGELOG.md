@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Fixed
+
+- The "Your climb" list now shows all seven rank steps on tall phones, instead of dropping one while the slide animates in.
+
 ## [0.3.1] - 2026-10-16
 
 **The city on the front page.** The 3D city from 0.3.0 now greets you before your story starts, too.
