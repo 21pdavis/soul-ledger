@@ -1,8 +1,8 @@
 "use client";
 
 import { Line } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { Suspense, useLayoutEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Suspense, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import * as THREE from "three";
 import type { StoryData } from "@/story/types";
 import { Landmarks } from "./Landmarks";
@@ -368,6 +368,36 @@ function Lanes({ simple }: { simple: boolean }) {
   );
 }
 
+/**
+ * Draws its children only once their shaders are compiled. The compile runs in the background
+ * (`compileAsync`, parallel where the browser allows), so a new set of materials never freezes a
+ * frame while the story's first card animates in. Where that fails, they simply show.
+ */
+function WarmUp({ children }: { children: ReactNode }) {
+  const group = useRef<THREE.Group>(null);
+  const { gl, camera, scene } = useThree();
+  const [ready, setReady] = useState(false);
+  useLayoutEffect(() => {
+    const g = group.current;
+    if (!g) return;
+    let live = true;
+    // Only visible objects are compiled, so show the group for the compile but not on screen yet.
+    g.visible = true;
+    gl.compileAsync(g, camera, scene)
+      .catch(() => {})
+      .finally(() => live && setReady(true));
+    g.visible = false;
+    return () => {
+      live = false;
+    };
+  }, [gl, camera, scene]);
+  return (
+    <group ref={group} visible={ready}>
+      {children}
+    </group>
+  );
+}
+
 /** The reader's heroes, duel and death map, placed for the story, with the camera following it. */
 function StoryCast({ tour, slide }: { tour: TourPlan; slide: number }) {
   return (
@@ -376,13 +406,15 @@ function StoryCast({ tour, slide }: { tour: TourPlan; slide: number }) {
           screen while they arrive, so the landing page's city never blinks out as the story
           starts; the camera is already flying in. */}
       <Suspense fallback={null}>
-        {tour.cast.map((m, i) => (
-          <Standee key={i} member={m} />
-        ))}
-        <DuelStage duel={tour.duel} />
-        <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
-        <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
-        <DeathProjector bins={tour.deaths} on={slide === 7} />
+        <WarmUp>
+          {tour.cast.map((m, i) => (
+            <Standee key={i} member={m} />
+          ))}
+          <DuelStage duel={tour.duel} />
+          <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
+          <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
+          <DeathProjector bins={tour.deaths} on={slide === 7} />
+        </WarmUp>
       </Suspense>
       <TourRig shots={tour.shots} slide={slide} />
     </>

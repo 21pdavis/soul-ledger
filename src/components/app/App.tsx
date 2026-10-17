@@ -55,6 +55,16 @@ export const STALL_MS = 20_000;
 
 const subscribeNothing = () => () => {};
 
+/** Runs `fn` when the browser is idle (soon, where idle callbacks are missing); returns a cancel. */
+function whenIdle(fn: () => void): () => void {
+  if (typeof requestIdleCallback === "function") {
+    const id = requestIdleCallback(fn, { timeout: 1500 });
+    return () => cancelIdleCallback(id);
+  }
+  const id = setTimeout(fn, 300);
+  return () => clearTimeout(id);
+}
+
 export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
   const [phase, setPhase] = useState<Phase>({ name: "entry" });
   // The story's current slide, for the city's camera to follow; null until the player is up.
@@ -181,10 +191,18 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
   // screens, then the story's own world. It stays mounted throughout, so starting the story is a
   // camera flight into the opening shot rather than a second city fading in.
   const story = phase.name === "story" ? phase.story : undefined;
+  // Building the story's cast is heavy, and the 3D must never hold up the story (ADR 0068): the
+  // city keeps circling until the first card is up and the browser has a quiet moment.
+  const [handedOver, setHandedOver] = useState<StoryData | null>(null);
+  const cardUp = story !== undefined && slide !== null;
+  useEffect(() => {
+    if (cardUp) return whenIdle(() => setHandedOver(story));
+  }, [cardUp, story]);
+  const worldStory = cardUp && handedOver === story ? story : undefined;
   const world = (
     <WorldLayer
-      story={story}
-      slide={story ? (slide ?? 0) : 0}
+      story={worldStory}
+      slide={worldStory ? (slide ?? 0) : 0}
       // Already running behind the landing page, so it simply carries on into the story.
       started
       reducedMotion={reducedMotion}

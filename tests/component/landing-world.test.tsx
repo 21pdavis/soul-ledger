@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WorldLayer } from "@/components/world/WorldLayer";
 import { ndjson, setup, storyEvent, storyUp } from "./app-harness";
@@ -49,7 +49,24 @@ describe("the world on the landing page", () => {
     expect(screen.getByTestId("world")).toBe(world);
     // The same canvas throughout: never torn down and redrawn (which would blink to black).
     expect(screen.getByTestId("world-canvas")).toBe(canvas);
-    expect(canvas).toHaveAttribute("data-scenery", "false");
+    await waitFor(() => expect(canvas).toHaveAttribute("data-scenery", "false"));
+  });
+
+  it("hands the city the story only once the first card is up and the browser is idle", async () => {
+    // The 3D must never hold up the story (ADR 0068): building the cast waits for idle time.
+    const idle: (() => void)[] = [];
+    vi.stubGlobal("requestIdleCallback", (cb: () => void) => idle.push(cb));
+    vi.stubGlobal("cancelIdleCallback", () => {});
+    const { enter } = setup(ndjson(storyEvent()));
+    await enter();
+    await storyUp();
+    const canvas = await screen.findByTestId("world-canvas");
+    expect(canvas).toHaveAttribute("data-scenery", "true");
+    await waitFor(() => expect(idle.length).toBeGreaterThan(0));
+    act(() => idle.forEach((cb) => cb()));
+    expect(screen.getByTestId("world-canvas")).toHaveAttribute("data-scenery", "false");
+    cleanup(); // unmount while the stubs are still in place
+    vi.unstubAllGlobals();
   });
 
   it("shows the 3D city as scenery, without a story, straight away", async () => {
