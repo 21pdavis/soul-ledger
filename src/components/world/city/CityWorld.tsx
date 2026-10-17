@@ -1,8 +1,16 @@
 "use client";
 
 import { Line } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import {
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import * as THREE from "three";
 import type { StoryData } from "@/story/types";
 import { Landmarks } from "./Landmarks";
@@ -31,6 +39,7 @@ import {
   Truck,
 } from "./Props";
 import { AmbientRig } from "./AmbientRig";
+import { loadMidBossGeometry } from "./midboss-mesh";
 import { TourRig } from "./TourRig";
 import { planTour, routeConnectors, type TourPlan } from "./tour";
 
@@ -368,17 +377,66 @@ function Lanes({ simple }: { simple: boolean }) {
   );
 }
 
+/**
+ * Draws its children only once the scene's shaders are ready for them. The compile runs in the
+ * background (`compileAsync`, parallel where the browser allows), so new materials and lights never
+ * freeze a frame while the story's first card animates in. Where that fails, they simply show.
+ */
+function WarmUp({ offscreen, children }: { offscreen: boolean; children: ReactNode }) {
+  const group = useRef<THREE.Group>(null);
+  const { gl, camera, scene } = useThree();
+  const [ready, setReady] = useState(false);
+  useLayoutEffect(() => {
+    const g = group.current;
+    if (!g) return;
+    let live = true;
+    // On Full the effects draw the scene into an off-screen buffer first, which needs shader
+    // variants with different colour handling than drawing straight to the screen. Compile for
+    // the same kind of target, or those variants would still be built on the spot.
+    const target = offscreen ? new THREE.WebGLRenderTarget(1, 1) : null;
+    const before = gl.getRenderTarget();
+    gl.setRenderTarget(target);
+    // The cast brings its own lights, and a different light count means every material in the
+    // city needs new shaders. So compile the whole scene as it will be with the cast in it (only
+    // visible objects and lights count: show the group for the compile, not on screen yet).
+    g.visible = true;
+    gl.compileAsync(scene, camera)
+      .catch(() => {})
+      .finally(() => {
+        target?.dispose();
+        if (live) setReady(true);
+      });
+    g.visible = false;
+    gl.setRenderTarget(before);
+    return () => {
+      live = false;
+    };
+  }, [gl, camera, scene, offscreen]);
+  return (
+    <group ref={group} visible={ready}>
+      {children}
+    </group>
+  );
+}
+
 /** The reader's heroes, duel and death map, placed for the story, with the camera following it. */
-function StoryCast({ tour, slide }: { tour: TourPlan; slide: number }) {
+function StoryCast({ tour, slide, simple }: { tour: TourPlan; slide: number; simple: boolean }) {
   return (
     <>
-      {tour.cast.map((m, i) => (
-        <Standee key={i} member={m} />
-      ))}
-      <DuelStage duel={tour.duel} />
-      <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
-      <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
-      <DeathProjector bins={tour.deaths} on={slide === 7} />
+      {/* The cast loads its own pictures. Waiting here, not at the canvas, keeps the city on
+          screen while they arrive, so the landing page's city never blinks out as the story
+          starts; the camera is already flying in. */}
+      <Suspense fallback={null}>
+        <WarmUp offscreen={!simple}>
+          {tour.cast.map((m, i) => (
+            <Standee key={i} member={m} />
+          ))}
+          <DuelStage duel={tour.duel} />
+          <PrecisionShot from={tour.shot.from} target={tour.shot.target} />
+          <SewerPit at={tour.pit} beamTo={[-0.3, 2.6, 4.5]} />
+          <DeathProjector bins={tour.deaths} on={slide === 7} />
+        </WarmUp>
+      </Suspense>
       <TourRig shots={tour.shots} slide={slide} />
     </>
   );
@@ -398,6 +456,8 @@ export default function CityWorld({
   /** The Simple graphics level: the same scene with fewer street props. */
   simple?: boolean;
 }) {
+  // Start building the story's heavy pieces off the main thread now, while this is scenery.
+  useEffect(() => void loadMidBossGeometry(), []);
   const tour = useMemo(() => (story ? planTour(story) : null), [story]);
   // Keep the camera's hops between lanes clear of buildings.
   const buildings = useMemo(
@@ -429,7 +489,7 @@ export default function CityWorld({
       <Buildings buildings={buildings} />
       <Lanes simple={simple} />
       <Landmarks />
-      {tour ? <StoryCast tour={tour} slide={slide} /> : <AmbientRig />}
+      {tour ? <StoryCast tour={tour} slide={slide} simple={simple} /> : <AmbientRig />}
     </>
   );
 }

@@ -59,13 +59,21 @@ export default function WorldCanvas({
     <Canvas
       className={styles.canvas}
       data-ready={ready}
-      // Shadows only so the death-map spotlight can carry its picture (nothing casts one).
-      shadows
+      // Shadows only so the death-map spotlight can carry its picture (nothing casts one). The
+      // standard style: three.js swaps the retired "soft" one for it on the first shadow drawn,
+      // which would throw away every shader warmed up for the story in one frame.
+      shadows="percentage"
       // Sharp on desktop; phones (coarse pointers) cap at 1.5x; Simple stays at 1x.
       dpr={simple ? 1 : [1, coarse ? 1.5 : 2]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
       camera={{ fov: 50, near: 0.3, far: 1000 }}
-      onCreated={() => requestAnimationFrame(() => setReady(true))}
+      onCreated={({ gl }) => {
+        // Checking each shader for errors reads the driver's logs, which makes it finish the
+        // shader on the spot: a stall on every new shader's first frame that undoes the
+        // background warm-up. Our shaders are three.js's own, so skip it.
+        gl.debug.checkShaderErrors = false;
+        requestAnimationFrame(() => setReady(true));
+      }}
     >
       <Suspense fallback={null}>
         <CityWorld slide={slide} story={story} simple={simple} />

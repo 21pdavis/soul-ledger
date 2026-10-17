@@ -4,6 +4,7 @@ import {
   WEAVE,
   ease,
   flightProgress,
+  planFlyIn,
   planHop,
   routeS,
   weaveOffset,
@@ -122,5 +123,21 @@ describe("weaveOffset", () => {
   it("peaks at WEAVE in the middle of a hop, on the side the sign picks", () => {
     expect(weaveOffset(0, 0.5, 1)).toBeCloseTo(WEAVE, 10);
     expect(weaveOffset(0, 0.5, -1)).toBeCloseTo(-WEAVE, 10);
+  });
+});
+
+describe("planFlyIn", () => {
+  // From the landing page's circling camera down into the story's opening shot (one city, no fade).
+  it("glides free, without a rooftop arc, and lands on the shot", () => {
+    const h = planFlyIn(150);
+    expect(h.route).toBeNull();
+    expect(h.lift).toBe(0);
+  });
+
+  it("takes its time: slower than an ordinary glide over the same distance, but under 5 s", () => {
+    for (const d of [40, 150, 300]) {
+      expect(planFlyIn(d).duration).toBeGreaterThan(hop(null, free, d).duration);
+      expect(planFlyIn(d).duration).toBeLessThanOrEqual(5);
+    }
   });
 });

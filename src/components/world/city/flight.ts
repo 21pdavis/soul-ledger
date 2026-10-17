@@ -58,6 +58,15 @@ export function planHop(args: {
   };
 }
 
+/**
+ * From the landing page's circling camera down into the story's opening shot: the same city, so
+ * the story starts with a flight instead of a fade. A gentle glide, slower than a hop between
+ * slides because it covers the whole descent, with no rooftop arc (it starts above them).
+ */
+export function planFlyIn(dist: number): Hop {
+  return { route: null, duration: clamp(2.4 + dist / 60, 3, 5), lift: 0 };
+}
+
 /** The place along the route at eased progress `k`: exactly `to` once `k` reaches 1. */
 export const routeS = (route: { from: number; to: number }, k: number) =>
   k >= 1 ? route.to : route.from + (route.to - route.from) * k;

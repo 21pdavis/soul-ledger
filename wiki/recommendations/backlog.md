@@ -28,7 +28,7 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P2 | Remove the unspent-souls code path (`SHOW_UNSPENT_SOULS_FIGURE`, roast copy); keep the DB column and parsing | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P2 | Optional ambient sound (rain, city hum), off by default with a mute button; a separate design job, not in M3 | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
 | P2 | Load the next slides' 3D assets ahead of time (like Reels), only if lag shows up in M3 | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
-| P2 | Keep one city from the landing page into the story, so the camera flies from the landing circle into the opening shot instead of fading in again (and an auto-drop carries over) | [ADR 0073](../decisions/0073-city-behind-the-landing-page.md) |
+| P2 | Merge the city's buildings into a few meshes (about 2,000 objects today) to cut the landing page's start-up stall | [ADR 0077](../decisions/0077-one-city-from-landing-to-story.md) |
 | P2 | Picture-comparison tests for hero models (they hold still, so they compare reliably) | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
 | P2 | Big visual style pass (fonts, look) after M3 or later | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
 | P2 | Add an e2e reduced-motion check (today only component tests cover it) | [ADR 0054](../decisions/0054-m2-testing-and-accessibility.md) |

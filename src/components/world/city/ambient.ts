@@ -8,6 +8,8 @@ export const AMBIENT = {
   height: 78,
   /** Seconds for one full lap. */
   lap: 300,
+  /** Seconds to glide back up into the circle after a story ("New lookup"). */
+  returnSeconds: 3.5,
 } as const;
 
 /** Where the camera is `t` seconds in, and what it looks at (the middle of the map). */
