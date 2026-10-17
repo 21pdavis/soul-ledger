@@ -7,7 +7,10 @@ import type { Jsonify } from "@/story/types";
  * Dates turned into ISO strings, so `story` is a `StoryData` and `patchStart` is `string | null`.
  * The stream always ends with exactly one `story` or `error` event, and nothing follows it.
  */
-export type ClientLookupEvent = Jsonify<LookupEvent>;
+export type ClientLookupEvent =
+  | Jsonify<LookupEvent>
+  /** Made by the client from an HTTP 429 (ADR 0075); the server never streams it. */
+  | { type: "error"; reason: "rate_limited"; retryAfter: number };
 
 export type ClientStoryEvent = Extract<ClientLookupEvent, { type: "story" }>;
 export type ClientErrorEvent = Extract<ClientLookupEvent, { type: "error" }>;
@@ -39,7 +42,10 @@ const KNOWN_REASONS: readonly string[] = [
   "fetch_failed",
 ] satisfies LookupErrorReason[];
 
-const failed = (reason: LookupErrorReason): ClientLookupEvent => ({ type: "error", reason });
+const failed = (reason: Exclude<LookupErrorReason, "rate_limited">): ClientLookupEvent => ({
+  type: "error",
+  reason,
+});
 
 /**
  * Runs a lookup and yields its NDJSON events as they arrive. Never throws: a network failure, a
@@ -55,6 +61,12 @@ export async function* streamLookup(
     response = await fetchImpl(lookupUrl(request), { signal });
   } catch {
     if (!signal?.aborted) yield failed("fetch_failed");
+    return;
+  }
+  if (response.status === 429) {
+    const seconds = Number(response.headers.get("retry-after"));
+    const retryAfter = Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : 60;
+    yield { type: "error", reason: "rate_limited", retryAfter };
     return;
   }
   if (!response.ok || !response.body) {

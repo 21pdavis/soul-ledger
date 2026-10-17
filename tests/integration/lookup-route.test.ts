@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db";
+import { createIpRateLimiter } from "@/lib/ip-rate-limit";
 import { createLookupHandler } from "@/lib/lookup-handler";
 import { createTestDb } from "../helpers/db";
 import { fakeApi } from "../helpers/fake-api";
@@ -78,5 +79,57 @@ describe("GET /api/lookup", () => {
       await GET(new Request(`http://localhost/api/lookup?q=${TEST_ACCOUNT_ID}`)),
     );
     expect(events).toEqual([{ type: "error", reason: "unavailable" }]);
+  });
+
+  describe("rate limit", () => {
+    const get = (ip?: string) =>
+      new Request(`http://localhost/api/lookup?q=${TEST_ACCOUNT_ID}`, {
+        headers: ip ? { "x-forwarded-for": `${ip}, 10.0.0.1` } : {},
+      });
+
+    function limited(opts: { exempt?: (r: Request) => boolean } = {}) {
+      const { api, state } = fakeApi();
+      const limiter = createIpRateLimiter({ limit: 2, windowMs: 60_000 });
+      const GET = createLookupHandler(() => ({ db, api }), { limiter, ...opts });
+      return { GET, state };
+    }
+
+    it("answers 429 with Retry-After and a JSON body once an IP is over the limit", async () => {
+      const { GET, state } = limited();
+      for (let i = 0; i < 2; i++) await (await GET(get("203.0.113.9"))).text();
+      const callsBefore = { ...state.calls };
+      const res = await GET(get("203.0.113.9"));
+      expect(res.status).toBe(429);
+      expect(Number(res.headers.get("retry-after"))).toBeGreaterThan(0);
+      expect(res.headers.get("content-type")).toContain("application/json");
+      const body = (await res.json()) as { error: string; retryAfter: number };
+      expect(body.error).toBe("rate_limited");
+      expect(body.retryAfter).toBe(Number(res.headers.get("retry-after")));
+      expect(state.calls).toEqual(callsBefore);
+    });
+
+    it("limits each client IP on its own", async () => {
+      const { GET } = limited();
+      for (let i = 0; i < 2; i++) await (await GET(get("203.0.113.9"))).text();
+      expect((await GET(get("203.0.113.9"))).status).toBe(429);
+      const other = await GET(get("198.51.100.4"));
+      expect(other.status).toBe(200);
+      await other.text();
+    });
+
+    it("counts requests with no address in one shared bucket", async () => {
+      const { GET } = limited();
+      for (let i = 0; i < 2; i++) await (await GET(get())).text();
+      expect((await GET(get())).status).toBe(429);
+    });
+
+    it("does not limit requests the exempt check accepts", async () => {
+      const { GET } = limited({ exempt: () => true });
+      for (let i = 0; i < 5; i++) {
+        const res = await GET(get("203.0.113.9"));
+        expect(res.status).toBe(200);
+        await res.text();
+      }
+    });
   });
 });

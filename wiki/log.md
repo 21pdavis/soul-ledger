@@ -1,5 +1,9 @@
 # Directory Update Log
 
+## 2026-10-17
+* **Decision**: [ADR 0075](decisions/0075-per-ip-lookup-rate-limit.md): `/api/lookup` is limited to 10 lookups a minute per client IP, in memory, with 429 and Retry-After; staging-key holders are exempt. Fixes #7; the cross-instance part joins #16.
+* **Research**: [Client IP behind Render's proxy](research/render-client-ip.md): first `x-forwarded-for` entry, with a spoofing caveat; not yet verified against Render.
+
 ## 2026-10-16
 * **Decision**: [ADR 0074](decisions/0074-no-ci-run-on-staging-pushes.md): CI no longer runs on pushes to staging (the up-to-date PR run already covers it), and a new commit on a PR cancels its older run. Amends ADR 0063 (owner decision).
 * **Milestone**: release 0.3.1 prepared: the city behind the landing page ([ADR 0073](decisions/0073-city-behind-the-landing-page.md), #95), a patch release per [ADR 0068](decisions/0068-m3-scope-and-order.md).
