@@ -18,10 +18,10 @@ concurrency:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -33,9 +33,9 @@ jobs:
           REF: ${{ github.ref }}
           EVENT_NAME: ${{ github.event_name }}
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -66,7 +66,7 @@ jobs:
 
   e2e:
     name: e2e (${{ matrix.device }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -78,7 +78,7 @@ jobs:
           - device: desktop
             projects: --project=desktop --project=gate
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -90,10 +90,10 @@ jobs:
           REF: ${{ github.ref }}
           EVENT_NAME: ${{ github.event_name }}
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         if: steps.changes.outputs.code == 'true'
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         if: steps.changes.outputs.code == 'true'
         with:
           node-version: 24
@@ -103,14 +103,14 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # Next.js reuses its compile cache between runs; Playwright keeps its downloaded browser.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         if: steps.changes.outputs.code == 'true'
         with:
           path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**') }}
           restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         if: steps.changes.outputs.code == 'true'
         with:
           path: ~/.cache/ms-playwright
@@ -134,7 +134,7 @@ jobs:
         if: steps.changes.outputs.code == 'true' && steps.changes.outputs.full == 'true'
         run: pnpm exec playwright test ${{ matrix.projects }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure() && steps.changes.outputs.code == 'true'
         with:
           name: playwright-report-${{ matrix.device }}
