@@ -31,7 +31,6 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 | P2 | Keep one city from the landing page into the story, so the camera flies from the landing circle into the opening shot instead of fading in again (and an auto-drop carries over) | [ADR 0073](../decisions/0073-city-behind-the-landing-page.md) |
 | P2 | Picture-comparison tests for hero models (they hold still, so they compare reliably) | [ADR 0068](../decisions/0068-m3-scope-and-order.md) |
 | P2 | Big visual style pass (fonts, look) after M3 or later | [ADR 0060](../decisions/0060-owner-decisions-m2-open-questions.md) |
-| P1 | Make the cached-matches note an overlay so it stops squeezing the stage on tiny phones (#38) | [M2 plan](m2-plan.md) |
 | P2 | Add an e2e reduced-motion check (today only component tests cover it) | [ADR 0054](../decisions/0054-m2-testing-and-accessibility.md) |
 | P2 | Fold the slide 8-10 helpers into the shared primitives and `copy.ts` (#37) | [M2 plan](m2-plan.md) |
 | P1 | Read and cite Valve's fan content policy | [monetization](../open-questions/monetization.md) |
