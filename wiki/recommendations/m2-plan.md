@@ -164,7 +164,7 @@ Each is testable at the layer in brackets.
 - [e2e] Entering a URL starts the lookup. (The Enter click becoming the audio-unlock gesture is deferred: M2 has no audio layer, see [backlog](backlog.md).)
 - [component] The loader moves through three stages driven only by NDJSON events (profile, history with hero ids, details fetched/total) and never advances on a timer alone.
 - [e2e] The story never mounts when `matchCount === 0`. This includes players whose only games are Street Brawl (`excludedMatches > 0`). They get the zero-matches screen.
-- [component] When the story event has `stale: true` (a refresh failed and the story comes from older cached matches), a short "showing cached matches" note appears.
+- [component] When the story event has `stale: true` (a refresh failed and the story comes from older cached matches), slide 1's footer says "From saved matches: we couldn't reach the latest just now." (#38).
 - [component] The loader tolerates a `waiting` event (shows a waiting state, does not error or skip a stage).
 - [e2e] `not_found`, `unavailable` / `fetch_failed` and zero-matches each render their full-screen state; unavailable has a working retry.
 - [e2e] A player with few matches still plays the story, with no same-hero claims and the N-matches line shown.
