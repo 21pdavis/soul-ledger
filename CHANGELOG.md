@@ -4,8 +4,13 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Changed
+
+- Browsers without hardware graphics acceleration now start the 3D city on the Simple setting, so it runs lighter from the first second. If it still runs too slowly it drops to Off by itself, as before.
+
 ### Fixed
 
+- If the current patch date cannot be found, "This patch" now says so and shows the story as "All time" instead of quietly mixing the two.
 - The "Showing cached matches" note now floats over the first slide's empty space instead of shrinking the story on small phones, never covers the headline, and you can still dismiss it.
 
 ## [0.3.1] - 2026-10-16

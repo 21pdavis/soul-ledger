@@ -27,6 +27,11 @@ describe("windowLabel", () => {
     }
   });
 
+  it("says All time, and why, when the server flags the patch as unavailable (#25)", () => {
+    const label = windowLabel({ window: "all", patchStart: null, patchUnavailable: true });
+    expect(label).toBe("All time (couldn't find the patch date)");
+  });
+
   it("falls back to All time, and says why, when the patch date could not be found (#25)", () => {
     const label = windowLabel({ window: "patch", patchStart: null });
     expect(label).toMatch(/^All time/);

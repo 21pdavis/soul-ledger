@@ -19,6 +19,15 @@ describe("WindowLabel", () => {
     expect(screen.getByText("Since patch Sep 30, 2026")).toBeInTheDocument();
   });
 
+  it("shows All time with a short note when the patch date was unavailable (#25)", () => {
+    const { container } = render(
+      <WindowLabel
+        meta={{ window: "all", patchStart: null, patchUnavailable: true, stale: false }}
+      />,
+    );
+    expect(container).toHaveTextContent("All time (couldn't find the patch date)");
+  });
+
   it("never says 'This patch' when the server had no patch date (#25)", () => {
     const { container } = render(
       <WindowLabel meta={{ window: "patch", patchStart: null, stale: false }} />,
