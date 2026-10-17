@@ -2,7 +2,15 @@
 
 import { Line } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import * as THREE from "three";
 import type { StoryData } from "@/story/types";
 import { Landmarks } from "./Landmarks";
@@ -31,6 +39,7 @@ import {
   Truck,
 } from "./Props";
 import { AmbientRig } from "./AmbientRig";
+import { loadMidBossGeometry } from "./midboss-mesh";
 import { TourRig } from "./TourRig";
 import { planTour, routeConnectors, type TourPlan } from "./tour";
 
@@ -447,6 +456,8 @@ export default function CityWorld({
   /** The Simple graphics level: the same scene with fewer street props. */
   simple?: boolean;
 }) {
+  // Start building the story's heavy pieces off the main thread now, while this is scenery.
+  useEffect(() => void loadMidBossGeometry(), []);
   const tour = useMemo(() => (story ? planTour(story) : null), [story]);
   // Keep the camera's hops between lanes clear of buildings.
   const buildings = useMemo(

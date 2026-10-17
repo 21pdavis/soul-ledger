@@ -8,12 +8,22 @@ import { fixtureStory } from "../fixtures/story";
 const h = vi.hoisted(() => ({
   frames: new Set<() => void>(),
   shadows: undefined as unknown,
+  onCreated: undefined as undefined | ((state: unknown) => void),
   cityReady: false,
   release: () => {},
 }));
 vi.mock("@react-three/fiber", () => ({
-  Canvas: ({ children, shadows }: { children: React.ReactNode; shadows?: unknown }) => {
+  Canvas: ({
+    children,
+    shadows,
+    onCreated,
+  }: {
+    children: React.ReactNode;
+    shadows?: unknown;
+    onCreated?: (state: unknown) => void;
+  }) => {
     h.shadows = shadows;
+    h.onCreated = onCreated;
     return <div>{children}</div>;
   },
   useFrame: (cb: () => void) => {
@@ -119,5 +129,14 @@ describe("WorldCanvas frame watching", () => {
     // which throws away every compiled shader in one frame (the stutter as the story starts).
     render(<WorldCanvas />);
     expect(h.shadows).toBe("percentage");
+  });
+
+  it("skips three.js's shader error check, which stalls each new shader's first frame", () => {
+    // Reading the driver's shader logs forces it to finish the shader on the spot, undoing the
+    // background warm-up before the story (the stutter as the cast appears).
+    render(<WorldCanvas />);
+    const gl = { debug: { checkShaderErrors: true } };
+    h.onCreated?.({ gl });
+    expect(gl.debug.checkShaderErrors).toBe(false);
   });
 });
