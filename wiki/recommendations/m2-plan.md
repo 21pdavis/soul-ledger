@@ -178,7 +178,7 @@ The ADR 0004 this-patch toggle is in M2 ([ADR 0052](../decisions/0052-m2-entry-l
 - [unit] The selection maps to the lookup URL as `window=all|patch` (default `all`).
 - [component] The selection is remembered in `localStorage` like the last URL, and restored on return.
 - [component] The story shows which window it is: "All time", or "since patch <date>" using `patchStart` from the lookup response. The label never uses a client-computed date.
-- [component] If `window === "patch"` but `patchStart === null` (the server could not find the patch date and returned all-time data; tracked in #25), the story is labelled "All time" or says the patch date couldn't be found. It is never labelled "This patch".
+- [component] If the server could not find the patch date it returns `window: "all"` with `patchUnavailable: true` (fixed in #25); the story is labelled "All time (couldn't find the patch date)". It is never labelled "This patch".
 - [unit] `patchStart` is formatted in UTC (`timeZone: "UTC"`), so it shows the same date everywhere. A test runs in a negative-offset timezone (for example `America/Los_Angeles`) and expects the UTC date, not the day before.
 - [component] Refresh (`refresh=1`) and Replay keep the current window: Refresh reruns the lookup with the same `window`.
 - [component] "Based on N matches" uses `matchCount` of the returned story, so it reflects the window.

@@ -32,7 +32,7 @@ Each stage is held on screen for a minimum time, the tally counters take a minim
 
 ## Window control
 
-- The ADR 0004 **this-patch toggle is in M2** (owner, 2026-10-07; [ADR 0004](0004-time-window.md) stays accepted). The entry screen has a selector, **All time** (default) or **This patch**, sent as `window=all|patch` to `/api/lookup` and remembered in `localStorage` like the URL. Refresh and Replay keep the current window. If the server returns `window: "patch"` with no `patchStart`, the story is labelled All time (issue #25).
+- The ADR 0004 **this-patch toggle is in M2** (owner, 2026-10-07; [ADR 0004](0004-time-window.md) stays accepted). The entry screen has a selector, **All time** (default) or **This patch**, sent as `window=all|patch` to `/api/lookup` and remembered in `localStorage` like the URL. Refresh and Replay keep the current window. If the patch date is unknown, the server returns `window: "all"` with `patchUnavailable: true` and the story is labelled All time, with a short note (issue #25).
 - It is built as an **extensible filter/window control** (a typed filter object, not a boolean) as a test run for more detailed filters later. No specific extra filters are decided; see the [backlog](../recommendations/backlog.md).
 - The story shows its window ("since patch <date>" from the response's `patchStart`). Patch dates come from [ADR 0035](0035-patch-date-from-changelog-title.md). An empty or thin patch window uses the zero-matches and few-matches states below.
 

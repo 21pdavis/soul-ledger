@@ -100,6 +100,24 @@ describe("runLookup", () => {
     expect(s.story.intro.firstMatchAt!.getTime()).toBeGreaterThanOrEqual(s.patchStart!.getTime());
   });
 
+  it("says so when the patch date is unknown: all-time data flagged patchUnavailable (#25)", async () => {
+    const { api, state } = fakeApi();
+    state.patchesFailWith = new Error("patches down");
+    const s = storyOf(await lookup(String(TEST_ACCOUNT_ID), { api }, { window: "patch" }));
+    expect(s.window).toBe("all");
+    expect(s.patchUnavailable).toBe(true);
+    expect(s.patchStart).toBeNull();
+    expect(s.story.matchCount).toBe(351);
+  });
+
+  it("does not flag patchUnavailable when the patch date is known or all time was asked for", async () => {
+    const { api } = fakeApi();
+    const patch = storyOf(await lookup(String(TEST_ACCOUNT_ID), { api }, { window: "patch" }));
+    expect(patch.patchUnavailable).toBe(false);
+    const all = storyOf(await lookup(String(TEST_ACCOUNT_ID), { api }, { window: "all" }));
+    expect(all.patchUnavailable).toBe(false);
+  });
+
   it("caches percentile metrics and the patch list between lookups", async () => {
     const { api, state } = fakeApi();
     await lookup(String(TEST_ACCOUNT_ID), { api }, { window: "patch" });

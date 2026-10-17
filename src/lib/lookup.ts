@@ -20,6 +20,8 @@ export type LookupEvent =
       player: { accountId: number; personaName: string | null; avatarUrl: string | null };
       window: StoryWindow;
       patchStart: Date | null;
+      /** True when a patch window was asked for but the patch date is unknown: the story is all-time (#25). */
+      patchUnavailable: boolean;
       /** True when a refresh failed and this story comes from older cached matches. */
       stale: boolean;
       story: Story;
@@ -82,6 +84,8 @@ export async function runLookup(
   }
 
   const patchStart = request.window === "patch" ? await getPatchStart(deps, now) : null;
+  // A patch window with no known patch date is served all-time data; say so (#25).
+  const patchUnavailable = request.window === "patch" && patchStart === null;
   const matches = await repo.getPlayerMatches(db, accountId, {
     since: patchStart ?? undefined,
   });
@@ -100,8 +104,9 @@ export async function runLookup(
       personaName: player?.personaName ?? null,
       avatarUrl: player?.avatarUrl ?? null,
     },
-    window: request.window,
+    window: patchUnavailable ? "all" : request.window,
     patchStart,
+    patchUnavailable,
     stale,
     story: computeStory({
       matches,
