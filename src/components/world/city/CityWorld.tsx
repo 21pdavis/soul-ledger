@@ -369,11 +369,11 @@ function Lanes({ simple }: { simple: boolean }) {
 }
 
 /**
- * Draws its children only once their shaders are compiled. The compile runs in the background
- * (`compileAsync`, parallel where the browser allows), so a new set of materials never freezes a
- * frame while the story's first card animates in. Where that fails, they simply show.
+ * Draws its children only once the scene's shaders are ready for them. The compile runs in the
+ * background (`compileAsync`, parallel where the browser allows), so new materials and lights never
+ * freeze a frame while the story's first card animates in. Where that fails, they simply show.
  */
-function WarmUp({ children }: { children: ReactNode }) {
+function WarmUp({ offscreen, children }: { offscreen: boolean; children: ReactNode }) {
   const group = useRef<THREE.Group>(null);
   const { gl, camera, scene } = useThree();
   const [ready, setReady] = useState(false);
@@ -381,16 +381,28 @@ function WarmUp({ children }: { children: ReactNode }) {
     const g = group.current;
     if (!g) return;
     let live = true;
-    // Only visible objects are compiled, so show the group for the compile but not on screen yet.
+    // On Full the effects draw the scene into an off-screen buffer first, which needs shader
+    // variants with different colour handling than drawing straight to the screen. Compile for
+    // the same kind of target, or those variants would still be built on the spot.
+    const target = offscreen ? new THREE.WebGLRenderTarget(1, 1) : null;
+    const before = gl.getRenderTarget();
+    gl.setRenderTarget(target);
+    // The cast brings its own lights, and a different light count means every material in the
+    // city needs new shaders. So compile the whole scene as it will be with the cast in it (only
+    // visible objects and lights count: show the group for the compile, not on screen yet).
     g.visible = true;
-    gl.compileAsync(g, camera, scene)
+    gl.compileAsync(scene, camera)
       .catch(() => {})
-      .finally(() => live && setReady(true));
+      .finally(() => {
+        target?.dispose();
+        if (live) setReady(true);
+      });
     g.visible = false;
+    gl.setRenderTarget(before);
     return () => {
       live = false;
     };
-  }, [gl, camera, scene]);
+  }, [gl, camera, scene, offscreen]);
   return (
     <group ref={group} visible={ready}>
       {children}
@@ -399,14 +411,14 @@ function WarmUp({ children }: { children: ReactNode }) {
 }
 
 /** The reader's heroes, duel and death map, placed for the story, with the camera following it. */
-function StoryCast({ tour, slide }: { tour: TourPlan; slide: number }) {
+function StoryCast({ tour, slide, simple }: { tour: TourPlan; slide: number; simple: boolean }) {
   return (
     <>
       {/* The cast loads its own pictures. Waiting here, not at the canvas, keeps the city on
           screen while they arrive, so the landing page's city never blinks out as the story
           starts; the camera is already flying in. */}
       <Suspense fallback={null}>
-        <WarmUp>
+        <WarmUp offscreen={!simple}>
           {tour.cast.map((m, i) => (
             <Standee key={i} member={m} />
           ))}
@@ -466,7 +478,7 @@ export default function CityWorld({
       <Buildings buildings={buildings} />
       <Lanes simple={simple} />
       <Landmarks />
-      {tour ? <StoryCast tour={tour} slide={slide} /> : <AmbientRig />}
+      {tour ? <StoryCast tour={tour} slide={slide} simple={simple} /> : <AmbientRig />}
     </>
   );
 }

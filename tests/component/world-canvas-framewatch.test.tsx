@@ -7,11 +7,15 @@ import { fixtureStory } from "../fixtures/story";
 // The real canvas needs WebGL; stand-ins let us drive the frame loop and the city's loading by hand.
 const h = vi.hoisted(() => ({
   frames: new Set<() => void>(),
+  shadows: undefined as unknown,
   cityReady: false,
   release: () => {},
 }));
 vi.mock("@react-three/fiber", () => ({
-  Canvas: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Canvas: ({ children, shadows }: { children: React.ReactNode; shadows?: unknown }) => {
+    h.shadows = shadows;
+    return <div>{children}</div>;
+  },
   useFrame: (cb: () => void) => {
     // Registered on mount (an effect), like the real one, so a suspended subtree adds nothing.
     useEffect(() => {
@@ -108,5 +112,12 @@ describe("WorldCanvas frame watching", () => {
     expect(h.frames.size).toBe(1);
     await run(1, 5); // the warm-up starts only now
     expect(onSlow).not.toHaveBeenCalled();
+  });
+
+  it("asks for the standard shadow style, so the shaders warmed up for the story are the ones used", () => {
+    // three.js swaps the retired "soft" style for the standard one on the first shadow it draws,
+    // which throws away every compiled shader in one frame (the stutter as the story starts).
+    render(<WorldCanvas />);
+    expect(h.shadows).toBe("percentage");
   });
 });
