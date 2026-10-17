@@ -4,7 +4,7 @@ title: "M2 plan: PR breakdown and per-slide acceptance criteria"
 description: "How to build M2 (the 11-slide 2D story) in nine PRs into staging, with a testable acceptance criterion list for every slide."
 tags: [m2, plan, slides, testing]
 status: stable
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T11:34:10Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-17T12:00:00Z }
 ---
 
 # Outcome

@@ -6,7 +6,7 @@ tags: [m2, ux, loading, errors]
 status: stable
 decision: accepted
 decided_on: 2026-10-07
-generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-08T14:00:00Z }
+generated: { by: claude-code/claude-sonnet-5-5, at: 2026-10-17T12:00:00Z }
 ---
 
 # Decision
