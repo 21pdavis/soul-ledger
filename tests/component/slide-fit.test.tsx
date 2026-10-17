@@ -110,6 +110,45 @@ describe("RankSlide fits the stage it is in", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(7);
   });
 
+  describe("the measuring switch only touches a running entrance", () => {
+    let running: unknown[];
+    let measured: number;
+    beforeEach(() => {
+      running = [];
+      measured = 0;
+      Object.defineProperty(Element.prototype, "getAnimations", {
+        configurable: true,
+        value: () => running,
+      });
+      const set = Element.prototype.setAttribute;
+      vi.spyOn(Element.prototype, "setAttribute").mockImplementation(function (
+        this: Element,
+        name: string,
+        value: string,
+      ) {
+        if (name === "data-fit-measuring") measured += 1;
+        set.call(this, name, value);
+      });
+    });
+    afterEach(() => {
+      delete (Element.prototype as unknown as Record<string, unknown>).getAnimations;
+    });
+
+    it("does not restart the entrance when a re-measure comes after it has finished", () => {
+      running = [{ playState: "finished" }]; // a finished animation still holds its end state
+      renderRank();
+      measured = 0;
+      act(() => resize?.());
+      expect(measured).toBe(0);
+    });
+
+    it("still measures with the entrance off while it is running", () => {
+      running = [{ playState: "running" }];
+      renderRank();
+      expect(measured).toBeGreaterThan(0);
+    });
+  });
+
   it("plots the same badges it lists", () => {
     box.height = 100 + 4 * 40;
     const { container } = renderRank();
