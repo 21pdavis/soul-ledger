@@ -107,7 +107,7 @@ function sparseStory() {
 
 const STORIES = [
   { name: "full story", story: () => fixtureStory(), over: {} },
-  { name: "sparse story, cached note", story: sparseStory, over: { stale: true } },
+  { name: "sparse story, saved-matches line", story: sparseStory, over: { stale: true } },
 ];
 
 test.describe("entry and loading", () => {

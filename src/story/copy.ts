@@ -111,8 +111,7 @@ export const LOADING_COPY = {
   },
 } as const;
 
-export const STALE_NOTE = "Showing cached matches. We couldn't reach the latest ones just now.";
-export const DISMISS = "Dismiss";
+export const STALE_NOTE = "From saved matches: we couldn't reach the latest just now.";
 
 export const STORY_ACTIONS_COPY = {
   refresh: "Refresh",

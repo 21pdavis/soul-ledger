@@ -1,7 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { StaleNote } from "@/components/app/StaleNote";
 import { WindowLabel } from "@/components/story/WindowLabel";
 
 describe("WindowLabel", () => {
@@ -34,18 +32,5 @@ describe("WindowLabel", () => {
     );
     expect(container).toHaveTextContent(/^All time/);
     expect(container).not.toHaveTextContent(/this patch/i);
-  });
-});
-
-describe("StaleNote", () => {
-  it("tells the player the story comes from cached matches", () => {
-    render(<StaleNote />);
-    expect(screen.getByRole("status")).toHaveTextContent(/showing cached matches/i);
-  });
-
-  it("can be dismissed", async () => {
-    render(<StaleNote />);
-    await userEvent.click(screen.getByRole("button", { name: "Dismiss" }));
-    expect(screen.queryByText(/showing cached matches/i)).not.toBeInTheDocument();
   });
 });

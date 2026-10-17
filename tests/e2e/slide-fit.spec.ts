@@ -120,7 +120,7 @@ test.describe("every slide fits its frame, worst case", () => {
   });
 
   for (const { width, height, phone, stale } of SIZES) {
-    test(`${width}x${height}${stale ? " (cached-matches note)" : ""}: nothing on any slide runs past the frame`, async ({
+    test(`${width}x${height}${stale ? " (saved-matches line)" : ""}: nothing on any slide runs past the frame`, async ({
       page,
       isMobile,
     }) => {
@@ -181,7 +181,11 @@ test.describe("every slide fits its frame, worst case", () => {
           await expect(current).toContainText("Oracle");
           // A bigger stage never shows fewer rows than a smaller one: the climb has 14 distinct
           // badges, so every stage with the stage's usual room shows the full 7.
-          if (!stale) await expect(frame.locator("ol li")).toHaveCount(7);
+          await expect(frame.locator("ol li")).toHaveCount(7);
+        }
+        if (slide.id === "intro" && stale) {
+          // The line is in the footer's flow, so the fit check above already covers it.
+          await expect(frame.getByText(/from saved matches/i)).toBeVisible();
         }
         if (slide.id === "kills") {
           // The worst case names a nemesis, so the fit check above really covers its line.

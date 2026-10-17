@@ -92,8 +92,8 @@ test("Look up another player returns to the entry screen", async ({ page }) => {
 });
 
 /**
- * The cases that squeeze the card. The combined case stacks all three squeezes (the stale note
- * shrinks the stage, "This patch" wraps the window line, long names fill the lines), so the
+ * The cases that squeeze the card. The combined case stacks all three squeezes (the stale line
+ * adds a footer row, "This patch" wraps the window line, long names fill the lines), so the
  * single-factor "stale" and "patch" cases are not run separately.
  */
 const CASES: { name: string; over: Record<string, unknown>; patch: boolean; long: boolean }[] = [

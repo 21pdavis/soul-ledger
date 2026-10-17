@@ -32,12 +32,12 @@ M2 is built and on `staging` (2026-10-08). The criteria below still describe wha
 - **Fit:** slides never scroll, so what does not fit gets smaller, and long lists drop rows to fit (rank climb 7 down to 3 keeping first, peak and current; roster top heroes 5 down to 3). See `useFitCount` and `tests/e2e/slide-fit.spec.ts` (#41).
 - **Valve notice:** owned by App's notices strip below the player, not by any slide.
 - **Unspent souls:** slide 8 ships the neutral sentence, with no unit claimed, pending #36.
-- **Cached-matches note:** it squeezes the stage on tiny phones (#38, make it an overlay).
+- **Cached-matches note:** it squeezed the stage on tiny phones; resolved in #107 by moving it into slide 1's footer as a plain line (#38).
 - **Audio-unlock:** deferred, there is no audio layer.
 - **a11y:** the axe scan (`tests/e2e/a11y.spec.ts`), and the keyboard-only suite landed in PR 9. Reduced motion is covered by component tests only, with no e2e suite (backlog) ([ADR 0054](../decisions/0054-m2-testing-and-accessibility.md)).
 - **Preview route:** the `/preview` fixture route used during the build is gone (#29).
 
-**Follow-ups:** #36 (unspent souls unit and missing-key bias), #37 (consolidate slide 8-10 helpers into shared primitives and `copy.ts`), #38 (cached-matches overlay), #25 (patch window without a known date). Still open for the owner: [font pairing](../open-questions/m2-font-pairing.md) (Limelight with Space Grotesk shipped as the default), [rank tier names](../open-questions/m2-rank-tier-names.md) (map built from the API fixture), [hero art terms](../open-questions/m2-hero-art-terms.md), [unspent souls unit](../open-questions/m2-unspent-souls-unit.md). The repo going public still waits on #8 and #9.
+**Follow-ups:** #36 (unspent souls unit and missing-key bias), #37 (consolidate slide 8-10 helpers into shared primitives and `copy.ts`), #38 (cached-matches note, done in #107), #25 (patch window without a known date). Still open for the owner: [font pairing](../open-questions/m2-font-pairing.md) (Limelight with Space Grotesk shipped as the default), [rank tier names](../open-questions/m2-rank-tier-names.md) (map built from the API fixture), [hero art terms](../open-questions/m2-hero-art-terms.md), [unspent souls unit](../open-questions/m2-unspent-souls-unit.md). The repo going public still waits on #8 and #9.
 
 # Context
 
@@ -164,7 +164,7 @@ Each is testable at the layer in brackets.
 - [e2e] Entering a URL starts the lookup. (The Enter click becoming the audio-unlock gesture is deferred: M2 has no audio layer, see [backlog](backlog.md).)
 - [component] The loader moves through three stages driven only by NDJSON events (profile, history with hero ids, details fetched/total) and never advances on a timer alone.
 - [e2e] The story never mounts when `matchCount === 0`. This includes players whose only games are Street Brawl (`excludedMatches > 0`). They get the zero-matches screen.
-- [component] When the story event has `stale: true` (a refresh failed and the story comes from older cached matches), a short "showing cached matches" note appears.
+- [component] When the story event has `stale: true` (a refresh failed and the story comes from older cached matches), slide 1's footer says "From saved matches: we couldn't reach the latest just now." (#38).
 - [component] The loader tolerates a `waiting` event (shows a waiting state, does not error or skip a stage).
 - [e2e] `not_found`, `unavailable` / `fetch_failed` and zero-matches each render their full-screen state; unavailable has a working retry.
 - [e2e] A player with few matches still plays the story, with no same-hero claims and the N-matches line shown.
