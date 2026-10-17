@@ -5,8 +5,9 @@ import { DISMISS, STALE_NOTE } from "@/story/copy";
 import styles from "./StaleNote.module.css";
 
 /**
- * Shown after the story when a refresh failed and the matches come from an earlier visit. It sits
- * in the page flow (never over the story) and can be dismissed.
+ * Shown over the top edge of the story stage, just under the progress bar, when a refresh failed
+ * and the matches come from an earlier visit. It takes no layout space, so the stage keeps its
+ * full size (#38), and it can be dismissed (keyboard included). role="status" announces it politely.
  */
 export function StaleNote() {
   const [dismissed, setDismissed] = useState(false);

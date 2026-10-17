@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { SLIDES, SLIDE_COUNT } from "@/story/copy";
 import { ENTRANCE_MS, initialPlayerState, reducePlayer } from "@/story/slide-index";
@@ -21,6 +22,8 @@ interface Props extends SlideProps {
   onSlideChange?: (index: number) => void;
   /** A 3D world sits behind the story: panels turn to glass and desktop cards step aside. */
   world?: boolean;
+  /** Floats over the top edge of the stage, under the progress bar (the cached-matches note). */
+  overlay?: ReactNode;
 }
 
 /**
@@ -36,6 +39,7 @@ export function StoryPlayer({
   entranceMs = ENTRANCE_MS,
   onSlideChange,
   world = false,
+  overlay,
 }: Props) {
   const ready = useIsClient();
   const mode = useStoryMode();
@@ -145,6 +149,7 @@ export function StoryPlayer({
       <div className={styles.progress} data-interactive={!tap}>
         <ProgressBar count={SLIDE_COUNT} current={state.index} onSelect={tap ? undefined : goTo} />
       </div>
+      {overlay}
       {tap && (
         <>
           <button type="button" className={styles.srNav} data-side="back" onClick={back}>
@@ -214,6 +219,7 @@ export function StoryPlayer({
               orientation="vertical"
             />
           </div>
+          {overlay}
         </div>
       )}
       <div role="status" aria-live="polite" className={styles.visuallyHidden}>

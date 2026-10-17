@@ -24,7 +24,6 @@ import { Disclaimer } from "./Disclaimer";
 import { ErrorScreen } from "./ErrorScreen";
 import { LoadingScreen } from "./LoadingScreen";
 import { ScreenShell } from "./ScreenShell";
-import { StaleNote } from "./StaleNote";
 import { StoryStage } from "./StoryStage";
 import styles from "./App.module.css";
 
@@ -180,7 +179,6 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
       <div className={styles.storyPage}>
         <StoryStage key={replayCount} {...props} />
         <div className={styles.notices}>
-          {phase.meta.stale && <StaleNote />}
           <Disclaimer />
         </div>
       </div>

@@ -28,21 +28,52 @@ test.describe("both layouts", () => {
     expect(stageBox.y + stageBox.height).toBeLessThanOrEqual(noticeBox.y);
   });
 
-  test("the cached-matches note sits below the player, clear of the progress bar", async ({
+  test("the cached-matches note floats over the stage, clear of the progress bar and controls", async ({
     page,
   }) => {
     await openStory(page, { stale: true });
     const note = page.getByText(/showing cached matches/i);
     await expect(note).toBeInViewport();
+    await expect(page.getByRole("status").filter({ hasText: /cached matches/i })).toHaveCount(1);
     const bar = (await page.getByRole("list", { name: "Story progress" }).boundingBox())!;
     const noteBox = (await note.boundingBox())!;
     const stageBox = (await stage(page).boundingBox())!;
-    expect(bar.y + bar.height).toBeLessThanOrEqual(noteBox.y);
-    expect(stageBox.y + stageBox.height).toBeLessThanOrEqual(noteBox.y);
-    // the note can be dismissed and the notice is still there
-    await page.getByRole("button", { name: "Dismiss" }).click();
+    type Box = { x: number; y: number; width: number; height: number };
+    const apart = (a: Box, b: Box) =>
+      a.y >= b.y + b.height ||
+      a.y + a.height <= b.y ||
+      a.x >= b.x + b.width ||
+      a.x + a.width <= b.x;
+    // an overlay: it sits inside the stage and overlaps neither the progress bar nor any control
+    expect(noteBox.y).toBeGreaterThanOrEqual(stageBox.y);
+    expect(noteBox.y + noteBox.height).toBeLessThanOrEqual(stageBox.y + stageBox.height);
+    expect(apart(noteBox, bar)).toBe(true);
+    for (const control of await stage(page)
+      .getByRole("button")
+      .filter({ hasNotText: "Dismiss" })
+      .all()) {
+      const box = await control.boundingBox();
+      if (box && box.width > 1) expect(apart(noteBox, box)).toBe(true);
+    }
+    // dismissible by keyboard; the Valve notice is still there
+    await page.getByRole("button", { name: "Dismiss" }).focus();
+    await page.keyboard.press("Enter");
     await expect(note).toHaveCount(0);
     await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeInViewport();
+  });
+
+  test("the cached-matches note does not shrink the stage (320x568)", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await openStory(page);
+    const plain = (await stage(page).boundingBox())!;
+    const other = await page.context().newPage();
+    await other.setViewportSize({ width: 320, height: 568 });
+    await openStory(other, { stale: true });
+    page = other;
+    await expect(page.getByText(/showing cached matches/i)).toBeVisible();
+    const withNote = (await stage(page).boundingBox())!;
+    expect(withNote.width).toBe(plain.width);
+    expect(withNote.height).toBe(plain.height);
   });
 
   test("no sideways scroll while the story plays", async ({ page }) => {

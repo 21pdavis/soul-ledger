@@ -5,6 +5,7 @@ import { StoryPlayer } from "@/components/story/StoryPlayer";
 import { WorldLayer } from "@/components/world/WorldLayer";
 import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
 import type { SlideProps } from "@/story/types";
+import { StaleNote } from "./StaleNote";
 import styles from "./StoryStage.module.css";
 
 /**
@@ -12,8 +13,9 @@ import styles from "./StoryStage.module.css";
  * on Replay. The 3D world sits behind the player (ADR 0068, 0069) and follows its current slide;
  * it starts loading only once the player reports its first slide, so it never delays the story.
  *
- * Not in here, on purpose: the Valve notice and the cached-matches note. App renders both in a
- * strip after this stage, so they stay on screen and cannot cover the player.
+ * The cached-matches note floats over the top edge of the player's stage (a dismissible overlay, so it never
+ * shrinks the stage, #38). Not in here, on purpose: the Valve notice, which App renders in the
+ * always-visible strip after this stage (ADR 0016).
  */
 export function StoryStage(props: SlideProps) {
   const [slide, setSlide] = useState<number | null>(null);
@@ -30,7 +32,12 @@ export function StoryStage(props: SlideProps) {
       {/* The page's one h1; the slide headlines are h2s below it. */}
       <h1 className={styles.visuallyHidden}>Your Soul Ledger story</h1>
       <div className={styles.player}>
-        <StoryPlayer {...props} world onSlideChange={onSlideChange} />
+        <StoryPlayer
+          {...props}
+          world
+          onSlideChange={onSlideChange}
+          overlay={props.meta.stale ? <StaleNote /> : null}
+        />
       </div>
     </main>
   );
