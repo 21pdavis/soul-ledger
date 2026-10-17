@@ -39,7 +39,13 @@ export type Phase =
   | { name: "entry" }
   | { name: "loading"; progress: ClientLookupEvent[]; countMs: number }
   | { name: "story"; story: StoryData; meta: StoryMeta }
-  | { name: "error"; kind: ErrorKind; window: StoryWindow; excludedMatches: number };
+  | {
+      name: "error";
+      kind: ErrorKind;
+      window: StoryWindow;
+      excludedMatches: number;
+      retryAfter?: number;
+    };
 
 interface Props {
   /** For tests: replaces the global `fetch` used for the lookup. */
@@ -104,6 +110,7 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
             kind: event.reason,
             window: next.window,
             excludedMatches: 0,
+            retryAfter: event.reason === "rate_limited" ? event.retryAfter : undefined,
           });
         } else if (event.story.matchCount === 0) {
           // Nothing to tell: the story never mounts without matches (ADR 0052).
@@ -220,6 +227,7 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
             kind={phase.kind}
             window={phase.window}
             excludedMatches={phase.excludedMatches}
+            retryAfter={phase.retryAfter}
             onRetry={() => request && void run(request)}
             onNewLookup={actions.onNewLookup}
           />

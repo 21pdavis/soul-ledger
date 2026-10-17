@@ -7,6 +7,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 ### Changed
 
 - Browsers without hardware graphics acceleration now start the 3D city on the Simple setting, so it runs lighter from the first second. If it still runs too slowly it drops to Off by itself, as before.
+- Looking up players is now limited to 10 a minute from one connection, so nobody can flood the site. If you go over, you see a short "Too many lookups, try again in N seconds" screen.
 
 ### Fixed
 

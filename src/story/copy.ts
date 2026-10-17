@@ -120,7 +120,12 @@ export const STORY_ACTIONS_COPY = {
   newLookup: "Look up another player",
 } as const;
 
-export type ErrorKind = "invalid" | "not_found" | "unavailable" | "fetch_failed" | "no_matches";
+export type ErrorKind =
+  "invalid" | "not_found" | "unavailable" | "fetch_failed" | "no_matches" | "rate_limited";
+
+/** The rate-limit screen's sentence (ADR 0076). */
+export const rateLimitedBody = (seconds: number) =>
+  `Too many lookups, try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}.`;
 
 interface ErrorCopy {
   title: string;
@@ -153,6 +158,13 @@ export const ERROR_COPY: Record<ErrorKind, ErrorCopy> = {
   fetch_failed: {
     title: "We lost the thread",
     body: "The connection dropped before your ledger arrived. Check your internet and try again in a minute.",
+    seal: "!",
+    action: { label: "Try again", does: "retry" },
+  },
+  rate_limited: {
+    title: "The ledger needs a breather",
+    // The wait is filled in by the screen (rateLimitedBody).
+    body: "",
     seal: "!",
     action: { label: "Try again", does: "retry" },
   },
