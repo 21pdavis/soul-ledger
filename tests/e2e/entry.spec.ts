@@ -102,10 +102,10 @@ test("a patch window with no matches says so", async ({ page }) => {
   await expect(page.getByText(/no matches since the latest patch/i)).toBeVisible();
 });
 
-test("a stale story shows the cached-matches note", async ({ page }) => {
+test("a stale story shows the saved-matches line", async ({ page }) => {
   await mockLookup(page, ndjson(storyEvent({ stale: true })));
   await enter(page);
-  await expect(page.getByText(/showing cached matches/i)).toBeVisible();
+  await expect(page.getByText(/from saved matches/i)).toBeVisible();
 });
 
 test("entry has no horizontal scroll and the Valve notice stays visible", async ({ page }) => {

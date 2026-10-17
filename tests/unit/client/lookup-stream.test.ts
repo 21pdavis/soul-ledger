@@ -120,6 +120,23 @@ describe("streamLookup", () => {
     expect(await collect(down)).toEqual([{ type: "error", reason: "fetch_failed" }]);
   });
 
+  it("reports HTTP 429 as rate_limited with the Retry-After seconds", async () => {
+    const limited = fetchOf(['{"error":"rate_limited","retryAfter":42}'], {
+      status: 429,
+      headers: { "retry-after": "42" },
+    });
+    expect(await collect(limited)).toEqual([
+      { type: "error", reason: "rate_limited", retryAfter: 42 },
+    ]);
+  });
+
+  it("falls back to a default wait when a 429 has no usable Retry-After", async () => {
+    const limited = fetchOf(["slow down"], { status: 429 });
+    expect(await collect(limited)).toEqual([
+      { type: "error", reason: "rate_limited", retryAfter: 60 },
+    ]);
+  });
+
   it("ends with fetch_failed when the connection drops before a story or error arrives", async () => {
     const events = await collect(fetchOf([line({ type: "resolved", accountId: 7 })]));
     expect(events.map((e) => e.type)).toEqual(["resolved", "error"]);

@@ -4,6 +4,18 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Changed
+
+- The city on the front page is now the same city your story plays in: when your story starts, the camera flies down from the skyline into the opening scene instead of the city fading in again.
+- Browsers without hardware graphics acceleration now start the 3D city on the Simple setting, so it runs lighter from the first second. If it still runs too slowly it drops to Off by itself, as before.
+- Looking up players is now limited to 10 a minute from one connection, so nobody can flood the site. If you go over, you see a short "Too many lookups, try again in N seconds" screen.
+
+### Fixed
+
+- The "Your climb" list now shows all seven rank steps on tall phones, instead of dropping one while the slide animates in.
+- If the current patch date cannot be found, "This patch" now says so and shows the story as "All time" instead of quietly mixing the two.
+- When the latest matches could not be fetched, the first slide now says "From saved matches" next to Refresh, instead of a note that shrank the story on small phones.
+
 ## [0.3.1] - 2026-10-16
 
 **The city on the front page.** The 3D city from 0.3.0 now greets you before your story starts, too.

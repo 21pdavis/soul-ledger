@@ -99,12 +99,12 @@ describe("SummarySlide", () => {
     }
   });
 
-  it("has no export action (PNG export is M4) and no cached-matches note (the app owns it)", () => {
+  it("has no export action (PNG export is M4) and no saved-matches line (only the opening slide has it)", () => {
     renderSummary(fixtureStory(), VARIANTS[0][1], {
       meta: { window: "all", patchStart: null, stale: true },
     });
     expect(screen.queryByRole("button", { name: /export|save|download|share/i })).toBeNull();
-    expect(screen.queryByText(/cached matches/i)).toBeNull();
+    expect(screen.queryByText(/saved matches/i)).toBeNull();
   });
 
   it("labels the patch window from the server's patch date", () => {

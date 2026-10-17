@@ -44,6 +44,15 @@ describe("App to story player props", () => {
     expect(screen.queryByText(/this patch/i)).not.toBeInTheDocument();
   });
 
+  it("passes the server's patchUnavailable flag on to the story's meta, so the label explains the fallback (#25)", async () => {
+    const { enter, user } = setup(
+      ndjson(storyEvent({ window: "all", patchStart: null, patchUnavailable: true })),
+    );
+    await user.click(screen.getByRole("radio", { name: "This patch" }));
+    await enter();
+    expect(await screen.findByText("All time (couldn't find the patch date)")).toBeInTheDocument();
+  });
+
   it("Refresh reruns the lookup with refresh=1 and the same window", async () => {
     const { enter, user, requested, fetchMock } = setup(
       ndjson(storyEvent({ window: "patch", patchStart: PATCH })),

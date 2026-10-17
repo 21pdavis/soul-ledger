@@ -1,5 +1,11 @@
 # Directory Update Log
 
+## 2026-10-17
+* **Decision**: [ADR 0077](decisions/0077-one-city-from-landing-to-story.md): one city from the landing page into the story, with a camera fly-in; the cast is built after the first card and warmed up in the background. Amends ADR 0073 (owner request).
+* **Decision**: [ADR 0076](decisions/0076-per-ip-lookup-rate-limit.md): `/api/lookup` is limited to 10 lookups a minute per client IP, in memory, with 429 and Retry-After; staging-key holders are exempt. Fixes #7; the cross-instance part joins #16.
+* **Research**: [Client IP behind Render's proxy](research/render-client-ip.md): use `true-client-ip` (Cloudflare sets it); the first `x-forwarded-for` entry is client-forged.
+* **Decision**: [ADR 0075](decisions/0075-software-webgl-starts-on-simple.md): browsers drawing WebGL in software start on Simple, not Off; the auto-drop still applies. Amends ADR 0068 (owner decision).
+
 ## 2026-10-16
 * **Decision**: [ADR 0074](decisions/0074-no-ci-run-on-staging-pushes.md): CI no longer runs on pushes to staging (the up-to-date PR run already covers it), and a new commit on a PR cancels its older run. Amends ADR 0063 (owner decision).
 * **Milestone**: release 0.3.1 prepared: the city behind the landing page ([ADR 0073](decisions/0073-city-behind-the-landing-page.md), #95), a patch release per [ADR 0068](decisions/0068-m3-scope-and-order.md).

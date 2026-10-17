@@ -44,6 +44,25 @@ describe("ErrorScreen", () => {
     },
   );
 
+  it.each([
+    [42, "Too many lookups, try again in 42 seconds."],
+    [1, "Too many lookups, try again in 1 second."],
+  ])("rate_limited (%s s): says how long to wait, and retry reruns the lookup", async (n, text) => {
+    const onRetry = vi.fn();
+    render(
+      <ErrorScreen
+        kind="rate_limited"
+        retryAfter={n}
+        window="all"
+        onRetry={onRetry}
+        onNewLookup={() => {}}
+      />,
+    );
+    expect(screen.getByText(text)).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
   it("invalid (the server rejected the input): asks for another link", async () => {
     const { onNewLookup, user } = setup("invalid");
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();

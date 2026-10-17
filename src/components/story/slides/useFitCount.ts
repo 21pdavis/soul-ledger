@@ -1,5 +1,8 @@
 import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 
+/** Set on the box while it is measured; SlideReveal.module.css stops the entrance animation. */
+const MEASURING = "data-fit-measuring";
+
 /**
  * How many rows of a list fit in a box that must never scroll or clip.
  *
@@ -24,7 +27,18 @@ export function useFitCount(
 
   useLayoutEffect(() => {
     const el = ref.current;
+    // Measure with the entrance animation off: a row mid-rise is shifted down by its transform,
+    // which widens scrollHeight and reads as an overflow that is not there (#44). Switching it
+    // off and on again inside this layout effect restarts the entrance before anything paints.
+    // Only while an entrance is running (the `both` fill keeps finished ones listed): a re-measure after it ended (resize, rotation, new list
+    // length) must not replay it. Browsers without getAnimations always switch it off.
+    const entering =
+      !!el &&
+      (typeof el.getAnimations !== "function" ||
+        el.getAnimations({ subtree: true }).some((a) => a.playState !== "finished"));
+    if (entering) el.setAttribute(MEASURING, "");
     const overflows = !!el && el.scrollHeight > el.clientHeight + 0.5;
+    if (entering) el.removeAttribute(MEASURING);
     if (overflows && count > min) setCount(count - 1);
     // Even `min` rows overflow: the slide gives up its extras, then the fit starts again from the
     // full list, so rows that fit in the room those extras freed are not lost. Once tight, a

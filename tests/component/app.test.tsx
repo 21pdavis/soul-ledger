@@ -122,6 +122,19 @@ describe("App flow", () => {
     expect(screen.getByLabelText("Paste your Steam profile URL")).toHaveValue(URL_A);
   });
 
+  it("a 429 from the server shows the wait in seconds", async () => {
+    const { enter } = setup(
+      new Response('{"error":"rate_limited","retryAfter":30}', {
+        status: 429,
+        headers: { "retry-after": "30" },
+      }),
+    );
+    await enter();
+    expect(
+      await screen.findByText("Too many lookups, try again in 30 seconds."),
+    ).toBeInTheDocument();
+  });
+
   it("an input the server rejects shows the invalid screen", async () => {
     const { enter } = setup(ndjson({ type: "error", reason: "invalid" }));
     await enter();
@@ -168,10 +181,10 @@ describe("App flow", () => {
     expect(await screen.findByText(/no matches since the latest patch/i)).toBeInTheDocument();
   });
 
-  it("shows a cached-matches note when the story is stale, and not otherwise", async () => {
+  it("shows the saved-matches line on the opening slide when the story is stale", async () => {
     const { enter } = setup(ndjson(storyEvent({ stale: true })));
     await enter();
-    expect(await screen.findByText(/showing cached matches/i)).toBeInTheDocument();
+    expect(await screen.findByText(/from saved matches/i)).toBeInTheDocument();
   });
 
   it("zero matches after a patch request that fell back to all time does not blame the patch (#25)", async () => {
@@ -190,21 +203,11 @@ describe("App flow", () => {
     expect(screen.getByText(/Not affiliated with or endorsed by Valve/)).toBeInTheDocument();
   });
 
-  it("puts the cached-matches note after the story, where it cannot cover it, and lets you dismiss it", async () => {
-    const { enter, user } = setup(ndjson(storyEvent({ stale: true })));
-    await enter();
-    const note = (await screen.findByText(/showing cached matches/i)).closest("[role=status]")!;
-    const story = screen.getByTestId("story-player");
-    expect(story.compareDocumentPosition(note) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    await user.click(screen.getByRole("button", { name: "Dismiss" }));
-    expect(screen.queryByText(/cached matches/i)).not.toBeInTheDocument();
-  });
-
-  it("shows no cached-matches note for a fresh story", async () => {
+  it("shows no saved-matches line for a fresh story", async () => {
     const { enter } = setup(ndjson(storyEvent()));
     await enter();
     await storyUp();
-    expect(screen.queryByText(/cached matches/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/saved matches/i)).not.toBeInTheDocument();
   });
 
   it("gives the story page one h1 inside main, above the slide headlines", async () => {

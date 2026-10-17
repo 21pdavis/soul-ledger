@@ -9,8 +9,8 @@ import styles from "./StoryStage.module.css";
  * on Replay. The 3D world behind it belongs to App, which keeps one city for the whole visit
  * (ADR 0068, 0069, 0073); this reports the current slide so the camera can follow it.
  *
- * Not in here, on purpose: the Valve notice and the cached-matches note. App renders both in a
- * strip after this stage, so they stay on screen and cannot cover the player.
+ * Not in here, on purpose: the Valve notice. App renders it in a strip after this stage, so it
+ * stays on screen and cannot cover the player. The saved-matches line is part of slide 1's footer.
  */
 export function StoryStage({
   onSlideChange,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { clientIp, type IpRateLimiter } from "./ip-rate-limit";
 import { runLookup, type LookupDeps, type LookupEvent } from "./lookup";
 
 const query = z.object({
@@ -10,13 +11,35 @@ const query = z.object({
     .transform((v) => v === "1" || v === "true"),
 });
 
+export interface LookupLimits {
+  /** Per-IP limiter; no limiting when absent. */
+  limiter?: IpRateLimiter;
+  /** Requests this accepts skip the limiter. */
+  exempt?: (request: Request) => boolean;
+}
+
 /**
  * Builds the GET handler for /api/lookup. The response is NDJSON: one LookupEvent per line,
  * ending with a "story" or "error" event, so the client can render loading stages as they
  * arrive (ADR 0014, ADR 0026).
  */
-export function createLookupHandler(deps: () => LookupDeps) {
+export function createLookupHandler(deps: () => LookupDeps, limits: LookupLimits = {}) {
   return async function GET(request: Request): Promise<Response> {
+    // Before anything costs us a database write or a deadlock-api call (ADR 0076).
+    if (limits.limiter && !limits.exempt?.(request)) {
+      const decision = limits.limiter.check(clientIp(request));
+      if (!decision.allowed) {
+        const retryAfter = decision.retryAfterSeconds;
+        return Response.json(
+          { error: "rate_limited", retryAfter },
+          {
+            status: 429,
+            headers: { "retry-after": String(retryAfter), "cache-control": "no-store" },
+          },
+        );
+      }
+    }
+
     const parsed = query.safeParse(Object.fromEntries(new URL(request.url).searchParams));
     if (!parsed.success) return Response.json({ error: "bad_request" }, { status: 400 });
     const { q, window, refresh } = parsed.data;
