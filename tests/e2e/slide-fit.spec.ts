@@ -210,3 +210,35 @@ test.describe("every slide fits its frame, worst case", () => {
     });
   }
 });
+
+// #44: the climb measured its rows while the entrance animation ran (a row mid-rise is shifted
+// down by its transform) and kept the lower count. The count is the same with default motion.
+test.describe("the rank climb lists the same rows with default motion", () => {
+  for (const { width, height } of [
+    { width: 412, height: 915 },
+    { width: 412, height: 839 },
+    { width: 360, height: 640 },
+  ]) {
+    test(`${width}x${height}: 7 rows`, async ({ page, isMobile }) => {
+      test.skip(!isMobile, "phone only");
+      await page.setViewportSize({ width, height });
+      await mockLookup(
+        page,
+        ndjson({ type: "resolved", accountId: 1 }, storyEvent({}, worstCaseStory())),
+      );
+      await openEntry(page);
+      await page.getByLabel("Paste your Steam profile URL").fill(PROFILE);
+      await page.getByRole("button", { name: "Open the ledger" }).click();
+      for (const slide of SLIDES) {
+        await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
+        if (slide.id === "rank") break;
+        await stageSettled(page);
+        await page.keyboard.press("ArrowRight");
+      }
+      await stageSettled(page);
+      const frame = current(page).locator("section").first();
+      await expect(frame.locator("li[aria-current=step]")).toContainText("Oracle");
+      await expect(frame.locator("ol li")).toHaveCount(7);
+    });
+  }
+});
