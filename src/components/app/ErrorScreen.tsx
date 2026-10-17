@@ -1,6 +1,12 @@
 import { useEffect, useRef } from "react";
 import type { StoryWindow } from "@/lib/lookup";
-import { ERROR_COPY, noMatchesDetails, STORY_ACTIONS_COPY, type ErrorKind } from "@/story/copy";
+import {
+  ERROR_COPY,
+  noMatchesDetails,
+  rateLimitedBody,
+  STORY_ACTIONS_COPY,
+  type ErrorKind,
+} from "@/story/copy";
 import styles from "./ErrorScreen.module.css";
 
 export type { ErrorKind };
@@ -11,6 +17,8 @@ interface Props {
   window: StoryWindow;
   /** Games the story skipped (Street Brawl and the like); only used by the zero-matches screen. */
   excludedMatches?: number;
+  /** Seconds the server asked us to wait; only used by the rate-limit screen. */
+  retryAfter?: number;
   /** Runs the same lookup again. */
   onRetry: () => void;
   /** Goes back to the entry screen. */
@@ -18,7 +26,14 @@ interface Props {
 }
 
 /** Full-screen, in-voice screen for a lookup that did not produce a story (ADR 0052). */
-export function ErrorScreen({ kind, window, excludedMatches = 0, onRetry, onNewLookup }: Props) {
+export function ErrorScreen({
+  kind,
+  window,
+  excludedMatches = 0,
+  retryAfter = 60,
+  onRetry,
+  onNewLookup,
+}: Props) {
   const copy = ERROR_COPY[kind];
   // The loader that had focus is gone, so move focus to the title: screen readers read it out.
   const title = useRef<HTMLHeadingElement>(null);
@@ -38,7 +53,9 @@ export function ErrorScreen({ kind, window, excludedMatches = 0, onRetry, onNewL
       <h1 ref={title} tabIndex={-1} className={styles.title}>
         {copy.title}
       </h1>
-      <p className={styles.body}>{copy.body}</p>
+      <p className={styles.body}>
+        {kind === "rate_limited" ? rateLimitedBody(retryAfter) : copy.body}
+      </p>
       {details.map((d) => (
         <p key={d} className={styles.detail}>
           {d}

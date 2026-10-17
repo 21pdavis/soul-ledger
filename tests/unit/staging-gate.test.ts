@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   gateDecision,
+  hasValidStagingToken,
   readGateConfig,
   signSession,
   tokensMatch,
@@ -103,5 +104,22 @@ describe("tokensMatch", () => {
     expect(tokensMatch("abc", "abc")).toBe(true);
     expect(tokensMatch("abc", "abd")).toBe(false);
     expect(tokensMatch("abc", "abcd")).toBe(false);
+  });
+});
+
+describe("hasValidStagingToken", () => {
+  const on = { STAGING_GATE: "on", STAGING_ACCESS_KEY: KEY };
+  const req = (token?: string) =>
+    new Request("http://x/api/lookup", { headers: token ? { "x-staging-token": token } : {} });
+
+  it("is true only when the gate is on and the header carries the access key", () => {
+    expect(hasValidStagingToken(req(KEY), on)).toBe(true);
+    expect(hasValidStagingToken(req(KEY + "x"), on)).toBe(false);
+    expect(hasValidStagingToken(req(), on)).toBe(false);
+  });
+
+  it("is false in production, where the gate is off, whatever the header says", () => {
+    expect(hasValidStagingToken(req(KEY), { STAGING_ACCESS_KEY: KEY })).toBe(false);
+    expect(hasValidStagingToken(req(KEY), { STAGING_GATE: "on" })).toBe(false);
   });
 });

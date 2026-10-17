@@ -122,6 +122,19 @@ describe("App flow", () => {
     expect(screen.getByLabelText("Paste your Steam profile URL")).toHaveValue(URL_A);
   });
 
+  it("a 429 from the server shows the wait in seconds", async () => {
+    const { enter } = setup(
+      new Response('{"error":"rate_limited","retryAfter":30}', {
+        status: 429,
+        headers: { "retry-after": "30" },
+      }),
+    );
+    await enter();
+    expect(
+      await screen.findByText("Too many lookups, try again in 30 seconds."),
+    ).toBeInTheDocument();
+  });
+
   it("an input the server rejects shows the invalid screen", async () => {
     const { enter } = setup(ndjson({ type: "error", reason: "invalid" }));
     await enter();
