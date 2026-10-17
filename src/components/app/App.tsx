@@ -98,6 +98,8 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
       const config = pace ?? resolvePace();
       const pacer = createLoadingPacer(config);
       setPhase({ name: "loading", progress: [], countMs: config.tallyCountMs });
+      // A new story starts from its own first card; the city waits for it (ADR 0077).
+      setSlide(null);
       let timer: ReturnType<typeof setTimeout> | undefined;
       // The server sends a status before every step, so long silence means something is stuck.
       let stallTimer: ReturnType<typeof setTimeout> | undefined;
@@ -192,7 +194,6 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
       onNewLookup: () => {
         running.current?.abort();
         setPhase({ name: "entry" });
-        setSlide(null);
       },
     }),
     [request, run],

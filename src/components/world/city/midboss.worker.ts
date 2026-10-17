@@ -1,6 +1,6 @@
 // Builds the mid-boss mesh off the main thread (see midboss-mesh.ts) and posts it back as arrays.
 import { buildMidBossGeometry } from "./midboss";
-import { geometryToArrays } from "./midboss-mesh";
+import { geometryToArrays } from "./midboss-arrays";
 
 const arrays = geometryToArrays(buildMidBossGeometry());
 // Typed as a window by the app's DOM lib; in a worker, postMessage takes the transfer list second.
