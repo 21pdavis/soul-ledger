@@ -196,4 +196,51 @@ describe("supportsWebGL", () => {
       probe.mockRestore();
     }
   });
+
+  async function probeWith(getParameter: (p: number) => unknown, debugInfo: boolean) {
+    vi.resetModules();
+    const { supportsWebGL, browserDeviceHint } = await import("@/lib/client/graphics");
+    const lose = vi.fn();
+    const ctx = {
+      RENDERER: 0x1f01,
+      getExtension: (name: string) =>
+        name === "WEBGL_lose_context"
+          ? { loseContext: lose }
+          : name === "WEBGL_debug_renderer_info" && debugInfo
+            ? { UNMASKED_RENDERER_WEBGL: 0x9246 }
+            : null,
+      getParameter,
+    };
+    const spy = vi
+      .spyOn(HTMLCanvasElement.prototype, "getContext")
+      .mockReturnValue(ctx as unknown as RenderingContext);
+    try {
+      return { supported: supportsWebGL(), hint: browserDeviceHint(), lose };
+    } finally {
+      spy.mockRestore();
+    }
+  }
+
+  it("falls back to the generic RENDERER when the debug extension is missing", async () => {
+    const r = await probeWith((p) => (p === 0x1f01 ? "llvmpipe" : undefined), false);
+    expect(r.supported).toBe(true);
+    expect(r.hint).toBe("simple");
+    expect(r.lose).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not crash when getParameter throws, and still releases the context", async () => {
+    const r = await probeWith(() => {
+      throw new Error("blocked");
+    }, true);
+    expect(r.supported).toBe(true);
+    expect(r.hint).toBe("full");
+    expect(r.lose).toHaveBeenCalledTimes(1);
+  });
+
+  it("ignores a non-string renderer", async () => {
+    const r = await probeWith(() => 42, true);
+    expect(r.supported).toBe(true);
+    expect(r.hint).toBe("full");
+    expect(r.lose).toHaveBeenCalledTimes(1);
+  });
 });
