@@ -97,6 +97,28 @@ test.describe("phone: tap controller", () => {
     });
   }
 
+  for (const [width, height] of [
+    [320, 568],
+    [390, 844],
+  ]) {
+    test(`the cached-matches note never covers the slide headline (${width}x${height})`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height });
+      await openStory(page, { stale: true });
+      const note = page.getByText(/showing cached matches/i);
+      await expect(note).toBeVisible();
+      const n = (await note.boundingBox())!;
+      const h = (await page.getByRole("heading", { level: 2 }).first().boundingBox())!;
+      const apart = n.y >= h.y + h.height || n.y + n.height <= h.y;
+      expect(apart).toBe(true);
+      // the note is for the first slide only: it is gone once the player moves on
+      await tapSide(page, "right");
+      await expect(stage(page)).not.toHaveAttribute("data-slide", "intro");
+      await expect(note).toHaveCount(0);
+    });
+  }
+
   test("is the tap controller, with 11 segments and the first one current", async ({ page }) => {
     await openStory(page);
     await expect(page.getByTestId("story-player")).toHaveAttribute("data-mode", "tap");

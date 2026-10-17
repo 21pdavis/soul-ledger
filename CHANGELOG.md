@@ -6,7 +6,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Fixed
 
-- The "Showing cached matches" note now floats over the top of the story instead of shrinking it on small phones, and you can still dismiss it.
+- The "Showing cached matches" note now floats over the first slide's empty space instead of shrinking the story on small phones, never covers the headline, and you can still dismiss it.
 
 ## [0.3.1] - 2026-10-16
 

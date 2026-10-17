@@ -13,13 +13,14 @@ import styles from "./StoryStage.module.css";
  * on Replay. The 3D world sits behind the player (ADR 0068, 0069) and follows its current slide;
  * it starts loading only once the player reports its first slide, so it never delays the story.
  *
- * The cached-matches note floats over the top edge of the player's stage (a dismissible overlay, so it never
+ * The cached-matches note floats over the first slide's empty band (a dismissible overlay, so it never
  * shrinks the stage, #38). Not in here, on purpose: the Valve notice, which App renders in the
  * always-visible strip after this stage (ADR 0016).
  */
 export function StoryStage(props: SlideProps) {
   const [slide, setSlide] = useState<number | null>(null);
   const onSlideChange = useCallback((i: number) => setSlide(i), []);
+  const [noteDismissed, setNoteDismissed] = useState(false);
   const reduced = usePrefersReducedMotion();
   return (
     <main className={styles.stage}>
@@ -36,7 +37,11 @@ export function StoryStage(props: SlideProps) {
           {...props}
           world
           onSlideChange={onSlideChange}
-          overlay={props.meta.stale ? <StaleNote /> : null}
+          overlay={
+            props.meta.stale && !noteDismissed ? (
+              <StaleNote onDismiss={() => setNoteDismissed(true)} />
+            ) : null
+          }
         />
       </div>
     </main>

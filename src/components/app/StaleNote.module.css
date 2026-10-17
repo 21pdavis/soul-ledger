@@ -2,14 +2,13 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  /* Pinned over the stage's top edge, under the progress bar; only the note takes pointer events. */
+  /* In the empty band on slide 1, between the dates and the footer; only the note takes pointer events. */
   position: absolute;
-  top: 1.75rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
+  top: 58%;
+  left: 1rem;
+  pointer-events: auto;
   width: max-content;
-  max-width: min(calc(100% - 2rem), 22rem);
+  max-width: calc(100% - 2rem);
   padding: 0.25rem 0.25rem 0.25rem 0.75rem;
   border: 1px solid var(--brass);
   background: var(--panel);

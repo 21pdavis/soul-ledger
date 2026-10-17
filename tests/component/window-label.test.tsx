@@ -1,6 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { StaleNote } from "@/components/app/StaleNote";
 import { WindowLabel } from "@/components/story/WindowLabel";
 
@@ -29,14 +29,18 @@ describe("WindowLabel", () => {
 });
 
 describe("StaleNote", () => {
-  it("tells the player the story comes from cached matches", () => {
-    render(<StaleNote />);
-    expect(screen.getByRole("status")).toHaveTextContent(/showing cached matches/i);
+  it("mounts an empty live region, then fills it with the cached-matches text", async () => {
+    render(<StaleNote onDismiss={() => {}} />);
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent(/showing cached matches/i),
+    );
   });
 
-  it("can be dismissed", async () => {
-    render(<StaleNote />);
-    await userEvent.click(screen.getByRole("button", { name: "Dismiss" }));
-    expect(screen.queryByText(/showing cached matches/i)).not.toBeInTheDocument();
+  it("asks to be dismissed when the button is pressed", async () => {
+    const onDismiss = vi.fn();
+    render(<StaleNote onDismiss={onDismiss} />);
+    await userEvent.click(await screen.findByRole("button", { name: "Dismiss" }));
+    expect(onDismiss).toHaveBeenCalledOnce();
   });
 });

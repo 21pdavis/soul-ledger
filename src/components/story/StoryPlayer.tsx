@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { CARD_SIDES } from "@/story/card-sides";
 import { SLIDES, SLIDE_COUNT } from "@/story/copy";
 import { ENTRANCE_MS, initialPlayerState, reducePlayer } from "@/story/slide-index";
 import type { SlideProps } from "@/story/types";
@@ -22,7 +23,7 @@ interface Props extends SlideProps {
   onSlideChange?: (index: number) => void;
   /** A 3D world sits behind the story: panels turn to glass and desktop cards step aside. */
   world?: boolean;
-  /** Floats over the top edge of the stage, under the progress bar (the cached-matches note). */
+  /** Floats over the first slide's free band, framed to the stage (phone) or card (desktop); gone on later slides. */
   overlay?: ReactNode;
 }
 
@@ -122,6 +123,16 @@ export function StoryPlayer({
   const [reached, setReached] = useState(0);
   if (state.index > reached) setReached(state.index);
 
+  // Slide 1 is the only one with a known empty band, so the overlay lives there and nowhere else.
+  const overlayFrame =
+    overlay && state.index === 0 ? (
+      <div className={styles.overlayFrame} data-mode={mode}>
+        <div className={styles.overlayInner} data-side={CARD_SIDES[0]}>
+          {overlay}
+        </div>
+      </div>
+    ) : null;
+
   const stage = (
     <div
       className={styles.stage}
@@ -149,7 +160,7 @@ export function StoryPlayer({
       <div className={styles.progress} data-interactive={!tap}>
         <ProgressBar count={SLIDE_COUNT} current={state.index} onSelect={tap ? undefined : goTo} />
       </div>
-      {overlay}
+      {overlayFrame}
       {tap && (
         <>
           <button type="button" className={styles.srNav} data-side="back" onClick={back}>
@@ -219,7 +230,7 @@ export function StoryPlayer({
               orientation="vertical"
             />
           </div>
-          {overlay}
+          {overlayFrame}
         </div>
       )}
       <div role="status" aria-live="polite" className={styles.visuallyHidden}>
