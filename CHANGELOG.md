@@ -2,7 +2,9 @@
 
 All notable changes to Soul Ledger are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow the milestones ([ADR 0041](wiki/decisions/0041-changelog-and-releases.md)): each milestone is a minor release (M1 = 0.1.0, M2 = 0.2.0, …), fixes between milestones are patch releases, and v1 ships as 1.0.0.
 
-n### Fixed
+## [Unreleased]
+
+### Fixed
 
 - The "Showing cached matches" note now floats over the top of the story instead of shrinking it on small phones, and you can still dismiss it.
 
