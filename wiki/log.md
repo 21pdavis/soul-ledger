@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-10-17
+* **Milestone**: release 0.3.2 prepared: one city from the landing page into the story ([ADR 0077](decisions/0077-one-city-from-landing-to-story.md), #109), software WebGL on Simple ([ADR 0075](decisions/0075-software-webgl-starts-on-simple.md)), the lookup rate limit ([ADR 0076](decisions/0076-per-ip-lookup-rate-limit.md)), and fixes #25, #38, #44; a patch release per [ADR 0068](decisions/0068-m3-scope-and-order.md).
 * **Decision**: [ADR 0077](decisions/0077-one-city-from-landing-to-story.md): one city from the landing page into the story, with a camera fly-in; the cast is built after the first card and warmed up in the background. Amends ADR 0073 (owner request).
 * **Decision**: [ADR 0076](decisions/0076-per-ip-lookup-rate-limit.md): `/api/lookup` is limited to 10 lookups a minute per client IP, in memory, with 429 and Retry-After; staging-key holders are exempt. Fixes #7; the cross-instance part joins #16.
 * **Research**: [Client IP behind Render's proxy](research/render-client-ip.md): use `true-client-ip` (Cloudflare sets it); the first `x-forwarded-for` entry is client-forged.

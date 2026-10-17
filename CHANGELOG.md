@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-17
+
+**One city, start to finish.** The city on the front page is now the same one your story plays in, and the camera flies straight into your opening scene. Plus a batch of fixes.
+
 ### Changed
 
 - The city on the front page is now the same city your story plays in: when your story starts, the camera flies down from the skyline into the opening scene instead of the city fading in again.
@@ -98,7 +102,8 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - The Render build no longer installs pnpm globally, because Render's global modules folder is read-only.
 - Failed Steam vanity-URL lookups are now logged with the reason. They had failed intermittently in production right after the first deploy.
 
-[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/21pdavis/soul-ledger/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/21pdavis/soul-ledger/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...v0.2.0
