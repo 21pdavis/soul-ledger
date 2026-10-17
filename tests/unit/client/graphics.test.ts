@@ -214,10 +214,13 @@ describe("supportsWebGL", () => {
     const spy = vi
       .spyOn(HTMLCanvasElement.prototype, "getContext")
       .mockReturnValue(ctx as unknown as RenderingContext);
+    // A strong machine, so only the renderer can lower the hint (CI runners have few cores).
+    const cores = vi.spyOn(navigator, "hardwareConcurrency", "get").mockReturnValue(8);
     try {
       return { supported: supportsWebGL(), hint: browserDeviceHint(), lose };
     } finally {
       spy.mockRestore();
+      cores.mockRestore();
     }
   }
 
