@@ -1,12 +1,18 @@
-import { render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WorldLayer } from "@/components/world/WorldLayer";
-import { setup } from "./app-harness";
+import { ndjson, setup, storyEvent, storyUp } from "./app-harness";
 
 vi.mock("@/components/world/WorldCanvas", () => ({
   default: ({ story }: { story?: unknown }) => (
     <div data-testid="world-canvas" data-scenery={story === undefined} />
   ),
+}));
+
+// jsdom has no WebGL; pretend it does so the 3D city (mocked above) is what gets drawn.
+vi.mock("@/lib/client/graphics", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/client/graphics")>()),
+  supportsWebGL: () => true,
 }));
 
 /** The landing page has the city behind it too, with no story yet to follow. */
@@ -29,8 +35,38 @@ describe("the world on the landing page", () => {
     const { enter } = setup(new Promise<Response>(() => {}));
     const world = screen.getByTestId("world");
     await enter();
-    expect(await screen.findByRole("status")).toHaveTextContent(/Looking up your ledger/);
+    // By text: with WebGL on, the graphics note is a second (empty) status region.
+    expect((await screen.findAllByText(/Looking up your ledger/)).length).toBeGreaterThan(0);
     expect(screen.getByTestId("world")).toBe(world);
+  });
+
+  it("keeps the same city when the story starts, and hands it the story to follow", async () => {
+    const { enter } = setup(ndjson(storyEvent()));
+    const world = screen.getByTestId("world");
+    const canvas = await screen.findByTestId("world-canvas");
+    await enter();
+    await storyUp();
+    expect(screen.getByTestId("world")).toBe(world);
+    // The same canvas throughout: never torn down and redrawn (which would blink to black).
+    expect(screen.getByTestId("world-canvas")).toBe(canvas);
+    await waitFor(() => expect(canvas).toHaveAttribute("data-scenery", "false"));
+  });
+
+  it("hands the city the story only once the first card is up and the browser is idle", async () => {
+    // The 3D must never hold up the story (ADR 0068): building the cast waits for idle time.
+    const idle: (() => void)[] = [];
+    vi.stubGlobal("requestIdleCallback", (cb: () => void) => idle.push(cb));
+    vi.stubGlobal("cancelIdleCallback", () => {});
+    const { enter } = setup(ndjson(storyEvent()));
+    await enter();
+    await storyUp();
+    const canvas = await screen.findByTestId("world-canvas");
+    expect(canvas).toHaveAttribute("data-scenery", "true");
+    await waitFor(() => expect(idle.length).toBeGreaterThan(0));
+    act(() => idle.forEach((cb) => cb()));
+    expect(screen.getByTestId("world-canvas")).toHaveAttribute("data-scenery", "false");
+    cleanup(); // unmount while the stubs are still in place
+    vi.unstubAllGlobals();
   });
 
   it("shows the 3D city as scenery, without a story, straight away", async () => {

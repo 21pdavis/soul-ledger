@@ -4,6 +4,22 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-17
+
+**One city, start to finish.** The city on the front page is now the same one your story plays in, and the camera flies straight into your opening scene. Plus a batch of fixes.
+
+### Changed
+
+- The city on the front page is now the same city your story plays in: when your story starts, the camera flies down from the skyline into the opening scene instead of the city fading in again.
+- Browsers without hardware graphics acceleration now start the 3D city on the Simple setting, so it runs lighter from the first second. If it still runs too slowly it drops to Off by itself, as before.
+- Looking up players is now limited to 10 a minute from one connection, so nobody can flood the site. If you go over, you see a short "Too many lookups, try again in N seconds" screen.
+
+### Fixed
+
+- The "Your climb" list now shows all seven rank steps on tall phones, instead of dropping one while the slide animates in.
+- If the current patch date cannot be found, "This patch" now says so and shows the story as "All time" instead of quietly mixing the two.
+- When the latest matches could not be fetched, the first slide now says "From saved matches" next to Refresh, instead of a note that shrank the story on small phones.
+
 ## [0.3.1] - 2026-10-16
 
 **The city on the front page.** The 3D city from 0.3.0 now greets you before your story starts, too.
@@ -86,7 +102,8 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 - The Render build no longer installs pnpm globally, because Render's global modules folder is read-only.
 - Failed Steam vanity-URL lookups are now logged with the reason. They had failed intermittently in production right after the first deploy.
 
-[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/21pdavis/soul-ledger/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/21pdavis/soul-ledger/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/21pdavis/soul-ledger/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/21pdavis/soul-ledger/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/21pdavis/soul-ledger/compare/v0.1.0...v0.2.0

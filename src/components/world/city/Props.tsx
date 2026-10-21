@@ -2,12 +2,13 @@
 
 import { Line, useTexture } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Component, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
+import { Component, use, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
 import * as THREE from "three";
 import type { DeathBins } from "@/story/death-bins";
 import { FALLBACK_CARD_SRC, heroCardSrc } from "@/story/hero-art";
 import { PALETTE, type Vec3 } from "./layout";
-import { MIDBOSS_PARTS, buildMidBossGeometry, frontAt } from "./midboss";
+import { MIDBOSS_PARTS, frontAt } from "./midboss";
+import { loadMidBossGeometry } from "./midboss-mesh";
 import type { CastMember, Duel } from "./tour";
 
 /** Flat-shaded low-poly material, the look for everything solid (ADR 0025). */
@@ -301,8 +302,8 @@ export function SewerPit({ at, beamTo }: { at: Vec3; beamTo: Vec3 }) {
  * `beamTo` is in the pit's frame.
  */
 function MidBoss({ beamTo }: { beamTo: Vec3 }) {
-  const geometry = useMemo(() => buildMidBossGeometry(), []);
-  useLayoutEffect(() => () => geometry.dispose(), [geometry]);
+  // Built off the main thread while the landing page was up, and shared (see midboss-mesh.ts).
+  const geometry = use(loadMidBossGeometry());
   const { dome, eye, teeth, hands } = MIDBOSS_PARTS;
   // Seat each tooth just inside the groove's edge, wherever the sculpt put the surface.
   const toothZ = useMemo(() => teeth.map((y) => frontAt(y, 0.3) - 0.05), [teeth]);

@@ -16,6 +16,8 @@ export interface StoryMeta {
   window: StoryWindow;
   /** ISO start of the current patch (UTC midnight), or null: see #25. */
   patchStart: string | null;
+  /** True when "This patch" was asked for but the server had no patch date and sent all-time data. */
+  patchUnavailable?: boolean;
   /** True when a refresh failed and the story comes from older cached matches. */
   stale: boolean;
 }

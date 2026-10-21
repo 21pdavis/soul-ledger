@@ -48,6 +48,19 @@ export function gateDecision(input: {
   return pathname === "/api" || pathname.startsWith("/api/") ? "deny_api" : "deny_page";
 }
 
+/**
+ * True when the gate is on and the request carries the access key in `x-staging-token`. Used to
+ * exempt trusted callers (the staging e2e suites) from rate limits; always false in production.
+ */
+export function hasValidStagingToken(
+  request: Request,
+  env: Record<string, string | undefined>,
+): boolean {
+  const { enabled, accessKey } = readGateConfig(env);
+  const token = request.headers.get(ACCESS_HEADER);
+  return enabled && !!accessKey && !!token && tokensMatch(token, accessKey);
+}
+
 /** A session cookie value: `<expiry ms>.<HMAC of the expiry>`, signed with the access key. */
 export function signSession(key: string, expiresAt: number): string {
   return `${expiresAt}.${hmac(key, String(expiresAt))}`;

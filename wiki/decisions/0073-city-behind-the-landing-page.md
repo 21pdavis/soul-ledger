@@ -28,4 +28,4 @@ After 0.3.0 the owner asked for the landing page to have the 3D city behind it a
 # Consequences
 
 - The "never delays" rule still holds: the entry and loading screens never wait for the 3D.
-- Moving from the landing page to the story remounts the city, so it fades in again and an auto-drop to Off on the landing page doesn't carry over (a drop to Simple does, because it is saved). Keeping one city across both, so the camera flies from the landing circle into the opening shot, is in the [backlog](../recommendations/backlog.md).
+- Moving from the landing page to the story remounts the city, so it fades in again and an auto-drop to Off on the landing page doesn't carry over (a drop to Simple does, because it is saved). Keeping one city across both, so the camera flies from the landing circle into the opening shot, was done in [ADR 0077](0077-one-city-from-landing-to-story.md).

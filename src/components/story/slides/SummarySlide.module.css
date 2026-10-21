@@ -3,7 +3,7 @@
  * rubber stamp, the only memorable thing here. Placeholder-grade: type and rules only.
  *
  * The stage clips (overflow: hidden) and how tall it is depends on the screen AND on what the app
- * shows under it (the Valve notice, plus the cached-matches note), so the layout tiers key on the
+ * shows under it (the Valve notice), so the layout tiers key on the
  * height the card really has (a size container), not on the viewport. The card degrades instead
  * of clipping: the stamp and then the scope note go first, and the actions stay pinned to the
  * foot of the frame so they are never the part that gets cut.
@@ -277,7 +277,7 @@
   }
 }
 
-/* Short stage (small phone, or the stage squeezed by the notice strip and the cached-matches note):
+/* Short stage (small phone, or the stage squeezed by the notice strip):
    no stamp, the foot becomes one row, everything tighter. */
 @container (max-height: 399px) {
   .card {
@@ -316,8 +316,8 @@
   }
 }
 
-/* Narrow stage (the cached-matches note shrinks the stage, and with it the width, since the stage
-   is always 9:16): no dotted leaders, smaller type, the two main actions stacked. */
+/* Narrow stage (a short phone shrinks the stage, and with it the width, since the stage is
+   always 9:16): no dotted leaders, smaller type, the two main actions stacked. */
 @container (max-width: 260px) {
   .line {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -376,7 +376,7 @@
   }
 }
 
-/* The shortest stages we meet (a 320x568 phone with the cached-matches note): squeeze the rest. */
+/* The shortest stages we meet (a 320x568 phone): squeeze the rest. */
 @container (max-height: 229px) {
   .card {
     gap: 0.3rem;

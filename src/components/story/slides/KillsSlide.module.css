@@ -288,7 +288,7 @@
   }
 }
 
-/* The smallest stages (a 320x568 phone with the cached-matches note, see SlideFrame.module.css). */
+/* The smallest stages (a 320x568 phone, see SlideFrame.module.css). */
 @container (max-height: 419px) {
   .slide {
     gap: 0.4rem;

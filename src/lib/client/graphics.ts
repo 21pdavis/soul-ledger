@@ -1,7 +1,8 @@
 /**
  * The 3D world's graphics level (ADR 0068): Full, Simple, or Off (a still image). A choice the
  * reader saved on this device always wins, except that without WebGL there is nothing to draw.
- * Otherwise the world starts on Full, or Off for readers who prefer reduced motion.
+ * Otherwise the world starts on Full (Simple on a weak device or software-drawn WebGL, ADR 0075),
+ * or Off for readers who prefer reduced motion.
  */
 export type GraphicsLevel = "full" | "simple" | "off";
 
@@ -30,17 +31,27 @@ export function chooseGraphics({
   return reducedMotion ? "off" : hint;
 }
 
+const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|basic render driver|mesa offscreen/i;
+
+/** True when a WebGL renderer string names a software (no graphics card) rasteriser (ADR 0075). */
+export function isSoftwareRenderer(renderer: string | undefined): boolean {
+  return renderer !== undefined && SOFTWARE_RENDERER.test(renderer);
+}
+
 /**
- * A weak device (few cores or little memory) starts on Simple. Unknown values count as fine.
- * The thresholds are a first guess, not tuned on real devices yet.
+ * A weak device (few cores or little memory) or software-drawn WebGL starts on Simple; the lowest
+ * hint wins. Unknown values count as fine. The thresholds are a first guess, not tuned yet.
  */
 export function deviceHintLevel({
   cores,
   memory,
+  softwareRenderer,
 }: {
   cores?: number;
   memory?: number;
+  softwareRenderer?: boolean;
 }): GraphicsLevel {
+  if (softwareRenderer) return "simple";
   if (cores !== undefined && cores <= 4) return "simple";
   if (memory !== undefined && memory <= 4) return "simple";
   return "full";
@@ -50,7 +61,12 @@ export function deviceHintLevel({
 export function browserDeviceHint(): GraphicsLevel {
   if (typeof navigator === "undefined") return "full";
   const n = navigator as Navigator & { deviceMemory?: number };
-  return deviceHintLevel({ cores: n.hardwareConcurrency, memory: n.deviceMemory });
+  supportsWebGL(); // runs the one-time probe, which also reads the renderer name
+  return deviceHintLevel({
+    cores: n.hardwareConcurrency,
+    memory: n.deviceMemory,
+    softwareRenderer: isSoftwareRenderer(webglRenderer),
+  });
 }
 
 /** The button's order: Full, then Simple, then Off, then round again. */
@@ -95,6 +111,18 @@ function safeStorage(): Storage | undefined {
 }
 
 let webglSupport: boolean | undefined;
+let webglRenderer: string | undefined;
+
+/** The GPU's name: the unmasked one when the browser offers it, else the generic RENDERER. */
+function readRenderer(gl: WebGLRenderingContext): string | undefined {
+  try {
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    const name = gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER);
+    return typeof name === "string" ? name : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * True when this browser can draw WebGL. Checked once per page on a throwaway canvas whose
@@ -108,6 +136,7 @@ export function supportsWebGL(): boolean {
     const canvas = document.createElement("canvas");
     const gl = (canvas.getContext("webgl2") ??
       canvas.getContext("webgl")) as WebGLRenderingContext | null;
+    if (gl) webglRenderer = readRenderer(gl);
     gl?.getExtension("WEBGL_lose_context")?.loseContext();
     webglSupport = Boolean(gl);
   } catch {

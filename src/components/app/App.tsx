@@ -24,7 +24,6 @@ import { Disclaimer } from "./Disclaimer";
 import { ErrorScreen } from "./ErrorScreen";
 import { LoadingScreen } from "./LoadingScreen";
 import { ScreenShell } from "./ScreenShell";
-import { StaleNote } from "./StaleNote";
 import { StoryStage } from "./StoryStage";
 import styles from "./App.module.css";
 
@@ -39,7 +38,13 @@ export type Phase =
   | { name: "entry" }
   | { name: "loading"; progress: ClientLookupEvent[]; countMs: number }
   | { name: "story"; story: StoryData; meta: StoryMeta }
-  | { name: "error"; kind: ErrorKind; window: StoryWindow; excludedMatches: number };
+  | {
+      name: "error";
+      kind: ErrorKind;
+      window: StoryWindow;
+      excludedMatches: number;
+      retryAfter?: number;
+    };
 
 interface Props {
   /** For tests: replaces the global `fetch` used for the lookup. */
@@ -55,8 +60,20 @@ export const STALL_MS = 20_000;
 
 const subscribeNothing = () => () => {};
 
+/** Runs `fn` when the browser is idle (soon, where idle callbacks are missing); returns a cancel. */
+function whenIdle(fn: () => void): () => void {
+  if (typeof requestIdleCallback === "function") {
+    const id = requestIdleCallback(fn, { timeout: 1500 });
+    return () => cancelIdleCallback(id);
+  }
+  const id = setTimeout(fn, 300);
+  return () => clearTimeout(id);
+}
+
 export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
   const [phase, setPhase] = useState<Phase>({ name: "entry" });
+  // The story's current slide, for the city's camera to follow; null until the player is up.
+  const [slide, setSlide] = useState<number | null>(null);
   const [request, setRequest] = useState<ClientLookupRequest | null>(null);
   // Bumped by Replay: remounting the story starts it again at slide 1.
   const [replayCount, setReplayCount] = useState(0);
@@ -81,6 +98,8 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
       const config = pace ?? resolvePace();
       const pacer = createLoadingPacer(config);
       setPhase({ name: "loading", progress: [], countMs: config.tallyCountMs });
+      // A new story starts from its own first card; the city waits for it (ADR 0077).
+      setSlide(null);
       let timer: ReturnType<typeof setTimeout> | undefined;
       // The server sends a status before every step, so long silence means something is stuck.
       let stallTimer: ReturnType<typeof setTimeout> | undefined;
@@ -104,6 +123,7 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
             kind: event.reason,
             window: next.window,
             excludedMatches: 0,
+            retryAfter: event.reason === "rate_limited" ? event.retryAfter : undefined,
           });
         } else if (event.story.matchCount === 0) {
           // Nothing to tell: the story never mounts without matches (ADR 0052).
@@ -119,7 +139,12 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
           setPhase({
             name: "story",
             story: event.story,
-            meta: { window: event.window, patchStart: event.patchStart, stale: event.stale },
+            meta: {
+              window: event.window,
+              patchStart: event.patchStart,
+              patchUnavailable: event.patchUnavailable,
+              stale: event.stale,
+            },
           });
         }
       };
@@ -174,24 +199,46 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
     [request, run],
   );
 
+  // One city for the whole visit (ADR 0068, 0073): scenery behind the entry, loading and error
+  // screens, then the story's own world. It stays mounted throughout, so starting the story is a
+  // camera flight into the opening shot rather than a second city fading in.
+  const story = phase.name === "story" ? phase.story : undefined;
+  // Building the story's cast is heavy, and the 3D must never hold up the story (ADR 0068): the
+  // city keeps circling until the first card is up and the browser has a quiet moment.
+  const [handedOver, setHandedOver] = useState<StoryData | null>(null);
+  const cardUp = story !== undefined && slide !== null;
+  useEffect(() => {
+    if (cardUp) return whenIdle(() => setHandedOver(story));
+  }, [cardUp, story]);
+  const worldStory = cardUp && handedOver === story ? story : undefined;
+  const world = (
+    <WorldLayer
+      story={worldStory}
+      slide={worldStory ? (slide ?? 0) : 0}
+      // Already running behind the landing page, so it simply carries on into the story.
+      started
+      reducedMotion={reducedMotion}
+    />
+  );
+
   if (phase.name === "story") {
     const props: SlideProps = { story: phase.story, meta: phase.meta, actions };
     return (
-      <div className={styles.storyPage}>
-        <StoryStage key={replayCount} {...props} />
-        <div className={styles.notices}>
-          {phase.meta.stale && <StaleNote />}
-          <Disclaimer />
+      <>
+        {world}
+        <div className={styles.storyPage}>
+          <StoryStage key={replayCount} {...props} onSlideChange={setSlide} />
+          <div className={styles.notices}>
+            <Disclaimer />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  // The city sits behind the entry, loading and error screens as scenery (no story to follow
-  // yet). It stays mounted across them; the story mounts its own, which follows the slides.
   return (
     <>
-      <WorldLayer started reducedMotion={reducedMotion} />
+      {world}
       <ScreenShell>
         {phase.name === "entry" && (
           <EntryScreen
@@ -215,6 +262,7 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
             kind={phase.kind}
             window={phase.window}
             excludedMatches={phase.excludedMatches}
+            retryAfter={phase.retryAfter}
             onRetry={() => request && void run(request)}
             onNewLookup={actions.onNewLookup}
           />

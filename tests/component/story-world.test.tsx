@@ -42,11 +42,10 @@ describe("story and world", () => {
     expect(CARD_SIDES.slice(0, 3)).toEqual(["left", "right", "left"]);
   });
 
-  it("puts the world layer behind the story on the stage", async () => {
-    render(<StoryStage {...fixtureSlideProps()} />);
-    expect(await screen.findByTestId("world")).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.getByTestId("story-player")).toHaveAttribute("data-world", "on"),
-    );
+  it("reports the current slide so the app's city can follow it", async () => {
+    const onSlideChange = vi.fn();
+    render(<StoryStage {...fixtureSlideProps()} onSlideChange={onSlideChange} />);
+    await waitFor(() => expect(onSlideChange).toHaveBeenCalledWith(0));
+    expect(screen.getByTestId("story-player")).toHaveAttribute("data-world", "on");
   });
 });

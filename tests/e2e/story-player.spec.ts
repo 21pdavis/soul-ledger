@@ -28,21 +28,34 @@ test.describe("both layouts", () => {
     expect(stageBox.y + stageBox.height).toBeLessThanOrEqual(noticeBox.y);
   });
 
-  test("the cached-matches note sits below the player, clear of the progress bar", async ({
+  test("the saved-matches line sits in the opening slide's footer beside Refresh", async ({
     page,
   }) => {
     await openStory(page, { stale: true });
-    const note = page.getByText(/showing cached matches/i);
-    await expect(note).toBeInViewport();
-    const bar = (await page.getByRole("list", { name: "Story progress" }).boundingBox())!;
-    const noteBox = (await note.boundingBox())!;
+    const line = stage(page).getByText(/from saved matches/i);
+    await expect(line).toBeInViewport();
+    // plain text, not a live region or a floating box: it is part of the slide
+    await expect(page.getByRole("status").filter({ hasText: /saved matches/i })).toHaveCount(0);
     const stageBox = (await stage(page).boundingBox())!;
-    expect(bar.y + bar.height).toBeLessThanOrEqual(noteBox.y);
-    expect(stageBox.y + stageBox.height).toBeLessThanOrEqual(noteBox.y);
-    // the note can be dismissed and the notice is still there
-    await page.getByRole("button", { name: "Dismiss" }).click();
-    await expect(note).toHaveCount(0);
+    const lineBox = (await line.boundingBox())!;
+    expect(lineBox.y).toBeGreaterThanOrEqual(stageBox.y);
+    expect(lineBox.y + lineBox.height).toBeLessThanOrEqual(stageBox.y + stageBox.height);
+    // the Valve notice is still there
     await expect(page.getByText(/Not affiliated with or endorsed by Valve/)).toBeInViewport();
+  });
+
+  test("the saved-matches line does not shrink the stage (320x568)", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await openStory(page);
+    const plain = (await stage(page).boundingBox())!;
+    const other = await page.context().newPage();
+    await other.setViewportSize({ width: 320, height: 568 });
+    await openStory(other, { stale: true });
+    page = other;
+    await expect(page.getByText(/from saved matches/i)).toBeVisible();
+    const withNote = (await stage(page).boundingBox())!;
+    expect(withNote.width).toBe(plain.width);
+    expect(withNote.height).toBe(plain.height);
   });
 
   test("no sideways scroll while the story plays", async ({ page }) => {
@@ -63,6 +76,23 @@ test.describe("phone: tap controller", () => {
     const box = (await stage(page).boundingBox())!;
     await stage(page).tap({
       position: { x: side === "right" ? box.width - 6 : 6, y: box.height * 0.5 },
+    });
+  }
+
+  for (const [width, height] of [
+    [320, 568],
+    [390, 844],
+  ]) {
+    test(`the saved-matches line is for the first slide only (${width}x${height})`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height });
+      await openStory(page, { stale: true });
+      const line = page.getByText(/from saved matches/i);
+      await expect(line).toBeVisible();
+      await tapSide(page, "right");
+      await expect(stage(page)).not.toHaveAttribute("data-slide", "intro");
+      await expect(line).toHaveCount(0);
     });
   }
 
