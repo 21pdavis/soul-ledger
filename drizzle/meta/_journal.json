@@ -8,6 +8,13 @@
       "when": 1791337576759,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794419632436,
+      "tag": "0001_shared_stories",
+      "breakpoints": true
     }
   ]
 }
