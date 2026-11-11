@@ -75,7 +75,10 @@ describe("buildLinkPreview", () => {
 
   it("keeps the same right margin as the left, and lets the stats wrap, for the longest rank and names", () => {
     const story = fixtureStory();
-    story.rank = { journey: [], current: { tier: 11, subrank: 6 } };
+    story.rank = {
+      journey: [],
+      current: { at: "2026-01-01", matchId: 1, badge: 116, tier: 11, subrank: 6 },
+    };
     story.main = { ...story.main!, heroId: 99 };
     const tree = buildLinkPreview({
       ...base,
