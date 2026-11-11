@@ -218,6 +218,11 @@ describe("buildSlidePicture", () => {
       expect(drawableName(name)).toBe(shown);
     });
 
+    it("keeps accents on names stored in decomposed form", () => {
+      expect(drawableName("Zoë")).toBe("Zoë");
+      expect(drawableName(GREEK.normalize("NFD"))).toBe(GREEK);
+    });
+
     it("drops characters no font draws, so no empty boxes", () => {
       expect(drawableName("Gaben \u5c71\u7530 \u2605")).toBe("Gaben");
     });

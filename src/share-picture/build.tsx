@@ -429,7 +429,9 @@ const NAME_FALLBACK = "A Soul Ledger player";
  */
 export function drawableName(name: string): string {
   const kept = name
-    .replace(/[^\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Greek}\p{N}\p{P}\s]/gu, "")
+    // Compose first and keep combining marks, so a decomposed "Zoë" keeps its accent.
+    .normalize("NFC")
+    .replace(/[^\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Greek}\p{N}\p{P}\p{M}\s]/gu, "")
     .replace(/\s+/g, " ")
     .trim();
   return /[\p{L}\p{N}]/u.test(kept) ? kept : NAME_FALLBACK;
