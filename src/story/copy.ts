@@ -132,6 +132,20 @@ export const SHARED_COPY = {
     name?.trim() ? `${name.trim()}'s story` : "A Soul Ledger player's story",
 } as const;
 
+/** The Share button on every slide (ADR 0079). */
+export const SHARE_COPY = {
+  button: "Share",
+  menuLabel: "Share this slide",
+  download: "Download picture",
+  copyLink: "Copy link",
+  copied: "Link copied",
+  copyFailed: "Couldn't copy the link. Try again.",
+  failed: "Couldn't make a link. Try again in a moment.",
+  rateLimited: (seconds: number) =>
+    `Too many shares, try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}`,
+  shareTitle: "My Soul Ledger",
+} as const;
+
 export type ErrorKind =
   "invalid" | "not_found" | "unavailable" | "fetch_failed" | "no_matches" | "rate_limited";
 

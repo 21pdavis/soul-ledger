@@ -69,5 +69,5 @@ export default async function SharedPage({ params }: Props) {
   const opened = await open(slug);
   if (opened.kind === "notFound") notFound();
   if (opened.kind === "expired") return <App expiredAccountId={opened.accountId} />;
-  return <App shared={opened.snapshot} />;
+  return <App shared={opened.snapshot} shareSlug={slug} />;
 }

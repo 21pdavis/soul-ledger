@@ -1,6 +1,7 @@
 import { CARD_SIDES } from "@/story/card-sides";
 import { SLIDES } from "@/story/copy";
 import type { SlideProps } from "@/story/types";
+import { ShareButton } from "./ShareButton";
 import { SlideFrame } from "./SlideFrame";
 import { SLIDE_COMPONENTS } from "./slides";
 import styles from "./StoryPlayer.module.css";
@@ -44,6 +45,7 @@ export function WideCard({
       data-side={CARD_SIDES[index]}
       inert={!isCurrent}
     >
+      {index <= reached && isCurrent && <ShareButton story={story} meta={meta} index={index} />}
       {index <= reached ? (
         <Slide
           story={story}

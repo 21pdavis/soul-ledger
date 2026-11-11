@@ -10,6 +10,9 @@ import { fixtureStory } from "../fixtures/story";
  */
 export const LIVE_SLUG = "e2e-live";
 export const EXPIRED_SLUG = "e2e-expired";
+/** A link whose player has the longest Steam name (32 characters), for layout checks. */
+export const LONG_NAME_SLUG = "e2e-long-name";
+export const LONG_NAME = "Wolfeschlegelsteinhausenberger1";
 export const SHARED_AT = "2026-11-11T23:30:00.000Z";
 
 export function writeShareFixtures(): string {
@@ -29,6 +32,10 @@ export function writeShareFixtures(): string {
     JSON.stringify({
       [LIVE_SLUG]: { expiresAt: "2099-01-01T00:00:00.000Z", snapshot },
       [EXPIRED_SLUG]: { expiresAt: "2020-01-01T00:00:00.000Z", snapshot },
+      [LONG_NAME_SLUG]: {
+        expiresAt: "2099-01-01T00:00:00.000Z",
+        snapshot: { ...snapshot, player: { ...snapshot.player, personaName: LONG_NAME } },
+      },
     }),
   );
   renameSync(temp, file);

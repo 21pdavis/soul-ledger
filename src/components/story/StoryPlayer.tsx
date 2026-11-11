@@ -6,6 +6,7 @@ import { ENTRANCE_MS, initialPlayerState, reducePlayer } from "@/story/slide-ind
 import type { SlideProps } from "@/story/types";
 import { ProgressBar } from "./ProgressBar";
 import { ScrollTrack } from "./ScrollTrack";
+import { ShareButton } from "./ShareButton";
 import { WideCard } from "./WideCard";
 import { SlideStage } from "./SlideStage";
 import { TapZone } from "./TapZone";
@@ -142,6 +143,8 @@ export function StoryPlayer({
         meta={meta}
         actions={slideActions}
       />
+      {/* Above the tap zones, so pressing Share never turns the slide. One per slide. */}
+      {tap && <ShareButton key={state.index} story={story} meta={meta} index={state.index} />}
       <div className={styles.progress} data-interactive={!tap}>
         <ProgressBar count={SLIDE_COUNT} current={state.index} onSelect={tap ? undefined : goTo} />
       </div>

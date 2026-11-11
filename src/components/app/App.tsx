@@ -52,6 +52,8 @@ export type Phase =
 interface Props {
   /** A share link's frozen story: the app opens on it, with no lookup (ADR 0079). */
   shared?: SharedSnapshot;
+  /** The slug of the share link this page was opened from, so Share reuses it. */
+  shareSlug?: string;
   /** An expired share link: its player, so "See their latest" still works. No story is sent. */
   expiredAccountId?: number;
   /** For tests: replaces the global `fetch` used for the lookup. */
@@ -77,7 +79,7 @@ function whenIdle(fn: () => void): () => void {
   return () => clearTimeout(id);
 }
 
-function sharedPhase(shared: SharedSnapshot): Phase {
+function sharedPhase(shared: SharedSnapshot, slug?: string): Phase {
   return {
     name: "story",
     story: shared.story,
@@ -86,15 +88,23 @@ function sharedPhase(shared: SharedSnapshot): Phase {
       patchStart: shared.meta.patchStart,
       patchUnavailable: shared.meta.patchUnavailable,
       stale: false,
-      shared: { at: shared.sharedAt, playerName: shared.player.personaName },
+      accountId: shared.player.accountId,
+      shared: { at: shared.sharedAt, playerName: shared.player.personaName, slug },
     },
   };
 }
 
-export function App({ shared, expiredAccountId, fetchImpl, pace, stallMs = STALL_MS }: Props) {
+export function App({
+  shared,
+  shareSlug,
+  expiredAccountId,
+  fetchImpl,
+  pace,
+  stallMs = STALL_MS,
+}: Props) {
   const [phase, setPhase] = useState<Phase>(() =>
     shared
-      ? sharedPhase(shared)
+      ? sharedPhase(shared, shareSlug)
       : expiredAccountId !== undefined
         ? { name: "expired", accountId: expiredAccountId }
         : { name: "entry" },
@@ -171,6 +181,7 @@ export function App({ shared, expiredAccountId, fetchImpl, pace, stallMs = STALL
               patchStart: event.patchStart,
               patchUnavailable: event.patchUnavailable,
               stale: event.stale,
+              accountId: event.player.accountId,
             },
           });
         }
