@@ -82,10 +82,26 @@ export async function runLookup(
     }
     stale = true;
   }
+  emit(await buildStoryEvent(deps, accountId, request.window, stale));
+}
 
-  const patchStart = request.window === "patch" ? await getPatchStart(deps, now) : null;
+export type StoryEvent = Extract<LookupEvent, { type: "story" }>;
+
+/**
+ * Builds the story event for a player from the database alone (plus the cached shared metrics),
+ * with no sync. Used by the lookup and by the share API, which must never trust a story from
+ * the client.
+ */
+export async function buildStoryEvent(
+  deps: LookupDeps,
+  accountId: number,
+  window: StoryWindow,
+  stale = false,
+): Promise<StoryEvent> {
+  const { db, now = () => new Date() } = deps;
+  const patchStart = window === "patch" ? await getPatchStart(deps, now) : null;
   // A patch window with no known patch date is served all-time data; say so (#25).
-  const patchUnavailable = request.window === "patch" && patchStart === null;
+  const patchUnavailable = window === "patch" && patchStart === null;
   const matches = await repo.getPlayerMatches(db, accountId, {
     since: patchStart ?? undefined,
   });
@@ -97,14 +113,14 @@ export async function runLookup(
   ]);
   const player = await repo.getPlayer(db, accountId);
 
-  emit({
+  return {
     type: "story",
     player: {
       accountId,
       personaName: player?.personaName ?? null,
       avatarUrl: player?.avatarUrl ?? null,
     },
-    window: patchUnavailable ? "all" : request.window,
+    window: patchUnavailable ? "all" : window,
     patchStart,
     patchUnavailable,
     stale,
@@ -114,7 +130,7 @@ export async function runLookup(
       globalMetrics,
       mainHeroMetrics,
     }),
-  });
+  };
 }
 
 /**
