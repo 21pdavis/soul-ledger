@@ -191,3 +191,79 @@
   gap: 0.5rem;
   flex: none;
 }
+
+/* Shared mode: the footer text takes the full width and the two actions sit side by side under it.
+   Squeezed beside stacked buttons, the text wrapped to six lines and ran past the frame (#123). */
+.sharedFooter {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.sharedFooter .sharedActions {
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.sharedFooter .refresh {
+  flex: 1;
+  padding-inline: 0.5rem;
+  line-height: 1.15;
+}
+
+/* The eyebrow and the footer's extra lines cost room a plain intro has: trim the gaps and the
+   actions' size so the longest Steam name still fits on a phone. */
+.sharedSlide {
+  gap: 1rem;
+}
+
+.sharedSlide .figure {
+  padding-bottom: 0.5rem;
+}
+
+.sharedFooter {
+  padding-bottom: 0;
+}
+
+.sharedFooter .refresh {
+  min-height: 2.5rem;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+}
+
+.sharedFooter .stale {
+  font-size: 0.75rem;
+}
+
+/* Smaller stages: the shared footer's four lines are set tighter still. */
+@container (max-height: 639px) {
+  .sharedSlide {
+    gap: 0.375rem;
+  }
+
+  .sharedSlide .figure {
+    padding-bottom: 0.25rem;
+  }
+
+  .sharedSlide .number {
+    font-size: clamp(2.5rem, 15cqw, 3rem);
+    line-height: 0.95;
+  }
+
+  .sharedFooter {
+    gap: 0.375rem;
+  }
+
+  .sharedFooter .basedOn,
+  .sharedFooter .window,
+  .sharedFooter .stale {
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .sharedFooter .refresh {
+    min-height: 2.25rem;
+    font-size: 0.75rem;
+  }
+}

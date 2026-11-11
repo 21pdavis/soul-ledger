@@ -1,6 +1,7 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { SLIDES } from "../../src/story/copy";
 import { fixtureStory } from "../fixtures/story";
+import { LONG_NAME_SLUG } from "./shared-fixtures";
 import { mockLookup, ndjson, openEntry, PROFILE, stageSettled, storyEvent } from "./lookup-mock";
 
 // Slides never scroll (ADR 0050), and the stage clips what does not fit, so a slide that is too
@@ -111,6 +112,39 @@ const SIZES: {
 /** The frame has a decorative inner rule 8px inside its edge: content stays clear of it sideways. */
 const RULE_INSET = 8;
 
+async function fitProblems(frame: Locator) {
+  return frame.evaluate((el, inset) => {
+    const f = el.getBoundingClientRect();
+    const out: string[] = [];
+    // Content ends where the frame's bottom padding starts, not at its edge.
+    const wrapper = el.firstElementChild as HTMLElement;
+    const bottom =
+      wrapper.getBoundingClientRect().bottom - parseFloat(getComputedStyle(wrapper).paddingBottom);
+    for (const node of el.querySelectorAll("*")) {
+      // The padded wrapper fills the frame by design.
+      if (node === el.firstElementChild) continue;
+      const r = node.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      if (
+        r.bottom > bottom + 1 ||
+        r.right > f.right - inset + 0.5 ||
+        r.left < f.left + inset - 0.5
+      ) {
+        const text = (node.textContent ?? "").trim().slice(0, 30);
+        out.push(
+          `<${node.tagName.toLowerCase()}> "${text}" bottom ${Math.round(r.bottom - f.bottom)}px right ${Math.round(r.right - f.right)}px`,
+        );
+      }
+    }
+    if (el.scrollHeight > el.clientHeight) {
+      out.push(
+        `frame ${Math.round(f.width)}x${Math.round(f.height)}: scrollHeight ${el.scrollHeight} > clientHeight ${el.clientHeight}`,
+      );
+    }
+    return out;
+  }, RULE_INSET);
+}
+
 /** Spare pixels the worst-case honorable mentions must leave, so font differences cannot clip them. */
 const MENTIONS_SLACK = 48;
 
@@ -143,37 +177,7 @@ test.describe("every slide fits its frame, worst case", () => {
         await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
         await stageSettled(page);
         const frame = current(page).locator("section").first();
-        const found = await frame.evaluate((el, inset) => {
-          const f = el.getBoundingClientRect();
-          const out: string[] = [];
-          // Content ends where the frame's bottom padding starts, not at its edge.
-          const wrapper = el.firstElementChild as HTMLElement;
-          const bottom =
-            wrapper.getBoundingClientRect().bottom -
-            parseFloat(getComputedStyle(wrapper).paddingBottom);
-          for (const node of el.querySelectorAll("*")) {
-            // The padded wrapper fills the frame by design.
-            if (node === el.firstElementChild) continue;
-            const r = node.getBoundingClientRect();
-            if (r.width === 0 || r.height === 0) continue;
-            if (
-              r.bottom > bottom + 1 ||
-              r.right > f.right - inset + 0.5 ||
-              r.left < f.left + inset - 0.5
-            ) {
-              const text = (node.textContent ?? "").trim().slice(0, 30);
-              out.push(
-                `<${node.tagName.toLowerCase()}> "${text}" bottom ${Math.round(r.bottom - f.bottom)}px right ${Math.round(r.right - f.right)}px`,
-              );
-            }
-          }
-          if (el.scrollHeight > el.clientHeight) {
-            out.push(
-              `frame ${Math.round(f.width)}x${Math.round(f.height)}: scrollHeight ${el.scrollHeight} > clientHeight ${el.clientHeight}`,
-            );
-          }
-          return out;
-        }, RULE_INSET);
+        const found = await fitProblems(frame);
         if (slide.id === "rank") {
           // The current rank is the point of the slide: its row is whole and in view.
           const current = frame.locator("li[aria-current=step]");
@@ -243,6 +247,40 @@ test.describe("the rank climb lists the same rows with default motion", () => {
       const frame = current(page).locator("section").first();
       await expect(frame.locator("li[aria-current=step]")).toContainText("Oracle");
       await expect(frame.locator("ol li")).toHaveCount(7);
+    });
+  }
+});
+
+// #123: a shared link adds a "Shared <date>" line and the player's name (up to 32 characters)
+// to the first slide, and the Share button sits on every slide. All of it must stay in the frame.
+test.describe("shared-link slides fit their frame, longest Steam name", () => {
+  test.skip(!!process.env.STAGING_URL, "needs the e2e fixture links");
+  for (const { width, height } of [
+    { width: 320, height: 568 },
+    { width: 360, height: 640 },
+    { width: 375, height: 667 },
+  ]) {
+    test(`${width}x${height}: intro and summary stay inside the frame`, async ({
+      page,
+      isMobile,
+    }) => {
+      test.skip(!isMobile, "phone only");
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width, height });
+      await page.goto(`/w/${LONG_NAME_SLUG}`);
+      await expect(page.getByRole("button", { name: "Share" })).toBeVisible();
+      const problems: string[] = [];
+      for (const slide of SLIDES) {
+        await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
+        await stageSettled(page);
+        if (slide.id === "intro") {
+          await expect(page.getByText(/Shared .* · numbers from that day/)).toBeVisible();
+        }
+        const frame = current(page).locator("section").first();
+        for (const f of (await fitProblems(frame)).slice(0, 2)) problems.push(`${slide.id}: ${f}`);
+        if (slide.id !== SLIDES.at(-1)!.id) await page.keyboard.press("ArrowRight");
+      }
+      expect(problems).toEqual([]);
     });
   }
 });
