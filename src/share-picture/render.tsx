@@ -73,6 +73,13 @@ const FONTS = [
   "share/fonts/SpaceGrotesk-Regular.woff",
 ] as const;
 
+/** Fallbacks for the glyphs Space Grotesk lacks (Steam names): satori tries fonts in order. */
+const FALLBACK_FONTS = [
+  "share/fonts/NotoSans-latin-ext.woff",
+  "share/fonts/NotoSans-cyrillic.woff",
+  "share/fonts/NotoSans-greek.woff",
+] as const;
+
 /**
  * Draws one slide of a story as a 1080x1920 PNG and returns its bytes. The caller decides what to
  * do with them (a later PR serves them from the share page).
@@ -80,10 +87,11 @@ const FONTS = [
 export async function renderSlidePicture(
   input: Omit<PictureInput, "assets">,
 ): Promise<ArrayBuffer> {
-  const [assets, limelight, grotesk] = await Promise.all([
+  const [assets, limelight, grotesk, ...fallbacks] = await Promise.all([
     loadAssets(input),
     load(FONTS[0]),
     load(FONTS[1]),
+    ...FALLBACK_FONTS.map(load),
   ]);
   const response = new ImageResponse(buildSlidePicture({ ...input, assets }), {
     width: PICTURE_WIDTH,
@@ -91,6 +99,12 @@ export async function renderSlidePicture(
     fonts: [
       { name: "Limelight", data: toArrayBuffer(limelight), weight: 400, style: "normal" },
       { name: "Space Grotesk", data: toArrayBuffer(grotesk), weight: 400, style: "normal" },
+      ...fallbacks.map((data) => ({
+        name: "Noto Sans",
+        data: toArrayBuffer(data),
+        weight: 400 as const,
+        style: "normal" as const,
+      })),
     ],
   });
   return response.arrayBuffer();

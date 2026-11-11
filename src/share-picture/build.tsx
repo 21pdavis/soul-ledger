@@ -30,6 +30,7 @@ import {
   worstMatchLine,
   type SlideId,
 } from "@/story/copy";
+import { deathMapSvg } from "./death-map";
 import { binDeaths, hottestCell } from "@/story/death-bins";
 import { formatHours, formatPatchDate, formatPercent } from "@/story/format";
 import { heroName } from "@/story/heroes";
@@ -320,11 +321,13 @@ const BODIES: Record<SlideId, Body> = {
 
   roast: ({ story }) => {
     const { roast } = story;
-    const hot = hottestCell(binDeaths(roast.deathPositions));
+    const bins = binDeaths(roast.deathPositions);
+    const hot = hottestCell(bins);
     return [
+      hot ? deathMapSvg(bins, hot, 520) : null,
       big(count(roast.deaths), deathsLabel(roast.deaths)),
       hot ? line(hotspotLine(hot.count), { color: C.bone }) : line(noDeathMapLine(roast.deaths)),
-      roast.worstMatch
+      roast.worstMatch && roast.worstMatch.deaths > 0
         ? line(
             worstMatchLine({
               deaths: roast.worstMatch.deaths,
@@ -416,6 +419,22 @@ const BODIES: Record<SlideId, Body> = {
 
 // -------------------------------------------------------------------------------- the frame
 
+const NAME_FALLBACK = "A Soul Ledger player";
+
+/**
+ * The player name as the picture's fonts can draw it. Steam names are free text, and Limelight,
+ * Space Grotesk and the Noto Sans fallbacks cover Latin, Latin Extended, Cyrillic and Greek only;
+ * anything else (CJK, emoji, symbols) would come out as empty boxes, so it is dropped, and a name
+ * with nothing drawable left becomes a plain label.
+ */
+export function drawableName(name: string): string {
+  const kept = name
+    .replace(/[^\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Greek}\p{N}\p{P}\s]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return /[\p{L}\p{N}]/u.test(kept) ? kept : NAME_FALLBACK;
+}
+
 /** "Shared Nov 11, 2026": the day, in UTC for everyone. */
 export const sharedLine = (sharedAt: string) => `Shared ${formatPatchDate(sharedAt)}`;
 
@@ -473,7 +492,7 @@ export function buildSlidePicture(input: PictureInput): ReactElement {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          {text({ fontSize: 40, color: C.brass, letterSpacing: 4 }, playerName)}
+          {text({ fontSize: 40, color: C.brass, letterSpacing: 4 }, drawableName(playerName))}
           {text({ fontFamily: DISPLAY, fontSize: 84, lineHeight: 1.1 }, headlineFor(slide.id))}
         </div>
 

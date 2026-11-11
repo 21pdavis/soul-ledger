@@ -37,4 +37,20 @@ describe("renderSlidePicture", () => {
     const png = await renderSlidePicture({ ...input, story: unknown, index: 1 });
     expect(png.byteLength).toBeGreaterThan(10_000);
   }, 60_000);
+
+  it("draws Cyrillic, Greek and CJK names, and the roast map, without throwing", async () => {
+    const names = ["Игорь", "Ελένη", "山田 ★"];
+    for (const playerName of names) {
+      const png = await renderSlidePicture({ ...input, playerName, index: 7 });
+      expect(png.byteLength).toBeGreaterThan(10_000);
+    }
+  }, 60_000);
+
+  it("draws Cyrillic letters, so two different names give different pictures", async () => {
+    const draw = async (playerName: string) =>
+      Buffer.from(await renderSlidePicture({ ...input, playerName, index: 0 }));
+    const a = await draw("Игорь");
+    const b = await draw("Васяя");
+    expect(a.equals(b)).toBe(false);
+  }, 60_000);
 });

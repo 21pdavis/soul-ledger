@@ -7,19 +7,19 @@ import styles from "./RoastSlide.module.css";
  * Decoration only: the plot's title and description carry the meaning.
  */
 
-const CX = 120;
-const CY = 120;
-const R = 96;
+export const CX = 120;
+export const CY = 120;
+export const R = 96;
 
 /** Lane centre-lines, base to base. The side lanes bow out to match where deaths actually land. */
-const LANES = {
+export const LANES = {
   left: "M120 40 L84 54 L52 84 L50 104 L50 136 L52 156 L84 186 L120 200",
   mid: "M120 40 L120 200",
   right: "M120 40 L156 54 L188 84 L190 104 L190 136 L188 156 L156 186 L120 200",
 } as const;
 
 /** Objective diamonds along the lanes: [x, y, size]. */
-const NODES: readonly (readonly [number, number, number])[] = [
+export const NODES: readonly (readonly [number, number, number])[] = [
   [120, 64, 5],
   [120, 176, 5],
   [120, 92, 4],
@@ -33,7 +33,7 @@ const NODES: readonly (readonly [number, number, number])[] = [
 ];
 
 /** Small jungle marks scattered between the lanes. */
-const CAMPS: readonly (readonly [number, number])[] = [
+export const CAMPS: readonly (readonly [number, number])[] = [
   [86, 96],
   [86, 144],
   [154, 96],
@@ -46,7 +46,7 @@ const CAMPS: readonly (readonly [number, number])[] = [
   [168, 120],
 ];
 
-const diamond = (x: number, y: number, s: number) =>
+export const diamond = (x: number, y: number, s: number) =>
   `M${x} ${y - s} L${x + s} ${y} L${x} ${y + s} L${x - s} ${y} Z`;
 
 export function DeadlockMap() {
