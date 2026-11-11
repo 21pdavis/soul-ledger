@@ -9,7 +9,7 @@ import type { SharedSnapshot } from "./types";
 export type OpenedShare =
   | { kind: "notFound" }
   | { kind: "expired"; accountId: number }
-  | { kind: "live"; snapshot: SharedSnapshot };
+  | { kind: "live"; snapshot: SharedSnapshot; expiresAt: Date };
 
 interface FixtureRow {
   expiresAt: string;
@@ -48,5 +48,5 @@ export async function openSharedStory(
   if (isSharedStoryExpired(row, now)) {
     return { kind: "expired", accountId: row.snapshot.player.accountId };
   }
-  return { kind: "live", snapshot: row.snapshot };
+  return { kind: "live", snapshot: row.snapshot, expiresAt: row.expiresAt };
 }

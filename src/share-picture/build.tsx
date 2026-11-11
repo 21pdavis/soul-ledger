@@ -54,7 +54,7 @@ export const PICTURE_HEIGHT = 1920;
 export const SITE_ADDRESS = "soul-ledger.onrender.com";
 
 /** The palette from tokens.css; satori has no CSS variables. */
-const C = {
+export const C = {
   ink: "#0d0b10",
   panel: "#17131c",
   bone: "#ece6d8",
@@ -83,17 +83,17 @@ export interface PictureInput {
 }
 
 type Style = CSSProperties;
-const DISPLAY = "Limelight";
-const BODY = "Space Grotesk";
+export const DISPLAY = "Limelight";
+export const BODY = "Space Grotesk";
 
-const box = (style: Style, children?: ReactNode): ReactElement => (
+export const box = (style: Style, children?: ReactNode): ReactElement => (
   <div style={{ display: "flex", ...style }}>{children}</div>
 );
-const text = (style: Style, children: ReactNode): ReactElement => (
+export const text = (style: Style, children: ReactNode): ReactElement => (
   <div style={{ display: "flex", fontFamily: BODY, color: C.bone, ...style }}>{children}</div>
 );
 
-const count = (n: number) => n.toLocaleString("en-US");
+export const count = (n: number) => n.toLocaleString("en-US");
 
 // ------------------------------------------------------------------------ building blocks
 
@@ -142,7 +142,7 @@ const bar = (label: string, shown: string, rate: number): ReactElement =>
   ]);
 
 /** A hero's art, or the monogram tile where there is none (ADR 0051, 0065). */
-function heroTile(heroId: number, size: number, assets: PictureAssets): ReactElement {
+export function heroTile(heroId: number, size: number, assets: PictureAssets): ReactElement {
   const src = assets.heroCard(heroId);
   if (src) {
     return (

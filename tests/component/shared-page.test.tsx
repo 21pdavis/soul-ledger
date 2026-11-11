@@ -1,5 +1,5 @@
 import { isValidElement } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { OpenedShare } from "@/lib/share/open";
 import type { SharedSnapshot } from "@/lib/share/types";
 import { fixtureStory } from "../fixtures/story";
@@ -30,7 +30,7 @@ describe("/w/[slug] page", () => {
   });
 
   it("opens a live link on the frozen story", async () => {
-    opened.value = { kind: "live", snapshot };
+    opened.value = { kind: "live", snapshot, expiresAt: new Date("2099-01-01") };
     const el = await SharedPage({ params });
     expect(isValidElement(el)).toBe(true);
     expect((el as { props: { shared: SharedSnapshot } }).props.shared).toBe(snapshot);
@@ -45,7 +45,7 @@ describe("/w/[slug] page", () => {
   });
 
   it("titles a live link with the player's name, and keeps expired and unknown links generic", async () => {
-    opened.value = { kind: "live", snapshot };
+    opened.value = { kind: "live", snapshot, expiresAt: new Date("2099-01-01") };
     expect(await generateMetadata({ params })).toMatchObject({
       title: "Haze Main's Soul Ledger story",
     });
@@ -59,11 +59,64 @@ describe("/w/[slug] page", () => {
     async (personaName) => {
       opened.value = {
         kind: "live",
+        expiresAt: new Date("2099-01-01"),
         snapshot: { ...snapshot, player: { ...snapshot.player, personaName } },
       };
       expect(await generateMetadata({ params })).toMatchObject({
         title: "A Soul Ledger player's story",
       });
+    },
+  );
+
+  it("gives a live link a wide preview image and a large-image card", async () => {
+    opened.value = { kind: "live", snapshot, expiresAt: new Date("2099-01-01") };
+    const meta = await generateMetadata({ params });
+    expect(meta.openGraph).toMatchObject({
+      title: "Haze Main's Soul Ledger story",
+      url: "/w/hazemain",
+      images: [{ url: "/w/hazemain/preview", width: 1200, height: 630 }],
+    });
+    expect(meta.openGraph?.description).toBeTruthy();
+    expect(meta.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: ["/w/hazemain/preview"],
+    });
+    expect(meta.metadataBase).toBeInstanceOf(URL);
+  });
+
+  describe("the base for absolute preview addresses", () => {
+    const baseFor = async () => {
+      opened.value = { kind: "live", snapshot, expiresAt: new Date("2099-01-01") };
+      return (await generateMetadata({ params })).metadataBase?.toString();
+    };
+    afterEach(() => vi.unstubAllEnvs());
+
+    it("is RENDER_EXTERNAL_URL when set", async () => {
+      vi.stubEnv("RENDER_EXTERNAL_URL", "https://soul-ledger-staging.onrender.com");
+      expect(await baseFor()).toBe("https://soul-ledger-staging.onrender.com/");
+    });
+
+    it.each([
+      ["unset", undefined],
+      ["empty", ""],
+      ["malformed", "not a url"],
+    ])("falls back to localhost when it is %s, without throwing", async (_name, value) => {
+      vi.stubEnv("RENDER_EXTERNAL_URL", value);
+      expect(await baseFor()).toBe("http://localhost:3000/");
+    });
+  });
+
+  it.each([{ kind: "expired", accountId: 77 } as const, { kind: "notFound" } as const])(
+    "gives a $kind link a generic preview with no player data and no image",
+    async (value) => {
+      opened.value = value;
+      const meta = await generateMetadata({ params });
+      expect(meta.openGraph).toMatchObject({ title: "Soul Ledger" });
+      expect(meta.openGraph).not.toHaveProperty("images");
+      expect(meta.twitter).not.toHaveProperty("images");
+      const json = JSON.stringify(meta);
+      expect(json).not.toContain("Haze Main");
+      expect(json).not.toContain("hazemain");
     },
   );
 });

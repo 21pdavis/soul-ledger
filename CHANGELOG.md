@@ -7,6 +7,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 ### Added
 
 - Shared story links open a frozen replay of someone's story, with the city, exactly as it was on the day they shared it. The page says when it was shared, offers "See their latest" and "Look up your own", and a link older than 90 days says it has expired. The first slide says whose story it is.
+- Pasting a share link into a chat or social app now shows a wide preview card: the player's name, their main hero's art, matches played, main hero and rank, over the city. Expired or unknown links show only a plain Soul Ledger card, with nothing about the player.
 
 ## [0.3.2] - 2026-10-17
 
