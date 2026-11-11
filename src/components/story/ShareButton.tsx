@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
   canShareFiles,
   linkPath,
   picturePath,
+  rememberedShareSlug,
+  rememberShareSlug,
   requestShareLink,
   type ShareLinkResult,
 } from "@/lib/client/share";
@@ -34,6 +36,13 @@ export function ShareButton({ meta, index, className }: Props) {
   const [notice, setNotice] = useState<Notice>(null);
   const trigger = useRef<HTMLButtonElement>(null);
 
+  // A notice is for a moment, not for good.
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(null), notice.kind === "alert" ? 6000 : 4000);
+    return () => clearTimeout(timer);
+  }, [notice]);
+
   const fail = (result: Extract<ShareLinkResult, { ok: false }>) =>
     setNotice({
       kind: "alert",
@@ -54,11 +63,15 @@ export function ShareButton({ meta, index, className }: Props) {
     setBusy(true);
     try {
       let linkSlug = meta.shared?.slug;
+      if (!linkSlug && meta.accountId !== undefined) {
+        linkSlug = rememberedShareSlug(meta.accountId, meta.window);
+      }
       if (!linkSlug) {
         if (meta.accountId === undefined) return fail({ ok: false, reason: "failed" });
         const result = await requestShareLink(meta.accountId, meta.window);
         if (!result.ok) return fail(result);
         linkSlug = result.slug;
+        rememberShareSlug(meta.accountId, meta.window, linkSlug);
       }
       const url = `${window.location.origin}${linkPath(linkSlug)}`;
       if (!canShareFiles()) {
@@ -73,10 +86,11 @@ export function ShareButton({ meta, index, className }: Props) {
         });
         await navigator.share({ files: [file], url, title: SHARE_COPY.shareTitle });
       } catch (err) {
-        // Closing the share sheet is not a failure.
-        if (!(err instanceof DOMException && err.name === "AbortError")) {
-          setNotice({ kind: "alert", text: SHARE_COPY.failed });
-        }
+        const name = err instanceof DOMException ? err.name : "";
+        // Closing the share sheet is not a failure. iOS refuses the sheet when the waits above
+        // used up the tap's moment: the menu still gets the picture and link out.
+        if (name === "NotAllowedError") setSlug(linkSlug);
+        else if (name !== "AbortError") setNotice({ kind: "alert", text: SHARE_COPY.failed });
       }
     } finally {
       setBusy(false);
@@ -122,7 +136,10 @@ export function ShareButton({ meta, index, className }: Props) {
             className={styles.item}
             href={picturePath(slug, index)}
             download={`soul-ledger-${index + 1}.png`}
-            onClick={() => setSlug(null)}
+            onClick={() => {
+              setSlug(null);
+              trigger.current?.focus();
+            }}
           >
             {SHARE_COPY.download}
           </a>
@@ -131,7 +148,12 @@ export function ShareButton({ meta, index, className }: Props) {
           </button>
         </div>
       )}
-      <p className={styles.notice} aria-live="polite">
+      {/* Always in the page (visually hidden when empty), or screen readers miss what is added. */}
+      <p
+        className={notice?.kind === "status" ? styles.notice : styles.quiet}
+        aria-live="polite"
+        data-testid="share-status"
+      >
         {notice?.kind === "status" ? notice.text : ""}
       </p>
       {notice?.kind === "alert" && (

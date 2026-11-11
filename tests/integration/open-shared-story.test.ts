@@ -34,7 +34,11 @@ describe("openSharedStory", () => {
 
   it("returns the frozen snapshot for a live link", async () => {
     await make("hazemain");
-    expect(await openSharedStory("hazemain", NOW, db)).toEqual({ kind: "live", snapshot });
+    expect(await openSharedStory("hazemain", NOW, db)).toEqual({
+      kind: "live",
+      snapshot,
+      expiresAt: new Date(NOW.getTime() + SHARE_TTL_MS),
+    });
   });
 
   it("is expired once past 90 days, carrying only the account id, never the story", async () => {
@@ -55,6 +59,7 @@ describe("openSharedStory", () => {
     expect(await openSharedStory("e2e-live", NOW, undefined, file)).toEqual({
       kind: "live",
       snapshot,
+      expiresAt: new Date("2099-01-01T00:00:00Z"),
     });
     expect(await openSharedStory("other", NOW, undefined, file)).toEqual({ kind: "notFound" });
   });

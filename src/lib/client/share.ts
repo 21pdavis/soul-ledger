@@ -35,6 +35,17 @@ export async function requestShareLink(
   }
 }
 
+const links = new Map<string, string>();
+const storyKey = (accountId: number, window: StoryWindow) => `${accountId}:${window}`;
+
+/** The link already made for this player's story in this tab, so repeat presses don't ask again. */
+export const rememberedShareSlug = (accountId: number, window: StoryWindow) =>
+  links.get(storyKey(accountId, window));
+export const rememberShareSlug = (accountId: number, window: StoryWindow, slug: string) =>
+  void links.set(storyKey(accountId, window), slug);
+/** Test seam: forget remembered links. */
+export const forgetShareLinks = () => links.clear();
+
 /** Where a link opens, and where its slide pictures live (slide index 0-based). */
 export const linkPath = (slug: string) => `/w/${slug}`;
 export const picturePath = (slug: string, index: number) => `/w/${slug}/picture/${index}`;

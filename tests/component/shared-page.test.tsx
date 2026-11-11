@@ -30,7 +30,7 @@ describe("/w/[slug] page", () => {
   });
 
   it("opens a live link on the frozen story", async () => {
-    opened.value = { kind: "live", snapshot };
+    opened.value = { kind: "live", snapshot, expiresAt: new Date("2099-01-01") };
     const el = await SharedPage({ params });
     expect(isValidElement(el)).toBe(true);
     expect((el as { props: { shared: SharedSnapshot } }).props.shared).toBe(snapshot);
@@ -47,7 +47,7 @@ describe("/w/[slug] page", () => {
   });
 
   it("titles a live link with the player's name, and keeps expired and unknown links generic", async () => {
-    opened.value = { kind: "live", snapshot };
+    opened.value = { kind: "live", snapshot, expiresAt: new Date("2099-01-01") };
     expect(await generateMetadata({ params })).toMatchObject({
       title: "Haze Main's Soul Ledger story",
     });
@@ -61,6 +61,7 @@ describe("/w/[slug] page", () => {
     async (personaName) => {
       opened.value = {
         kind: "live",
+        expiresAt: new Date("2099-01-01"),
         snapshot: { ...snapshot, player: { ...snapshot.player, personaName } },
       };
       expect(await generateMetadata({ params })).toMatchObject({

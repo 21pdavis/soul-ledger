@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ShareButton } from "@/components/story/ShareButton";
+import { forgetShareLinks } from "@/lib/client/share";
 import type { StoryMeta } from "@/story/types";
 import { fixtureStory } from "../fixtures/story";
 
@@ -28,11 +29,15 @@ const setNavigator = (props: Record<string, unknown>) => {
 };
 
 beforeEach(() => {
+  forgetShareLinks();
   fetchMock = vi.fn();
   vi.stubGlobal("fetch", fetchMock);
   setNavigator({ share: undefined, canShare: undefined, clipboard: undefined });
 });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
 
 const press = () => userEvent.click(screen.getByRole("button", { name: "Share" }));
 
@@ -108,6 +113,88 @@ describe("ShareButton on a phone", () => {
     render(<ShareButton story={story} meta={shared} index={1} />);
     await press();
     await waitFor(() => expect(share).toHaveBeenCalled());
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+});
+
+describe("ShareButton gesture and memory", () => {
+  it("falls back to the menu when the browser refuses the share sheet after the waits (iOS)", async () => {
+    const share = vi.fn().mockRejectedValue(new DOMException("no gesture", "NotAllowedError"));
+    setNavigator({ share, canShare: () => true });
+    fetchMock.mockResolvedValueOnce(PNG());
+    render(<ShareButton story={story} meta={shared} index={1} />);
+    await press();
+    expect(await screen.findByRole("link", { name: "Download picture" })).toHaveAttribute(
+      "href",
+      "/w/gaben-abc/picture/1",
+    );
+    expect(screen.getByRole("button", { name: "Copy link" })).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("makes the link once per story, however often it is pressed or the slide remounts", async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ slug: "gaben-abc", path: "/w/gaben-abc" }));
+    const first = render(<ShareButton story={story} meta={live} index={0} />);
+    await press();
+    await screen.findByRole("link", { name: "Download picture" });
+    first.unmount();
+    render(<ShareButton story={story} meta={live} index={4} />);
+    await press();
+    expect(await screen.findByRole("link", { name: "Download picture" })).toHaveAttribute(
+      "href",
+      "/w/gaben-abc/picture/4",
+    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("makes a new link for a different window of the same player", async () => {
+    fetchMock.mockResolvedValue(jsonResponse({ slug: "gaben-abc", path: "/w/gaben-abc" }));
+    const first = render(<ShareButton story={story} meta={live} index={0} />);
+    await press();
+    await screen.findByRole("link", { name: "Download picture" });
+    first.unmount();
+    render(<ShareButton story={story} meta={{ ...live, window: "patch" }} index={0} />);
+    await press();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+  });
+
+  it("gives focus back to Share after Download picture", async () => {
+    render(<ShareButton story={story} meta={shared} index={2} />);
+    await press();
+    const link = await screen.findByRole("link", { name: "Download picture" });
+    link.addEventListener("click", (e) => e.preventDefault());
+    await userEvent.click(link);
+    expect(screen.getByRole("button", { name: "Share" })).toHaveFocus();
+  });
+});
+
+describe("ShareButton notices", () => {
+  it("keeps a status region in the page so 'Link copied' is announced, then clears it", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    setNavigator({ clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
+    render(<ShareButton story={story} meta={shared} index={0} />);
+    const region = screen.getByTestId("share-status");
+    expect(region).toBeInTheDocument();
+    expect(region).toBeEmptyDOMElement();
+    await press();
+    await userEvent.click(await screen.findByRole("button", { name: "Copy link" }));
+    expect(await screen.findByTestId("share-status")).toHaveTextContent("Link copied");
+    expect(screen.getByTestId("share-status")).toBe(region);
+    await act(async () => {
+      vi.advanceTimersByTime(6000);
+    });
+    expect(screen.getByTestId("share-status")).toBeEmptyDOMElement();
+  });
+
+  it("clears an error notice after a few seconds too", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    fetchMock.mockResolvedValueOnce(jsonResponse({ error: "unavailable" }, 503));
+    render(<ShareButton story={story} meta={live} index={0} />);
+    await press();
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+    await act(async () => {
+      vi.advanceTimersByTime(8000);
+    });
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

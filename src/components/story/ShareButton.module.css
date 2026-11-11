@@ -66,8 +66,16 @@
   text-align: right;
 }
 
-.notice:empty {
-  display: none;
+/* The empty status region stays rendered so assistive tech announces what it later gets. */
+.quiet {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .notice[data-kind="alert"] {
