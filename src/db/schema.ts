@@ -10,6 +10,7 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 import type { MmrHistoryEntry } from "@/lib/deadlock-api/schemas";
+import type { SharedSnapshot } from "@/lib/share/types";
 import type { DeathPoint } from "@/lib/stats/types";
 
 // Account ids are 32-bit unsigned, so they overflow Postgres `integer`.
@@ -97,6 +98,27 @@ export const fetchJobs = pgTable("fetch_jobs", {
   finishedAt: timestamp("finished_at", { withTimezone: true }),
   error: text("error"),
 });
+
+/**
+ * Frozen stories behind share links (ADR 0079). A row is made when someone taps Share, reused
+ * for the same story (same `content_hash`) while live, and deleted by the weekly cleanup once
+ * `expires_at` has passed.
+ */
+export const sharedStories = pgTable(
+  "shared_stories",
+  {
+    slug: text("slug").primaryKey(),
+    accountId: accountId().notNull(),
+    contentHash: text("content_hash").notNull(),
+    snapshot: jsonb("snapshot").$type<SharedSnapshot>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  },
+  (t) => [
+    index("shared_stories_content_hash_idx").on(t.contentHash),
+    index("shared_stories_expires_at_idx").on(t.expiresAt),
+  ],
+);
 
 /** Cached API responses that are not per-player, such as global percentile metrics. */
 export const apiCache = pgTable("api_cache", {

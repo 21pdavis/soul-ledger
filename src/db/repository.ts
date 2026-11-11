@@ -1,8 +1,9 @@
-import { and, asc, desc, eq, gte, lt, ne, or } from "drizzle-orm";
+import { and, asc, desc, eq, gt, gte, lt, lte, ne, or } from "drizzle-orm";
 import type { MmrHistoryEntry } from "@/lib/deadlock-api/schemas";
 import type { DeathPoint, PlayerMatch } from "@/lib/stats/types";
 import type { Db } from "./index";
-import { apiCache, fetchJobs, playerMatches, players } from "./schema";
+import { SHARE_TTL_MS, type SharedSnapshot } from "@/lib/share/types";
+import { apiCache, fetchJobs, playerMatches, players, sharedStories } from "./schema";
 
 // Compile-time check that the table and the domain type stay in sync.
 type Row = typeof playerMatches.$inferSelect;
@@ -168,6 +169,69 @@ export async function finishJob(
 export async function getJob(db: Db, accountId: number) {
   const [job] = await db.select().from(fetchJobs).where(eq(fetchJobs.accountId, accountId));
   return job ?? null;
+}
+
+// ---- shared stories (ADR 0079) ----
+
+export type SharedStoryRow = typeof sharedStories.$inferSelect;
+
+export interface NewSharedStory {
+  slug: string;
+  accountId: number;
+  /** Identifies "the same story", so repeat shares reuse one link. */
+  contentHash: string;
+  snapshot: SharedSnapshot;
+  now: Date;
+}
+
+/** Stores a share link expiring `SHARE_TTL_MS` from `now`. Throws if the slug is taken. */
+export async function createSharedStory(db: Db, story: NewSharedStory): Promise<SharedStoryRow> {
+  const [row] = await db
+    .insert(sharedStories)
+    .values({
+      slug: story.slug,
+      accountId: story.accountId,
+      contentHash: story.contentHash,
+      snapshot: story.snapshot,
+      createdAt: story.now,
+      expiresAt: new Date(story.now.getTime() + SHARE_TTL_MS),
+    })
+    .returning();
+  return row;
+}
+
+/** A share link by slug, expired or not; callers check `isSharedStoryExpired`. */
+export async function getSharedStory(db: Db, slug: string): Promise<SharedStoryRow | null> {
+  const [row] = await db.select().from(sharedStories).where(eq(sharedStories.slug, slug));
+  return row ?? null;
+}
+
+export function isSharedStoryExpired(row: Pick<SharedStoryRow, "expiresAt">, now: Date): boolean {
+  return row.expiresAt.getTime() <= now.getTime();
+}
+
+/** The newest live link for this story, so sharing it again reuses that link. */
+export async function findLiveSharedStoryByHash(
+  db: Db,
+  contentHash: string,
+  now: Date,
+): Promise<SharedStoryRow | null> {
+  const [row] = await db
+    .select()
+    .from(sharedStories)
+    .where(and(eq(sharedStories.contentHash, contentHash), gt(sharedStories.expiresAt, now)))
+    .orderBy(desc(sharedStories.createdAt))
+    .limit(1);
+  return row ?? null;
+}
+
+/** The weekly cleanup: removes every expired link and returns how many went. */
+export async function deleteExpiredSharedStories(db: Db, now: Date): Promise<number> {
+  const deleted = await db
+    .delete(sharedStories)
+    .where(lte(sharedStories.expiresAt, now))
+    .returning({ slug: sharedStories.slug });
+  return deleted.length;
 }
 
 // ---- API response cache ----
