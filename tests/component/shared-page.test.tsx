@@ -34,6 +34,8 @@ describe("/w/[slug] page", () => {
     const el = await SharedPage({ params });
     expect(isValidElement(el)).toBe(true);
     expect((el as { props: { shared: SharedSnapshot } }).props.shared).toBe(snapshot);
+    // Share reuses this link instead of making another.
+    expect((el as { props: { shareSlug: string } }).props.shareSlug).toBe("hazemain");
   });
 
   it("opens an expired link on the expired screen, without sending the story", async () => {

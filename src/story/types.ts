@@ -20,10 +20,14 @@ export interface StoryMeta {
   patchUnavailable?: boolean;
   /** True when a refresh failed and the story comes from older cached matches. */
   stale: boolean;
+  /** The player's id, so Share can make a link (ADR 0079). Absent only in old fixtures. */
+  accountId?: number;
   /** Set when the story is a frozen share link (ADR 0079): ISO time the link was made. */
   shared?: {
     at: string;
     /** Who shared it; null or blank when unknown. */ playerName?: string | null;
+    /** This page's own link, which Share reuses instead of making another. */
+    slug?: string;
   };
 }
 
