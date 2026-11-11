@@ -29,6 +29,9 @@ describe("GET /w/[slug]/preview", () => {
     const res = await GET(req, ctx);
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toBe("image/png");
+    expect(res.headers.get("cache-control")).toBe(
+      "public, max-age=86400, s-maxage=86400, immutable",
+    );
     expect((await res.arrayBuffer()).byteLength).toBeGreaterThan(10_000);
   }, 30_000);
 

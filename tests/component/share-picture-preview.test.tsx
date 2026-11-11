@@ -10,7 +10,7 @@ import type { PictureAssets } from "@/share-picture/build";
 import { monogramFor } from "@/story/monogram";
 import { heroName } from "@/story/heroes";
 import { rankLabel } from "@/story/ranks";
-import { fixtureStory } from "../../fixtures/story";
+import { fixtureStory } from "../fixtures/story";
 
 function read(node: ReactNode): { texts: string[]; images: string[] } {
   const out = { texts: [] as string[], images: [] as string[] };
@@ -72,4 +72,48 @@ describe("buildLinkPreview", () => {
     expect(all).toContain("Gaben");
     expect(all).not.toContain("undefined");
   });
+
+  it("keeps the same right margin as the left, and lets the stats wrap, for the longest rank and names", () => {
+    const story = fixtureStory();
+    story.rank = { journey: [], current: { tier: 11, subrank: 6 } };
+    story.main = { ...story.main!, heroId: 99 };
+    const tree = buildLinkPreview({
+      ...base,
+      story,
+      playerName: "A Very Long Player Name",
+    }) as ElementLike;
+    const find = (n: unknown, pred: (e: ElementLike) => boolean): ElementLike | null => {
+      if (!n || typeof n !== "object") return null;
+      if (Array.isArray(n)) return n.map((c) => find(c, pred)).find(Boolean) ?? null;
+      const el = n as ElementLike;
+      if (pred(el)) return el;
+      return find(el.props?.children, pred);
+    };
+    const overlay = find(tree, (e) => e.props?.style?.padding === 56)!;
+    const column = find(
+      overlay,
+      (e) => e.props?.style?.flexDirection === "column" && e !== overlay,
+    )!;
+    const tile = 380;
+    const { padding, gap } = overlay.props.style!;
+    // Left margin is `padding`; the column must end `padding` short of the right edge.
+    expect(padding! + tile + gap! + column.props.style!.width!).toBe(PREVIEW_WIDTH - padding!);
+    const row = find(column, (e) => e.props?.style?.columnGap === 40)!;
+    expect(row.props.style!.flexWrap).toBe("wrap");
+    expect(draw({ story }).texts).toContain("Eternus 6");
+  });
 });
+
+interface ElementLike {
+  props: {
+    children?: unknown;
+    style?: {
+      padding?: number;
+      gap?: number;
+      columnGap?: number;
+      width?: number;
+      flexDirection?: string;
+      flexWrap?: string;
+    };
+  };
+}

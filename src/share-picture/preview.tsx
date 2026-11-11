@@ -26,6 +26,12 @@ import {
 export const PREVIEW_WIDTH = 1200;
 export const PREVIEW_HEIGHT = 630;
 
+const PADDING = 56;
+const GAP = 56;
+const TILE = 380;
+/** The text column ends PADDING short of the right edge, the same margin as on the left. */
+const COLUMN_WIDTH = PREVIEW_WIDTH - 2 * PADDING - TILE - GAP;
+
 export interface PreviewInput {
   story: StoryData;
   playerName: string;
@@ -33,8 +39,8 @@ export interface PreviewInput {
 }
 
 const stat = (value: string, label: string): ReactElement =>
-  box({ flexDirection: "column", gap: 4 }, [
-    text({ fontFamily: DISPLAY, fontSize: 44, color: C.brass, lineHeight: 1.1 }, value),
+  box({ flexDirection: "column", gap: 4, maxWidth: COLUMN_WIDTH }, [
+    text({ fontFamily: DISPLAY, fontSize: 40, color: C.brass, lineHeight: 1.1 }, value),
     text({ fontSize: 26, color: C.muted }, label),
   ]);
 
@@ -87,16 +93,16 @@ export function buildLinkPreview({ story, playerName, assets }: PreviewInput): R
           left: 0,
           width: PREVIEW_WIDTH,
           height: PREVIEW_HEIGHT,
-          padding: 56,
-          gap: 56,
+          padding: PADDING,
+          gap: GAP,
           alignItems: "center",
         }}
       >
-        {main ? heroTile(main.heroId, 380, assets) : null}
-        <div style={{ display: "flex", flexDirection: "column", flexGrow: 1, gap: 28 }}>
+        {main ? heroTile(main.heroId, TILE, assets) : null}
+        <div style={{ display: "flex", flexDirection: "column", width: COLUMN_WIDTH, gap: 28 }}>
           {text({ fontSize: 30, color: C.brass, letterSpacing: 4 }, "SOUL LEDGER")}
           {text({ fontFamily: DISPLAY, fontSize: 76, lineHeight: 1.1 }, drawableName(playerName))}
-          <div style={{ display: "flex", gap: 40 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", columnGap: 40, rowGap: 20 }}>
             {stat(count(matches), matchesUnit(matches))}
             {main ? stat(heroName(main.heroId), "main hero") : null}
             {rank ? stat(rank, "rank") : null}

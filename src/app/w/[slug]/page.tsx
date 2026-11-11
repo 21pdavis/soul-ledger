@@ -24,7 +24,14 @@ const GENERIC: Metadata = {
 };
 
 /** Where absolute preview addresses point: Render sets RENDER_EXTERNAL_URL for each service. */
-const metadataBase = () => new URL(process.env.RENDER_EXTERNAL_URL ?? "http://localhost:3000");
+const metadataBase = () => {
+  const fallback = "http://localhost:3000";
+  try {
+    return new URL(process.env.RENDER_EXTERNAL_URL || fallback);
+  } catch {
+    return new URL(fallback);
+  }
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;

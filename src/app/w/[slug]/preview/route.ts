@@ -20,6 +20,9 @@ export async function GET(
     playerName: opened.snapshot.player.personaName?.trim() ?? "",
   });
   return new Response(png, {
-    headers: { "content-type": "image/png", "cache-control": "public, max-age=300" },
+    headers: {
+      "content-type": "image/png",
+      "cache-control": "public, max-age=86400, s-maxage=86400, immutable",
+    },
   });
 }

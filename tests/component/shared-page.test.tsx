@@ -1,5 +1,5 @@
 import { isValidElement } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { OpenedShare } from "@/lib/share/open";
 import type { SharedSnapshot } from "@/lib/share/types";
 import { fixtureStory } from "../fixtures/story";
@@ -81,6 +81,28 @@ describe("/w/[slug] page", () => {
       images: ["/w/hazemain/preview"],
     });
     expect(meta.metadataBase).toBeInstanceOf(URL);
+  });
+
+  describe("the base for absolute preview addresses", () => {
+    const baseFor = async () => {
+      opened.value = { kind: "live", snapshot };
+      return (await generateMetadata({ params })).metadataBase?.toString();
+    };
+    afterEach(() => vi.unstubAllEnvs());
+
+    it("is RENDER_EXTERNAL_URL when set", async () => {
+      vi.stubEnv("RENDER_EXTERNAL_URL", "https://soul-ledger-staging.onrender.com");
+      expect(await baseFor()).toBe("https://soul-ledger-staging.onrender.com/");
+    });
+
+    it.each([
+      ["unset", undefined],
+      ["empty", ""],
+      ["malformed", "not a url"],
+    ])("falls back to localhost when it is %s, without throwing", async (_name, value) => {
+      vi.stubEnv("RENDER_EXTERNAL_URL", value);
+      expect(await baseFor()).toBe("http://localhost:3000/");
+    });
   });
 
   it.each([{ kind: "expired", accountId: 77 } as const, { kind: "notFound" } as const])(
