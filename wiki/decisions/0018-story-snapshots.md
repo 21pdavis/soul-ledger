@@ -16,3 +16,5 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T14:00:00Z }
 - A "see my latest" button regenerates the story from fresh data.
 
 Refines [ADR 0011](0011-sharing.md).
+
+> **Superseded in part ([ADR 0079](0079-m4-sharing-scope.md)):** snapshots are created on Share, reused, expire after 90 days, and the address carries a name.

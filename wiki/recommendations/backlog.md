@@ -68,3 +68,4 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 - Filter Street Brawl (`game_mode` 4) out of the main stats or show it separately ([match fields](../research/match-metadata-fields.md)).
 - Queue every API fetch server-side behind the per-IP rate limits. Never call the API from the browser.
 - Never evade the per-IP limits (IP rotation, extra outbound IPs). Ask the maintainers for more headroom instead ([ADR 0058](../decisions/0058-contact-maintainers-and-respect-rate-limits.md)).
+- M5 analytics details (which tool, which events, retention, consent): needs its own grilling session; prefer a privacy-friendly tool ([ADR 0080](../decisions/0080-roadmap-analytics-security-legal-milestone.md)).
