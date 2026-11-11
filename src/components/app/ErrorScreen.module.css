@@ -117,3 +117,11 @@
   outline: 3px solid var(--bone);
   outline-offset: 3px;
 }
+
+/* A link that looks like the primary button. */
+.linkButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
