@@ -29,4 +29,4 @@ Choices made while building M4 ([ADR 0079](0079-m4-sharing-scope.md), [plan](../
 # Known gaps
 
 * #119: no global ceiling on the number of share rows.
-* #123: being fixed.
+* #123: the "Shared <date>" line is clipped at 360x640 with a long name (open layout bug).
