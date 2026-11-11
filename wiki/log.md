@@ -1,6 +1,8 @@
 # Directory Update Log
 
 ## 2026-11-11
+* **Milestone**: M4 plan steps 1-7 built and merged into staging (#115-#122); release 0.4.0 is next. Known gaps: #119, #123.
+* **Decision**: [ADR 0081](decisions/0081-m4-sharing-build-decisions.md): M4 build decisions (server rebuilds stories, per-player link reuse, accent-folding slugs, first-slide label by owner decision, name folding in pictures, image caching, cron after 0.4.0 is live).
 * **Decision**: link preview is an explicit `/w/[slug]/preview` route plus `openGraph.images` set in `generateMetadata` for live links only. Next's `opengraph-image` file convention was not used because it would attach an image to expired and unknown links too ([ADR 0079](decisions/0079-m4-sharing-scope.md)).
 * **Research**: [Rendering share pictures with next/og](research/share-picture-rendering.md): satori rejects WebP and variable fonts; hero cards are converted with sharp; city stills come from a capture script.
 * **Decision**: [ADR 0079](decisions/0079-m4-sharing-scope.md): M4 sharing scope (slide pictures, share links with 90-day expiry, OG preview, weekly Render cleanup); amends ADRs 0011 and 0018. Plan: [M4 plan](recommendations/m4-plan.md) (owner decision).
