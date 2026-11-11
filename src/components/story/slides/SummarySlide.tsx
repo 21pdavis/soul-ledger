@@ -1,4 +1,5 @@
 import {
+  SHARED_COPY,
   STORY_ACTIONS_COPY,
   SUMMARY_COPY,
   headlineFor,
@@ -7,6 +8,7 @@ import {
 } from "@/story/copy";
 import { basedOnMatches } from "@/story/window-label";
 import { HeroTile } from "../HeroTile";
+import { SharedLine } from "../SharedControls";
 import { SlideFrame } from "../SlideFrame";
 import { WindowLabel } from "../WindowLabel";
 import type { SlideComponent } from "./contract";
@@ -65,10 +67,17 @@ export const SummarySlide: SlideComponent = ({
             <div className={styles.basis}>
               <WindowLabel meta={meta} className={styles.window} />
               <p className={styles.based}>{basedOnMatches(story.matchCount)}</p>
+              {meta.shared && <SharedLine at={meta.shared.at} className={styles.based} />}
             </div>
-            <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
-              {STORY_ACTIONS_COPY.refresh}
-            </button>
+            {meta.shared ? (
+              <button type="button" className={styles.refresh} onClick={actions.onSeeLatest}>
+                {SHARED_COPY.seeLatest}
+              </button>
+            ) : (
+              <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
+                {STORY_ACTIONS_COPY.refresh}
+              </button>
+            )}
             <div
               className={styles.stamp}
               data-testid="summary-stamp"
@@ -84,7 +93,7 @@ export const SummarySlide: SlideComponent = ({
               {STORY_ACTIONS_COPY.replay}
             </button>
             <button type="button" className={styles.secondary} onClick={actions.onNewLookup}>
-              {STORY_ACTIONS_COPY.newLookup}
+              {meta.shared ? SHARED_COPY.lookUpOwn : STORY_ACTIONS_COPY.newLookup}
             </button>
           </div>
         </div>

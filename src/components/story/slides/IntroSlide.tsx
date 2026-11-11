@@ -9,6 +9,7 @@ import {
 import { formatHours } from "@/story/format";
 import { basedOnMatches } from "@/story/window-label";
 import { SlideFrame } from "../SlideFrame";
+import { SharedActions, SharedLine } from "../SharedControls";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
 import { WindowLabel } from "../WindowLabel";
@@ -68,11 +69,24 @@ export const IntroSlide: SlideComponent = ({
           <div>
             <p className={styles.basedOn}>{basedOnMatches(story.matchCount)}</p>
             <WindowLabel meta={meta} className={styles.window} />
-            {meta.stale && <p className={styles.stale}>{STALE_NOTE}</p>}
+            {meta.shared ? (
+              <SharedLine at={meta.shared.at} className={styles.stale} />
+            ) : (
+              meta.stale && <p className={styles.stale}>{STALE_NOTE}</p>
+            )}
           </div>
-          <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
-            {STORY_ACTIONS_COPY.refresh}
-          </button>
+          {meta.shared ? (
+            <SharedActions
+              onSeeLatest={actions.onSeeLatest}
+              onLookUpOwn={actions.onNewLookup}
+              buttonClassName={styles.refresh}
+              className={styles.sharedActions}
+            />
+          ) : (
+            <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
+              {STORY_ACTIONS_COPY.refresh}
+            </button>
+          )}
         </SlideReveal>
       </div>
     </SlideFrame>

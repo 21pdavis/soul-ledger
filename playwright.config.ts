@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import { GRAPHICS_KEY } from "./src/lib/client/graphics";
 import { PACE_OVERRIDE_KEY } from "./src/lib/client/loading-pace";
+import { writeShareFixtures } from "./tests/e2e/shared-fixtures";
 
 const DEFAULT_PORT = 3100;
 const DEFAULT_GATE_PORT = 3101;
@@ -92,6 +93,8 @@ export default defineConfig({
           url: `http://localhost:${PORT}/api/health`,
           reuseExistingServer: mayReuse(PORT, DEFAULT_PORT),
           timeout: 60_000,
+          // Share links for the /w/<slug> specs (src/lib/share/open.ts); e2e has no database.
+          env: { SHARED_STORY_FIXTURES: writeShareFixtures() },
         },
         {
           command: `pnpm exec next start -p ${GATE_PORT}`,
