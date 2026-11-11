@@ -6,7 +6,7 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ### Fixed
 
-- A share link that does not exist (mistyped or removed) now shows a Soul Ledger page saying "We couldn't find that story", with a "Look up your own" button, instead of a plain white error page.
+- A share link that does not exist (mistyped or removed) now shows a Soul Ledger page saying "We couldn't find that story", with a "Look up your own" button, instead of a plain white error page. Any other unknown address now shows a Soul Ledger "Page not found" page with a "Go to Soul Ledger" button.
 
 ### Added
 

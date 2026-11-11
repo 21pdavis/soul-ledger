@@ -119,6 +119,13 @@ export const STORY_ACTIONS_COPY = {
   newLookup: "Look up another player",
 } as const;
 
+/** The site-wide 404 for any unknown address. */
+export const NOT_FOUND_COPY = {
+  title: "Page not found",
+  body: "That address doesn't lead anywhere.",
+  action: "Go to Soul Ledger",
+} as const;
+
 /** Shared (frozen) story mode, ADR 0079. */
 export const SHARED_COPY = {
   seeLatest: "See their latest",
