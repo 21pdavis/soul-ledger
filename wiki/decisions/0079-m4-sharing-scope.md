@@ -32,7 +32,7 @@ The owner settled M4 in a grilling session on 2026-11-11. It refines [ADR 0011](
 | Who | Anyone viewing a story can make one. No login; the stats are public anyway |
 | When | A snapshot is created only when someone taps Share; the same story reuses the same link |
 | Address | `/w/<name>-<random>`. The name is the Steam name at share time, reduced to plain letters and digits, capped at about 20 characters. If nothing usable is left, the random part alone |
-| Rate limit | Link creation is capped at 10 a minute per visitor, the same mechanism as [ADR 0076](0076-per-ip-lookup-rate-limit.md) |
+| Rate limit | Link creation is capped at 10 a minute per visitor: the same per-IP, in-memory limiter as [ADR 0076](0076-per-ip-lookup-rate-limit.md), but its own counter (sharing does not use up the lookup allowance), with the same staging-key exemption |
 | Storage | A new table holds shared stories |
 
 ## Opening a link
@@ -50,6 +50,7 @@ The owner settled M4 in a grilling session on 2026-11-11. It refines [ADR 0011](
 ## Link preview and removal
 
 - **Preview:** a wide OG image with the player name, main hero art, matches, main hero and rank, over the city.
+- **Hero art** on slide pictures and previews follows [ADR 0065](0065-hero-art-served-locally.md) (the owner confirmed hero art on the preview, 2026-11-11), with the monogram as the fallback for a hero without art.
 - **Removal:** player data removal stays in the removal form, now in M7 ([ADR 0080](0080-roadmap-analytics-security-legal-milestone.md)), and will cover shared stories too.
 
 ## Not in scope

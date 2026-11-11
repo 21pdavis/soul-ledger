@@ -51,7 +51,7 @@ Tech debt and security hardening live in [GitHub issues labelled `tech-debt`](ht
 
 - **Hero 3D models** ([ADR 0069](../decisions/0069-m3-city-tour-and-hero-cards.md)): code-sculpted heroes did not reach the bar. In order to try: an image-to-3D tool (Meshy, Tripo, Hyper3D, Hunyuan3D) on one hero's art plus auto-rigging (Mixamo); a commissioned low-poly artist in batches; the game's own models only after checking Valve's fan-content rules. Each hero needs idle, attack and zip-line poses.
 
-- **Hall of Fame (M6)** ranks the fun stats from our own cache, because the API has no distribution for them ([percentile metrics](../research/percentile-metrics.md)).
+- **Hall of Fame (M7)** ranks the fun stats from our own cache, because the API has no distribution for them ([percentile metrics](../research/percentile-metrics.md)).
 
 - Steam OpenID login ([ADR 0002](../decisions/0002-steam-id-no-login.md)).
 - Username search like Statlocker's, after the URL-only prototype. The API already has `/v1/players/steam-search` (search by account id or persona name, with a recent-activity weighting) ([API](../research/deadlock-api.md)).
