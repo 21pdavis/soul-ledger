@@ -20,6 +20,11 @@ export interface StoryMeta {
   patchUnavailable?: boolean;
   /** True when a refresh failed and the story comes from older cached matches. */
   stale: boolean;
+  /** Set when the story is a frozen share link (ADR 0079): ISO time the link was made. */
+  shared?: {
+    at: string;
+    /** Who shared it; null or blank when unknown. */ playerName?: string | null;
+  };
 }
 
 /** What slides can ask the app to do. */
@@ -27,6 +32,8 @@ export interface StoryActions {
   onRefresh: () => void;
   onReplay: () => void;
   onNewLookup: () => void;
+  /** Shared mode only: run a normal live lookup for the shared player. */
+  onSeeLatest?: () => void;
 }
 
 /** Every slide component takes exactly this. */

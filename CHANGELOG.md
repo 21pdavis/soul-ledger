@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Added
+
+- Shared story links open a frozen replay of someone's story, with the city, exactly as it was on the day they shared it. The page says when it was shared, offers "See their latest" and "Look up your own", and a link older than 90 days says it has expired. The first slide says whose story it is.
+
 ## [0.3.2] - 2026-10-17
 
 **One city, start to finish.** The city on the front page is now the same one your story plays in, and the camera flies straight into your opening scene. Plus a batch of fixes.

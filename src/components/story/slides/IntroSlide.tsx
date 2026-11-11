@@ -1,5 +1,6 @@
 import {
   INTRO_COPY,
+  SHARED_COPY,
   STALE_NOTE,
   STORY_ACTIONS_COPY,
   formatLedgerDate,
@@ -9,6 +10,7 @@ import {
 import { formatHours } from "@/story/format";
 import { basedOnMatches } from "@/story/window-label";
 import { SlideFrame } from "../SlideFrame";
+import { SharedActions, SharedLine } from "../SharedControls";
 import { SlideReveal } from "../SlideReveal";
 import { StoryCountUp } from "../StoryCountUp";
 import { WindowLabel } from "../WindowLabel";
@@ -32,7 +34,10 @@ export const IntroSlide: SlideComponent = ({
   if (intro.lastMatchAt) dates.push({ label: INTRO_COPY.latestEntry, at: intro.lastMatchAt });
 
   return (
-    <SlideFrame headline={headlineFor("intro")}>
+    <SlideFrame
+      headline={headlineFor("intro")}
+      eyebrow={meta.shared ? SHARED_COPY.storyOf(meta.shared.playerName) : undefined}
+    >
       <div className={styles.slide}>
         <SlideReveal index={0} animate={playing} kind="stamp" className={styles.figure}>
           <p data-testid="intro-matches" className={styles.line}>
@@ -68,11 +73,24 @@ export const IntroSlide: SlideComponent = ({
           <div>
             <p className={styles.basedOn}>{basedOnMatches(story.matchCount)}</p>
             <WindowLabel meta={meta} className={styles.window} />
-            {meta.stale && <p className={styles.stale}>{STALE_NOTE}</p>}
+            {meta.shared ? (
+              <SharedLine at={meta.shared.at} className={styles.stale} />
+            ) : (
+              meta.stale && <p className={styles.stale}>{STALE_NOTE}</p>
+            )}
           </div>
-          <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
-            {STORY_ACTIONS_COPY.refresh}
-          </button>
+          {meta.shared ? (
+            <SharedActions
+              onSeeLatest={actions.onSeeLatest}
+              onLookUpOwn={actions.onNewLookup}
+              buttonClassName={styles.refresh}
+              className={styles.sharedActions}
+            />
+          ) : (
+            <button type="button" className={styles.refresh} onClick={actions.onRefresh}>
+              {STORY_ACTIONS_COPY.refresh}
+            </button>
+          )}
         </SlideReveal>
       </div>
     </SlideFrame>

@@ -13,6 +13,7 @@ import {
   type PaceConfig,
 } from "@/lib/client/loading-pace";
 import { defaultPrefs, readPrefsSnapshot, savePrefs, type Prefs } from "@/lib/client/prefs";
+import type { SharedSnapshot } from "@/lib/share/types";
 import type { StoryWindow } from "@/lib/lookup";
 import type { ErrorKind } from "@/story/copy";
 import type { LookupFilters } from "@/story/filters";
@@ -21,6 +22,7 @@ import { usePrefersReducedMotion } from "@/components/story/useMediaQuery";
 import { WorldLayer } from "@/components/world/WorldLayer";
 import { EntryScreen } from "./EntryScreen";
 import { Disclaimer } from "./Disclaimer";
+import { ExpiredScreen } from "./ExpiredScreen";
 import { ErrorScreen } from "./ErrorScreen";
 import { LoadingScreen } from "./LoadingScreen";
 import { ScreenShell } from "./ScreenShell";
@@ -36,6 +38,7 @@ import styles from "./App.module.css";
  */
 export type Phase =
   | { name: "entry" }
+  | { name: "expired"; accountId: number }
   | { name: "loading"; progress: ClientLookupEvent[]; countMs: number }
   | { name: "story"; story: StoryData; meta: StoryMeta }
   | {
@@ -47,6 +50,10 @@ export type Phase =
     };
 
 interface Props {
+  /** A share link's frozen story: the app opens on it, with no lookup (ADR 0079). */
+  shared?: SharedSnapshot;
+  /** An expired share link: its player, so "See their latest" still works. No story is sent. */
+  expiredAccountId?: number;
   /** For tests: replaces the global `fetch` used for the lookup. */
   fetchImpl?: typeof fetch;
   /** For tests: replaces the loader pacing (`NO_PACE` skips every wait). Default: `resolvePace()`. */
@@ -70,8 +77,28 @@ function whenIdle(fn: () => void): () => void {
   return () => clearTimeout(id);
 }
 
-export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
-  const [phase, setPhase] = useState<Phase>({ name: "entry" });
+function sharedPhase(shared: SharedSnapshot): Phase {
+  return {
+    name: "story",
+    story: shared.story,
+    meta: {
+      window: shared.meta.window,
+      patchStart: shared.meta.patchStart,
+      patchUnavailable: shared.meta.patchUnavailable,
+      stale: false,
+      shared: { at: shared.sharedAt, playerName: shared.player.personaName },
+    },
+  };
+}
+
+export function App({ shared, expiredAccountId, fetchImpl, pace, stallMs = STALL_MS }: Props) {
+  const [phase, setPhase] = useState<Phase>(() =>
+    shared
+      ? sharedPhase(shared)
+      : expiredAccountId !== undefined
+        ? { name: "expired", accountId: expiredAccountId }
+        : { name: "entry" },
+  );
   // The story's current slide, for the city's camera to follow; null until the player is up.
   const [slide, setSlide] = useState<number | null>(null);
   const [request, setRequest] = useState<ClientLookupRequest | null>(null);
@@ -191,12 +218,21 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
       // Same URL, same window; only the refresh flag changes.
       onRefresh: () => request && void run({ ...request, refresh: true }),
       onReplay: () => setReplayCount((n) => n + 1),
+      // The same account and window as the shared story, but live.
+      onSeeLatest: shared
+        ? () =>
+            void run({
+              input: String(shared.player.accountId),
+              window: shared.meta.window,
+              refresh: false,
+            })
+        : undefined,
       onNewLookup: () => {
         running.current?.abort();
         setPhase({ name: "entry" });
       },
     }),
-    [request, run],
+    [request, run, shared],
   );
 
   // One city for the whole visit (ADR 0068, 0073): scenery behind the entry, loading and error
@@ -247,6 +283,18 @@ export function App({ fetchImpl, pace, stallMs = STALL_MS }: Props) {
             initial={lastEntry ?? stored ?? defaultPrefs()}
             onSubmit={submit}
             focusTitle={request !== null}
+          />
+        )}
+        {phase.name === "expired" && (
+          <ExpiredScreen
+            onSeeLatest={() =>
+              void run({
+                input: String(phase.accountId),
+                ...defaultPrefs().filters,
+                refresh: false,
+              })
+            }
+            onLookUpOwn={actions.onNewLookup}
           />
         )}
         {phase.name === "loading" && (
