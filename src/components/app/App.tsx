@@ -86,7 +86,7 @@ function sharedPhase(shared: SharedSnapshot): Phase {
       patchStart: shared.meta.patchStart,
       patchUnavailable: shared.meta.patchUnavailable,
       stale: false,
-      shared: { at: shared.sharedAt },
+      shared: { at: shared.sharedAt, playerName: shared.player.personaName },
     },
   };
 }

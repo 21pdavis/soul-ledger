@@ -47,7 +47,7 @@ describe("/w/[slug] page", () => {
   it("titles a live link with the player's name, and keeps expired and unknown links generic", async () => {
     opened.value = { kind: "live", snapshot };
     expect(await generateMetadata({ params })).toMatchObject({
-      title: expect.stringContaining("Haze Main"),
+      title: "Haze Main's Soul Ledger story",
     });
     opened.value = { kind: "expired", accountId: 77 };
     const generic = await generateMetadata({ params });

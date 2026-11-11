@@ -26,6 +26,21 @@
   padding: 2rem 1.5rem;
 }
 
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
 .headline {
   margin: 0;
   font-family: var(--font-display);

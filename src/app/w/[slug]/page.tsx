@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = opened.snapshot.player.personaName;
   return {
     ...GENERIC,
-    title: name ? `${name}'s Deadlock story · Soul Ledger` : "A Deadlock story · Soul Ledger",
+    title: name ? `${name}'s Soul Ledger story` : "A Soul Ledger player's story",
     description: "A frozen Deadlock year, wrapped in Soul Ledger.",
     // Hook for the rich link preview (M4 step 6): add `openGraph.images` / `twitter` here, built
     // from `opened.snapshot`.

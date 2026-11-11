@@ -9,7 +9,9 @@ import type { SharedSnapshot } from "@/lib/share/types";
 import { fixtureSlideProps, fixtureStory } from "../fixtures/story";
 import { ndjson, storyEvent, storyUp } from "./app-harness";
 
-const SHARED = { at: "2026-11-11T23:59:00.000Z" };
+const SHARED: { at: string; playerName?: string | null } = {
+  at: "2026-11-11T23:59:00.000Z",
+};
 const LINE = "Shared Nov 11, 2026 · numbers from that day";
 
 function renderSlide(Slide: typeof IntroSlide, shared?: typeof SHARED) {
@@ -47,6 +49,30 @@ describe.each([
     expect(screen.getByRole("button", { name: "Refresh" })).toBeInTheDocument();
     expect(screen.queryByText(LINE)).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "See their latest" })).not.toBeInTheDocument();
+  });
+});
+
+describe("whose story it is, on the shared first slide", () => {
+  it("names the player above the headline", () => {
+    renderSlide(IntroSlide, { ...SHARED, playerName: "Gaben" });
+    const label = screen.getByText("Gaben's story");
+    const headline = screen.getByRole("heading", { level: 2 });
+    expect(label.compareDocumentPosition(headline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it.each([null, "   "])("falls back to a generic line for a %j name", (playerName) => {
+    renderSlide(IntroSlide, { ...SHARED, playerName });
+    expect(screen.getByText("A Soul Ledger player's story")).toBeInTheDocument();
+  });
+
+  it("is not shown on a normal story", () => {
+    renderSlide(IntroSlide);
+    expect(screen.queryByText(/'s story$/)).not.toBeInTheDocument();
+  });
+
+  it("flows from the snapshot through the app", () => {
+    render(<App shared={snapshot()} pace={NO_PACE} />);
+    expect(screen.getByText("Gaben's story")).toBeInTheDocument();
   });
 });
 

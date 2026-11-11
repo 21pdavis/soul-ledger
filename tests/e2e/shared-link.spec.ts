@@ -15,6 +15,7 @@ test("a live link replays the frozen story with no lookup, then Look up your own
   await page.goto(`/w/${LIVE_SLUG}`);
   await expect(stage(page)).toHaveAttribute("data-slide", "intro");
   await expect(page.getByText("Shared Nov 11, 2026 · numbers from that day")).toBeVisible();
+  await expect(page.getByText("Gaben's story")).toBeVisible();
   await expect(page.getByRole("button", { name: "Refresh" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "See their latest" })).toBeVisible();
   expect(urls).toHaveLength(0);

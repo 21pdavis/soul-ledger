@@ -1,5 +1,6 @@
 import {
   INTRO_COPY,
+  SHARED_COPY,
   STALE_NOTE,
   STORY_ACTIONS_COPY,
   formatLedgerDate,
@@ -33,7 +34,10 @@ export const IntroSlide: SlideComponent = ({
   if (intro.lastMatchAt) dates.push({ label: INTRO_COPY.latestEntry, at: intro.lastMatchAt });
 
   return (
-    <SlideFrame headline={headlineFor("intro")}>
+    <SlideFrame
+      headline={headlineFor("intro")}
+      eyebrow={meta.shared ? SHARED_COPY.storyOf(meta.shared.playerName) : undefined}
+    >
       <div className={styles.slide}>
         <SlideReveal index={0} animate={playing} kind="stamp" className={styles.figure}>
           <p data-testid="intro-matches" className={styles.line}>
