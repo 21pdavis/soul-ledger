@@ -183,11 +183,86 @@
   }
 }
 
-/* Shared mode: the two actions stack where Refresh sat, so a phone footer still fits. */
+/* Shared mode: the footer text takes the full width and the two actions sit side by side under it.
+   Squeezed beside stacked buttons, the text wrapped to six lines and ran past the frame (#123). The
+   actions keep the 44px tap minimum at every size: the room comes from the text, never the buttons. */
 .sharedActions {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 0.5rem;
   flex: none;
+}
+
+.sharedFooter {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  padding-bottom: 0;
+}
+
+.sharedFooter .sharedActions {
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.sharedFooter .refresh {
+  flex: 1;
+  min-height: 2.75rem;
+  padding: 0.25rem 0.5rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+/* The eyebrow and the footer's extra lines cost a phone room a plain intro has (the stage tiers,
+   see SlideFrame.module.css): trim the gaps and the text, never the buttons. */
+@container (max-height: 639px) {
+  .sharedSlide {
+    gap: 0.375rem;
+  }
+
+  .sharedSlide .figure {
+    padding-bottom: 0.25rem;
+  }
+
+  .sharedSlide .number {
+    font-size: clamp(2.5rem, 15cqw, 3rem);
+    line-height: 0.95;
+  }
+
+  .sharedFooter {
+    gap: 0.375rem;
+  }
+
+  .sharedFooter .basedOn,
+  .sharedFooter .window,
+  .sharedFooter .stale {
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .sharedFooter .refresh {
+    font-size: 0.8125rem;
+  }
+}
+
+/* The smallest phones (a 320x568 stage is ~480px tall): the figure and gaps give up the last pixels. */
+@container (max-height: 519px) {
+  .sharedSlide {
+    gap: 0.25rem;
+  }
+
+  .sharedSlide .number {
+    font-size: 2.25rem;
+  }
+
+  .sharedFooter {
+    gap: 0.25rem;
+  }
+
+  .sharedFooter .refresh {
+    padding-inline: 0.25rem;
+    font-size: 0.75rem;
+  }
 }

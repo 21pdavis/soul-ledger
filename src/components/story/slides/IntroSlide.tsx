@@ -38,7 +38,7 @@ export const IntroSlide: SlideComponent = ({
       headline={headlineFor("intro")}
       eyebrow={meta.shared ? SHARED_COPY.storyOf(meta.shared.playerName) : undefined}
     >
-      <div className={styles.slide}>
+      <div className={meta.shared ? `${styles.slide} ${styles.sharedSlide}` : styles.slide}>
         <SlideReveal index={0} animate={playing} kind="stamp" className={styles.figure}>
           <p data-testid="intro-matches" className={styles.line}>
             <StoryCountUp value={intro.matches} className={styles.number} {...count} />{" "}
@@ -69,7 +69,11 @@ export const IntroSlide: SlideComponent = ({
           </SlideReveal>
         )}
 
-        <SlideReveal index={3} animate={playing} className={styles.footer}>
+        <SlideReveal
+          index={3}
+          animate={playing}
+          className={meta.shared ? `${styles.footer} ${styles.sharedFooter}` : styles.footer}
+        >
           <div>
             <p className={styles.basedOn}>{basedOnMatches(story.matchCount)}</p>
             <WindowLabel meta={meta} className={styles.window} />
