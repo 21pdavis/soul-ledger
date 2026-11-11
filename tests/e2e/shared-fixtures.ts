@@ -1,6 +1,6 @@
-import { mkdirSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { mkdirSync, renameSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
+import { SHARE_FIXTURES_FILE } from "../../src/lib/share/fixture-path";
 import { fixtureStory } from "../fixtures/story";
 
 /**
@@ -20,15 +20,17 @@ export function writeShareFixtures(): string {
     meta: { window: "all", patchStart: null, patchUnavailable: false },
     story: fixtureStory(),
   };
-  const dir = join(tmpdir(), "soul-ledger-e2e");
-  mkdirSync(dir, { recursive: true });
-  const file = join(dir, "share-fixtures.json");
+  const file = SHARE_FIXTURES_FILE;
+  mkdirSync(dirname(file), { recursive: true });
+  // Atomic: Playwright loads the config in several processes while the server may be reading.
+  const temp = `${file}.${process.pid}.tmp`;
   writeFileSync(
-    file,
+    temp,
     JSON.stringify({
       [LIVE_SLUG]: { expiresAt: "2099-01-01T00:00:00.000Z", snapshot },
       [EXPIRED_SLUG]: { expiresAt: "2020-01-01T00:00:00.000Z", snapshot },
     }),
   );
+  renameSync(temp, file);
   return file;
 }

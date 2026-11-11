@@ -1,9 +1,10 @@
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db";
 import * as repo from "@/db/repository";
+import { SHARE_FIXTURES_ENV, SHARE_FIXTURES_FILE } from "@/lib/share/fixture-path";
 import { openSharedStory } from "@/lib/share/open";
 import { SHARE_TTL_MS, type SharedSnapshot } from "@/lib/share/types";
 import { createTestDb } from "../helpers/db";
@@ -56,5 +57,47 @@ describe("openSharedStory", () => {
       snapshot,
     });
     expect(await openSharedStory("other", NOW, undefined, file)).toEqual({ kind: "notFound" });
+  });
+
+  describe("the SHARED_STORY_FIXTURES env hook", () => {
+    const saved = { fixtures: process.env[SHARE_FIXTURES_ENV], render: process.env.RENDER };
+    const restore = (key: string, value: string | undefined) => {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    };
+    const writeAt = (file: string) => {
+      mkdirSync(join(file, ".."), { recursive: true });
+      writeFileSync(
+        file,
+        JSON.stringify({ "e2e-live": { expiresAt: "2099-01-01T00:00:00Z", snapshot } }),
+      );
+    };
+    beforeEach(() => {
+      delete process.env.RENDER;
+    });
+    afterEach(() => {
+      restore(SHARE_FIXTURES_ENV, saved.fixtures);
+      restore("RENDER", saved.render);
+    });
+
+    it("honours the one fixed e2e path", async () => {
+      writeAt(SHARE_FIXTURES_FILE);
+      process.env[SHARE_FIXTURES_ENV] = SHARE_FIXTURES_FILE;
+      expect((await openSharedStory("e2e-live", NOW, db)).kind).toBe("live");
+    });
+
+    it("ignores an env path that is not the fixed one", async () => {
+      const other = join(mkdtempSync(join(tmpdir(), "shares-")), "x.json");
+      writeAt(other);
+      process.env[SHARE_FIXTURES_ENV] = other;
+      expect(await openSharedStory("e2e-live", NOW, db)).toEqual({ kind: "notFound" });
+    });
+
+    it("ignores the env path whenever RENDER is set", async () => {
+      writeAt(SHARE_FIXTURES_FILE);
+      process.env[SHARE_FIXTURES_ENV] = SHARE_FIXTURES_FILE;
+      process.env.RENDER = "true";
+      expect(await openSharedStory("e2e-live", NOW, db)).toEqual({ kind: "notFound" });
+    });
   });
 });

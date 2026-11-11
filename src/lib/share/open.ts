@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { Db } from "@/db";
 import { getSharedStory, isSharedStoryExpired } from "@/db/repository";
+import { SHARE_FIXTURES_ENV, SHARE_FIXTURES_FILE } from "./fixture-path";
 import type { SharedSnapshot } from "./types";
 
 /** What opening `/w/<slug>` finds. An expired link never carries the frozen story (ADR 0079). */
@@ -15,18 +17,23 @@ interface FixtureRow {
 }
 
 /**
- * Test seam: when `SHARED_STORY_FIXTURES` names a JSON file of `{ [slug]: { expiresAt, snapshot } }`,
- * the e2e server reads links from it instead of the database (CI's e2e has none). Never set in
- * any real environment.
+ * Test seam: when `SHARED_STORY_FIXTURES` names the one fixed e2e file of
+ * `{ [slug]: { expiresAt, snapshot } }`, the e2e server reads links from it instead of the database
+ * (CI's e2e has none). Ignored on Render and for any other path, so a stray variable can't serve
+ * fake stories in a real environment.
  */
-const FIXTURES_ENV = "SHARED_STORY_FIXTURES";
+function envFixtureFile(env: NodeJS.ProcessEnv): string | undefined {
+  const value = env[SHARE_FIXTURES_ENV];
+  if (!value || env.RENDER || env.RENDER_SERVICE_ID) return undefined;
+  return resolve(value) === resolve(SHARE_FIXTURES_FILE) ? SHARE_FIXTURES_FILE : undefined;
+}
 
 /** Looks a share link up by slug and says whether it is missing, expired or live. */
 export async function openSharedStory(
   slug: string,
   now: Date,
   db?: Db,
-  fixtureFile: string | undefined = process.env[FIXTURES_ENV],
+  fixtureFile: string | undefined = envFixtureFile(process.env),
 ): Promise<OpenedShare> {
   let row: { expiresAt: Date; snapshot: SharedSnapshot } | null;
   if (fixtureFile) {
