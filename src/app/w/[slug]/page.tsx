@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const opened = await open(slug);
   // Expired and unknown links reveal nothing about the player.
   if (opened.kind !== "live") return GENERIC;
-  const name = opened.snapshot.player.personaName;
+  const name = opened.snapshot.player.personaName?.trim();
   return {
     ...GENERIC,
     title: name ? `${name}'s Soul Ledger story` : "A Soul Ledger player's story",

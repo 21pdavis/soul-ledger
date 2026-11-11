@@ -53,4 +53,17 @@ describe("/w/[slug] page", () => {
     const generic = await generateMetadata({ params });
     expect(JSON.stringify(generic)).not.toContain("Haze Main");
   });
+
+  it.each([null, "", "   "])(
+    "titles a nameless player's link generically (%j)",
+    async (personaName) => {
+      opened.value = {
+        kind: "live",
+        snapshot: { ...snapshot, player: { ...snapshot.player, personaName } },
+      };
+      expect(await generateMetadata({ params })).toMatchObject({
+        title: "A Soul Ledger player's story",
+      });
+    },
+  );
 });

@@ -39,6 +39,8 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--brass);
+  /* A long Steam name must wrap, not overflow a 320px phone. */
+  overflow-wrap: anywhere;
 }
 
 .headline {
