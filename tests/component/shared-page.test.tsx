@@ -66,4 +66,34 @@ describe("/w/[slug] page", () => {
       });
     },
   );
+
+  it("gives a live link a wide preview image and a large-image card", async () => {
+    opened.value = { kind: "live", snapshot };
+    const meta = await generateMetadata({ params });
+    expect(meta.openGraph).toMatchObject({
+      title: "Haze Main's Soul Ledger story",
+      url: "/w/hazemain",
+      images: [{ url: "/w/hazemain/preview", width: 1200, height: 630 }],
+    });
+    expect(meta.openGraph?.description).toBeTruthy();
+    expect(meta.twitter).toMatchObject({
+      card: "summary_large_image",
+      images: ["/w/hazemain/preview"],
+    });
+    expect(meta.metadataBase).toBeInstanceOf(URL);
+  });
+
+  it.each([{ kind: "expired", accountId: 77 } as const, { kind: "notFound" } as const])(
+    "gives a $kind link a generic preview with no player data and no image",
+    async (value) => {
+      opened.value = value;
+      const meta = await generateMetadata({ params });
+      expect(meta.openGraph).toMatchObject({ title: "Soul Ledger" });
+      expect(meta.openGraph).not.toHaveProperty("images");
+      expect(meta.twitter).not.toHaveProperty("images");
+      const json = JSON.stringify(meta);
+      expect(json).not.toContain("Haze Main");
+      expect(json).not.toContain("hazemain");
+    },
+  );
 });
