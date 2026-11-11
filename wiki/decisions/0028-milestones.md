@@ -24,3 +24,5 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-10-06T16:00:00Z }
 - **Phone and desktop web are both first-class at every milestone.** The phone-first 9:16 layout ([ADR 0012](0012-phone-first.md)) must also feel deliberate on desktop.
 
 > **Superseded in part ([ADR 0068](0068-m3-scope-and-order.md)):** M3 is now a story-following world with art cards for every hero first; low-poly models follow a three-hero checkpoint instead of covering all playable heroes up front.
+
+> **Superseded in part ([ADR 0080](0080-roadmap-analytics-security-legal-milestone.md)):** a new M5 (analytics, security and legal) is added; squad mode is now M6, and Hall of Fame and the removal form M7. M4's sharing scope is in [ADR 0079](0079-m4-sharing-scope.md).
