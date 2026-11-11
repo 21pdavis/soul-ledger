@@ -6,14 +6,14 @@ tags: [m3, 3d, landing, performance]
 status: stable
 decision: accepted
 decided_on: 2026-10-17
-generated: { by: claude-code/claude-opus-5-5, at: 2026-10-17T22:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-11T12:00:00Z }
 ---
 
 Amends the "Story" row and the consequences of [ADR 0073](0073-city-behind-the-landing-page.md). Keeps the "never delays the story" rule of [ADR 0068](0068-m3-scope-and-order.md).
 
 # Context
 
-The owner asked (2026-10-17) for the backlog item "keep one city from the landing page into the story": seamless is better. They reviewed it on localhost, reported a stutter as the story started, and signed off once it was gone.
+The owner asked (2026-10-17) for the backlog item "keep one city from the landing page into the story": seamless is better. They reviewed it on localhost and reported a stutter as the story started. It was improved but not gone; on 2026-11-11 the owner said to fix the rest later, tracked in #112.
 
 # Decision
 
