@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 import sharp from "sharp";
+import type { StoryData } from "@/story/types";
 import { SLIDES } from "@/story/copy";
 import { HEROES_WITH_CARD, heroCardSrc } from "@/story/hero-art";
 import {
@@ -11,6 +12,7 @@ import {
   type PictureAssets,
   type PictureInput,
 } from "./build";
+import { PREVIEW_HEIGHT, PREVIEW_WIDTH, buildLinkPreview } from "./preview";
 
 const PUBLIC = path.join(process.cwd(), "public");
 const MIME: Record<string, string> = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" };
@@ -56,6 +58,10 @@ async function loadAssets(input: Pick<PictureInput, "story" | "index">): Promise
   const { story } = input;
   if (story.main) ids.add(story.main.heroId);
   story.roster.topHeroes.forEach((h) => ids.add(h.heroId));
+  return assetsFor(ids, stillPath(SLIDES[input.index].id));
+}
+
+async function assetsFor(ids: Set<number>, still: string): Promise<PictureAssets> {
   const cards = new Map<number, string>();
   await Promise.all(
     [...ids]
@@ -63,7 +69,7 @@ async function loadAssets(input: Pick<PictureInput, "story" | "index">): Promise
       .map(async (id) => cards.set(id, await cardDataUri(id))),
   );
   return {
-    still: await dataUri(stillPath(SLIDES[input.index].id)),
+    still: await dataUri(still),
     heroCard: (id) => cards.get(id) ?? null,
   };
 }
@@ -87,27 +93,57 @@ const FALLBACK_FONTS = [
 export async function renderSlidePicture(
   input: Omit<PictureInput, "assets">,
 ): Promise<ArrayBuffer> {
-  const [assets, limelight, grotesk, ...fallbacks] = await Promise.all([
-    loadAssets(input),
+  const [assets, fonts] = await Promise.all([loadAssets(input), loadFonts()]);
+  const response = new ImageResponse(buildSlidePicture({ ...input, assets }), {
+    width: PICTURE_WIDTH,
+    height: PICTURE_HEIGHT,
+    fonts,
+  });
+  return response.arrayBuffer();
+}
+
+/** The wide 1200x630 picture shown when a share link is pasted somewhere (ADR 0079). */
+export async function renderLinkPreview(input: {
+  story: StoryData;
+  playerName: string;
+}): Promise<ArrayBuffer> {
+  const ids = new Set<number>();
+  if (input.story.main) ids.add(input.story.main.heroId);
+  const [assets, fonts] = await Promise.all([assetsFor(ids, stillPath("intro")), loadFonts()]);
+  const response = new ImageResponse(buildLinkPreview({ ...input, assets }), {
+    width: PREVIEW_WIDTH,
+    height: PREVIEW_HEIGHT,
+    fonts,
+  });
+  return response.arrayBuffer();
+}
+
+async function loadFonts() {
+  const [limelight, grotesk, ...fallbacks] = await Promise.all([
     load(FONTS[0]),
     load(FONTS[1]),
     ...FALLBACK_FONTS.map(load),
   ]);
-  const response = new ImageResponse(buildSlidePicture({ ...input, assets }), {
-    width: PICTURE_WIDTH,
-    height: PICTURE_HEIGHT,
-    fonts: [
-      { name: "Limelight", data: toArrayBuffer(limelight), weight: 400, style: "normal" },
-      { name: "Space Grotesk", data: toArrayBuffer(grotesk), weight: 400, style: "normal" },
-      ...fallbacks.map((data) => ({
-        name: "Noto Sans",
-        data: toArrayBuffer(data),
-        weight: 400 as const,
-        style: "normal" as const,
-      })),
-    ],
-  });
-  return response.arrayBuffer();
+  return [
+    {
+      name: "Limelight",
+      data: toArrayBuffer(limelight),
+      weight: 400 as const,
+      style: "normal" as const,
+    },
+    {
+      name: "Space Grotesk",
+      data: toArrayBuffer(grotesk),
+      weight: 400 as const,
+      style: "normal" as const,
+    },
+    ...fallbacks.map((data) => ({
+      name: "Noto Sans",
+      data: toArrayBuffer(data),
+      weight: 400 as const,
+      style: "normal" as const,
+    })),
+  ];
 }
 
 function toArrayBuffer(b: Buffer): ArrayBuffer {

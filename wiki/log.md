@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-11-11
+* **Decision**: link preview is an explicit `/w/[slug]/preview` route plus `openGraph.images` set in `generateMetadata` for live links only. Next's `opengraph-image` file convention was not used because it would attach an image to expired and unknown links too ([ADR 0079](decisions/0079-m4-sharing-scope.md)).
 * **Research**: [Rendering share pictures with next/og](research/share-picture-rendering.md): satori rejects WebP and variable fonts; hero cards are converted with sharp; city stills come from a capture script.
 * **Decision**: [ADR 0079](decisions/0079-m4-sharing-scope.md): M4 sharing scope (slide pictures, share links with 90-day expiry, OG preview, weekly Render cleanup); amends ADRs 0011 and 0018. Plan: [M4 plan](recommendations/m4-plan.md) (owner decision).
 * **Decision**: [ADR 0080](decisions/0080-roadmap-analytics-security-legal-milestone.md): new M5 for analytics, security and legal; squad mode is M6, Hall of Fame and removal form M7. Amends ADR 0028 (owner decision).
