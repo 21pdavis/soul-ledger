@@ -1,4 +1,5 @@
-# Render Blueprint (ADR 0005). Neon hosts the database (ADR 0033), so Render runs only the web app.
+# Render Blueprint (ADR 0005). Neon hosts the database (ADR 0033). This file defines only the web app;
+# the weekly shared-stories cleanup is a Cron Job the owner creates by hand (wiki m4-plan.md, step 7).
 services:
   - type: web
     name: soul-ledger
