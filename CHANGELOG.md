@@ -4,6 +4,10 @@ All notable changes to Soul Ledger are recorded here. The format follows [Keep a
 
 ## [Unreleased]
 
+### Fixed
+
+- A share link that does not exist (mistyped or removed) now shows a Soul Ledger page saying "We couldn't find that story", with a "Look up your own" button, instead of a plain white error page.
+
 ### Added
 
 - A Share button on every slide, including the last one. On a phone it opens the share sheet with that slide's picture and a link. On a computer it offers "Download picture" and "Copy link". If you share too fast it tells you how long to wait.

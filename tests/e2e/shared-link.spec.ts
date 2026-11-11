@@ -50,4 +50,7 @@ test("an expired link says so and never sends the story to the browser", async (
 test("an unknown link is a 404", async ({ page }) => {
   const response = await page.goto("/w/no-such-story");
   expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "We couldn't find that story" })).toBeVisible();
+  await page.getByRole("link", { name: "Look up your own" }).click();
+  await expect(page.getByLabel("Paste your Steam profile URL")).toBeVisible();
 });

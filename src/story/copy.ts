@@ -125,6 +125,8 @@ export const SHARED_COPY = {
   lookUpOwn: "Look up your own",
   expiredTitle: "This story has expired",
   expiredBody: "Share links last 90 days. Their latest story is still a tap away.",
+  notFoundTitle: "We couldn't find that story",
+  notFoundBody: "That link may be mistyped or removed.",
   /** "Shared Nov 11, 2026 · numbers from that day"; the date is UTC. */
   line: (date: string) => `Shared ${date} · numbers from that day`,
   /** The small label above the first slide's headline: whose story this is. */
