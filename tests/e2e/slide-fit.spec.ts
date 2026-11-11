@@ -252,7 +252,53 @@ test.describe("the rank climb lists the same rows with default motion", () => {
 });
 
 // #123: a shared link adds a "Shared <date>" line and the player's name (up to 32 characters)
-// to the first slide, and the Share button sits on every slide. All of it must stay in the frame.
+// to the first slide, and the Share button sits on every slide. All of it must stay in the frame,
+// and every button and link in it keeps the 44px tap minimum.
+const MIN_TAP = 44;
+
+async function smallTargets(frame: Locator) {
+  return frame.evaluate((el, min) => {
+    const out: string[] = [];
+    for (const node of el.querySelectorAll("button, a")) {
+      const r = node.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      if (r.width < min - 0.5 || r.height < min - 0.5) {
+        out.push(
+          `<${node.tagName.toLowerCase()}> "${(node.textContent ?? "").trim().slice(0, 20)}" ${Math.round(r.width)}x${Math.round(r.height)}`,
+        );
+      }
+    }
+    return out;
+  }, MIN_TAP);
+}
+
+async function walkShared(page: Page) {
+  await page.goto(`/w/${LONG_NAME_SLUG}`);
+  await expect(page.getByRole("button", { name: "Share" })).toBeVisible();
+  const problems: string[] = [];
+  for (const slide of SLIDES) {
+    await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
+    await stageSettled(page);
+    if (slide.id === "intro") {
+      await expect(page.getByText(/Shared .* · numbers from that day/)).toBeVisible();
+    }
+    const frame = current(page).locator("section").first();
+    for (const f of (await fitProblems(frame)).slice(0, 2)) problems.push(`${slide.id}: ${f}`);
+    if (slide.id === "intro") {
+      // The slide's own actions and the Share pill (a summary slide's older buttons are a separate gap).
+      const share = (await page.getByRole("button", { name: "Share" }).boundingBox())!;
+      if (share.width < MIN_TAP - 0.5 || share.height < MIN_TAP - 0.5) {
+        problems.push(
+          `intro: tap target Share ${Math.round(share.width)}x${Math.round(share.height)}`,
+        );
+      }
+      for (const f of await smallTargets(frame)) problems.push(`intro: tap target ${f}`);
+    }
+    if (slide.id !== SLIDES.at(-1)!.id) await page.keyboard.press("ArrowRight");
+  }
+  return problems;
+}
+
 test.describe("shared-link slides fit their frame, longest Steam name", () => {
   test.skip(!!process.env.STAGING_URL, "needs the e2e fixture links");
   for (const { width, height } of [
@@ -260,27 +306,29 @@ test.describe("shared-link slides fit their frame, longest Steam name", () => {
     { width: 360, height: 640 },
     { width: 375, height: 667 },
   ]) {
-    test(`${width}x${height}: intro and summary stay inside the frame`, async ({
+    test(`${width}x${height}: intro and summary stay inside the frame, taps stay 44px`, async ({
       page,
       isMobile,
     }) => {
       test.skip(!isMobile, "phone only");
       await page.emulateMedia({ reducedMotion: "reduce" });
       await page.setViewportSize({ width, height });
-      await page.goto(`/w/${LONG_NAME_SLUG}`);
-      await expect(page.getByRole("button", { name: "Share" })).toBeVisible();
-      const problems: string[] = [];
-      for (const slide of SLIDES) {
-        await expect(stage(page)).toHaveAttribute("data-slide", slide.id);
-        await stageSettled(page);
-        if (slide.id === "intro") {
-          await expect(page.getByText(/Shared .* · numbers from that day/)).toBeVisible();
-        }
-        const frame = current(page).locator("section").first();
-        for (const f of (await fitProblems(frame)).slice(0, 2)) problems.push(`${slide.id}: ${f}`);
-        if (slide.id !== SLIDES.at(-1)!.id) await page.keyboard.press("ArrowRight");
-      }
-      expect(problems).toEqual([]);
+      expect(await walkShared(page)).toEqual([]);
+    });
+  }
+
+  for (const { width, height } of [
+    { width: 1280, height: 720 },
+    { width: 1440, height: 900 },
+  ]) {
+    test(`${width}x${height}: the desktop card fits too, taps stay 44px`, async ({
+      page,
+      isMobile,
+    }) => {
+      test.skip(!!isMobile, "desktop only");
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.setViewportSize({ width, height });
+      expect(await walkShared(page)).toEqual([]);
     });
   }
 });
