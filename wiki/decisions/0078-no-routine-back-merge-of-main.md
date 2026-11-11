@@ -1,7 +1,7 @@
 ---
 type: Decision Record
 title: "0078: No routine back-merge of main into staging"
-description: "After a release, main is not merged back into staging; the empty-of-changes merge commit only makes staging look behind, and Update branch on the release PR covers it if GitHub ever requires it."
+description: "After a release, main is not merged back into staging; the release merge commit carries no changes, so staging only looks behind, and Update branch on the release PR covers it if GitHub ever requires it."
 tags: [git, releases, workflow]
 status: stable
 decision: accepted
@@ -33,5 +33,5 @@ Owner confirmed 2026-11-11:
 * Fewer history-only PRs and CI runs after each release.
 * `staging` will show as behind `main` by the release merge commits. That is expected.
 
-[^nvie]: { id: nvie }
-[^gitlab]: { id: gitlab }
+[^nvie]: nvie, "A successful Git branching model" (note recommending simpler flows for continuous delivery).
+[^gitlab]: GitLab, "What is GitLab Flow" (environment branches flow downstream only).

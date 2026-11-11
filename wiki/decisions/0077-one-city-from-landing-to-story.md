@@ -13,7 +13,7 @@ Amends the "Story" row and the consequences of [ADR 0073](0073-city-behind-the-l
 
 # Context
 
-The owner asked (2026-10-17) for the backlog item "keep one city from the landing page into the story": seamless is better. They reviewed it on localhost, reported a stutter as the story started. It was improved but not gone; on 2026-11-11 the owner said to fix the rest later, tracked in #112.
+The owner asked (2026-10-17) for the backlog item "keep one city from the landing page into the story": seamless is better. They reviewed it on localhost and reported a stutter as the story started. It was improved but not gone; on 2026-11-11 the owner said to fix the rest later, tracked in #112.
 
 # Decision
 
