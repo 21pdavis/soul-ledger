@@ -119,12 +119,21 @@ export const STORY_ACTIONS_COPY = {
   newLookup: "Look up another player",
 } as const;
 
+/** The site-wide 404 for any unknown address. */
+export const NOT_FOUND_COPY = {
+  title: "Page not found",
+  body: "That address doesn't lead anywhere.",
+  action: "Go to Soul Ledger",
+} as const;
+
 /** Shared (frozen) story mode, ADR 0079. */
 export const SHARED_COPY = {
   seeLatest: "See their latest",
   lookUpOwn: "Look up your own",
   expiredTitle: "This story has expired",
   expiredBody: "Share links last 90 days. Their latest story is still a tap away.",
+  notFoundTitle: "We couldn't find that story",
+  notFoundBody: "That link may be mistyped or removed.",
   /** "Shared Nov 11, 2026 · numbers from that day"; the date is UTC. */
   line: (date: string) => `Shared ${date} · numbers from that day`,
   /** The small label above the first slide's headline: whose story this is. */

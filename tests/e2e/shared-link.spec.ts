@@ -47,7 +47,18 @@ test("an expired link says so and never sends the story to the browser", async (
   await expect(page.getByRole("button", { name: "See their latest" })).toBeVisible();
 });
 
-test("an unknown link is a 404", async ({ page }) => {
+test("any other unknown address is a generic 404 page", async ({ page }) => {
+  const response = await page.goto("/foo");
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await page.getByRole("link", { name: "Go to Soul Ledger" }).click();
+  await expect(page.getByLabel("Paste your Steam profile URL")).toBeVisible();
+});
+
+test("an unknown share link is a 404", async ({ page }) => {
   const response = await page.goto("/w/no-such-story");
   expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "We couldn't find that story" })).toBeVisible();
+  await page.getByRole("link", { name: "Look up your own" }).click();
+  await expect(page.getByLabel("Paste your Steam profile URL")).toBeVisible();
 });
