@@ -91,7 +91,7 @@ export function createShareHandler(deps: () => ShareDeps, limits: ShareLimits = 
         story,
       };
       const contentHash = createHash("sha256")
-        .update(stableJson({ accountId, window, story }))
+        .update(stableJson({ accountId, window, player: event.player, story }))
         .digest("hex");
 
       let row = await repo.findLiveSharedStoryByHash(db, accountId, contentHash, now);

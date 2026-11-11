@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db";
 import * as repo from "@/db/repository";
 import { createIpRateLimiter } from "@/lib/ip-rate-limit";
-import { runLookup } from "@/lib/lookup";
+import { runLookup, type LookupEvent } from "@/lib/lookup";
 import { createShareHandler, type ShareLimits } from "@/lib/share-handler";
 import { SHARE_TTL_MS } from "@/lib/share/types";
 import { createTestDb } from "../helpers/db";
@@ -19,13 +19,16 @@ afterEach(() => close());
 
 const NOW = new Date("2026-11-11T12:00:00Z");
 
-async function seedPlayer() {
+type StoryEvent = Extract<LookupEvent, { type: "story" }>;
+
+/** Runs the real lookup for the window; returns the story event the viewer was shown. */
+async function seedPlayer(window: "all" | "patch" = "all") {
   const { api } = fakeApi();
-  await runLookup(
-    { input: String(TEST_ACCOUNT_ID), window: "all", refresh: false },
-    { db, api },
-    () => {},
-  );
+  let story: StoryEvent | undefined;
+  await runLookup({ input: String(TEST_ACCOUNT_ID), window, refresh: false }, { db, api }, (e) => {
+    if (e.type === "story") story = e;
+  });
+  return story!;
 }
 
 function handler(limits?: ShareLimits) {
@@ -66,6 +69,33 @@ describe("POST /api/share", () => {
     const a = await share();
     const b = await share();
     expect(b.slug).toBe(a.slug);
+  });
+
+  it("makes a new link when the player renames on Steam", async () => {
+    await seedPlayer();
+    const a = await share();
+    const player = await repo.getPlayer(db, TEST_ACCOUNT_ID);
+    await repo.upsertPlayer(db, {
+      accountId: TEST_ACCOUNT_ID,
+      personaName: "Renamed Soul",
+      avatarUrl: player?.avatarUrl ?? null,
+    });
+    const b = await share();
+    expect(b.slug).not.toBe(a.slug);
+    const row = await repo.getSharedStory(db, b.slug);
+    expect(row?.snapshot.player.personaName).toBe("Renamed Soul");
+  });
+
+  it("shares the story the lookup showed, for both windows", async () => {
+    const lookupAll = await seedPlayer("all");
+    const lookupPatch = await seedPlayer("patch");
+    const json = (v: unknown) => JSON.parse(JSON.stringify(v));
+    const all = await repo.getSharedStory(db, (await share("all")).slug);
+    const patch = await repo.getSharedStory(db, (await share("patch")).slug);
+    expect(all?.snapshot.story).toEqual(json(lookupAll.story));
+    expect(patch?.snapshot.story).toEqual(json(lookupPatch.story));
+    expect(patch?.snapshot.meta.patchStart).not.toBeNull();
+    expect(patch?.snapshot.meta.window).toBe("patch");
   });
 
   it("makes a different link for a different window", async () => {
@@ -112,14 +142,14 @@ describe("POST /api/share", () => {
     });
 
     it("keeps its own counter, separate from lookups", async () => {
-      const lookupLimiter = createIpRateLimiter({ limit: 2, windowMs: 60_000 });
-      const shareLimiter = createIpRateLimiter({ limit: 2, windowMs: 60_000 });
-      lookupLimiter.check("203.0.113.9");
-      lookupLimiter.check("203.0.113.9");
-      expect(lookupLimiter.check("203.0.113.9").allowed).toBe(false);
-      await seedPlayer();
-      const res = await handler({ limiter: shareLimiter })(req());
-      expect(res.status).toBe(200);
+      // The real routes: an IP that used up its lookups can still share.
+      const { GET: lookup } = await import("@/app/api/lookup/route");
+      const { POST: shareRoute } = await import("@/app/api/share/route");
+      const ip = { "true-client-ip": "203.0.113.77" };
+      const get = () => lookup(new Request("http://localhost/api/lookup", { headers: ip }));
+      for (let i = 0; i < 10; i++) await get();
+      expect((await get()).status).toBe(429);
+      expect((await shareRoute(post({}, ip))).status).toBe(400);
     });
 
     it("does not limit requests the exempt check accepts", async () => {
