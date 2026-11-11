@@ -1,5 +1,8 @@
 # Directory Update Log
 
+## 2026-11-11
+* **Decision**: [ADR 0078](decisions/0078-no-routine-back-merge-of-main.md): no routine back-merge of main into staging after releases; use Update branch on the release PR if GitHub ever requires it (owner decision).
+
 ## 2026-10-17
 * **Milestone**: release 0.3.2 prepared: one city from the landing page into the story ([ADR 0077](decisions/0077-one-city-from-landing-to-story.md), #109), software WebGL on Simple ([ADR 0075](decisions/0075-software-webgl-starts-on-simple.md)), the lookup rate limit ([ADR 0076](decisions/0076-per-ip-lookup-rate-limit.md)), and fixes #25, #38, #44; a patch release per [ADR 0068](decisions/0068-m3-scope-and-order.md).
 * **Decision**: [ADR 0077](decisions/0077-one-city-from-landing-to-story.md): one city from the landing page into the story, with a camera fly-in; the cast is built after the first card and warmed up in the background. Amends ADR 0073 (owner request).
