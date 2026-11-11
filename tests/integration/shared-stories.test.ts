@@ -77,24 +77,39 @@ describe("shared stories", () => {
   describe("findLiveSharedStoryByHash", () => {
     it("finds the live link for the same story", async () => {
       await create("a-ab12cd34", "h1");
-      const row = await repo.findLiveSharedStoryByHash(db, "h1", NOW);
+      const row = await repo.findLiveSharedStoryByHash(db, 1, "h1", NOW);
       expect(row?.slug).toBe("a-ab12cd34");
     });
 
     it("ignores other stories", async () => {
       await create("a-ab12cd34", "h1");
-      expect(await repo.findLiveSharedStoryByHash(db, "h2", NOW)).toBeNull();
+      expect(await repo.findLiveSharedStoryByHash(db, 1, "h2", NOW)).toBeNull();
     });
 
     it("ignores expired links, so an old story gets a fresh one", async () => {
       await create("a-ab12cd34", "h1", new Date(NOW.getTime() - 91 * DAY));
-      expect(await repo.findLiveSharedStoryByHash(db, "h1", NOW)).toBeNull();
+      expect(await repo.findLiveSharedStoryByHash(db, 1, "h1", NOW)).toBeNull();
+    });
+
+    it("ignores another player's link with the same hash", async () => {
+      await create("b-ab12cd34", "h1", NOW, 2);
+      expect(await repo.findLiveSharedStoryByHash(db, 1, "h1", NOW)).toBeNull();
+    });
+
+    it("ignores a link with less than a week left, so a re-share gets a fresh one", async () => {
+      await create("a-ab12cd34", "h1", new Date(NOW.getTime() - 84 * DAY));
+      expect(await repo.findLiveSharedStoryByHash(db, 1, "h1", NOW)).toBeNull();
+    });
+
+    it("reuses a link with more than a week left", async () => {
+      await create("a-ab12cd34", "h1", new Date(NOW.getTime() - 82 * DAY));
+      expect((await repo.findLiveSharedStoryByHash(db, 1, "h1", NOW))?.slug).toBe("a-ab12cd34");
     });
 
     it("prefers the newest live link when there are several", async () => {
       await create("old-ab12cd34", "h1", new Date(NOW.getTime() - 2 * DAY));
       await create("new-ab12cd34", "h1", new Date(NOW.getTime() - 1 * DAY));
-      expect((await repo.findLiveSharedStoryByHash(db, "h1", NOW))?.slug).toBe("new-ab12cd34");
+      expect((await repo.findLiveSharedStoryByHash(db, 1, "h1", NOW))?.slug).toBe("new-ab12cd34");
     });
   });
 

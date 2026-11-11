@@ -10,6 +10,13 @@ describe("slugName", () => {
     expect(slugName("Zoë Ångström")).toBe("zoeangstrom");
   });
 
+  it("folds letters that have no accent to strip", () => {
+    expect(slugName("Øyvind")).toBe("oyvind");
+    expect(slugName("Æon")).toBe("aeon");
+    expect(slugName("Straße")).toBe("strasse");
+    expect(slugName("Łukasz Þór")).toBe("lukaszthor");
+  });
+
   it("drops symbols and emoji", () => {
     expect(slugName("~*xX_Sn1per_Xx*~ 🔥")).toBe("xxsn1perxx");
   });

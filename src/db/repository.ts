@@ -210,16 +210,29 @@ export function isSharedStoryExpired(row: Pick<SharedStoryRow, "expiresAt">, now
   return row.expiresAt.getTime() <= now.getTime();
 }
 
-/** The newest live link for this story, so sharing it again reuses that link. */
+/** A reused link must have at least this long left, or a re-share gets a fresh link. */
+export const SHARE_REUSE_MIN_LIFE_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * The newest link for this player's story with at least a week left, so sharing it again
+ * reuses that link instead of handing out one about to expire.
+ */
 export async function findLiveSharedStoryByHash(
   db: Db,
+  accountId: number,
   contentHash: string,
   now: Date,
 ): Promise<SharedStoryRow | null> {
   const [row] = await db
     .select()
     .from(sharedStories)
-    .where(and(eq(sharedStories.contentHash, contentHash), gt(sharedStories.expiresAt, now)))
+    .where(
+      and(
+        eq(sharedStories.accountId, accountId),
+        eq(sharedStories.contentHash, contentHash),
+        gt(sharedStories.expiresAt, new Date(now.getTime() + SHARE_REUSE_MIN_LIFE_MS)),
+      ),
+    )
     .orderBy(desc(sharedStories.createdAt))
     .limit(1);
   return row ?? null;

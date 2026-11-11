@@ -7,6 +7,19 @@ const RANDOM_LENGTH = 8;
 // 32 symbols, so each random byte maps to one evenly (byte & 31).
 const ALPHABET = "abcdefghijkmnpqrstuvwxyz23456789";
 
+// Letters NFKD leaves whole, which would otherwise be dropped (Øyvind would become yvind).
+const FOLD: Record<string, string> = {
+  ß: "ss",
+  æ: "ae",
+  œ: "oe",
+  ø: "o",
+  ł: "l",
+  đ: "d",
+  ð: "d",
+  þ: "th",
+  ı: "i",
+};
+
 /**
  * A Steam name reduced to plain lowercase letters and digits for a URL: accents are folded to
  * their base letter, everything else is dropped. Empty when nothing usable is left.
@@ -15,6 +28,7 @@ export function slugName(personaName: string | null | undefined): string {
   return (personaName ?? "")
     .normalize("NFKD")
     .toLowerCase()
+    .replace(/[ßæœøłđðþı]/g, (c) => FOLD[c] ?? "")
     .replace(/[^a-z0-9]/g, "")
     .slice(0, SLUG_NAME_MAX);
 }
