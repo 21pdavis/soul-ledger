@@ -69,6 +69,8 @@ Group tightly coupled tasks (for example three related slides) into one PR. Ever
 
 ## h. Bounded loops
 
+> Amended by [ADR 0083](0083-reviewer-and-implementer-talk-directly.md): a PR whose reviewer and implementer talk directly has no cap on fix rounds; an agent stops after 4 context compactions instead.
+
 At most 2 fix rounds per PR. A third round means the orchestrator re-plans or asks the owner instead of looping. Reviewers re-review only after blocking findings ([ADR 0047](0047-streamlined-review-and-ci.md)), and check only the fixes.
 
 ## i. Measure
