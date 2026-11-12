@@ -1,6 +1,7 @@
 # Directory Update Log
 
 ## 2026-11-12
+* **Decision**: [ADR 0083](decisions/0083-reviewer-and-implementer-talk-directly.md): each PR's reviewer and implementer talk directly via SendMessage; caps of 2 fix rounds, about 100-word messages, stop after 4 compactions or about 150k context (owner decision).
 * **Decision**: [ADR 0082](decisions/0082-fewer-longer-lived-agents.md): about 3 to 4 PRs and 10 agents per milestone; implementers own their PR through review fixes; reviews unchanged. Supersedes part of ADR 0057 (owner decision after M4 used most of a 5-hour window with about 30 agents).
 
 ## 2026-11-11
