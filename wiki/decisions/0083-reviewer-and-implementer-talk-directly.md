@@ -1,12 +1,12 @@
 ---
 type: Decision Record
 title: "0083: One reviewer per PR talks directly with its implementer, within hard limits"
-description: "Each PR has one implementer and one reviewer that message each other directly through the review and fix rounds, with the orchestrator stepping in only to merge or unblock; message size, rounds and context compactions are capped."
+description: "Each PR has one implementer and one reviewer that message each other directly through the review and fix rounds, with the orchestrator stepping in only to merge or unblock; there is no cap on fix rounds; the only stop is 4 context compactions, so long conversations do not drift into hallucination."
 tags: [process, agents, review, tokens]
 status: stable
 decision: accepted
 decided_on: 2026-11-12
-generated: { by: claude-code/claude-opus-5-5, at: 2026-11-12T11:00:00Z }
+generated: { by: claude-code/claude-opus-5-5, at: 2026-11-12T12:00:00Z }
 ---
 
 # Context
@@ -42,10 +42,9 @@ The GitHub threads stay the record of the conversation. Messages between agents 
 
 | Limit | Rule |
 |---|---|
-| Fix rounds | At most **2** per PR (as ADR 0057 h). A third round stops the pair and goes to the orchestrator to re-plan or ask the owner. |
+| Fix rounds | **No cap.** The pair keeps going until the reviewer approves (owner decision 2026-11-12; this replaces the 2-round limit of ADR 0057 h for paired PRs). |
 | Message size | At most about **100 words** between agents; at most 150 words to the orchestrator. |
-| Context compaction | An agent that has been compacted **4 times** stops at once: it writes a short handoff on the PR (what is done, what is left) and reports to the orchestrator, which starts a fresh agent from that note. After the **2nd** compaction it should already be finishing, not starting new work. |
-| Context size | An agent nearing about **150k tokens** of context hands off the same way instead of carrying on. |
+| Context compaction | An agent that has been compacted **4 times** stops at once: it writes a short handoff on the PR (what is done, what is left) and reports to the orchestrator, which starts a fresh agent from that note. The cap exists so that an agent working from many layers of summary does not start inventing details. |
 | Disagreement | If the implementer disputes a blocking finding, it replies on the thread and messages the reviewer once. If they still disagree, both stop and the orchestrator decides, or asks the owner when it is a business decision. |
 | Owner-only matters | Business decisions, owner look sign-off, merges and anything outside the PR always go to the orchestrator. |
 
@@ -56,4 +55,4 @@ If a direct message fails (the other agent is gone or unreachable), the sender r
 # Consequences
 
 - The orchestrator is woken about twice per PR (PR opened, PR approved) instead of four to six times.
-- A short conversation keeps both agents' context small; the compaction and size caps stop a long one from growing without bound.
+- A conversation can run as long as the review needs; the 4-compaction cap is the only stop, so a long one is handed to a fresh agent before its memory degrades.
