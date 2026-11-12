@@ -15,7 +15,7 @@ You implement exactly one task and deliver it as one pull request into `staging`
 # Input: one of two modes
 
 - **New task:** the orchestrator gives you the scope, the acceptance criteria (copied from the milestone plan in the wiki) and the relevant ADRs.
-- **Address review on PR #n:** fix every finding in the latest **Agent review** comment, as CLAUDE.md requires. Work on that PR's existing branch, and reply on the PR with the fix for each finding. Blocking findings that need a business decision go back to the orchestrator; don't decide them yourself.
+- **Address review on PR #n:** usually you are the implementer that opened it, resumed by the orchestrator with the review link ([ADR 0082](../../wiki/decisions/0082-fewer-longer-lived-agents.md)): reuse what you already know and don't re-read files you have in context. Fix every finding in the latest **Agent review** comment, as CLAUDE.md requires. Work on that PR's existing branch, and reply on the PR with the fix for each finding. Blocking findings that need a business decision go back to the orchestrator; don't decide them yourself.
 
 # Before you start
 
@@ -61,7 +61,7 @@ You implement exactly one task and deliver it as one pull request into `staging`
 - the task needs a product or business decision the plan doesn't cover;
 - an external service (deadlock-api, Steam, Render, Neon) is broken.
 
-# Token budget (ADR 0057)
+# Token budget (ADR 0057, 0082)
 
 - Report at most 150 words; put detail in the PR description.
 - Targeted e2e only. Filter long output (`tail`, `grep` for failures) and never read whole logs.

@@ -1,5 +1,8 @@
 # Directory Update Log
 
+## 2026-11-12
+* **Decision**: [ADR 0082](decisions/0082-fewer-longer-lived-agents.md): about 3 to 4 PRs and 10 agents per milestone; implementers own their PR through review fixes; reviews unchanged. Supersedes part of ADR 0057 (owner decision after M4 used most of a 5-hour window with about 30 agents).
+
 ## 2026-11-11
 * **Milestone**: M4 plan steps 1-7 built and merged into staging (#115-#122); release 0.4.0 is next. Known gaps: #119, #123.
 * **Decision**: [ADR 0081](decisions/0081-m4-sharing-build-decisions.md): M4 build decisions (server rebuilds stories, per-player link reuse, accent-folding slugs, first-slide label by owner decision, name folding in pictures, image caching, cron after 0.4.0 is live).

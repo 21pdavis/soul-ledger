@@ -154,12 +154,12 @@ Running SQL on Neon, other risky Neon changes and triggering Render deploys alwa
 
 **Blocked means:** the same failure survives about 3 genuinely different attempts; a product or business decision the plan and ADRs don't answer; a needed action is denied by the hard limits above; or an external service (deadlock-api, Steam, Render, Neon, GitHub) is down.
 
-## Token budget for runs (ADR 0057)
+## Token budget for runs (ADR 0057, 0082)
 
 Runs are limited by usage, so every agent follows these (reasoning and the rest of the policy in [ADR 0057](wiki/decisions/0057-token-efficient-unattended-runs.md)):
 
 - **Hand-backs are short:** at most about 150 words to the orchestrator. Detail goes in the PR description or review comment, and reports are never pasted into other replies.
-- **Fresh, narrow agents:** don't resume an agent for a small fix. Use a fresh agent given the PR number and review link, or the orchestrator for fixes of about 20 lines or fewer.
+- **Few, long-lived agents ([ADR 0082](wiki/decisions/0082-fewer-longer-lived-agents.md)):** about 3 to 4 PRs and about 10 agents per milestone. The implementer that opens a PR owns it until merge: the orchestrator sends it the review link with `SendMessage` (promptly, while its context is cached) and it fixes everything in one commit. Re-reviews go to the same reviewer. The orchestrator fixes rounds of about 50 lines or fewer itself. No fresh fix agents.
 - **Briefs are short** (200 to 300 words): goal, areas, acceptance criteria (link the plan), constraints. Pass references, not pasted contents, and don't restate this file.
 - **Tests are targeted:** run unit and component tests plus only the e2e spec files you touched. CI runs the full e2e suite. Filter long output (`tail`, `grep`) and never read whole logs.
 - **Loops are bounded:** at most 2 fix rounds per PR. A third means the orchestrator re-plans or asks the owner.
@@ -186,9 +186,9 @@ For autonomous runs, the **main session is the orchestrator**. It splits the mil
 
 **Flow for a milestone:**
 1. The orchestrator builds the shared foundation itself.
-2. Implementers work the remaining tasks in parallel batches.
-3. Each PR goes to `reviewer`, then the fix loop, then CI, then the merge, then a report to the owner.
-4. `qa` checks live staging after merges.
+2. Implementers work the remaining slices (about 3 to 4 PRs in all) in parallel.
+3. Each PR goes to `reviewer`, then back to its own implementer for fixes, then CI, then the merge, then a report to the owner.
+4. `qa` checks live staging after merges; anything it finds is fixed in one PR.
 5. `wiki-keeper` runs before the final `staging` → `main` PR to the owner.
 
 ## Planned stack (accepted, see wiki/decisions/0005)
