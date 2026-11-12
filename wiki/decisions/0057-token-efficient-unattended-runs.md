@@ -31,6 +31,8 @@ M2 used about two 5-hour usage windows. `/usage` attributed the spend as: implem
 
 ## b. Subagent lifecycle
 
+> Superseded by [ADR 0082](0082-fewer-longer-lived-agents.md): implementers now stay on their PR through review fixes, and the orchestrator limit is about 50 lines.
+
 - Use fresh, narrowly scoped agents.
 - Do **not** resume an agent for a small fix: resuming reloads its whole transcript. Use a fresh agent given the PR number and a link to the review comment, or fix it in the orchestrator when it is about 20 lines or fewer.
 - Resume only when the fix truly needs that agent's accumulated context.
