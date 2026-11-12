@@ -21,7 +21,7 @@ Reviews are unchanged: same reviewer, model and effort rules ([ADR 0057](0057-to
 |---|---|
 | PRs per milestone | About **3 to 4**, each a coherent slice (for example backend, pictures and preview, page and button). Split further only when one implementer genuinely can't hold the slice. |
 | Agent budget | About **10 agents per milestone** in total (implementers, reviewers, QA, wiki). Going past it means the plan was too fine: the orchestrator says so and re-plans. |
-| Implementer lifetime | The implementer that opens a PR **owns it until merge**. After the review, the orchestrator sends it the review link with `SendMessage`, and it fixes everything in one commit, replies on the threads and stops. No fresh fix agents. Send it promptly (within about an hour), while its context is still cached. |
+| Implementer lifetime | The implementer that opens a PR **owns it until merge**. After the review, its reviewer sends it the review link with `SendMessage` (amended by [ADR 0083](0083-reviewer-and-implementer-talk-directly.md): the pair talk directly), and it fixes everything in one commit, replies on the threads and stops. No fresh fix agents. Send it promptly (within about an hour), while its context is still cached. |
 | Re-review | Goes to the **same reviewer** agent via `SendMessage`, so it doesn't re-read the PR from scratch. |
 | Orchestrator fixes | The orchestrator fixes findings itself when the whole round is about **50 lines or fewer** (was 20). |
 | QA findings | Bugs QA finds before a release are fixed in **one** PR, by one implementer. |
