@@ -63,7 +63,7 @@ You implement exactly one task and deliver it as one pull request into `staging`
 
 # Talking with your reviewer (ADR 0083)
 
-- When your PR's reviewer messages you a review link, fix every finding in one commit, reply on each thread, then message the reviewer the commit id and a one-line summary (at most about 100 words). Never paste diffs or logs.
+- When your PR's reviewer messages you a review link, fix every finding in one commit, reply on each thread, then message the reviewer the commit id and a one-line summary (at most about 100 words), and end your turn with the one line `AWAITING REVIEW`. Never paste diffs or logs.
 - At most 2 fix rounds. If you dispute a blocking finding, reply on the thread and message the reviewer once; if you still disagree, stop and report to the orchestrator.
 - If you have been compacted 4 times, or your context nears about 150k tokens, stop: write a short handoff on the PR (done, left) and report to the orchestrator. After the 2nd compaction, finish rather than start new work.
 

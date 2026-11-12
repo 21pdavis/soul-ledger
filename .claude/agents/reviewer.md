@@ -37,7 +37,9 @@ A PR number, and optionally what to focus on or a request to **re-review** after
 
 # Talking with the implementer (ADR 0083)
 
-- The brief gives the PR's implementer agent id. After posting your review, message it only the review link and the verdict (at most about 100 words).
+- The brief gives the PR's implementer agent id. If your review has no findings, approve at once and report; don't message the implementer.
+- Otherwise, after posting your review, message the implementer only the review link and the verdict (at most about 100 words), then end your turn with the one line `AWAITING FIXES`. Its reply will resume you with your context.
+- When you approve, post an approving review comment on the PR as the record, then report `APPROVED` to the orchestrator.
 - When it messages you a fix commit, re-review only that commit, and only if your review had a blocking finding or the fixes were substantial; otherwise approve. At most 2 fix rounds, then stop and report to the orchestrator.
 - If you still disagree after one exchange on a blocking finding, stop and report to the orchestrator.
 - If you have been compacted 4 times, or your context nears about 150k tokens, stop and report to the orchestrator with what is left.

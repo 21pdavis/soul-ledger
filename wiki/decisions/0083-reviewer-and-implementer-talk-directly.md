@@ -20,10 +20,18 @@ generated: { by: claude-code/claude-opus-5-5, at: 2026-11-12T11:00:00Z }
 - Each PR has exactly **one implementer and one reviewer** for its whole life. Review effort and model rules are unchanged ([ADR 0057](0057-token-efficient-unattended-runs.md) d).
 - Both agents have `SendMessage`. The orchestrator gives the reviewer the implementer's agent id in the review brief.
 
+## How the agents stay available
+
+A subagent's turn ends when it hands back, but a `SendMessage` to a finished agent resumes it with its transcript. So each agent ends its turn while waiting, and the other's message wakes it:
+
+- After messaging the implementer, the reviewer ends its turn with a one-line `AWAITING FIXES` report, which the orchestrator ignores.
+- After messaging the reviewer, the implementer ends its turn the same way.
+- The reviewer records final approval as an approving review comment on the PR, then reports `APPROVED` to the orchestrator.
+
 ## The conversation
 
 1. The implementer opens the PR and reports to the orchestrator, which starts the reviewer.
-2. The reviewer posts its review on GitHub as before, then sends the implementer **only the review link and the verdict**.
+2. The reviewer posts its review on GitHub as before. With no findings it approves at once (step 5) and doesn't message the implementer. Otherwise it sends the implementer **only the review link and the verdict**.
 3. The implementer fixes every finding in one commit, replies on each thread, and sends the reviewer **only the new commit and a one-line summary**.
 4. The reviewer re-reviews that commit only if the review had a blocking finding or the fixes were substantial ([ADR 0047](0047-streamlined-review-and-ci.md)). Otherwise it approves.
 5. When the reviewer approves, it reports to the orchestrator, which waits for CI, merges and tells the owner.
