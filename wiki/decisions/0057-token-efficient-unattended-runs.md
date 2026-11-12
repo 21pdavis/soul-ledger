@@ -31,7 +31,7 @@ M2 used about two 5-hour usage windows. `/usage` attributed the spend as: implem
 
 ## b. Subagent lifecycle
 
-> Superseded by [ADR 0082](0082-fewer-longer-lived-agents.md): implementers now stay on their PR through review fixes, and the orchestrator limit is about 50 lines.
+> Superseded by [ADR 0082](0082-fewer-longer-lived-agents.md): implementers now stay on their PR through review and CI fixes (this also changes the fix route in section k), and the orchestrator limit is about 50 lines.
 
 - Use fresh, narrowly scoped agents.
 - Do **not** resume an agent for a small fix: resuming reloads its whole transcript. Use a fresh agent given the PR number and a link to the review comment, or fix it in the orchestrator when it is about 20 lines or fewer.
@@ -87,7 +87,7 @@ At the end of each milestone the owner shares `/usage` attribution by subagent, 
 
 - Implementers do **not** wait for CI. After pushing they open or update the PR and stop with their short report.
 - The orchestrator watches CI with a background shell command (`gh pr checks N --watch` run in the background). It costs no model tokens while waiting and notifies on exit.
-- If CI fails, a small fresh Haiku agent reads the failing job log and reports at most 100 words: failing test names, the error line and the likely cause. The fix then goes to a fresh narrowly scoped agent or the orchestrator (policy b).
+- If CI fails, a small fresh Haiku agent reads the failing job log and reports at most 100 words: failing test names, the error line and the likely cause. The fix then goes to the PR's own implementer, resumed, or to the orchestrator ([ADR 0082](0082-fewer-longer-lived-agents.md)).
 - Why: a blocked implementer keeps its whole context alive and re-reads it on resume. Waiting is a job for a plain command, and triage is a job for Haiku.
 
 # Alternatives considered
